@@ -1,0 +1,17 @@
+{
+  "name": "vital-training",
+  "version": "1.0.0",
+  "description": "Dashboard de administración Vital Training",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.22.1"
+  }
+}
