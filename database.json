@@ -1,0 +1,218 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nombre": "Carlos Rodríguez",
+      "email": "carlos.rodriguez@vitaltraining.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Activo"
+    },
+    {
+      "id": 2,
+      "nombre": "Ana Martínez",
+      "email": "ana.martinez@vitaltraining.com",
+      "password": "1234",
+      "rol": "Nutricionista",
+      "estado": "Activo"
+    },
+    {
+      "id": 3,
+      "nombre": "Luis García",
+      "email": "luis.garcia@vitaltraining.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Inactivo"
+    },
+    {
+      "id": 4,
+      "nombre": "Miguel Alejandro Correa Samboni",
+      "email": "miguel@vitaltraining.com",
+      "password": "admin123",
+      "rol": "Administrador",
+      "estado": "Activo"
+    },
+    {
+      "id": 5,
+      "nombre": "Sofía Herrera",
+      "email": "sofia.herrera@vitaltraining.com",
+      "password": "1234",
+      "rol": "Nutricionista",
+      "estado": "Activo"
+    },
+    {
+      "id": 6,
+      "nombre": "Andrés Ospina",
+      "email": "andres.ospina@vitaltraining.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Activo"
+    },
+    {
+      "id": 7,
+      "nombre": "Valentina Torres",
+      "email": "valentina@vitaltraining.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Inactivo"
+    },
+    {
+      "id": 8,
+      "nombre": "Diego Ramírez",
+      "email": "diego.ramirez@vitaltraining.com",
+      "password": "1234",
+      "rol": "Nutricionista",
+      "estado": "Activo"
+    },
+    {
+      "id": 1777938861404,
+      "nombre": "juan toro",
+      "email": "juan@gmail.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "70",
+      "altura": "178",
+      "fechaNacimiento": "2005-07-07",
+      "posicion": "Portero",
+      "frecuencia": "1-2 veces por semana",
+      "condiciones": [
+        "Ninguna"
+      ],
+      "fechaRegistro": "4/5/2026"
+    },
+    {
+      "id": 1777941666467,
+      "nombre": "cubillan",
+      "email": "negro@cirilo.com",
+      "password": "gayy",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "90",
+      "altura": "150",
+      "fechaNacimiento": "2026-05-04",
+      "posicion": "Extremo",
+      "frecuencia": "1-2 veces por semana",
+      "condiciones": [
+        "Diabetes",
+        "Hipertensión",
+        "Lesión muscular"
+      ],
+      "fechaRegistro": "4/5/2026"
+    },
+    {
+      "id": 1777942345183,
+      "nombre": "darwin",
+      "email": "darwin@gmail.com",
+      "password": "12341234",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "90",
+      "altura": "178",
+      "fechaNacimiento": "2005-02-08",
+      "posicion": "Portero",
+      "frecuencia": "3-4 veces por semana",
+      "condiciones": [
+        "Ninguna"
+      ],
+      "fechaRegistro": "4/5/2026"
+    },
+    {
+      "id": 1777942396472,
+      "nombre": "daniel",
+      "email": "daniel@gmail.com",
+      "password": "1234",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "90",
+      "altura": "178",
+      "fechaNacimiento": "2005-02-08",
+      "posicion": "Portero",
+      "frecuencia": "3-4 veces por semana",
+      "condiciones": [
+        "Ninguna"
+      ],
+      "fechaRegistro": "4/5/2026"
+    }
+  ],
+  "incidencias": [
+    {
+      "id": 1,
+      "titulo": "Error al guardar comida en diario",
+      "usuario": "Carlos Rodríguez",
+      "categoria": "Bug",
+      "prioridad": "alta",
+      "estado": "en progreso",
+      "fecha": "12/11/2024",
+      "descripcion": "Al intentar guardar una comida personalizada, la app se cierra inesperadamente. El problema ocurre solo cuando el nombre de la comida supera los 30 caracteres.",
+      "comentarios": [
+        {
+          "autor": "Carlos Rodríguez",
+          "fecha": "12/11/2024",
+          "texto": "Adjunto captura del error. Pasa siempre en iOS 17."
+        },
+        {
+          "autor": "Admin",
+          "fecha": "13/11/2024",
+          "texto": "Recibido, estamos investigando el crash en iOS 17."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "titulo": "No puedo ver mi plan nutricional asignado",
+      "usuario": "Andrés Ospina",
+      "categoria": "Soporte",
+      "prioridad": "media",
+      "estado": "abierta",
+      "fecha": "14/11/2024",
+      "descripcion": "Mi nutricionista dice que ya me asignó el plan, pero en la app no aparece nada en la sección de planes.",
+      "comentarios": []
+    },
+    {
+      "id": 3,
+      "titulo": "Solicitud de nueva función: exportar reporte PDF",
+      "usuario": "Ana Martínez",
+      "categoria": "Mejora",
+      "prioridad": "baja",
+      "estado": "abierta",
+      "fecha": "15/11/2024",
+      "descripcion": "Sería muy útil poder exportar el progreso del paciente en PDF para compartir con otros profesionales de salud.",
+      "comentarios": [
+        {
+          "autor": "Admin",
+          "fecha": "15/11/2024",
+          "texto": "Excelente sugerencia, la agregaremos al backlog."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "titulo": "No recibo notificaciones de recordatorio",
+      "usuario": "Valentina Torres",
+      "categoria": "Bug",
+      "prioridad": "critica",
+      "estado": "abierta",
+      "fecha": "13/11/2024",
+      "descripcion": "Tengo activadas las notificaciones en ajustes del teléfono y en la app, pero no me llegan las alertas de hidratación ni de comidas.",
+      "comentarios": []
+    },
+    {
+      "id": 5,
+      "titulo": "Gráfica de progreso no carga datos históricos",
+      "usuario": "Diego Ramírez",
+      "categoria": "Bug",
+      "prioridad": "alta",
+      "estado": "abierta",
+      "fecha": "10/11/2024",
+      "descripcion": "La gráfica de progreso de peso solo muestra datos de los últimos 7 días, sin importar el rango seleccionado.",
+      "comentarios": [
+        {
+          "autor": "Admin",
+          "fecha": "11/11/2024",
+          "texto": "Identificado el problema en el endpoint de historial. Corregido en versión 2.1.4."
+        }
+      ]
+    }
+  ]
+}
