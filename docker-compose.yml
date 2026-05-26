@@ -1,0 +1,24 @@
+﻿version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vital-training
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - JWT_SECRET=${JWT_SECRET:-vt-super-secret-key-2026}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}
+    volumes:
+      # Persiste la base de datos fuera del contenedor
+      - ./database.json:/app/database.json
+    restart: unless-stopped
+
+  # Descomentar para analisis SonarQube local
+  # sonarqube:
+  #   image: sonarqube:community
+  #   ports:
+  #     - "9000:9000"
