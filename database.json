@@ -1,0 +1,5673 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nombre": "Admin Principal",
+      "email": "admin@vital.com",
+      "password": "$2b$10$.n2XvBcXCNU6HAbODeTrqOYzgqooqCG6mKQmRWQZhTcxJYMwtaKBC",
+      "rol": "Administrador",
+      "estado": "Activo"
+    },
+    {
+      "id": 2,
+      "nombre": "Maria Lopez",
+      "email": "maria@vital.com",
+      "password": "$2b$10$AdTj14wYwFRFiCzE4dAqa.BtSBBpf8f8XOJpUQYscvrKcy.PGATfK",
+      "rol": "Nutricionista",
+      "estado": "Activo"
+    },
+    {
+      "id": 3,
+      "nombre": "Pedro Sanchez",
+      "email": "pedro@vital.com",
+      "password": "$2b$10$AdTj14wYwFRFiCzE4dAqa.BtSBBpf8f8XOJpUQYscvrKcy.PGATfK",
+      "rol": "Nutricionista",
+      "estado": "Activo"
+    },
+    {
+      "id": 4,
+      "nombre": "Carlos Rodriguez",
+      "email": "carlos@vital.com",
+      "password": "$2b$10$30GHKamDIOiefuGqxK7VWOWjhYoF7lpTRTGq4xsxbciJiPPPci3DW",
+      "rol": "Futbolista",
+      "estado": "Activo"
+    },
+    {
+      "id": 5,
+      "nombre": "Diego Torres",
+      "email": "diego@vital.com",
+      "password": "$2b$10$30GHKamDIOiefuGqxK7VWOWjhYoF7lpTRTGq4xsxbciJiPPPci3DW",
+      "rol": "Futbolista",
+      "estado": "Activo"
+    },
+    {
+      "id": 1779493548369,
+      "nombre": "juan toro",
+      "email": "juan@gmail.com",
+      "password": "$2b$10$JwInJe8NSKBRDsPBO9KmnOyv7b.9ZKPiNyYPnQgq7b8SlNpdqfeN.",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "67",
+      "altura": "178",
+      "fechaNacimiento": "2026-05-16",
+      "posicion": "Defensa Central",
+      "frecuencia": "1-2 veces por semana",
+      "condiciones": [
+        "Ninguna"
+      ],
+      "fechaRegistro": "22/5/2026"
+    },
+    {
+      "id": 1779494467466,
+      "nombre": "darwin",
+      "email": "darwin@gmail.com",
+      "password": "$2b$10$PsQxQRcgIPsM6v6qpswYAuNBi/XuH/1OPI.noxWkWl9bBp1i7Puia",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "87",
+      "altura": "197",
+      "fechaNacimiento": "2026-05-16",
+      "posicion": "Extremo",
+      "frecuencia": "3-4 veces por semana",
+      "pie": "Ambos (ambidiestro)",
+      "objetivo": "Preparación para competencia",
+      "fechaRegistro": "22/5/2026"
+    },
+    {
+      "id": 1779497926471,
+      "nombre": "Elizabeth",
+      "email": "Eliza@gmail.com",
+      "password": "$2b$10$lW0KRGJ3/Iq1EUc5.P1cqO79CImzK/f4CmRJ5E7YwpmE53znr87r6",
+      "rol": "Futbolista",
+      "estado": "Activo",
+      "peso": "87",
+      "altura": "178",
+      "fechaNacimiento": "2026-05-22",
+      "posicion": "Mediocampista",
+      "frecuencia": "3-4 veces por semana",
+      "pie": "Izquierdo",
+      "objetivo": "Perder peso",
+      "fechaRegistro": "22/5/2026"
+    }
+  ],
+  "incidencias": [],
+  "perfiles": [
+    {
+      "userId": 4,
+      "nombre": "Carlos Rodriguez",
+      "edad": 24,
+      "posicion": "Delantero",
+      "equipo": "Vital FC",
+      "altura": 178,
+      "peso": 74,
+      "nutricionistaId": 2,
+      "fechaIngreso": "2025-01-10"
+    },
+    {
+      "userId": 5,
+      "nombre": "Diego Torres",
+      "edad": 22,
+      "posicion": "Mediocampista",
+      "equipo": "Vital FC",
+      "altura": 175,
+      "peso": 70,
+      "nutricionistaId": 3,
+      "fechaIngreso": "2025-02-03"
+    }
+  ],
+  "comidas": [
+    {
+      "id": 1,
+      "userId": 4,
+      "nombre": "Arepa con huevo y aguacate",
+      "tipo": "Desayuno",
+      "calorias": 480,
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 2,
+      "userId": 4,
+      "nombre": "Pollo con arroz integral",
+      "tipo": "Almuerzo",
+      "calorias": 520,
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 3,
+      "userId": 4,
+      "nombre": "Batido de proteina",
+      "tipo": "Merienda",
+      "calorias": 260,
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 4,
+      "userId": 4,
+      "nombre": "Salmon con camote",
+      "tipo": "Cena",
+      "calorias": 580,
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 5,
+      "userId": 5,
+      "nombre": "Smoothie bowl de frutas",
+      "tipo": "Desayuno",
+      "calorias": 360,
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 6,
+      "userId": 5,
+      "nombre": "Bowl de quinoa con garbanzos",
+      "tipo": "Almuerzo",
+      "calorias": 540,
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 7,
+      "userId": 5,
+      "nombre": "Galletas de arroz con aguacate",
+      "tipo": "Merienda",
+      "calorias": 200,
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 8,
+      "userId": 5,
+      "nombre": "Crema de zanahoria",
+      "tipo": "Cena",
+      "calorias": 260,
+      "fecha": "2025-05-21"
+    }
+  ],
+  "rutinas": [
+    {
+      "id": 1,
+      "userId": 4,
+      "nombre": "Explosividad + Fuerza",
+      "tipo": "Fuerza",
+      "duracionMinutos": 60,
+      "intensidad": "Alta",
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 2,
+      "userId": 4,
+      "nombre": "Tecnica de gol",
+      "tipo": "Tecnica",
+      "duracionMinutos": 45,
+      "intensidad": "Media",
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 3,
+      "userId": 5,
+      "nombre": "Resistencia aerobica",
+      "tipo": "Cardio",
+      "duracionMinutos": 50,
+      "intensidad": "Media",
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 4,
+      "userId": 5,
+      "nombre": "Tecnica + Pases",
+      "tipo": "Tecnica",
+      "duracionMinutos": 45,
+      "intensidad": "Media",
+      "fecha": "2025-05-21"
+    }
+  ],
+  "alertas": [
+    {
+      "id": 1,
+      "userId": 4,
+      "tipo": "salud",
+      "mensaje": "Tu nivel de fatiga fue alto (8/10) ayer. Considera reducir la intensidad hoy.",
+      "leida": false,
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 2,
+      "userId": 5,
+      "tipo": "nutricion",
+      "mensaje": "Llevas 2 dias sin registrar comidas. Recuerda mantener tu dieta al dia.",
+      "leida": false,
+      "fecha": "2025-05-21"
+    }
+  ],
+  "salud": [
+    {
+      "id": 1,
+      "userId": 4,
+      "fatiga": 8,
+      "sueno": 6,
+      "recuperacion": 5,
+      "notas": "Senti las piernas pesadas tras el partido",
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 2,
+      "userId": 4,
+      "fatiga": 5,
+      "sueno": 8,
+      "recuperacion": 7,
+      "notas": "Buen descanso, me siento bien",
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 3,
+      "userId": 4,
+      "fatiga": 6,
+      "sueno": 7,
+      "recuperacion": 6,
+      "notas": "",
+      "fecha": "2025-05-19"
+    },
+    {
+      "id": 4,
+      "userId": 5,
+      "fatiga": 4,
+      "sueno": 9,
+      "recuperacion": 8,
+      "notas": "Excelente semana de entrenamiento",
+      "fecha": "2025-05-21"
+    },
+    {
+      "id": 5,
+      "userId": 5,
+      "fatiga": 5,
+      "sueno": 8,
+      "recuperacion": 7,
+      "notas": "",
+      "fecha": "2025-05-20"
+    },
+    {
+      "id": 6,
+      "userId": 5,
+      "fatiga": 3,
+      "sueno": 9,
+      "recuperacion": 9,
+      "notas": "Descanse muy bien el fin de semana",
+      "fecha": "2025-05-19"
+    },
+    {
+      "id": 1779494608076,
+      "userId": 1779494467466,
+      "fecha": "2026-05-23",
+      "fatiga": 5,
+      "sueno": 7,
+      "recuperacion": 5,
+      "notas": "",
+      "createdAt": "2026-05-23T00:03:28.077Z"
+    },
+    {
+      "id": 1779498208658,
+      "userId": 1779497926471,
+      "fecha": "2026-05-23",
+      "fatiga": 5,
+      "sueno": 7,
+      "recuperacion": 5,
+      "notas": "",
+      "createdAt": "2026-05-23T01:03:28.658Z"
+    }
+  ],
+  "notas": [],
+  "perfilesMedicos": [
+    {
+      "userId": 4,
+      "condiciones": [
+        "Tendinitis cronica",
+        "Asma inducida por ejercicio"
+      ],
+      "alergias": [],
+      "preferencias": "Sin restricciones",
+      "completado": true,
+      "planAlimenticio": {
+        "descripcion": "Plan personalizado · Tendinitis cronica, Asma inducida por ejercicio · Sin alergias · Sin restricciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "desayuno": {
+              "nombre": "Arepa de maíz con huevo revuelto y aguacate",
+              "desc": "2 arepas de maíz, 3 huevos revueltos, medio aguacate",
+              "kcal": 480,
+              "proteina": 24,
+              "carbs": 42,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "soya",
+                "frutos-secos",
+                "maní",
+                "maíz-libre"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pechuga de pollo a la plancha con arroz integral y ensalada verde",
+              "desc": "180g pechuga, 100g arroz integral, ensalada de lechuga, tomate, pepino con limón",
+              "kcal": 520,
+              "proteina": 44,
+              "carbs": 52,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaTarde": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Sopa de vegetales con pollo desmenuzado",
+              "desc": "Zanahoria, apio, papa, pollo, caldo casero sin sal, perejil — reconfortante y ligera",
+              "kcal": 300,
+              "proteina": 28,
+              "carbs": 28,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Insomnio crónico",
+                "Síndrome de intestino irritable (SII)"
+              ],
+              "condicionesEvitar": [
+                "Apio"
+              ]
+            }
+          },
+          {
+            "dia": "Martes",
+            "desayuno": {
+              "nombre": "Avena sin gluten con plátano y mantequilla de maní",
+              "desc": "80g avena certificada sin gluten, 1 plátano maduro, 1 cda mantequilla de maní",
+              "kcal": 440,
+              "proteina": 14,
+              "carbs": 68,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado"
+              ],
+              "noApto": [
+                "bajo-carbohidratos",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Cacahuetes / Maní",
+                "Hipoglucemia reactiva",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Filete de salmón al horno con camote y brócoli",
+              "desc": "200g salmón, 150g camote asado, brócoli al vapor, aceite de oliva y ajo",
+              "kcal": 580,
+              "proteina": 46,
+              "carbs": 42,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Depresión",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Artritis temprana",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Pescado"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "cena": {
+              "nombre": "Filete de tilapia al limón con ensalada de pepino",
+              "desc": "180g tilapia al horno, ensalada de pepino, cebolla morada, cilantro, limón",
+              "kcal": 280,
+              "proteina": 38,
+              "carbs": 8,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Hipertensión arterial",
+                "Diabetes tipo 2",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            }
+          },
+          {
+            "dia": "Miércoles",
+            "desayuno": {
+              "nombre": "Batido de proteína vegetal con espinaca y berries",
+              "desc": "1 scoop proteína vegetal, 1 taza espinaca, 1 taza berries mixtos, agua de coco",
+              "kcal": 320,
+              "proteina": 28,
+              "carbs": 32,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Intolerancia a la lactosa",
+                "Anemia ferropénica",
+                "Hipotiroidismo"
+              ],
+              "condicionesEvitar": [
+                "Fresas / Frutos rojos"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Hummus casero con zanahorias y apio crudos",
+              "desc": "80g hummus, bastones de zanahoria y apio — rico en fibra y proteína vegetal",
+              "kcal": 180,
+              "proteina": 8,
+              "carbs": 22,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Apio"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Bowl de quinoa con garbanzos, vegetales asados y tahini",
+              "desc": "100g quinoa, 120g garbanzos, pimientos, berenjena asada, 2 cdas tahini",
+              "kcal": 540,
+              "proteina": 22,
+              "carbs": 70,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Estreñimiento crónico"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Colesterol alto"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Pechuga al horno con espárragos y papa en cubos",
+              "desc": "160g pechuga, espárragos al horno, 100g papa en cubos condimentada con hierbas",
+              "kcal": 380,
+              "proteina": 40,
+              "carbs": 30,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Jueves",
+            "desayuno": {
+              "nombre": "Tostadas de pan integral con aguacate y salmón ahumado",
+              "desc": "2 tostadas integrales, medio aguacate, 80g salmón ahumado, semillas de chía",
+              "kcal": 460,
+              "proteina": 28,
+              "carbs": 38,
+              "grasa": 18,
+              "sinAlergenos": [
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegetariano",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Depresión",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Gluten (trigo, cebada, centeno)",
+                "Pescado"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Lomo de res magro con puré de papa y zanahorias",
+              "desc": "180g lomo de res, 150g puré de papa sin mantequilla, zanahorias cocidas",
+              "kcal": 560,
+              "proteina": 42,
+              "carbs": 44,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Periostitis tibial (shin splints)",
+                "Tendinitis crónica"
+              ],
+              "condicionesEvitar": [
+                "Colesterol alto",
+                "Triglicéridos elevados"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Crema de zanahoria y jengibre con tostadas de arroz",
+              "desc": "Sopa crema de zanahoria con jengibre y cúrcuma, 2 tostadas de arroz sin gluten",
+              "kcal": 260,
+              "proteina": 6,
+              "carbs": 48,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Artritis temprana"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Viernes",
+            "desayuno": {
+              "nombre": "Yogur griego alto en proteína con granola y mango",
+              "desc": "200g yogur griego 0%, 50g granola sin azúcar, 1 mango en trozos",
+              "kcal": 400,
+              "proteina": 26,
+              "carbs": 54,
+              "grasa": 6,
+              "sinAlergenos": [
+                "mariscos",
+                "pescado",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Ansiedad generalizada",
+                "Insomnio crónico",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Gluten (trigo, cebada, centeno)",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pasta de legumbre con boloñesa de lentejas y champiñones",
+              "desc": "100g pasta de lentejas, 200g lentejas cocidas, champiñones, tomate natural, hierbas",
+              "kcal": 500,
+              "proteina": 28,
+              "carbs": 72,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Síndrome de intestino irritable (SII)",
+                "Enfermedad de Crohn"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Tuna en agua con galletas de arroz",
+              "desc": "1 lata de atún en agua, 3 galletas de arroz, limón y perejil",
+              "kcal": 180,
+              "proteina": 24,
+              "carbs": 18,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Alto en proteína",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Bowl de arroz integral con edamame y verduras encurtidas",
+              "desc": "80g arroz integral, 100g edamame, zanahoria encurtida, pepino, alga nori, tamari",
+              "kcal": 400,
+              "proteina": 18,
+              "carbs": 66,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja"
+              ]
+            }
+          },
+          {
+            "dia": "Sábado",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pavo al horno con ensalada mediterránea y aceitunas",
+              "desc": "180g pavo asado, lechuga romana, tomate, pepino, aceitunas, feta, vinagreta",
+              "kcal": 480,
+              "proteina": 40,
+              "carbs": 18,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Tortilla española sin patata con vegetales",
+              "desc": "3 huevos, pimientos, cebolla, espinaca, aceite de oliva — sin papa para bajo carb",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 8,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Bajo en carbohidratos",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            }
+          },
+          {
+            "dia": "Domingo",
+            "desayuno": {
+              "nombre": "Smoothie bowl de frutas tropicales con semillas",
+              "desc": "Base de pitahaya y mango, topped con semillas de girasol, coco rallado y kiwi",
+              "kcal": 360,
+              "proteina": 8,
+              "carbs": 64,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis",
+                "Dermatitis atópica"
+              ],
+              "condicionesEvitar": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Tofu orgánico salteado con verduras y arroz jazmín",
+              "desc": "200g tofu firme, brócoli, zanahoria, pimientos, 80g arroz jazmín, tamari bajo sodio",
+              "kcal": 460,
+              "proteina": 24,
+              "carbs": 56,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Hipotiroidismo",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja",
+                "Hipertensión arterial"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Caldo de res con verduras y fideos de arroz",
+              "desc": "Caldo casero de res, fideos de arroz, zanahoria, nabo, cebollín, sin sal añadida",
+              "kcal": 320,
+              "proteina": 24,
+              "carbs": 38,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Tendinitis crónica",
+                "Artritis temprana",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": []
+            }
+          }
+        ],
+        "notas": [
+          "🫁 Mantén siempre hidratación adecuada. Come 2h antes del entrenamiento.",
+          "💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.",
+          "🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar."
+        ]
+      },
+      "rutinaSemanal": {
+        "descripcion": "Rutina para Delantero · adaptada a condiciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "tipo": "Explosividad + Fuerza",
+            "ejercicios": [
+              {
+                "nombre": "Escalera de agilidad",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Conos en zigzag",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Carrera lateral en cono",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Sentadilla con peso corporal",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Prensa de piernas",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Peso muerto rumano",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Hip thrust con banda",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Martes",
+            "tipo": "Técnica de gol",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Escalera de agilidad",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Conos en zigzag",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Carrera lateral en cono",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Miércoles",
+            "tipo": "Recuperación activa",
+            "ejercicios": [
+              {
+                "nombre": "Elongación de cuádriceps — 30 seg c/lado",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Estiramiento de isquiotibiales en suelo",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Foam roller en pantorrillas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Movilidad de cadera — 10 repeticiones",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Jueves",
+            "tipo": "Fuerza + Core",
+            "ejercicios": [
+              {
+                "nombre": "Sentadilla con peso corporal",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Prensa de piernas",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Peso muerto rumano",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Hip thrust con banda",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Viernes",
+            "tipo": "Finalización + Técnica",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Sábado",
+            "tipo": "Partido / Simulacro",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Domingo",
+            "tipo": "Descanso completo",
+            "ejercicios": [],
+            "descanso": true
+          }
+        ],
+        "notas": [
+          "🫁 Calentamiento prolongado de 15 min antes de cualquier actividad intensa. Lleva inhalador."
+        ]
+      },
+      "creadoEn": "2026-05-22T23:37:47.074Z"
+    },
+    {
+      "userId": 5,
+      "condiciones": [],
+      "alergias": [
+        "Lacteos / Lactosa"
+      ],
+      "preferencias": "Vegetariano (sin carne ni pescado)",
+      "completado": true,
+      "planAlimenticio": {
+        "descripcion": "Plan personalizado · Sin condiciones · 1 alergia(s) · Sin restricciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "desayuno": {
+              "nombre": "Arepa de maíz con huevo revuelto y aguacate",
+              "desc": "2 arepas de maíz, 3 huevos revueltos, medio aguacate",
+              "kcal": 480,
+              "proteina": 24,
+              "carbs": 42,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "soya",
+                "frutos-secos",
+                "maní",
+                "maíz-libre"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pechuga de pollo a la plancha con arroz integral y ensalada verde",
+              "desc": "180g pechuga, 100g arroz integral, ensalada de lechuga, tomate, pepino con limón",
+              "kcal": 520,
+              "proteina": 44,
+              "carbs": 52,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaTarde": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Sopa de vegetales con pollo desmenuzado",
+              "desc": "Zanahoria, apio, papa, pollo, caldo casero sin sal, perejil — reconfortante y ligera",
+              "kcal": 300,
+              "proteina": 28,
+              "carbs": 28,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Insomnio crónico",
+                "Síndrome de intestino irritable (SII)"
+              ],
+              "condicionesEvitar": [
+                "Apio"
+              ]
+            }
+          },
+          {
+            "dia": "Martes",
+            "desayuno": {
+              "nombre": "Avena sin gluten con plátano y mantequilla de maní",
+              "desc": "80g avena certificada sin gluten, 1 plátano maduro, 1 cda mantequilla de maní",
+              "kcal": 440,
+              "proteina": 14,
+              "carbs": 68,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado"
+              ],
+              "noApto": [
+                "bajo-carbohidratos",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Cacahuetes / Maní",
+                "Hipoglucemia reactiva",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Filete de salmón al horno con camote y brócoli",
+              "desc": "200g salmón, 150g camote asado, brócoli al vapor, aceite de oliva y ajo",
+              "kcal": 580,
+              "proteina": 46,
+              "carbs": 42,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Depresión",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Artritis temprana",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Pescado"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "cena": {
+              "nombre": "Filete de tilapia al limón con ensalada de pepino",
+              "desc": "180g tilapia al horno, ensalada de pepino, cebolla morada, cilantro, limón",
+              "kcal": 280,
+              "proteina": 38,
+              "carbs": 8,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Hipertensión arterial",
+                "Diabetes tipo 2",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            }
+          },
+          {
+            "dia": "Miércoles",
+            "desayuno": {
+              "nombre": "Batido de proteína vegetal con espinaca y berries",
+              "desc": "1 scoop proteína vegetal, 1 taza espinaca, 1 taza berries mixtos, agua de coco",
+              "kcal": 320,
+              "proteina": 28,
+              "carbs": 32,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Intolerancia a la lactosa",
+                "Anemia ferropénica",
+                "Hipotiroidismo"
+              ],
+              "condicionesEvitar": [
+                "Fresas / Frutos rojos"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Hummus casero con zanahorias y apio crudos",
+              "desc": "80g hummus, bastones de zanahoria y apio — rico en fibra y proteína vegetal",
+              "kcal": 180,
+              "proteina": 8,
+              "carbs": 22,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Apio"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Bowl de quinoa con garbanzos, vegetales asados y tahini",
+              "desc": "100g quinoa, 120g garbanzos, pimientos, berenjena asada, 2 cdas tahini",
+              "kcal": 540,
+              "proteina": 22,
+              "carbs": 70,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Estreñimiento crónico"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Colesterol alto"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Pechuga al horno con espárragos y papa en cubos",
+              "desc": "160g pechuga, espárragos al horno, 100g papa en cubos condimentada con hierbas",
+              "kcal": 380,
+              "proteina": 40,
+              "carbs": 30,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Jueves",
+            "desayuno": {
+              "nombre": "Tostadas de pan integral con aguacate y salmón ahumado",
+              "desc": "2 tostadas integrales, medio aguacate, 80g salmón ahumado, semillas de chía",
+              "kcal": 460,
+              "proteina": 28,
+              "carbs": 38,
+              "grasa": 18,
+              "sinAlergenos": [
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegetariano",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Depresión",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Gluten (trigo, cebada, centeno)",
+                "Pescado"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Lomo de res magro con puré de papa y zanahorias",
+              "desc": "180g lomo de res, 150g puré de papa sin mantequilla, zanahorias cocidas",
+              "kcal": 560,
+              "proteina": 42,
+              "carbs": 44,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Periostitis tibial (shin splints)",
+                "Tendinitis crónica"
+              ],
+              "condicionesEvitar": [
+                "Colesterol alto",
+                "Triglicéridos elevados"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Crema de zanahoria y jengibre con tostadas de arroz",
+              "desc": "Sopa crema de zanahoria con jengibre y cúrcuma, 2 tostadas de arroz sin gluten",
+              "kcal": 260,
+              "proteina": 6,
+              "carbs": 48,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Artritis temprana"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Viernes",
+            "desayuno": {
+              "nombre": "Yogur griego alto en proteína con granola y mango",
+              "desc": "200g yogur griego 0%, 50g granola sin azúcar, 1 mango en trozos",
+              "kcal": 400,
+              "proteina": 26,
+              "carbs": 54,
+              "grasa": 6,
+              "sinAlergenos": [
+                "mariscos",
+                "pescado",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Ansiedad generalizada",
+                "Insomnio crónico",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Gluten (trigo, cebada, centeno)",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pasta de legumbre con boloñesa de lentejas y champiñones",
+              "desc": "100g pasta de lentejas, 200g lentejas cocidas, champiñones, tomate natural, hierbas",
+              "kcal": 500,
+              "proteina": 28,
+              "carbs": 72,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Síndrome de intestino irritable (SII)",
+                "Enfermedad de Crohn"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Tuna en agua con galletas de arroz",
+              "desc": "1 lata de atún en agua, 3 galletas de arroz, limón y perejil",
+              "kcal": 180,
+              "proteina": 24,
+              "carbs": 18,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Alto en proteína",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Bowl de arroz integral con edamame y verduras encurtidas",
+              "desc": "80g arroz integral, 100g edamame, zanahoria encurtida, pepino, alga nori, tamari",
+              "kcal": 400,
+              "proteina": 18,
+              "carbs": 66,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja"
+              ]
+            }
+          },
+          {
+            "dia": "Sábado",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pavo al horno con ensalada mediterránea y aceitunas",
+              "desc": "180g pavo asado, lechuga romana, tomate, pepino, aceitunas, feta, vinagreta",
+              "kcal": 480,
+              "proteina": 40,
+              "carbs": 18,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Tortilla española sin patata con vegetales",
+              "desc": "3 huevos, pimientos, cebolla, espinaca, aceite de oliva — sin papa para bajo carb",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 8,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Bajo en carbohidratos",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            }
+          },
+          {
+            "dia": "Domingo",
+            "desayuno": {
+              "nombre": "Smoothie bowl de frutas tropicales con semillas",
+              "desc": "Base de pitahaya y mango, topped con semillas de girasol, coco rallado y kiwi",
+              "kcal": 360,
+              "proteina": 8,
+              "carbs": 64,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis",
+                "Dermatitis atópica"
+              ],
+              "condicionesEvitar": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Tofu orgánico salteado con verduras y arroz jazmín",
+              "desc": "200g tofu firme, brócoli, zanahoria, pimientos, 80g arroz jazmín, tamari bajo sodio",
+              "kcal": 460,
+              "proteina": 24,
+              "carbs": 56,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Hipotiroidismo",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja",
+                "Hipertensión arterial"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Caldo de res con verduras y fideos de arroz",
+              "desc": "Caldo casero de res, fideos de arroz, zanahoria, nabo, cebollín, sin sal añadida",
+              "kcal": 320,
+              "proteina": 24,
+              "carbs": 38,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Tendinitis crónica",
+                "Artritis temprana",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": []
+            }
+          }
+        ],
+        "notas": [
+          "🚫 Alergias registradas: Lacteos / Lactosa. Revisa siempre etiquetas de productos.",
+          "💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.",
+          "🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar."
+        ]
+      },
+      "rutinaSemanal": {
+        "descripcion": "Rutina para Mediocampista",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "tipo": "Resistencia aeróbica",
+            "ejercicios": [
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Martes",
+            "tipo": "Técnica + Pases",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Sprints 10m x 8 repeticiones",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Escalera de agilidad",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Conos en zigzag",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Saltos pliométricos en caja",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Miércoles",
+            "tipo": "Recuperación activa",
+            "ejercicios": [
+              {
+                "nombre": "Elongación de cuádriceps — 30 seg c/lado",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Estiramiento de isquiotibiales en suelo",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Foam roller en pantorrillas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Movilidad de cadera — 10 repeticiones",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Jueves",
+            "tipo": "Fuerza + Cardio",
+            "ejercicios": [
+              {
+                "nombre": "Sentadilla con peso corporal",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Prensa de piernas",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Peso muerto rumano",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Zancadas hacia adelante",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Viernes",
+            "tipo": "Técnica táctica",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Sábado",
+            "tipo": "Partido / Simulacro",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Domingo",
+            "tipo": "Descanso completo",
+            "ejercicios": [],
+            "descanso": true
+          }
+        ],
+        "notas": [
+          "✅ Sin restricciones especiales. Sigue el plan completo con buena técnica."
+        ]
+      },
+      "creadoEn": "2026-05-22T23:37:47.089Z"
+    },
+    {
+      "userId": 1779494467466,
+      "condiciones": [
+        "Epicondilitis (codo de tenista)",
+        "Anemia ferropénica",
+        "Diabetes tipo 2",
+        "Colitis ulcerosa",
+        "Dermatitis atópica"
+      ],
+      "alergias": [
+        "Lácteos / Lactosa",
+        "Maíz"
+      ],
+      "preferencias": "Alto en proteína",
+      "completado": true,
+      "planAlimenticio": {
+        "descripcion": "Plan personalizado · Epicondilitis (codo de tenista), Anemia ferropénica · 2 alergia(s) · Sin restricciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pechuga de pollo a la plancha con arroz integral y ensalada verde",
+              "desc": "180g pechuga, 100g arroz integral, ensalada de lechuga, tomate, pepino con limón",
+              "kcal": 520,
+              "proteina": 44,
+              "carbs": 52,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Sopa de vegetales con pollo desmenuzado",
+              "desc": "Zanahoria, apio, papa, pollo, caldo casero sin sal, perejil — reconfortante y ligera",
+              "kcal": 300,
+              "proteina": 28,
+              "carbs": 28,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Insomnio crónico",
+                "Síndrome de intestino irritable (SII)"
+              ],
+              "condicionesEvitar": [
+                "Apio"
+              ]
+            }
+          },
+          {
+            "dia": "Martes",
+            "desayuno": {
+              "nombre": "Porridge de chía con leche vegetal y fruta",
+              "desc": "3 cdas semillas chía, 250ml leche de almendra, frutos del bosque, canela",
+              "kcal": 300,
+              "proteina": 10,
+              "carbs": 36,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Colesterol alto",
+                "Triglicéridos elevados",
+                "Diabetes tipo 2"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Filete de salmón al horno con camote y brócoli",
+              "desc": "200g salmón, 150g camote asado, brócoli al vapor, aceite de oliva y ajo",
+              "kcal": 580,
+              "proteina": 46,
+              "carbs": 42,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Depresión",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Artritis temprana",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Pescado"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Filete de tilapia al limón con ensalada de pepino",
+              "desc": "180g tilapia al horno, ensalada de pepino, cebolla morada, cilantro, limón",
+              "kcal": 280,
+              "proteina": 38,
+              "carbs": 8,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Hipertensión arterial",
+                "Diabetes tipo 2",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            }
+          },
+          {
+            "dia": "Miércoles",
+            "desayuno": {
+              "nombre": "Batido de leche de coco con espinaca y proteína de cáñamo",
+              "desc": "200ml leche de coco, 30g proteína cáñamo, espinaca, jengibre, curcuma",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 14,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Psoriasis",
+                "Dermatitis atópica",
+                "Artritis temprana",
+                "Depresión"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Bowl de quinoa con garbanzos, vegetales asados y tahini",
+              "desc": "100g quinoa, 120g garbanzos, pimientos, berenjena asada, 2 cdas tahini",
+              "kcal": 540,
+              "proteina": 22,
+              "carbs": 70,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Estreñimiento crónico"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Colesterol alto"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Pechuga al horno con espárragos y papa en cubos",
+              "desc": "160g pechuga, espárragos al horno, 100g papa en cubos condimentada con hierbas",
+              "kcal": 380,
+              "proteina": 40,
+              "carbs": 30,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Jueves",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Lomo de res magro con puré de papa y zanahorias",
+              "desc": "180g lomo de res, 150g puré de papa sin mantequilla, zanahorias cocidas",
+              "kcal": 560,
+              "proteina": 42,
+              "carbs": 44,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Periostitis tibial (shin splints)",
+                "Tendinitis crónica"
+              ],
+              "condicionesEvitar": [
+                "Colesterol alto",
+                "Triglicéridos elevados"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Crema de zanahoria y jengibre con tostadas de arroz",
+              "desc": "Sopa crema de zanahoria con jengibre y cúrcuma, 2 tostadas de arroz sin gluten",
+              "kcal": 260,
+              "proteina": 6,
+              "carbs": 48,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Artritis temprana"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Viernes",
+            "desayuno": {
+              "nombre": "Porridge de chía con leche vegetal y fruta",
+              "desc": "3 cdas semillas chía, 250ml leche de almendra, frutos del bosque, canela",
+              "kcal": 300,
+              "proteina": 10,
+              "carbs": 36,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Colesterol alto",
+                "Triglicéridos elevados",
+                "Diabetes tipo 2"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pasta de legumbre con boloñesa de lentejas y champiñones",
+              "desc": "100g pasta de lentejas, 200g lentejas cocidas, champiñones, tomate natural, hierbas",
+              "kcal": 500,
+              "proteina": 28,
+              "carbs": 72,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Síndrome de intestino irritable (SII)",
+                "Enfermedad de Crohn"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Bowl de arroz integral con edamame y verduras encurtidas",
+              "desc": "80g arroz integral, 100g edamame, zanahoria encurtida, pepino, alga nori, tamari",
+              "kcal": 400,
+              "proteina": 18,
+              "carbs": 66,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja"
+              ]
+            }
+          },
+          {
+            "dia": "Sábado",
+            "desayuno": {
+              "nombre": "Batido de leche de coco con espinaca y proteína de cáñamo",
+              "desc": "200ml leche de coco, 30g proteína cáñamo, espinaca, jengibre, curcuma",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 14,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Psoriasis",
+                "Dermatitis atópica",
+                "Artritis temprana",
+                "Depresión"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pavo al horno con ensalada mediterránea y aceitunas",
+              "desc": "180g pavo asado, lechuga romana, tomate, pepino, aceitunas, feta, vinagreta",
+              "kcal": 480,
+              "proteina": 40,
+              "carbs": 18,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Tortilla española sin patata con vegetales",
+              "desc": "3 huevos, pimientos, cebolla, espinaca, aceite de oliva — sin papa para bajo carb",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 8,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Bajo en carbohidratos",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            }
+          },
+          {
+            "dia": "Domingo",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Tofu orgánico salteado con verduras y arroz jazmín",
+              "desc": "200g tofu firme, brócoli, zanahoria, pimientos, 80g arroz jazmín, tamari bajo sodio",
+              "kcal": 460,
+              "proteina": 24,
+              "carbs": 56,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Hipotiroidismo",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja",
+                "Hipertensión arterial"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Caldo de res con verduras y fideos de arroz",
+              "desc": "Caldo casero de res, fideos de arroz, zanahoria, nabo, cebollín, sin sal añadida",
+              "kcal": 320,
+              "proteina": 24,
+              "carbs": 38,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Tendinitis crónica",
+                "Artritis temprana",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": []
+            }
+          }
+        ],
+        "notas": [
+          "⚠️ Controla la glucosa antes y después de entrenar. Consulta tu médico para ajustes de dosis.",
+          "💊 Acompaña las comidas ricas en hierro con vitamina C para mejorar absorción.",
+          "🍽 Come despacio, mastica bien y evita comidas copiosas antes de entrenar.",
+          "🚫 Alergias registradas: Lácteos / Lactosa, Maíz. Revisa siempre etiquetas de productos.",
+          "💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.",
+          "🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar."
+        ]
+      },
+      "rutinaSemanal": {
+        "descripcion": "Rutina para Mediocampista · adaptada a condiciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "tipo": "Resistencia aeróbica",
+            "ejercicios": [
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Martes",
+            "tipo": "Técnica + Pases",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Sprints 10m x 8 repeticiones",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Escalera de agilidad",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Conos en zigzag",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Saltos pliométricos en caja",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Miércoles",
+            "tipo": "Recuperación activa",
+            "ejercicios": [
+              {
+                "nombre": "Elongación de cuádriceps — 30 seg c/lado",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Estiramiento de isquiotibiales en suelo",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Foam roller en pantorrillas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Movilidad de cadera — 10 repeticiones",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Jueves",
+            "tipo": "Fuerza + Cardio",
+            "ejercicios": [
+              {
+                "nombre": "Sentadilla con peso corporal",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Prensa de piernas",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Peso muerto rumano",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Zancadas hacia adelante",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Viernes",
+            "tipo": "Técnica táctica",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Sábado",
+            "tipo": "Partido / Simulacro",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Domingo",
+            "tipo": "Descanso completo",
+            "ejercicios": [],
+            "descanso": true
+          }
+        ],
+        "notas": [
+          "🩸 Mide glucosa antes de entrenar. Ten snack rápido disponible (glucosa, jugo)."
+        ]
+      },
+      "creadoEn": "2026-05-23T00:02:33.703Z"
+    },
+    {
+      "userId": 1779497926471,
+      "condiciones": [],
+      "alergias": [],
+      "preferencias": "Vegano (sin productos animales)",
+      "completado": true,
+      "planAlimenticio": {
+        "descripcion": "Plan personalizado · Sin condiciones · Sin alergias · Sin restricciones",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "desayuno": {
+              "nombre": "Arepa de maíz con huevo revuelto y aguacate",
+              "desc": "2 arepas de maíz, 3 huevos revueltos, medio aguacate",
+              "kcal": 480,
+              "proteina": 24,
+              "carbs": 42,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "soya",
+                "frutos-secos",
+                "maní",
+                "maíz-libre"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pechuga de pollo a la plancha con arroz integral y ensalada verde",
+              "desc": "180g pechuga, 100g arroz integral, ensalada de lechuga, tomate, pepino con limón",
+              "kcal": 520,
+              "proteina": 44,
+              "carbs": 52,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": []
+            },
+            "meriendaTarde": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Sopa de vegetales con pollo desmenuzado",
+              "desc": "Zanahoria, apio, papa, pollo, caldo casero sin sal, perejil — reconfortante y ligera",
+              "kcal": 300,
+              "proteina": 28,
+              "carbs": 28,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Insomnio crónico",
+                "Síndrome de intestino irritable (SII)"
+              ],
+              "condicionesEvitar": [
+                "Apio"
+              ]
+            }
+          },
+          {
+            "dia": "Martes",
+            "desayuno": {
+              "nombre": "Avena sin gluten con plátano y mantequilla de maní",
+              "desc": "80g avena certificada sin gluten, 1 plátano maduro, 1 cda mantequilla de maní",
+              "kcal": 440,
+              "proteina": 14,
+              "carbs": 68,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado"
+              ],
+              "noApto": [
+                "bajo-carbohidratos",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Cacahuetes / Maní",
+                "Hipoglucemia reactiva",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Filete de salmón al horno con camote y brócoli",
+              "desc": "200g salmón, 150g camote asado, brócoli al vapor, aceite de oliva y ajo",
+              "kcal": 580,
+              "proteina": 46,
+              "carbs": 42,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Depresión",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Artritis temprana",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Pescado"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "cena": {
+              "nombre": "Filete de tilapia al limón con ensalada de pepino",
+              "desc": "180g tilapia al horno, ensalada de pepino, cebolla morada, cilantro, limón",
+              "kcal": 280,
+              "proteina": 38,
+              "carbs": 8,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Hipertensión arterial",
+                "Diabetes tipo 2",
+                "Sobrepeso / Obesidad",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            }
+          },
+          {
+            "dia": "Miércoles",
+            "desayuno": {
+              "nombre": "Batido de proteína vegetal con espinaca y berries",
+              "desc": "1 scoop proteína vegetal, 1 taza espinaca, 1 taza berries mixtos, agua de coco",
+              "kcal": 320,
+              "proteina": 28,
+              "carbs": 32,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Intolerancia a la lactosa",
+                "Anemia ferropénica",
+                "Hipotiroidismo"
+              ],
+              "condicionesEvitar": [
+                "Fresas / Frutos rojos"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Hummus casero con zanahorias y apio crudos",
+              "desc": "80g hummus, bastones de zanahoria y apio — rico en fibra y proteína vegetal",
+              "kcal": 180,
+              "proteina": 8,
+              "carbs": 22,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Apio"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Bowl de quinoa con garbanzos, vegetales asados y tahini",
+              "desc": "100g quinoa, 120g garbanzos, pimientos, berenjena asada, 2 cdas tahini",
+              "kcal": 540,
+              "proteina": 22,
+              "carbs": 70,
+              "grasa": 16,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Estreñimiento crónico"
+              ],
+              "condicionesEvitar": [
+                "Sésamo / Ajonjolí",
+                "Colesterol alto"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Pechuga al horno con espárragos y papa en cubos",
+              "desc": "160g pechuga, espárragos al horno, 100g papa en cubos condimentada con hierbas",
+              "kcal": 380,
+              "proteina": 40,
+              "carbs": 30,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Jueves",
+            "desayuno": {
+              "nombre": "Tostadas de pan integral con aguacate y salmón ahumado",
+              "desc": "2 tostadas integrales, medio aguacate, 80g salmón ahumado, semillas de chía",
+              "kcal": 460,
+              "proteina": 28,
+              "carbs": 38,
+              "grasa": 18,
+              "sinAlergenos": [
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegetariano",
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Colesterol alto",
+                "Hipertensión arterial",
+                "Depresión",
+                "Déficit de vitamina D"
+              ],
+              "condicionesEvitar": [
+                "Gluten (trigo, cebada, centeno)",
+                "Pescado"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Puñado de nueces mixtas y arándanos secos",
+              "desc": "30g nueces + almendras + arándanos secos sin azúcar añadida",
+              "kcal": 220,
+              "proteina": 6,
+              "carbs": 20,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Depresión",
+                "Ansiedad generalizada"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)",
+                "Fresas / Frutos rojos",
+                "Diabetes tipo 2"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Lomo de res magro con puré de papa y zanahorias",
+              "desc": "180g lomo de res, 150g puré de papa sin mantequilla, zanahorias cocidas",
+              "kcal": 560,
+              "proteina": 42,
+              "carbs": 44,
+              "grasa": 14,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Periostitis tibial (shin splints)",
+                "Tendinitis crónica"
+              ],
+              "condicionesEvitar": [
+                "Colesterol alto",
+                "Triglicéridos elevados"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Crema de zanahoria y jengibre con tostadas de arroz",
+              "desc": "Sopa crema de zanahoria con jengibre y cúrcuma, 2 tostadas de arroz sin gluten",
+              "kcal": 260,
+              "proteina": 6,
+              "carbs": 48,
+              "grasa": 6,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Reflujo gastroesofágico (ERGE)",
+                "Gastritis crónica",
+                "Artritis temprana"
+              ],
+              "condicionesEvitar": []
+            }
+          },
+          {
+            "dia": "Viernes",
+            "desayuno": {
+              "nombre": "Yogur griego alto en proteína con granola y mango",
+              "desc": "200g yogur griego 0%, 50g granola sin azúcar, 1 mango en trozos",
+              "kcal": 400,
+              "proteina": 26,
+              "carbs": 54,
+              "grasa": 6,
+              "sinAlergenos": [
+                "mariscos",
+                "pescado",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Ansiedad generalizada",
+                "Insomnio crónico",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Gluten (trigo, cebada, centeno)",
+                "Diabetes tipo 2"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Yogur griego con semillas de chía y canela",
+              "desc": "150g yogur griego 0%, 1 cda semillas chía, canela al gusto — sin azúcar",
+              "kcal": 160,
+              "proteina": 18,
+              "carbs": 10,
+              "grasa": 4,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Insomnio crónico",
+                "Ansiedad generalizada",
+                "Gastritis crónica"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pasta de legumbre con boloñesa de lentejas y champiñones",
+              "desc": "100g pasta de lentejas, 200g lentejas cocidas, champiñones, tomate natural, hierbas",
+              "kcal": 500,
+              "proteina": 28,
+              "carbs": 72,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Anemia ferropénica",
+                "Hipotiroidismo",
+                "Estreñimiento crónico",
+                "Colesterol alto"
+              ],
+              "condicionesEvitar": [
+                "Síndrome de intestino irritable (SII)",
+                "Enfermedad de Crohn"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Tuna en agua con galletas de arroz",
+              "desc": "1 lata de atún en agua, 3 galletas de arroz, limón y perejil",
+              "kcal": 180,
+              "proteina": 24,
+              "carbs": 18,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Alto en proteína",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Pescado",
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "cena": {
+              "nombre": "Bowl de arroz integral con edamame y verduras encurtidas",
+              "desc": "80g arroz integral, 100g edamame, zanahoria encurtida, pepino, alga nori, tamari",
+              "kcal": 400,
+              "proteina": 18,
+              "carbs": 66,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja"
+              ]
+            }
+          },
+          {
+            "dia": "Sábado",
+            "desayuno": {
+              "nombre": "Tortilla de clara de huevo con champiñones y espinaca",
+              "desc": "5 claras de huevo, 100g champiñones, puñado espinaca, ajo, aceite de oliva",
+              "kcal": 200,
+              "proteina": 28,
+              "carbs": 6,
+              "grasa": 7,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano-estricto"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 1",
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos",
+                "Colesterol alto",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Galletas de arroz con aguacate y sal de mar",
+              "desc": "3 galletas de arroz, 1/2 aguacate aplastado, pizca de sal marina y limón",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Enfermedad celíaca / Intolerancia al gluten",
+                "Reflujo gastroesofágico (ERGE)"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Pavo al horno con ensalada mediterránea y aceitunas",
+              "desc": "180g pavo asado, lechuga romana, tomate, pepino, aceitunas, feta, vinagreta",
+              "kcal": 480,
+              "proteina": 40,
+              "carbs": 18,
+              "grasa": 22,
+              "sinAlergenos": [
+                "gluten",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Hipoglucemia reactiva",
+                "Bajo en carbohidratos"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Manzana con mantequilla de almendra",
+              "desc": "1 manzana mediana con 1 cda de mantequilla de almendra sin azúcar",
+              "kcal": 200,
+              "proteina": 4,
+              "carbs": 28,
+              "grasa": 9,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "soya",
+                "maíz"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Colesterol alto",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": [
+                "Frutos secos (nueces, almendras, etc.)"
+              ]
+            },
+            "cena": {
+              "nombre": "Tortilla española sin patata con vegetales",
+              "desc": "3 huevos, pimientos, cebolla, espinaca, aceite de oliva — sin papa para bajo carb",
+              "kcal": 280,
+              "proteina": 22,
+              "carbs": 8,
+              "grasa": 18,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano"
+              ],
+              "condicionesOk": [
+                "Diabetes tipo 2",
+                "Bajo en carbohidratos",
+                "Sobrepeso / Obesidad"
+              ],
+              "condicionesEvitar": [
+                "Huevo"
+              ]
+            }
+          },
+          {
+            "dia": "Domingo",
+            "desayuno": {
+              "nombre": "Smoothie bowl de frutas tropicales con semillas",
+              "desc": "Base de pitahaya y mango, topped con semillas de girasol, coco rallado y kiwi",
+              "kcal": 360,
+              "proteina": 8,
+              "carbs": 64,
+              "grasa": 10,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "bajo-carbohidratos"
+              ],
+              "condicionesOk": [
+                "Estreñimiento crónico",
+                "Psoriasis",
+                "Dermatitis atópica"
+              ],
+              "condicionesEvitar": [
+                "Diabetes tipo 2",
+                "Diabetes tipo 1",
+                "Hipoglucemia reactiva"
+              ]
+            },
+            "meriendaMañana": {
+              "nombre": "Pepino con limón, sal y chamoy natural",
+              "desc": "1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar",
+              "kcal": 60,
+              "proteina": 2,
+              "carbs": 12,
+              "grasa": 0,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Sobrepeso / Obesidad",
+                "Diabetes tipo 2",
+                "Hipertensión arterial"
+              ],
+              "condicionesEvitar": [
+                "Cítricos (naranja, limón)"
+              ]
+            },
+            "almuerzo": {
+              "nombre": "Tofu orgánico salteado con verduras y arroz jazmín",
+              "desc": "200g tofu firme, brócoli, zanahoria, pimientos, 80g arroz jazmín, tamari bajo sodio",
+              "kcal": 460,
+              "proteina": 24,
+              "carbs": 56,
+              "grasa": 12,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Hipotiroidismo",
+                "Enfermedad celíaca / Intolerancia al gluten"
+              ],
+              "condicionesEvitar": [
+                "Soya / Soja",
+                "Hipertensión arterial"
+              ]
+            },
+            "meriendaTarde": {
+              "nombre": "Batido de proteína con agua y plátano",
+              "desc": "1 scoop proteína whey o vegetal, 1 plátano, 300ml agua fría",
+              "kcal": 260,
+              "proteina": 26,
+              "carbs": 34,
+              "grasa": 2,
+              "sinAlergenos": [
+                "gluten",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [],
+              "condicionesOk": [
+                "Post-entrenamiento",
+                "Alto en proteína"
+              ],
+              "condicionesEvitar": [
+                "Lácteos / Lactosa",
+                "Diabetes tipo 2"
+              ]
+            },
+            "cena": {
+              "nombre": "Caldo de res con verduras y fideos de arroz",
+              "desc": "Caldo casero de res, fideos de arroz, zanahoria, nabo, cebollín, sin sal añadida",
+              "kcal": 320,
+              "proteina": 24,
+              "carbs": 38,
+              "grasa": 8,
+              "sinAlergenos": [
+                "gluten",
+                "lactosa",
+                "huevo",
+                "mariscos",
+                "pescado",
+                "frutos-secos",
+                "maní",
+                "soya"
+              ],
+              "noApto": [
+                "vegano",
+                "vegetariano"
+              ],
+              "condicionesOk": [
+                "Tendinitis crónica",
+                "Artritis temprana",
+                "Insomnio crónico"
+              ],
+              "condicionesEvitar": []
+            }
+          }
+        ],
+        "notas": [
+          "💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.",
+          "🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar."
+        ]
+      },
+      "rutinaSemanal": {
+        "descripcion": "Rutina para Mediocampista",
+        "semana": [
+          {
+            "dia": "Lunes",
+            "tipo": "Resistencia aeróbica",
+            "ejercicios": [
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Martes",
+            "tipo": "Técnica + Pases",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Sprints 10m x 8 repeticiones",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Escalera de agilidad",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Conos en zigzag",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Saltos pliométricos en caja",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Miércoles",
+            "tipo": "Recuperación activa",
+            "ejercicios": [
+              {
+                "nombre": "Elongación de cuádriceps — 30 seg c/lado",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Estiramiento de isquiotibiales en suelo",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Foam roller en pantorrillas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Movilidad de cadera — 10 repeticiones",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Jueves",
+            "tipo": "Fuerza + Cardio",
+            "ejercicios": [
+              {
+                "nombre": "Sentadilla con peso corporal",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Prensa de piernas",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Peso muerto rumano",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Zancadas hacia adelante",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Carrera continua 20-30 min",
+                "impacto": "alto",
+                "series": 4,
+                "repeticiones": 10,
+                "tiempo": null
+              },
+              {
+                "nombre": "Trote suave 15 min",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Bicicleta estática 25 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Natación 30 min",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Viernes",
+            "tipo": "Técnica táctica",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha frontal 60 seg",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Plancha lateral",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Dead bug",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Rotaciones con banda elástica",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Sábado",
+            "tipo": "Partido / Simulacro",
+            "ejercicios": [
+              {
+                "nombre": "Control de balón — toque suave",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Pases cortos en parejas",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              },
+              {
+                "nombre": "Conducción con cambio de dirección",
+                "impacto": "medio",
+                "series": 3,
+                "repeticiones": 12,
+                "tiempo": null
+              },
+              {
+                "nombre": "Dominio de balón",
+                "impacto": "bajo",
+                "series": 3,
+                "repeticiones": null,
+                "tiempo": "30-40 seg"
+              }
+            ],
+            "descanso": false
+          },
+          {
+            "dia": "Domingo",
+            "tipo": "Descanso completo",
+            "ejercicios": [],
+            "descanso": true
+          }
+        ],
+        "notas": [
+          "✅ Sin restricciones especiales. Sigue el plan completo con buena técnica."
+        ]
+      },
+      "creadoEn": "2026-05-23T01:03:04.952Z"
+    }
+  ]
+}

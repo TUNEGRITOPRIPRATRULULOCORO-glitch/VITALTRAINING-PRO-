@@ -1,17 +1,53 @@
 {
   "name": "vital-training",
   "version": "1.0.0",
-  "description": "Dashboard de administración Vital Training",
-  "main": "backend/server.js",
+  "description": "Sistema de gestión deportiva para futbolistas, nutricionistas y administradores",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node backend/server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "jest --forceExit",
+    "test:coverage": "jest --coverage --forceExit",
+    "test:watch": "jest --watch"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "futbol",
+    "nutricion",
+    "salud",
+    "deportes"
+  ],
+  "author": "Vital Training Team",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^4.22.1"
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.21.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "api/**/*.service.js",
+      "data/db.js",
+      "middleware/auth.js",
+      "!api/ia/ia.service.js",
+      "!data/migration.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 60
+      }
+    }
   }
 }

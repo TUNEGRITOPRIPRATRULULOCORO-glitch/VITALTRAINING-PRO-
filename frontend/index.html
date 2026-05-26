@@ -3,683 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vital Training — Panel de Administración</title>
+    <title>Vital Training</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2316a34a'/><text x='50%25' y='57%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='13' fill='white'>VT</text></svg>">
 </head>
 <body>
 
-    <!-- ===================== -->
-    <!-- PANTALLA AUTH         -->
-    <!-- ===================== -->
-    <div id="auth-screen">
+<!-- ========================= -->
+<!-- PANTALLA AUTH             -->
+<!-- ========================= -->
+<div id="auth-screen">
 
-        <!-- LOGIN -->
-        <div id="screen-login" class="auth-container">
-            <div class="auth-brand">
-                <div class="auth-logo">VT</div>
-                <span class="auth-logo-name">Vital Training</span>
+    <!-- LOGIN -->
+    <div id="screen-login" class="auth-container">
+        <div class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo-wrap">
+                    <div class="auth-logo">VT</div>
+                    <span class="auth-logo-name">Vital Training</span>
+                </div>
+                <h1>Entrena.<br>Nutre.<br><span>Supérate.</span></h1>
+                <p class="auth-tagline">La plataforma integral para atletas de alto rendimiento.</p>
+                <div class="auth-features">
+                    <div class="auth-feature">
+                        <div class="auth-feature-icon">⚡</div>
+                        <div class="auth-feature-text">
+                            <strong>Plan personalizado</strong>
+                            <span>Rutinas y nutrición adaptadas a tu posición</span>
+                        </div>
+                    </div>
+                    <div class="auth-feature">
+                        <div class="auth-feature-icon">📊</div>
+                        <div class="auth-feature-text">
+                            <strong>Seguimiento en tiempo real</strong>
+                            <span>Monitorea tu salud y rendimiento diario</span>
+                        </div>
+                    </div>
+                    <div class="auth-feature">
+                        <div class="auth-feature-icon">🤖</div>
+                        <div class="auth-feature-text">
+                            <strong>Asistente IA</strong>
+                            <span>Análisis inteligente de tu progreso atlético</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="auth-card">
-                <div class="auth-card-header">
-                    <h2>Bienvenido de vuelta</h2>
-                    <p>Ingresa tus credenciales para acceder al panel</p>
-                </div>
-                <div id="login-error" class="auth-error hidden"></div>
-                <div class="auth-form">
-                    <div class="auth-input-group">
-                        <label>Correo electrónico</label>
-                        <div class="auth-input-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                            <input type="email" id="login-email" placeholder="correo@vitaltraining.com" autocomplete="email">
-                        </div>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Contraseña</label>
-                        <div class="auth-input-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-                        </div>
-                    </div>
-                    <button class="auth-btn" id="login-btn" onclick="doLogin()">
-                        <span>Iniciar sesión</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
-                <div class="auth-hint">
-                    <span>Credenciales de prueba:</span>
-                    <code>miguel@vitaltraining.com</code> / <code>admin123</code>
-                </div>
-                <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-1')">Regístrate aquí</a></p>
+            <div class="auth-brand-bottom">
+                <p>© 2026 Vital Training · Todos los derechos reservados</p>
             </div>
         </div>
-
-        <!-- REGISTRO PASO 1 -->
-        <div id="screen-register-1" class="auth-container hidden">
-            <div class="auth-brand">
-                <div class="auth-logo">VT</div>
-                <span class="auth-logo-name">Vital Training</span>
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2>Bienvenido de vuelta</h2>
+                <p>Ingresa tus credenciales para acceder</p>
             </div>
-            <div class="auth-card">
-                <div class="auth-progress">
-                    <div class="auth-progress-labels">
-                        <span>Paso 1 de 2 — Datos personales</span>
-                        <span class="auth-progress-pct">50%</span>
-                    </div>
-                    <div class="auth-progress-bar"><div class="auth-progress-fill" style="width:50%"></div></div>
-                </div>
-                <div class="auth-card-header">
-                    <h2>Datos personales</h2>
-                    <p>Cuéntanos sobre ti para personalizar tu plan</p>
-                </div>
-                <div class="auth-form">
-                    <div class="auth-input-group">
-                        <label>Nombre completo *</label>
-                        <div class="auth-input-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez">
-                        </div>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Correo electrónico *</label>
-                        <div class="auth-input-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                            <input type="email" id="reg-email" placeholder="juan@ejemplo.com">
-                        </div>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Contraseña *</label>
-                        <div class="auth-input-wrap">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            <input type="password" id="reg-password" placeholder="Mínimo 4 caracteres">
-                        </div>
-                    </div>
-                    <div class="auth-input-row">
-                        <div class="auth-input-group">
-                            <label>Peso (kg) *</label>
-                            <input type="number" id="reg-peso" placeholder="70">
-                        </div>
-                        <div class="auth-input-group">
-                            <label>Altura (cm) *</label>
-                            <input type="number" id="reg-altura" placeholder="175">
-                        </div>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Fecha de nacimiento *</label>
-                        <input type="date" id="reg-fecha">
-                    </div>
-                    <div id="reg1-error" class="auth-error hidden"></div>
-                    <button class="auth-btn" onclick="goToStep2()">
-                        <span>Continuar</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
-                <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="showAuthScreen('screen-login')">Inicia sesión</a></p>
-            </div>
-        </div>
-
-        <!-- REGISTRO PASO 2 -->
-        <div id="screen-register-2" class="auth-container hidden">
-            <div class="auth-brand">
-                <div class="auth-logo">VT</div>
-                <span class="auth-logo-name">Vital Training</span>
-            </div>
-            <div class="auth-card">
-                <div class="auth-progress">
-                    <div class="auth-progress-labels">
-                        <span>Paso 2 de 2 — Perfil deportivo</span>
-                        <span class="auth-progress-pct">100%</span>
-                    </div>
-                    <div class="auth-progress-bar"><div class="auth-progress-fill" style="width:100%"></div></div>
-                </div>
-                <div class="auth-card-header">
-                    <h2>Información deportiva</h2>
-                    <p>Completa tu perfil para recibir tu plan personalizado</p>
-                </div>
-                <div class="auth-form">
-                    <div class="auth-input-group">
-                        <label>Posición *</label>
-                        <select id="reg-posicion">
-                            <option value="">Selecciona tu posición</option>
-                            <option>Portero</option>
-                            <option>Defensa Central</option>
-                            <option>Lateral</option>
-                            <option>Mediocampista</option>
-                            <option>Extremo</option>
-                            <option>Delantero</option>
-                        </select>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Frecuencia de juego *</label>
-                        <select id="reg-frecuencia">
-                            <option value="">¿Cuántas veces juegas por semana?</option>
-                            <option>1-2 veces por semana</option>
-                            <option>3-4 veces por semana</option>
-                            <option>5+ veces por semana</option>
-                            <option>Todos los días</option>
-                        </select>
-                    </div>
-                    <div class="auth-input-group">
-                        <label>Condiciones médicas</label>
-                        <div class="auth-checkboxes">
-                            <label class="auth-checkbox"><input type="checkbox" value="Diabetes"> <span>Diabetes</span></label>
-                            <label class="auth-checkbox"><input type="checkbox" value="Hipertensión"> <span>Hipertensión</span></label>
-                            <label class="auth-checkbox"><input type="checkbox" value="Lesión muscular"> <span>Lesión muscular</span></label>
-                            <label class="auth-checkbox"><input type="checkbox" value="Ninguna" id="check-ninguna"> <span>Ninguna</span></label>
-                        </div>
-                    </div>
-                    <div id="reg2-error" class="auth-error hidden"></div>
-                    <button class="auth-btn auth-btn-success" onclick="doRegistro()">
-                        <span>Crear mi perfil</span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
-                    </button>
-                    <button class="auth-btn-back" onclick="showAuthScreen('screen-register-1')">← Volver al paso anterior</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL LOADING REGISTRO -->
-        <div id="reg-loading" class="auth-loading-overlay hidden">
-            <div class="auth-loading-box">
-                <div class="auth-loading-icon">
-                    <div class="auth-spinner-lg"></div>
-                </div>
-                <h3>Creando tu perfil...</h3>
-                <p>Esto tomará solo un momento.</p>
-            </div>
-        </div>
-
-        <!-- PANTALLA ÉXITO REGISTRO -->
-        <div id="screen-success" class="auth-container hidden">
-            <div class="auth-brand">
-                <div class="auth-logo">VT</div>
-                <span class="auth-logo-name">Vital Training</span>
-            </div>
-            <div class="auth-card auth-success-card">
-                <div class="auth-success-icon">✓</div>
-                <h2>¡Perfil creado!</h2>
-                <p>Tu cuenta ha sido creada exitosamente. Un administrador activará tu acceso pronto.</p>
-                <div class="auth-plan-preview">
-                    <div class="auth-plan-title">Tu plan nutricional estimado</div>
-                    <div class="auth-calories">2,916 <span>kcal/día</span></div>
-                    <div class="auth-macros">
-                        <div class="auth-macro"><div class="auth-macro-dot blue"></div><strong>137g</strong><span>Proteínas</span></div>
-                        <div class="auth-macro"><div class="auth-macro-dot green"></div><strong>410g</strong><span>Carbos</span></div>
-                        <div class="auth-macro"><div class="auth-macro-dot orange"></div><strong>81g</strong><span>Grasas</span></div>
+            <div id="login-error" class="auth-error hidden"></div>
+            <div class="auth-form">
+                <div class="auth-input-group">
+                    <label>Correo electrónico</label>
+                    <div class="auth-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        <input type="email" id="login-email" placeholder="correo@vitaltraining.com" autocomplete="email">
                     </div>
                 </div>
-                <button class="auth-btn" onclick="showAuthScreen('screen-login')">
-                    <span>Ir al inicio de sesión</span>
+                <div class="auth-input-group">
+                    <label>Contraseña</label>
+                    <div class="auth-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                </div>
+                <button class="auth-btn" id="login-btn" onclick="doLogin()">
+                    <span>Iniciar sesión</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
-        </div>
-
-    </div><!-- /auth-screen -->
-
-
-    <!-- ===================== -->
-    <!-- PANEL DE ADMIN        -->
-    <!-- ===================== -->
-    <div id="app" class="hidden">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-icon">VT</div>
-                <div class="logo-text">
-                    <span class="logo-main">Vital Training</span>
-                    <span class="logo-sub">Admin Panel</span>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <span class="nav-label">Navegación</span>
-                <button class="nav-btn active" data-view="usuarios" onclick="renderView('usuarios')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Usuarios
-                </button>
-                <button class="nav-btn" data-view="reportes" onclick="renderView('reportes')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                    Reportes
-                </button>
-                <button class="nav-btn" data-view="soporte" onclick="renderView('soporte')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    Soporte
-                    <span class="nav-badge" id="badge-soporte"></span>
-                </button>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="admin-avatar" id="sidebar-avatar">MA</div>
-                <div class="admin-info">
-                    <span class="admin-name" id="sidebar-name">Admin</span>
-                    <span class="admin-role">Administrador</span>
-                </div>
-                <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                </button>
-            </div>
-        </aside>
-
-        <main id="content" class="main-content">
-            <!-- Cargado por JS -->
-        </main>
-    </div><!-- /app -->
-
-
-    <!-- ===================== -->
-    <!-- MODAL                 -->
-    <!-- ===================== -->
-    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <h3 id="modal-title">Detalle</h3>
-                <button class="modal-close" onclick="closeModal()">✕</button>
-            </div>
-            <div id="modal-body"></div>
+            <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-1')">Regístrate aquí</a></p>
         </div>
     </div>
 
-    <script src="script.js"></script>
-
-    <!-- ===================== -->
-    <!-- PANEL FUTBOLISTA      -->
-    <!-- ===================== -->
-    <div id="panel-futbolista" class="hidden">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-icon">VT</div>
-                <div class="logo-text">
-                    <span class="logo-main">Vital Training</span>
-                    <span class="logo-sub">Mi Panel</span>
+    <!-- REGISTRO PASO 1 -->
+    <div id="screen-register-1" class="auth-container hidden">
+        <div class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo-wrap">
+                    <div class="auth-logo">VT</div>
+                    <span class="auth-logo-name">Vital Training</span>
                 </div>
+                <h1>Crea tu<br>perfil de<br><span>atleta.</span></h1>
+                <p class="auth-tagline">Únete a la plataforma de gestión deportiva profesional.</p>
             </div>
-
-            <nav class="sidebar-nav">
-                <span class="nav-label">Mi espacio</span>
-                <button class="nav-btn active" data-pf-view="dashboard" onclick="pfRenderView('dashboard')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Dashboard
-                </button>
-                <button class="nav-btn" data-pf-view="perfil" onclick="pfRenderView('perfil')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    Mi Perfil
-                </button>
-                <button class="nav-btn" data-pf-view="historial" onclick="pfRenderView('historial')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
-                    Historial
-                </button>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="admin-avatar" id="pf-avatar">--</div>
-                <div class="admin-info">
-                    <span class="admin-name" id="pf-nombre">Futbolista</span>
-                    <span class="admin-role">Futbolista</span>
+            <div class="auth-brand-bottom">
+                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+            </div>
+        </div>
+        <div class="auth-card">
+            <div class="auth-progress">
+                <div class="auth-progress-labels">
+                    <span>Paso 1 de 2 — Datos personales</span>
+                    <span class="auth-progress-pct">50%</span>
                 </div>
-                <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <div class="auth-progress-bar"><div class="auth-progress-fill" style="width:50%"></div></div>
+            </div>
+            <div class="auth-card-header">
+                <h2>Datos personales</h2>
+                <p>Cuéntanos sobre ti para personalizar tu plan</p>
+            </div>
+            <div class="auth-form">
+                <div class="auth-input-group">
+                    <label>Nombre completo *</label>
+                    <div class="auth-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez">
+                    </div>
+                </div>
+                <div class="auth-input-group">
+                    <label>Correo electrónico *</label>
+                    <div class="auth-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        <input type="email" id="reg-email" placeholder="juan@ejemplo.com">
+                    </div>
+                </div>
+                <div class="auth-input-group">
+                    <label>Contraseña *</label>
+                    <div class="auth-input-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="reg-password" placeholder="Mínimo 4 caracteres">
+                    </div>
+                </div>
+                <div class="auth-input-row">
+                    <div class="auth-input-group">
+                        <label>Peso (kg) *</label>
+                        <input type="number" id="reg-peso" placeholder="70">
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Altura (cm) *</label>
+                        <input type="number" id="reg-altura" placeholder="175">
+                    </div>
+                </div>
+                <div class="auth-input-group">
+                    <label>Fecha de nacimiento *</label>
+                    <input type="date" id="reg-fecha">
+                </div>
+                <div id="reg1-error" class="auth-error hidden"></div>
+                <button class="auth-btn" onclick="goToStep2()">
+                    <span>Continuar</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
-        </aside>
+            <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="showAuthScreen('screen-login')">Inicia sesión</a></p>
+        </div>
+    </div>
 
-        <main id="pf-content" class="main-content">
-            <!-- Cargado por JS -->
-        </main>
-    </div><!-- /panel-futbolista -->
-
-    <!-- ===================== -->
-    <!-- SCRIPT PANEL USUARIO  -->
-    <!-- ===================== -->
-    <script>
-        const API_BASE = 'http://localhost:4000/api';
-
-        // ── Render de vistas del panel futbolista ──────────────────────────
-        async function pfRenderView(view) {
-            // Actualizar nav activo
-            document.querySelectorAll('[data-pf-view]').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.pfView === view);
-            });
-
-            const content = document.getElementById('pf-content');
-            content.innerHTML = '<div class="pf-loading">Cargando...</div>';
-
-            try {
-                switch (view) {
-                    case 'dashboard': await pfRenderDashboard(); break;
-                    case 'perfil':    await pfRenderPerfil();    break;
-                    case 'historial': await pfRenderHistorial(); break;
-                    default: content.innerHTML = '<p>Vista no encontrada.</p>';
-                }
-            } catch (err) {
-                content.innerHTML = `<div class="pf-error">Error al cargar la vista: ${err.message}</div>`;
-            }
-        }
-
-        // ── DASHBOARD ─────────────────────────────────────────────────────
-        async function pfRenderDashboard() {
-            const userId = getCurrentUserId();
-            const res  = await fetch(`${API_BASE}/panel/${userId}/resumen`);
-            const data = await res.json();
-
-            const content = document.getElementById('pf-content');
-            const p = data.perfil || {};
-
-            content.innerHTML = `
-                <div class="pf-page">
-                    <div class="pf-page-header">
-                        <h1>Bienvenido, ${p.nombre || 'Futbolista'} 👋</h1>
-                        <p class="pf-subtitle">Aquí tienes un resumen de tu actividad</p>
-                    </div>
-
-                    <!-- Tarjetas de stats -->
-                    <div class="pf-stats-grid">
-                        <div class="pf-stat-card">
-                            <div class="pf-stat-icon pf-icon-blue">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                            <div class="pf-stat-info">
-                                <span class="pf-stat-label">Posición</span>
-                                <span class="pf-stat-value">${p.posicion || '—'}</span>
-                            </div>
-                        </div>
-                        <div class="pf-stat-card">
-                            <div class="pf-stat-icon pf-icon-green">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                            </div>
-                            <div class="pf-stat-info">
-                                <span class="pf-stat-label">Comidas registradas</span>
-                                <span class="pf-stat-value">${(data.ultimasComidas || []).length}</span>
-                            </div>
-                        </div>
-                        <div class="pf-stat-card">
-                            <div class="pf-stat-icon pf-icon-orange">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            </div>
-                            <div class="pf-stat-info">
-                                <span class="pf-stat-label">Rutinas registradas</span>
-                                <span class="pf-stat-value">${(data.ultimasRutinas || []).length}</span>
-                            </div>
-                        </div>
-                        <div class="pf-stat-card">
-                            <div class="pf-stat-icon pf-icon-red">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                            </div>
-                            <div class="pf-stat-info">
-                                <span class="pf-stat-label">Alertas activas</span>
-                                <span class="pf-stat-value">${(data.alertasRecientes || []).length}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Últimas comidas -->
-                    <div class="pf-section">
-                        <div class="pf-section-header">
-                            <h2>Últimas comidas</h2>
-                            <button class="pf-link-btn" onclick="pfRenderView('historial')">Ver todas →</button>
-                        </div>
-                        <div class="pf-list">
-                            ${(data.ultimasComidas && data.ultimasComidas.length)
-                                ? data.ultimasComidas.map(c => `
-                                    <div class="pf-list-item">
-                                        <div class="pf-list-dot pf-dot-green"></div>
-                                        <div class="pf-list-text">
-                                            <strong>${c.nombre || c.descripcion || 'Comida'}</strong>
-                                            <span>${c.calorias ? c.calorias + ' kcal' : ''} ${c.fecha ? '· ' + new Date(c.fecha).toLocaleDateString('es-CO') : ''}</span>
-                                        </div>
-                                    </div>`).join('')
-                                : '<p class="pf-empty">No hay comidas registradas aún.</p>'
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Últimas rutinas -->
-                    <div class="pf-section">
-                        <div class="pf-section-header">
-                            <h2>Últimas rutinas</h2>
-                            <button class="pf-link-btn" onclick="pfRenderView('historial')">Ver todas →</button>
-                        </div>
-                        <div class="pf-list">
-                            ${(data.ultimasRutinas && data.ultimasRutinas.length)
-                                ? data.ultimasRutinas.map(r => `
-                                    <div class="pf-list-item">
-                                        <div class="pf-list-dot pf-dot-blue"></div>
-                                        <div class="pf-list-text">
-                                            <strong>${r.nombre || r.descripcion || 'Rutina'}</strong>
-                                            <span>${r.duracion ? r.duracion + ' min' : ''} ${r.fecha ? '· ' + new Date(r.fecha).toLocaleDateString('es-CO') : ''}</span>
-                                        </div>
-                                    </div>`).join('')
-                                : '<p class="pf-empty">No hay rutinas registradas aún.</p>'
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Alertas recientes -->
-                    ${(data.alertasRecientes && data.alertasRecientes.length) ? `
-                    <div class="pf-section">
-                        <div class="pf-section-header">
-                            <h2>Alertas recientes</h2>
-                        </div>
-                        <div class="pf-list">
-                            ${data.alertasRecientes.map(a => `
-                                <div class="pf-list-item pf-alert-item">
-                                    <div class="pf-list-dot pf-dot-red"></div>
-                                    <div class="pf-list-text">
-                                        <strong>${a.titulo || a.mensaje || 'Alerta'}</strong>
-                                        <span>${a.fecha ? new Date(a.fecha).toLocaleDateString('es-CO') : ''}</span>
-                                    </div>
-                                </div>`).join('')}
-                        </div>
-                    </div>` : ''}
+    <!-- REGISTRO PASO 2 -->
+    <div id="screen-register-2" class="auth-container hidden">
+        <div class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo-wrap">
+                    <div class="auth-logo">VT</div>
+                    <span class="auth-logo-name">Vital Training</span>
                 </div>
-            `;
-        }
-
-        // ── PERFIL ────────────────────────────────────────────────────────
-        async function pfRenderPerfil() {
-            const userId = getCurrentUserId();
-            const res  = await fetch(`${API_BASE}/panel/${userId}/perfil`);
-            const data = await res.json();
-            const p = data.perfil || data;
-
-            document.getElementById('pf-content').innerHTML = `
-                <div class="pf-page">
-                    <div class="pf-page-header">
-                        <h1>Mi Perfil</h1>
-                        <p class="pf-subtitle">Mantén tus datos actualizados</p>
-                    </div>
-
-                    <div class="pf-card">
-                        <div class="pf-avatar-block">
-                            <div class="pf-avatar-lg">${(p.nombre || 'U').charAt(0).toUpperCase()}</div>
-                            <div>
-                                <h3>${p.nombre || '—'}</h3>
-                                <span class="pf-badge">${p.posicion || 'Sin posición'}</span>
-                            </div>
-                        </div>
-
-                        <div class="pf-form" id="pf-perfil-form">
-                            <div class="pf-form-row">
-                                <div class="pf-form-group">
-                                    <label>Nombre completo</label>
-                                    <input type="text" id="pf-input-nombre" value="${p.nombre || ''}" placeholder="Tu nombre">
-                                </div>
-                                <div class="pf-form-group">
-                                    <label>Edad</label>
-                                    <input type="number" id="pf-input-edad" value="${p.edad || ''}" placeholder="Años">
-                                </div>
-                            </div>
-                            <div class="pf-form-row">
-                                <div class="pf-form-group">
-                                    <label>Peso (kg)</label>
-                                    <input type="number" id="pf-input-peso" value="${p.peso || ''}" placeholder="kg">
-                                </div>
-                                <div class="pf-form-group">
-                                    <label>Altura (cm)</label>
-                                    <input type="number" id="pf-input-altura" value="${p.altura || ''}" placeholder="cm">
-                                </div>
-                            </div>
-                            <div class="pf-form-group">
-                                <label>Posición en el campo</label>
-                                <select id="pf-input-posicion">
-                                    <option value="">Selecciona tu posición</option>
-                                    ${['Portero','Defensa Central','Lateral','Mediocampista','Extremo','Delantero'].map(pos =>
-                                        `<option ${p.posicion === pos ? 'selected' : ''}>${pos}</option>`
-                                    ).join('')}
-                                </select>
-                            </div>
-                            <div id="pf-perfil-msg" class="hidden"></div>
-                            <button class="pf-btn-primary" onclick="pfGuardarPerfil()">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                                Guardar cambios
-                            </button>
-                        </div>
-                    </div>
+                <h1>Perfil<br><span>deportivo.</span></h1>
+                <p class="auth-tagline">Último paso para personalizar tu experiencia.</p>
+            </div>
+            <div class="auth-brand-bottom">
+                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+            </div>
+        </div>
+        <div class="auth-card">
+            <div class="auth-progress">
+                <div class="auth-progress-labels">
+                    <span>Paso 2 de 2 — Perfil deportivo</span>
+                    <span class="auth-progress-pct">100%</span>
                 </div>
-            `;
-        }
-
-        async function pfGuardarPerfil() {
-            const userId = getCurrentUserId();
-            const body = {
-                nombre:   document.getElementById('pf-input-nombre').value.trim(),
-                edad:     parseInt(document.getElementById('pf-input-edad').value) || null,
-                peso:     parseFloat(document.getElementById('pf-input-peso').value) || null,
-                altura:   parseFloat(document.getElementById('pf-input-altura').value) || null,
-                posicion: document.getElementById('pf-input-posicion').value
-            };
-
-            const msg = document.getElementById('pf-perfil-msg');
-            try {
-                const res = await fetch(`${API_BASE}/panel/${userId}/perfil`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                msg.className = 'pf-msg-success';
-                msg.textContent = '✓ Perfil actualizado correctamente';
-                msg.classList.remove('hidden');
-                // Actualizar nombre en sidebar
-                const nombre = body.nombre || data.perfil?.nombre || '';
-                document.getElementById('pf-nombre').textContent = nombre.split(' ')[0] || 'Futbolista';
-                document.getElementById('pf-avatar').textContent = nombre.charAt(0).toUpperCase() || '—';
-                setTimeout(() => msg.classList.add('hidden'), 3000);
-            } catch (err) {
-                msg.className = 'pf-msg-error';
-                msg.textContent = '✗ Error al guardar: ' + err.message;
-                msg.classList.remove('hidden');
-            }
-        }
-
-        // ── HISTORIAL ─────────────────────────────────────────────────────
-        async function pfRenderHistorial() {
-            const userId = getCurrentUserId();
-
-            const [resComidas, resRutinas, resAlertas] = await Promise.all([
-                fetch(`${API_BASE}/panel/${userId}/historial/comidas`).then(r => r.json()),
-                fetch(`${API_BASE}/panel/${userId}/historial/rutinas`).then(r => r.json()),
-                fetch(`${API_BASE}/panel/${userId}/historial/alertas`).then(r => r.json())
-            ]);
-
-            const comidas = resComidas.comidas || resComidas || [];
-            const rutinas = resRutinas.rutinas || resRutinas || [];
-            const alertas = resAlertas.alertas || resAlertas || [];
-
-            document.getElementById('pf-content').innerHTML = `
-                <div class="pf-page">
-                    <div class="pf-page-header">
-                        <h1>Historial</h1>
-                        <p class="pf-subtitle">Registro completo de tu actividad</p>
-                    </div>
-
-                    <!-- Tabs -->
-                    <div class="pf-tabs">
-                        <button class="pf-tab active" onclick="pfSwitchTab(this, 'tab-comidas')">
-                            🥗 Comidas <span class="pf-tab-count">${comidas.length}</span>
-                        </button>
-                        <button class="pf-tab" onclick="pfSwitchTab(this, 'tab-rutinas')">
-                            🏃 Rutinas <span class="pf-tab-count">${rutinas.length}</span>
-                        </button>
-                        <button class="pf-tab" onclick="pfSwitchTab(this, 'tab-alertas')">
-                            🔔 Alertas <span class="pf-tab-count">${alertas.length}</span>
-                        </button>
-                    </div>
-
-                    <!-- Tab: Comidas -->
-                    <div id="tab-comidas" class="pf-tab-panel">
-                        ${comidas.length ? `
-                        <div class="pf-table-wrap">
-                            <table class="pf-table">
-                                <thead><tr><th>Comida</th><th>Calorías</th><th>Fecha</th></tr></thead>
-                                <tbody>
-                                    ${comidas.map(c => `
-                                    <tr>
-                                        <td>${c.nombre || c.descripcion || '—'}</td>
-                                        <td>${c.calorias ? c.calorias + ' kcal' : '—'}</td>
-                                        <td>${c.fecha ? new Date(c.fecha).toLocaleDateString('es-CO') : '—'}</td>
-                                    </tr>`).join('')}
-                                </tbody>
-                            </table>
-                        </div>` : '<p class="pf-empty">No hay comidas en el historial.</p>'}
-                    </div>
-
-                    <!-- Tab: Rutinas -->
-                    <div id="tab-rutinas" class="pf-tab-panel hidden">
-                        ${rutinas.length ? `
-                        <div class="pf-table-wrap">
-                            <table class="pf-table">
-                                <thead><tr><th>Rutina</th><th>Duración</th><th>Fecha</th></tr></thead>
-                                <tbody>
-                                    ${rutinas.map(r => `
-                                    <tr>
-                                        <td>${r.nombre || r.descripcion || '—'}</td>
-                                        <td>${r.duracion ? r.duracion + ' min' : '—'}</td>
-                                        <td>${r.fecha ? new Date(r.fecha).toLocaleDateString('es-CO') : '—'}</td>
-                                    </tr>`).join('')}
-                                </tbody>
-                            </table>
-                        </div>` : '<p class="pf-empty">No hay rutinas en el historial.</p>'}
-                    </div>
-
-                    <!-- Tab: Alertas -->
-                    <div id="tab-alertas" class="pf-tab-panel hidden">
-                        ${alertas.length ? `
-                        <div class="pf-table-wrap">
-                            <table class="pf-table">
-                                <thead><tr><th>Alerta</th><th>Tipo</th><th>Fecha</th></tr></thead>
-                                <tbody>
-                                    ${alertas.map(a => `
-                                    <tr>
-                                        <td>${a.titulo || a.mensaje || '—'}</td>
-                                        <td><span class="pf-badge-sm pf-badge-red">${a.tipo || 'General'}</span></td>
-                                        <td>${a.fecha ? new Date(a.fecha).toLocaleDateString('es-CO') : '—'}</td>
-                                    </tr>`).join('')}
-                                </tbody>
-                            </table>
-                        </div>` : '<p class="pf-empty">No hay alertas registradas.</p>'}
-                    </div>
+                <div class="auth-progress-bar"><div class="auth-progress-fill" style="width:100%"></div></div>
+            </div>
+            <div class="auth-card-header">
+                <h2>Información deportiva</h2>
+                <p>Completa tu perfil para recibir tu plan personalizado</p>
+            </div>
+            <div class="auth-form">
+                <div class="auth-input-group">
+                    <label>Posición *</label>
+                    <select id="reg-posicion">
+                        <option value="">Selecciona tu posición</option>
+                        <option>Portero</option><option>Defensa Central</option><option>Lateral</option>
+                        <option>Mediocampista</option><option>Extremo</option><option>Delantero</option>
+                    </select>
                 </div>
-            `;
-        }
+                <div class="auth-input-group">
+                    <label>Frecuencia de juego *</label>
+                    <select id="reg-frecuencia">
+                        <option value="">¿Cuántas veces juegas por semana?</option>
+                        <option>1-2 veces por semana</option><option>3-4 veces por semana</option>
+                        <option>5+ veces por semana</option><option>Todos los días</option>
+                    </select>
+                </div>
+                <div class="auth-input-group">
+                    <label>Pie dominante *</label>
+                    <select id="reg-pie">
+                        <option value="">Selecciona tu pie dominante</option>
+                        <option>Derecho</option>
+                        <option>Izquierdo</option>
+                        <option>Ambos (ambidiestro)</option>
+                    </select>
+                </div>
+                <div class="auth-input-group">
+                    <label>Objetivo principal *</label>
+                    <select id="reg-objetivo">
+                        <option value="">¿Cuál es tu objetivo?</option>
+                        <option>Mejorar rendimiento deportivo</option>
+                        <option>Ganar masa muscular</option>
+                        <option>Perder peso</option>
+                        <option>Recuperación de lesión</option>
+                        <option>Mantener forma física</option>
+                        <option>Preparación para competencia</option>
+                    </select>
+                </div>
+                <div id="reg2-error" class="auth-error hidden"></div>
+                <button class="auth-btn auth-btn-success" onclick="doRegistro()">
+                    <span>Crear mi perfil</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                </button>
+                <button class="auth-btn-back" onclick="showAuthScreen('screen-register-1')">← Volver al paso anterior</button>
+            </div>
+        </div>
+    </div>
 
-        // ── Tabs helper ───────────────────────────────────────────────────
-        function pfSwitchTab(btn, tabId) {
-            document.querySelectorAll('.pf-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.pf-tab-panel').forEach(p => p.classList.add('hidden'));
-            btn.classList.add('active');
-            document.getElementById(tabId).classList.remove('hidden');
-        }
+    <!-- LOADING REGISTRO -->
+    <div id="reg-loading" class="auth-loading-overlay hidden">
+        <div class="auth-loading-box">
+            <div class="auth-spinner-lg"></div>
+            <h3>Creando tu perfil...</h3>
+            <p>Esto tomará solo un momento.</p>
+        </div>
+    </div>
 
-        // ── Helper: obtener userId del usuario logueado ───────────────────
-        // Ajusta esto según cómo guardes el usuario en tu script.js
-        function getCurrentUserId() {
-            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            return user.id || user._id || 1;
-        }
-    </script>
+    <!-- ÉXITO REGISTRO -->
+    <div id="screen-success" class="auth-container hidden">
+        <div class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo-wrap">
+                    <div class="auth-logo">VT</div>
+                    <span class="auth-logo-name">Vital Training</span>
+                </div>
+                <h1>Listo para<br><span>comenzar.</span></h1>
+                <p class="auth-tagline">Tu perfil ha sido creado exitosamente.</p>
+            </div>
+            <div class="auth-brand-bottom">
+                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+            </div>
+        </div>
+        <div class="auth-card auth-success-card">
+            <div class="auth-success-icon">✓</div>
+            <h2>¡Perfil creado!</h2>
+            <p>Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión.</p>
+            <button class="auth-btn" onclick="showAuthScreen('screen-login')">
+                <span>Ir al inicio de sesión</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
 
+</div><!-- /auth-screen -->
+
+
+<!-- ========================= -->
+<!-- PANEL ADMINISTRADOR       -->
+<!-- ========================= -->
+<div id="app" class="hidden">
+    <div class="mobile-topbar">
+        <button class="hamburger-btn" onclick="toggleSidebar('app')">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="mobile-topbar-title">Vital Training</span>
+    </div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">VT</div>
+            <div class="logo-text">
+                <span class="logo-main">Vital Training</span>
+                <span class="logo-sub">Admin Panel</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-label">Navegación</span>
+            <button class="nav-btn active" data-view="dashboard" onclick="renderView('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </button>
+            <button class="nav-btn" data-view="usuarios" onclick="renderView('usuarios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Usuarios
+            </button>
+            <button class="nav-btn" data-view="reportes" onclick="renderView('reportes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Reportes
+            </button>
+            <button class="nav-btn" data-view="soporte" onclick="renderView('soporte')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Soporte
+                <span class="nav-badge" id="badge-soporte"></span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-avatar" id="sidebar-avatar">MA</div>
+            <div class="admin-info">
+                <span class="admin-name" id="sidebar-name">Admin</span>
+                <span class="admin-role" id="sidebar-role">Administrador</span>
+            </div>
+            <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-1"></button>
+            <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <main id="content" class="main-content"></main>
+</div>
+
+
+<!-- ========================= -->
+<!-- PANEL NUTRICIONISTA       -->
+<!-- ========================= -->
+<div id="panel-nutricionista" class="hidden">
+    <div class="mobile-topbar">
+        <button class="hamburger-btn" onclick="toggleSidebar('panel-nutricionista')">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="mobile-topbar-title">Vital Training</span>
+    </div>
+    <aside class="sidebar sidebar-nutri">
+        <div class="sidebar-header">
+            <div class="logo-icon logo-nutri">VT</div>
+            <div class="logo-text">
+                <span class="logo-main">Vital Training</span>
+                <span class="logo-sub">Nutricionista</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-label">Mi panel</span>
+            <button class="nav-btn active" data-nt-view="dashboard" onclick="ntRenderView('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Dashboard
+            </button>
+            <button class="nav-btn" data-nt-view="pacientes" onclick="ntRenderView('pacientes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Mis Futbolistas
+            </button>
+            <button class="nav-btn" data-nt-view="soporte" onclick="ntRenderView('soporte')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Consultas <span id="badge-nt-soporte" class="nav-badge hidden"></span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-avatar avatar-nutri" id="nt-avatar">NR</div>
+            <div class="admin-info">
+                <span class="admin-name" id="nt-nombre">Nutricionista</span>
+                <span class="admin-role">Nutricionista</span>
+            </div>
+            <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-2"></button>
+            <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <main id="nt-content" class="main-content"></main>
+</div>
+
+
+<!-- ========================= -->
+<!-- PANEL FUTBOLISTA          -->
+<!-- ========================= -->
+<div id="panel-futbolista" class="hidden">
+    <div class="mobile-topbar">
+        <button class="hamburger-btn" onclick="toggleSidebar('panel-futbolista')">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="mobile-topbar-title">Vital Training</span>
+    </div>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">VT</div>
+            <div class="logo-text">
+                <span class="logo-main">Vital Training</span>
+                <span class="logo-sub">Mi Panel</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <span class="nav-label">Mi espacio</span>
+            <button class="nav-btn active" data-pf-view="dashboard" onclick="pfRenderView('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Dashboard
+            </button>
+            <button class="nav-btn" data-pf-view="perfil" onclick="pfRenderView('perfil')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Mi Perfil
+            </button>
+            <button class="nav-btn" data-pf-view="salud" onclick="pfRenderView('salud')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                Mi Salud
+            </button>
+            <button class="nav-btn" data-pf-view="historial" onclick="pfRenderView('historial')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                Historial
+            </button>
+            <button class="nav-btn" data-pf-view="plan" onclick="pfRenderView('plan')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Mi Plan
+            </button>
+            <button class="nav-btn" data-pf-view="ia" onclick="pfRenderView('ia')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+                Asistente IA
+            </button>
+            <button class="nav-btn" data-pf-view="soporte" onclick="pfRenderView('soporte')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Soporte
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-avatar" id="pf-avatar">--</div>
+            <div class="admin-info">
+                <span class="admin-name" id="pf-nombre">Futbolista</span>
+                <span class="admin-role">Futbolista</span>
+            </div>
+            <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-3"></button>
+            <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </aside>
+    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <main id="pf-content" class="main-content"></main>
+</div>
+
+
+<!-- MODAL GLOBAL -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modal-title">Detalle</h3>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div id="modal-body"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
