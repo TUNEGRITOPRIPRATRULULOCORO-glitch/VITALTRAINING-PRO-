@@ -2,7 +2,7 @@ const { query } = require('../../data/db');
 
 async function getContextoUsuario(req, res) {
   try {
-    const userId = Number(req.params.userId);
+    const userId = Number(req.params.uid);
 
     const result = await query(`
       SELECT
