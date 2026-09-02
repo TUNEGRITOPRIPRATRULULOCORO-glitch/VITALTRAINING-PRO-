@@ -6,3 +6,7 @@ router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
 router.get('/:userId/consulta', ctrl.getConsulta);
 
 module.exports = router;
+
+const n8nContextController = require('./n8nContext.controller');
+router.get('/n8n-contexto/:userId', n8nContextController.getContextoUsuario);
+
