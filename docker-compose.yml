@@ -1,24 +1,37 @@
-﻿version: "3.8"
+﻿services:
+  db:
+    image: postgres:16-alpine
+    container_name: vital-training-db
+    environment:
+      POSTGRES_USER: vitaltraining
+      POSTGRES_PASSWORD: vitaltraining123
+      POSTGRES_DB: vitaltraining
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitaltraining"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: vital-training
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "4000:4000"
     environment:
       - PORT=4000
-      - JWT_SECRET=${JWT_SECRET:-vt-super-secret-key-2026}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-8h}
-    volumes:
-      # Persiste la base de datos fuera del contenedor
-      - ./database.json:/app/database.json
+      - JWT_SECRET=vt-super-secret-key-2026
+      - JWT_EXPIRES_IN=8h
+      - DATABASE_URL=postgresql://vitaltraining:vitaltraining123@db:5432/vitaltraining
     restart: unless-stopped
 
-  # Descomentar para analisis SonarQube local
-  # sonarqube:
-  #   image: sonarqube:community
-  #   ports:
-  #     - "9000:9000"
+volumes:
+  pgdata:
