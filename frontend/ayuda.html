@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayuda — Vital Training</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg-card: #1e293b;
+    --bg-card-soft: #172033;
+    --border: #2d3b52;
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --green-soft: rgba(34,197,94,0.12);
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    font-size: 18px;
+  }
+
+  .topbar {
+    background: linear-gradient(135deg, #14532d, #0f172a 70%);
+    padding: 40px 24px 56px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .icon {
+    width: 64px; height: 64px;
+    background: var(--green);
+    border-radius: 16px;
+    display: flex; align-items:center; justify-content:center;
+    margin: 0 auto 16px;
+  }
+  .topbar h1 { font-size: 32px; font-weight: 700; }
+  .topbar p {
+    color: var(--text-dim);
+    font-size: 18px;
+    margin-top: 8px;
+    max-width: 480px;
+    margin-left:auto; margin-right:auto;
+  }
+
+  .search-wrap {
+    max-width: 560px;
+    margin: -28px auto 0;
+    padding: 0 24px;
+    position: relative;
+    z-index: 5;
+  }
+  .search-box {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    display:flex; align-items:center; gap:12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .search-box input {
+    background:none; border:none; outline:none;
+    color: var(--text); font-size: 18px; width:100%;
+    font-family: inherit;
+  }
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  main { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .indice {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 56px;
+  }
+  .indice a {
+    text-decoration:none;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 16px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap: 10px;
+    color: var(--text);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .indice a:hover { border-color: var(--green); transform: translateY(-2px); }
+  .indice .emoji { font-size: 34px; }
+  .indice .label { font-size: 15px; font-weight: 600; }
+
+  .seccion { margin-bottom: 64px; scroll-margin-top: 24px; }
+  .seccion-header { display:flex; align-items:center; gap:14px; margin-bottom: 20px; }
+  .seccion-header .num {
+    width: 44px; height: 44px; flex-shrink:0;
+    background: var(--green-soft);
+    border: 2px solid var(--green);
+    color: var(--green);
+    border-radius: 12px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:20px;
+  }
+  .seccion-header h2 { font-size: 24px; font-weight: 700; }
+
+  .paso {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .paso .titulo-paso {
+    display:flex; align-items:center; gap:10px;
+    font-weight: 700; font-size: 17px; margin-bottom: 8px;
+    color: var(--text);
+  }
+  .paso .titulo-paso .dot { width:8px; height:8px; border-radius:50%; background: var(--green); flex-shrink:0; }
+  .paso p { color: #cbd5e1; font-size: 17px; }
+  .paso p + p { margin-top: 8px; }
+
+  .captura {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .tip {
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.25);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 10px;
+    display:flex; gap: 12px; align-items:flex-start;
+  }
+  .tip .icono { font-size: 20px; flex-shrink:0; }
+  .tip p { color: #bae6fd; font-size: 16px; }
+
+  .aviso {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 10px;
+    display:flex; gap: 12px; align-items:flex-start;
+  }
+  .aviso .icono { font-size: 20px; flex-shrink:0; }
+  .aviso p { color: #fde68a; font-size: 16px; }
+
+  .etiqueta-boton {
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--green); color:#fff; font-weight:600; font-size:15px;
+    padding: 6px 14px; border-radius: 8px; margin: 2px 2px;
+  }
+  .etiqueta-menu {
+    display:inline-flex; align-items:center; gap:6px;
+    background: var(--bg-card-soft); border: 1px solid var(--border);
+    color: var(--text); font-weight:600; font-size:15px;
+    padding: 6px 14px; border-radius: 8px; margin: 2px 2px;
+  }
+
+  .faq-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  .faq-pregunta { padding: 18px 20px; font-weight: 700; font-size: 17px; cursor: pointer; display:flex; justify-content:space-between; align-items:center; gap: 12px; }
+  .faq-pregunta .flecha { transition: transform .2s ease; color: var(--green); font-size: 20px; }
+  .faq-item.abierta .faq-pregunta .flecha { transform: rotate(180deg); }
+  .faq-respuesta { max-height: 0; overflow: hidden; transition: max-height .25s ease; padding: 0 20px; }
+  .faq-item.abierta .faq-respuesta { max-height: 300px; padding: 0 20px 18px; }
+  .faq-respuesta p { color: #cbd5e1; font-size: 16px; }
+
+  .contacto {
+    background: linear-gradient(135deg, var(--green-soft), transparent);
+    border: 1px solid var(--green);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+    margin-top: 40px;
+  }
+  .contacto h3 { font-size: 22px; margin-bottom: 10px; }
+  .contacto p { color: var(--text-dim); font-size: 17px; margin-bottom: 18px; }
+
+  .oculto { display: none !important; }
+
+  @media (max-width: 480px) {
+    body { font-size: 16px; }
+    .topbar h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="icon">
+      <svg width="30" height="30" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg>
+    </div>
+    <h1>¿En qué te ayudamos?</h1>
+    <p>Aquí te explicamos, paso a paso, cómo usar Vital Training. No necesitas saber nada de computadores, solo sigue las imágenes y los pasos.</p>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span style="font-size:20px">🔍</span>
+      <input type="text" id="buscador" placeholder="Escribe lo que quieres saber... ej: comida">
+    </div>
+  </div>
+
+  <main>
+
+    <div class="indice" id="indice">
+      <a href="#entrar"><span class="emoji">🔑</span><span class="label">Entrar a mi cuenta</span></a>
+      <a href="#dashboard"><span class="emoji">🏠</span><span class="label">Mi pantalla principal</span></a>
+      <a href="#perfil"><span class="emoji">🙋</span><span class="label">Mi perfil</span></a>
+      <a href="#comidas"><span class="emoji">🍽️</span><span class="label">Mis comidas</span></a>
+      <a href="#rutinas"><span class="emoji">🏃</span><span class="label">Mis rutinas</span></a>
+      <a href="#alertas"><span class="emoji">🔔</span><span class="label">Mis avisos</span></a>
+      <a href="#historial"><span class="emoji">📖</span><span class="label">Mi historial</span></a>
+      <a href="#asistente"><span class="emoji">🤖</span><span class="label">El asistente</span></a>
+      <a href="#preguntas"><span class="emoji">❓</span><span class="label">Preguntas comunes</span></a>
+      <a href="#contacto-rapido"><span class="emoji">💬</span><span class="label">Pedir ayuda</span></a>
+    </div>
+
+    <!-- 1. ENTRAR -->
+    <section class="seccion" id="entrar" data-tema="entrar cuenta login clave contraseña iniciar sesion registro">
+      <div class="seccion-header"><div class="num">1</div><h2>Cómo entrar a tu cuenta</h2></div>
+
+      <div class="paso">
+        <div class="titulo-paso"><span class="dot"></span>Si ya tienes cuenta</div>
+        <img src="img/login.png" alt="Pantalla de inicio de sesión de Vital Training" class="captura">
+        <p>Abre Vital Training. Vas a ver dos cajitas: una dice <strong>Correo electrónico</strong> y otra dice <strong>Contraseña</strong>.</p>
+        <p>Escribe tu correo en la primera cajita, y tu clave secreta en la segunda. Luego presiona el botón verde que dice <span class="etiqueta-boton">Iniciar sesión →</span></p>
+        <div class="tip"><span class="icono">💡</span><p>Si escribes tu correo o clave mal, la pantalla te lo va a decir con un mensaje. No te preocupes, solo inténtalo de nuevo con calma.</p></div>
+      </div>
+
+      <div class="paso">
+        <div class="titulo-paso"><span class="dot"></span>Si es tu primera vez</div>
+        <p>Debajo del botón verde vas a ver un texto que dice <strong>¿No tienes cuenta? Regístrate aquí</strong>. Tócalo.</p>
+        <p>Te va a pedir tu nombre, tu correo y una clave que tú inventes. Guarda esa clave en un lugar seguro, ¡la vas a necesitar cada vez que entres!</p>
+        <div class="aviso"><span class="icono">⚠️</span><p>Nunca le des tu clave a otra persona, ni siquiera a un amigo. Es solo tuya.</p></div>
+      </div>
+    </section>
+
+    <!-- 2. DASHBOARD -->
+    <section class="seccion" id="dashboard" data-tema="dashboard inicio pantalla principal resumen">
+      <div class="seccion-header"><div class="num">2</div><h2>Tu pantalla principal (Dashboard)</h2></div>
+      <div class="paso">
+        <img src="img/dashboard.png" alt="Pantalla principal del panel del futbolista" class="captura">
+        <p>Cuando entras, esta es la primera pantalla que ves. Es como el resumen del día: te dice qué has comido, qué ejercicios hiciste, y si tienes algún aviso nuevo.</p>
+      </div>
+      <div class="paso">
+        <div class="titulo-paso"><span class="dot"></span>Las tarjetas de arriba</div>
+        <p>Vas a ver varias cajitas pequeñas con números. Cada una te dice algo distinto:</p>
+        <p>🍽️ <strong>Comidas recientes</strong> — cuántas comidas has registrado</p>
+        <p>🏃 <strong>Rutinas recientes</strong> — cuántos entrenamientos has hecho</p>
+        <p>🔔 <strong>Avisos sin leer</strong> — mensajes nuevos para ti</p>
+      </div>
+    </section>
+
+    <!-- 3. PERFIL -->
+    <section class="seccion" id="perfil" data-tema="perfil datos personales editar nombre edad peso altura posicion">
+      <div class="seccion-header"><div class="num">3</div><h2>Tu perfil</h2></div>
+      <div class="paso">
+        <img src="img/perfil.png" alt="Pantalla de Mi Perfil" class="captura">
+        <p>Aquí guardas tus datos: tu nombre, tu edad, tu peso, tu altura y en qué posición juegas.</p>
+        <p>Para llegar aquí, busca en el menú de la izquierda el botón que dice <span class="etiqueta-menu">🙋 Mi Perfil</span></p>
+      </div>
+      <div class="paso">
+        <div class="titulo-paso"><span class="dot"></span>Cómo cambiar tus datos</div>
+        <p>Toca dentro de la cajita que quieras cambiar (por ejemplo, tu peso), borra el número viejo y escribe el nuevo.</p>
+        <p>Cuando termines, busca el botón que dice <span class="etiqueta-boton">Guardar</span> y tócalo. Así tus cambios quedan guardados.</p>
+      </div>
+    </section>
+
+    <!-- 4. COMIDAS -->
+    <section class="seccion" id="comidas" data-tema="comidas comida nutricion desayuno almuerzo cena plan alimenticio">
+      <div class="seccion-header"><div class="num">4</div><h2>Tus comidas</h2></div>
+      <div class="paso">
+        <img src="img/comidas.png" alt="Pantalla del plan de comidas" class="captura">
+        <p>Aquí puedes ver tu plan de comidas de la semana: qué desayunar, qué almorzar, qué cenar. Lo prepara tu nutricionista pensando en ti.</p>
+      </div>
+      <div class="tip"><span class="icono">💡</span><p>Si tienes alguna alergia (por ejemplo a los frutos secos), avísale a tu nutricionista para que la anote en tu perfil médico. Así el plan de comidas siempre la va a tener en cuenta.</p></div>
+    </section>
+
+    <!-- 5. RUTINAS -->
+    <section class="seccion" id="rutinas" data-tema="rutinas ejercicio entrenamiento gimnasio">
+      <div class="seccion-header"><div class="num">5</div><h2>Tus rutinas de entrenamiento</h2></div>
+      <div class="paso">
+        <img src="img/rutinas.png" alt="Pantalla de rutinas de entrenamiento" class="captura">
+        <p>Aquí ves qué ejercicios te tocan cada día de la semana: cuántas series, cuántas repeticiones, y cuánto tiempo debes hacer cada uno.</p>
+        <p>Si un día dice <strong>Descanso</strong>, significa que ese día no hay que entrenar. ¡Descansar también es parte de mejorar!</p>
+      </div>
+    </section>
+
+    <!-- 6. ALERTAS -->
+    <section class="seccion" id="alertas" data-tema="alertas avisos notificaciones mensajes">
+      <div class="seccion-header"><div class="num">6</div><h2>Tus avisos</h2></div>
+      <div class="paso">
+        <img src="img/alertas.png" alt="Pantalla de avisos" class="captura">
+        <p>Aquí llegan mensajes importantes para ti, como recordatorios de tomar agua, o felicitaciones cuando llevas varios días entrenando seguido.</p>
+        <p>Si un aviso tiene un puntito de color, significa que todavía no lo has leído.</p>
+      </div>
+    </section>
+
+    <!-- 7. HISTORIAL -->
+    <section class="seccion" id="historial" data-tema="historial pasado registros anteriores">
+      <div class="seccion-header"><div class="num">7</div><h2>Tu historial</h2></div>
+      <div class="paso">
+        <img src="img/historial.png" alt="Pantalla de historial" class="captura">
+        <p>Aquí puedes ver todo lo que has hecho antes: comidas de días pasados, entrenamientos anteriores, y avisos viejos. Es como un cuaderno donde queda guardado todo tu camino.</p>
+      </div>
+    </section>
+
+    <!-- 8. ASISTENTE -->
+    <section class="seccion" id="asistente" data-tema="asistente chatbot ia inteligencia artificial preguntar chat">
+      <div class="seccion-header"><div class="num">8</div><h2>El asistente</h2></div>
+      <div class="paso">
+        <img src="img/asistente.png" alt="Pantalla del asistente de inteligencia artificial" class="captura">
+        <p>Es como un amigo dentro de la aplicación que conoce tus datos y te puede responder preguntas, como:</p>
+        <p>💬 "¿Puedo entrenar hoy?"</p>
+        <p>💬 "¿Cómo estuve esta semana?"</p>
+        <p>💬 "¿Estoy durmiendo bien?"</p>
+        <p>Solo escribe tu pregunta y el asistente te responde usando la información real que tienes guardada.</p>
+      </div>
+      <div class="aviso"><span class="icono">⚠️</span><p>El asistente no es un doctor. Si te sientes mal de verdad, siempre habla con tu nutricionista o con un médico.</p></div>
+    </section>
+
+    <!-- PREGUNTAS FRECUENTES -->
+    <section class="seccion" id="preguntas" data-tema="preguntas frecuentes olvide clave contraseña problema error">
+      <div class="seccion-header"><div class="num">?</div><h2>Preguntas que la gente hace mucho</h2></div>
+
+      <div class="faq-item">
+        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>Se me olvidó mi contraseña, ¿qué hago?</span><span class="flecha">▾</span></div>
+        <div class="faq-respuesta"><p>Pídele a un administrador de tu equipo que te ayude a recuperarla, o pídele que te cree una nueva contraseña. Ellos pueden hacerlo desde su panel.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>Escribí algo mal, ¿puedo corregirlo?</span><span class="flecha">▾</span></div>
+        <div class="faq-respuesta"><p>Sí. Ve a la sección que quieras corregir (por ejemplo tu perfil), borra lo que está mal, escribe lo correcto y toca <strong>Guardar</strong>.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Por qué no veo mis comidas de hoy?</span><span class="flecha">▾</span></div>
+        <div class="faq-respuesta"><p>Puede ser que tu nutricionista todavía no haya armado tu plan de esta semana. Espera un poco, o pregúntale directamente a él o ella.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>La pantalla se ve rara o no carga</span><span class="flecha">▾</span></div>
+        <div class="faq-respuesta"><p>Intenta cerrar la aplicación y volver a abrirla. Si sigue igual, pídele a alguien que revise que tengas internet conectado.</p></div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Cómo salgo de mi cuenta?</span><span class="flecha">▾</span></div>
+        <div class="faq-respuesta"><p>Busca tu nombre o tu foto, generalmente abajo del todo en el menú de la izquierda. Ahí vas a encontrar un botón para salir de tu cuenta con seguridad.</p></div>
+      </div>
+    </section>
+
+    <div class="contacto" id="contacto-rapido">
+      <h3>¿Sigues con dudas?</h3>
+      <p>No hay problema. Pídele a tu nutricionista o a un administrador que te acompañe la primera vez. ¡Con el tiempo, todo esto se vuelve muy fácil!</p>
+    </div>
+
+  </main>
+
+  <script>
+    function toggleFaq(el) {
+      const item = el.parentElement;
+      const yaAbierta = item.classList.contains('abierta');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('abierta'));
+      if (!yaAbierta) item.classList.add('abierta');
+    }
+
+    const buscador = document.getElementById('buscador');
+    const secciones = document.querySelectorAll('.seccion');
+    const indice = document.getElementById('indice');
+
+    buscador.addEventListener('input', () => {
+      const texto = buscador.value.trim().toLowerCase();
+      if (!texto) {
+        secciones.forEach(s => s.classList.remove('oculto'));
+        indice.classList.remove('oculto');
+        return;
+      }
+      indice.classList.add('oculto');
+      secciones.forEach(s => {
+        const tema = s.getAttribute('data-tema') || '';
+        const contenido = s.innerText.toLowerCase();
+        const coincide = tema.includes(texto) || contenido.includes(texto);
+        s.classList.toggle('oculto', !coincide);
+      });
+    });
+  </script>
+
+</body>
+</html>
