@@ -54,8 +54,8 @@ describe('auth.service — login', () => {
 describe('auth.service — registro', () => {
   test('crea un nuevo usuario correctamente', async () => {
     query.mockResolvedValueOnce({ rows: [] });
-    query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Juan Test', email: 'juan@test.com', rol: 'Futbolista', estado: 'Activo' }] });
-    const result = await authService.registro({ nombre: 'Juan Test', email: 'juan@test.com', password: 'abc123' });
+    query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Juan Test', email: 'juan@test.com', rol: 'Atleta', estado: 'Activo' }] });
+    const result = await authService.registro({ nombre: 'Juan Test', email: 'juan@test.com', password: 'abc12345' });
     expect(result.usuario).toBeDefined();
     expect(result.usuario.email).toBe('juan@test.com');
     expect(result.usuario.password).toBeUndefined();
@@ -75,16 +75,16 @@ describe('auth.service — registro', () => {
 
   test('retorna error si el email ya existe', async () => {
     query.mockResolvedValueOnce({ rows: [{ id: 1 }] });
-    const result = await authService.registro({ nombre: 'Duplicado', email: 'admin@test.com', password: 'cualquiera' });
+    const result = await authService.registro({ nombre: 'Duplicado', email: 'admin@test.com', password: 'cualquiera123' });
     expect(result.error).toBeDefined();
     expect(result.status).toBe(409);
   });
 
-  test('el nuevo usuario tiene rol Futbolista por defecto', async () => {
+  test('el nuevo usuario tiene rol Atleta por defecto', async () => {
     query.mockResolvedValueOnce({ rows: [] });
-    query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Nuevo', email: 'nuevo@test.com', rol: 'Futbolista', estado: 'Activo' }] });
-    const result = await authService.registro({ nombre: 'Nuevo', email: 'nuevo@test.com', password: '1234' });
-    expect(result.usuario.rol).toBe('Futbolista');
+    query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Nuevo', email: 'nuevo@test.com', rol: 'Atleta', estado: 'Activo' }] });
+    const result = await authService.registro({ nombre: 'Nuevo', email: 'nuevo@test.com', password: '12345678' });
+    expect(result.usuario.rol).toBe('Atleta');
     expect(result.usuario.estado).toBe('Activo');
   });
 

@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nombre        VARCHAR(255) NOT NULL,
   email         VARCHAR(255) UNIQUE NOT NULL,
   password      VARCHAR(255) NOT NULL,
-  rol           VARCHAR(50)  NOT NULL DEFAULT 'Futbolista',
+  rol           VARCHAR(50)  NOT NULL DEFAULT 'Atleta',
   estado        VARCHAR(50)  NOT NULL DEFAULT 'Activo',
+  deporte_principal VARCHAR(50) NOT NULL DEFAULT 'Fútbol',
   peso          NUMERIC,
   altura        NUMERIC,
   fecha_nacimiento DATE,
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS perfiles (
   id         BIGSERIAL PRIMARY KEY,
-  user_id    BIGINT UNIQUE REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id    BIGINT UNIQUE,
   nombre     VARCHAR(255),
   edad       INTEGER,
   peso       NUMERIC,
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS perfiles (
 
 CREATE TABLE IF NOT EXISTS perfiles_medicos (
   id               BIGSERIAL PRIMARY KEY,
-  user_id          BIGINT UNIQUE REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id          BIGINT UNIQUE,
   condiciones      JSONB    DEFAULT '[]',
   alergias         JSONB    DEFAULT '[]',
   preferencias     VARCHAR(255) DEFAULT 'Sin restricciones',
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS perfiles_medicos (
 
 CREATE TABLE IF NOT EXISTS salud (
   id           BIGSERIAL PRIMARY KEY,
-  user_id      BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id      BIGINT,
   fecha        DATE NOT NULL,
   fatiga       INTEGER NOT NULL DEFAULT 5,
   sueno        INTEGER NOT NULL DEFAULT 7,
@@ -53,7 +54,7 @@ CREATE TABLE IF NOT EXISTS salud (
 
 CREATE TABLE IF NOT EXISTS alertas (
   id         BIGSERIAL PRIMARY KEY,
-  user_id    BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id    BIGINT,
   tipo       VARCHAR(100),
   mensaje    TEXT,
   leida      BOOLEAN DEFAULT FALSE,
@@ -63,7 +64,7 @@ CREATE TABLE IF NOT EXISTS alertas (
 
 CREATE TABLE IF NOT EXISTS comidas (
   id             BIGSERIAL PRIMARY KEY,
-  user_id        BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id        BIGINT,
   nombre         VARCHAR(255) NOT NULL,
   tipo           VARCHAR(100) DEFAULT 'almuerzo',
   calorias       INTEGER DEFAULT 0,
@@ -77,7 +78,7 @@ CREATE TABLE IF NOT EXISTS comidas (
 
 CREATE TABLE IF NOT EXISTS rutinas (
   id               BIGSERIAL PRIMARY KEY,
-  user_id          BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id          BIGINT,
   nombre           VARCHAR(255) NOT NULL,
   tipo             VARCHAR(100) DEFAULT 'entrenamiento',
   duracion_minutos INTEGER DEFAULT 60,
@@ -90,7 +91,7 @@ CREATE TABLE IF NOT EXISTS rutinas (
 
 CREATE TABLE IF NOT EXISTS incidencias (
   id          BIGSERIAL PRIMARY KEY,
-  user_id     BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id     BIGINT,
   titulo      VARCHAR(255) NOT NULL,
   usuario     VARCHAR(255),
   categoria   VARCHAR(100) DEFAULT 'Soporte',
@@ -104,7 +105,7 @@ CREATE TABLE IF NOT EXISTS incidencias (
 
 CREATE TABLE IF NOT EXISTS cumplimiento (
   id         BIGSERIAL PRIMARY KEY,
-  user_id    BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id    BIGINT,
   fecha      DATE NOT NULL,
   dia_semana VARCHAR(50) DEFAULT '',
   tipo       VARCHAR(100) DEFAULT '',
@@ -115,10 +116,20 @@ CREATE TABLE IF NOT EXISTS cumplimiento (
 
 CREATE TABLE IF NOT EXISTS notas_nutricionista (
   id                   BIGSERIAL PRIMARY KEY,
-  user_id              BIGINT REFERENCES usuarios(id) ON DELETE CASCADE,
+  user_id              BIGINT,
   nutricionista_id     BIGINT,
   nutricionista_nombre VARCHAR(255),
   texto                TEXT,
   fecha                VARCHAR(50),
   created_at           TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE alertas ADD CONSTRAINT alertas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE comidas ADD CONSTRAINT comidas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE rutinas ADD CONSTRAINT rutinas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE incidencias ADD CONSTRAINT incidencias_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE cumplimiento ADD CONSTRAINT cumplimiento_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE notas_nutricionista ADD CONSTRAINT notas_nutricionista_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

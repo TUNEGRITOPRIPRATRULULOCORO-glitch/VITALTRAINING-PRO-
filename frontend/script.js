@@ -1,6 +1,6 @@
 /* =============================================
-   VITAL TRAINING — script.js
-   Auth · Admin · Nutricionista · Futbolista
+   VITAL SPORTS — script.js
+   Auth · Admin · Nutricionista · Multi-deporte
 ============================================= */
 
 const API = '/api';
@@ -86,11 +86,14 @@ async function apiFetch(url, opts = {}) {
 }
 
 // ── Enrutador de paneles ───────────────────────
+function normalizeRole(rol) { return rol === 'Futbolista' ? 'Atleta' : rol; }
+const isAtletaRole = (rol) => ['Atleta', 'Futbolista'].includes(rol);
+
 function routeUser(user, token) {
     setSession(user, token);
     currentUser = user;
     hideAllPanels();
-    if      (user.rol === 'Futbolista')    showPanelFutbolista(user);
+    if      (isAtletaRole(user.rol))       showPanelFutbolista(user);
     else if (user.rol === 'Nutricionista') showPanelNutricionista(user);
     else                                   showPanel(user);
 }
@@ -115,6 +118,55 @@ function showAuthScreen(id) {
     if (el) { el.classList.remove('hidden'); el.style.animation='none'; void el.offsetWidth; el.style.animation=''; }
 }
 
+function getSportFieldConfig(deporte) {
+    const config = {
+        'Fútbol': {
+            posicionLabel: 'Posición *',
+            posicionOptions: ['Portero','Defensa Central','Lateral','Mediocampista','Extremo','Delantero'],
+            frecuenciaLabel: 'Frecuencia de juego *',
+            frecuenciaOptions: ['1-2 veces por semana','3-4 veces por semana','5+ veces por semana','Todos los días'],
+            pieLabel: 'Pie dominante *',
+            pieOptions: ['Derecho','Izquierdo','Ambos']
+        },
+        'Baloncesto': {
+            posicionLabel: 'Posición *',
+            posicionOptions: ['Base','Escolta','Alero','Pívot'],
+            frecuenciaLabel: 'Sesiones por semana *',
+            frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana','Diario'],
+            pieLabel: 'Mano dominante *',
+            pieOptions: ['Derecha','Izquierda','Ambas']
+        },
+        'Tenis': {
+            posicionLabel: 'Especialidad *',
+            posicionOptions: ['Right-handed','Left-handed','Dobles','Individuales'],
+            frecuenciaLabel: 'Frecuencia de entrenamiento *',
+            frecuenciaOptions: ['1-2 días por semana','3-4 días por semana','5+ días por semana','Diario'],
+            pieLabel: 'Mano dominante *',
+            pieOptions: ['Derecha','Izquierda','Ambas']
+        }
+    };
+    return config[deporte] || config['Fútbol'];
+}
+
+function updateSportSpecificFields() {
+    const deporte = document.getElementById('reg-deporte')?.value || '';
+    const posicionLabel = document.getElementById('reg-posicion-label');
+    const frecuenciaLabel = document.getElementById('reg-frecuencia-label');
+    const pieLabel = document.getElementById('reg-pie-label');
+    const posicionSelect = document.getElementById('reg-posicion');
+    const frecuenciaSelect = document.getElementById('reg-frecuencia');
+    const pieSelect = document.getElementById('reg-pie');
+
+    const choice = getSportFieldConfig(deporte);
+    posicionLabel.textContent = choice.posicionLabel;
+    frecuenciaLabel.textContent = choice.frecuenciaLabel;
+    pieLabel.textContent = choice.pieLabel;
+
+    posicionSelect.innerHTML = `<option value="">${choice.posicionLabel.replace('*','')}</option>${choice.posicionOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
+    frecuenciaSelect.innerHTML = `<option value="">${choice.frecuenciaLabel.replace('*','')}</option>${choice.frecuenciaOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
+    pieSelect.innerHTML = `<option value="">${choice.pieLabel.replace('*','')}</option>${choice.pieOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
+}
+
 // ── Utilidades ─────────────────────────────────
 function getInitials(name) { return name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase(); }
 
@@ -133,7 +185,12 @@ function avatarColor(name) {
     let h=0; for(let x of name) h=(h*31+x.charCodeAt(0))%c.length; return c[h];
 }
 
-function rolBadge(rol)      { const m={'Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador'}; return `<span class="badge ${m[rol]||''}">${rol}</span>`; }
+function normalizeDisplayRole(rol) { return ['Futbolista', 'Atleta'].includes(rol) ? 'Atleta' : rol; }
+function getSportIcon(sport) { const map = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾' }; return map[sport] || '🏅'; }
+function getSportLabel(sport) { return sport || 'Deporte'; }
+function getSportBadge(sport) { const map = { 'Fútbol':'⚽ Fútbol', 'Baloncesto':'🏀 Baloncesto', 'Tenis':'🎾 Tenis' }; return map[sport] || `🏅 ${sport || 'Deporte'}`; }
+function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
+function getSportBadgeNeutral(sport) { return getSportBadge(sport || 'Fútbol'); }
 function estadoBadge(e)     { const m={'Activo':'badge-activo','Inactivo':'badge-inactivo'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
 function prioridadBadge(p)  { const m={'alta':'badge-alta','media':'badge-media','baja':'badge-baja','critica':'badge-critica'}; return `<span class="badge ${m[p]||''}">${p}</span>`; }
 function incEstadoBadge(e)  { const m={'abierta':'badge-abierta','en progreso':'badge-en-progreso','resuelta':'badge-resuelta'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
@@ -179,7 +236,7 @@ function showError(msg, retryFn='') {
 }
 
 function setTitle(seccion) {
-    document.title = seccion ? `${seccion} — Vital Training` : 'Vital Training';
+    document.title = seccion ? `${seccion} — Vital Sports` : 'Vital Sports';
 }
 
 function toggleSidebar(panelId) {
@@ -238,13 +295,13 @@ async function doRegistro() {
     const nombre=document.getElementById('reg-nombre').value.trim(), email=document.getElementById('reg-email').value.trim(),
           password=document.getElementById('reg-password').value, peso=document.getElementById('reg-peso').value,
           altura=document.getElementById('reg-altura').value, fechaNacimiento=document.getElementById('reg-fecha').value,
-          posicion=document.getElementById('reg-posicion').value, frecuencia=document.getElementById('reg-frecuencia').value,
-          pie=document.getElementById('reg-pie').value, objetivo=document.getElementById('reg-objetivo').value,
-          errorEl=document.getElementById('reg2-error');
-    if(!posicion||!frecuencia||!pie||!objetivo){errorEl.textContent='Completa todos los campos del perfil deportivo.';errorEl.classList.remove('hidden');return;}
+          deporte=document.getElementById('reg-deporte').value, posicion=document.getElementById('reg-posicion').value,
+          frecuencia=document.getElementById('reg-frecuencia').value, pie=document.getElementById('reg-pie').value,
+          objetivo=document.getElementById('reg-objetivo').value, errorEl=document.getElementById('reg2-error');
+    if(!deporte||!posicion||!frecuencia||!pie||!objetivo){errorEl.textContent='Completa todos los campos del perfil deportivo.';errorEl.classList.remove('hidden');return;}
     errorEl.classList.add('hidden'); document.getElementById('reg-loading').classList.remove('hidden');
     try {
-        const res=await fetch(`${API}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre,email,password,peso,altura,fechaNacimiento,posicion,frecuencia,pie,objetivo})});
+        const res=await fetch(`${API}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre,email,password,peso,altura,fechaNacimiento,deporte,posicion,frecuencia,pie,objetivo})});
         const data=await res.json();
         document.getElementById('reg-loading').classList.add('hidden');
         if(!res.ok){errorEl.textContent=data.error||'Error al crear la cuenta';errorEl.classList.remove('hidden');}
@@ -332,7 +389,7 @@ async function renderDashboardAdmin() {
                 ${inc.slice(0,4).map(i=>`<div class="mini-item" onclick="renderView('soporte')"><div class="mini-item-body"><div class="mini-item-title">${i.titulo}</div><div class="mini-item-sub">${i.usuario} · ${i.fecha}</div></div><div class="mini-item-right">${prioridadBadge(i.prioridad)}</div></div>`).join('')||'<p style="color:var(--text-muted);font-size:13px;padding:4px 0">Sin incidencias</p>'}
             </div></div>
             <div class="card"><div class="card-header"><h2>Estado del sistema</h2></div><div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-                ${[['Futbolistas',stats.porRol.Futbolista,'#0ea5e9'],['Nutricionistas',stats.porRol.Nutricionista,'#8b5cf6'],['Admins',stats.porRol.Administrador,'#f59e0b']].map(([l,v,c])=>`
+                ${[['Atletas',stats.porRol.Futbolista,'#0ea5e9'],['Nutricionistas',stats.porRol.Nutricionista,'#8b5cf6'],['Admins',stats.porRol.Administrador,'#f59e0b']].map(([l,v,c])=>`
                 <div class="meter-wrap"><span class="meter-label">${l}</span><div class="meter-bar"><div class="meter-fill" style="width:${stats.totalUsuarios?Math.round(v/stats.totalUsuarios*100):0}%;background:${c}"></div></div><span class="meter-val">${v}</span></div>`).join('')}
                 <div class="insight-box" style="margin-top:8px"><strong>📊 Plataforma</strong>${stats.activos} activos · ${stats.totalSalud} registros de salud · ${stats.incidenciasAbiertas} tickets pendientes</div>
             </div></div>
@@ -352,7 +409,7 @@ async function renderDashboardAdmin() {
     // Chart roles
     chartInstances['rd'] = new Chart(document.getElementById('chart-roles-dash').getContext('2d'),{
         type:'doughnut',
-        data:{labels:['Futbolistas','Nutricionistas','Admins'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},
+        data:{labels:['Atletas','Nutricionistas','Admins'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},
         options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}
     });
     // Chart fatiga
@@ -395,7 +452,7 @@ async function renderUsuarios() {
             <div class="stat-card"><div class="stat-icon green">👥</div><div class="stat-info"><div class="stat-value">${users.length}</div><div class="stat-label">Total usuarios</div></div></div>
             <div class="stat-card"><div class="stat-icon blue">✅</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.estado==='Activo').length}</div><div class="stat-label">Activos</div></div></div>
             <div class="stat-card"><div class="stat-icon red">⏸</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.estado==='Inactivo').length}</div><div class="stat-label">Inactivos</div></div></div>
-            <div class="stat-card"><div class="stat-icon purple">⚽</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.rol==='Futbolista').length}</div><div class="stat-label">Futbolistas</div></div></div>
+            <div class="stat-card"><div class="stat-icon purple">⚽</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.rol==='Futbolista').length}</div><div class="stat-label">Atletas</div></div></div>
         </div>
         <div class="card">
             <div class="card-header">
@@ -405,7 +462,7 @@ async function renderUsuarios() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                         <input type="text" id="search-u" placeholder="Buscar..." oninput="filtrarUsuarios()">
                     </div>
-                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option>Futbolista</option><option>Nutricionista</option><option>Administrador</option></select>
+                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option value="Futbolista">Atleta</option><option>Nutricionista</option><option>Administrador</option></select>
                     <select id="filter-estado" onchange="filtrarUsuarios()"><option>Todos los estados</option><option>Activo</option><option>Inactivo</option></select>
                 </div>
             </div>
@@ -433,7 +490,7 @@ function modalNuevoUsuario() {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" placeholder="Ej: Juan Pérez"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" placeholder="juan@email.com"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol"><option>Futbolista</option><option>Nutricionista</option><option>Administrador</option></select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol"><option value="Futbolista">Atleta</option><option>Nutricionista</option><option>Administrador</option></select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activo</option><option>Inactivo</option></select></div>
         </div>
         <div class="form-group"><label>Contraseña inicial (mín. 8 caracteres)</label><input type="text" id="f-password" placeholder="Mínimo 8 caracteres"></div>
@@ -459,7 +516,7 @@ async function modalEditarUsuario(id) {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" value="${escapeHtml(u.nombre)}"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" value="${escapeHtml(u.email)}"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Nutricionista','Administrador'].map(r=>`<option ${r===u.rol?'selected':''}>${r}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Nutricionista','Administrador'].map(r=>`<option value="${r}" ${r===u.rol?'selected':''}>${r === 'Futbolista' ? 'Atleta' : r}</option>`).join('')}</select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado">${['Activo','Inactivo'].map(e=>`<option ${e===u.estado?'selected':''}>${e}</option>`).join('')}</select></div>
         </div>
         <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="guardarEdicionUsuario(${id})">Guardar</button></div>
@@ -502,7 +559,7 @@ async function renderReportes() {
         </div>
         <div class="card"><div class="card-header"><h2>Estado general</h2></div><div style="padding:24px">
             <div class="stats-grid" style="margin-bottom:0">
-                <div class="stat-card"><div class="stat-icon green">⚽</div><div class="stat-info"><div class="stat-value">${stats.porRol.Futbolista}</div><div class="stat-label">Futbolistas</div></div></div>
+                <div class="stat-card"><div class="stat-icon green">⚽</div><div class="stat-info"><div class="stat-value">${stats.porRol.Futbolista}</div><div class="stat-label">Atletas</div></div></div>
                 <div class="stat-card"><div class="stat-icon purple">🥗</div><div class="stat-info"><div class="stat-value">${stats.porRol.Nutricionista}</div><div class="stat-label">Nutricionistas</div></div></div>
                 <div class="stat-card"><div class="stat-icon blue">🛡</div><div class="stat-info"><div class="stat-value">${stats.porRol.Administrador}</div><div class="stat-label">Administradores</div></div></div>
                 <div class="stat-card"><div class="stat-icon green">✔</div><div class="stat-info"><div class="stat-value">${stats.incidenciasPorEstado.resuelta||0}</div><div class="stat-label">Resueltas</div></div></div>
@@ -513,7 +570,7 @@ async function renderReportes() {
             </div>
         </div></div>
     </div>`;
-    chartInstances['roles']=new Chart(document.getElementById('chart-roles').getContext('2d'),{type:'doughnut',data:{labels:['Futbolista','Nutricionista','Administrador'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}});
+    chartInstances['roles']=new Chart(document.getElementById('chart-roles').getContext('2d'),{type:'doughnut',data:{labels:['Atleta','Nutricionista','Administrador'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}});
     const iEst=stats.incidenciasPorEstado;
     chartInstances['inc']=new Chart(document.getElementById('chart-incidencias').getContext('2d'),{type:'bar',data:{labels:['Abierta','En progreso','Resuelta'],datasets:[{label:'Incidencias',data:[iEst.abierta||0,iEst['en progreso']||0,iEst.resuelta||0],backgroundColor:['#fca5a5','#fcd34d','#86efac'],borderRadius:8,borderSkipped:false}]},options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{family:'Outfit'}}},y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Outfit'}},grid:{color:'#f1f5f9'}}},maintainAspectRatio:false}});
 }
@@ -618,7 +675,7 @@ function showPanelNutricionista(user) {
 
 function ntRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', pacientes:'Mis Futbolistas', soporte:'Consultas de atletas' };
+    const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', soporte:'Consultas de atletas' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-nutricionista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.ntView===view));
@@ -644,11 +701,15 @@ async function ntRenderDashboard() {
     const fatigaAlta = futbolistas.filter(f=>f.ultimaSalud?.fatiga>=8).length;
     const sinDatos   = futbolistas.filter(f=>!f.ultimaSalud).length;
     const conDatos   = futbolistas.filter(f=>f.ultimaSalud);
+    const deportes = [...new Set(futbolistas.map(f => f.deporte_principal || f.deporte || 'Fútbol'))];
     main.innerHTML=`
     <div class="view-enter">
         <div class="nutri-welcome">
             <h2>Hola, ${escapeHtml(currentUser.nombre.split(' ')[0])} 🥗</h2>
             <p>Tienes ${futbolistas.length} atletas activos bajo tu seguimiento</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+                ${deportes.map(d => `<span class="badge badge-activo" style="padding:5px 10px;display:inline-flex;align-items:center;gap:6px;">${getSportBadge(d)}</span>`).join('') || '<span class="badge badge-activo">🏅 Sin deportes activos</span>'}
+            </div>
         </div>
         <div class="stats-grid" style="margin-bottom:24px">
             <div class="stat-card"><div class="stat-icon purple">⚽</div><div class="stat-info"><div class="stat-value">${futbolistas.length}</div><div class="stat-label">Atletas activos</div></div></div>
@@ -711,7 +772,7 @@ async function ntRenderPacientes() {
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Mis Futbolistas</h1><p>${_ntTodosPacientes.length} atletas activos</p></div>
+            <div class="view-title"><h1>Mis Atletas</h1><p>${_ntTodosPacientes.length} atletas activos</p></div>
             <div class="filters-bar">
                 <div class="search-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -727,7 +788,7 @@ async function ntRenderPacientes() {
         </div>
         <div id="nt-pacientes-grid" class="pacientes-grid">
             ${_ntTodosPacientes.length ? _ntTodosPacientes.map(f=>ntCardFutbolista(f)).join('') :
-            `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No hay futbolistas activos</p></div>`}
+            `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No hay atletas activos</p></div>`}
         </div>
     </div>`;
 }
@@ -959,9 +1020,9 @@ function switchTab(btn, tabId) {
 }
 
 // ────────────────────────────────────────────────
-// PANEL FUTBOLISTA
+// PANEL ATLETA
 // ────────────────────────────────────────────────
-async function showPanelFutbolista(user) {
+async function showPanelAtleta(user) {
     setTitle('Dashboard');
     currentUser=user;
     hideAllPanels();
@@ -977,6 +1038,8 @@ async function showPanelFutbolista(user) {
         pfRenderView('dashboard');
     }
 }
+
+const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
@@ -1004,10 +1067,15 @@ async function pfRenderDashboard() {
     const saludData=await apiFetch(`${API}/salud/${userId}`).then(r=>r.json()).catch(()=>[]);
     const ultimaSalud=saludData[0]||null;
 
+    const deporteActual = currentUser.deporte_principal || 'Fútbol';
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Bienvenido, ${escapeHtml(currentUser.nombre.split(' ')[0])} ⚽</h1><p>Tu resumen de hoy</p></div>
+            <div class="view-title">
+                <div class="sport-pill sport-pill-${deporteActual.toLowerCase().replace(/[^a-z]/g,'')}">${getSportBadgeNeutral(deporteActual)}</div>
+                <h1>Bienvenido, ${escapeHtml(currentUser.nombre.split(' ')[0])} ${getSportIcon(deporteActual)}</h1>
+                <p>Tu resumen deportivo de hoy</p>
+            </div>
             <button class="btn btn-primary" onclick="pfRenderView('salud')">+ Registrar salud</button>
         </div>
         <div class="stats-grid">
@@ -1061,20 +1129,29 @@ async function pfRenderPerfil() {
     const data=await apiFetch(`${API}/panel/${userId}/perfil`).then(r=>r.json()).catch(()=>null);
     const main=document.getElementById('pf-content');
     const p=data?.perfil||{};
+    const sportOptions=['Fútbol','Baloncesto','Tenis'];
+    const deporteActual = p.deportePrincipal || currentUser.deporte_principal || 'Fútbol';
+    const sportConfig = getSportFieldConfig(deporteActual);
+    const posicionActual = p.posicion || sportConfig.posicionOptions[0];
+
     main.innerHTML=`
     <div class="view-enter">
-        <div class="view-header"><div class="view-title"><h1>Mi Perfil</h1><p>Tu información deportiva personal</p></div></div>
+        <div class="view-header"><div class="view-title"><h1>Mi Perfil</h1><p>Tu información deportiva y de rendimiento</p></div></div>
         <div class="card" style="max-width:560px">
-            <div class="card-header"><h2>Datos del jugador</h2></div>
+            <div class="card-header"><h2>Datos del perfil</h2></div>
             <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
                 <div class="form-group"><label>Nombre completo</label><input type="text" id="pf-f-nombre" value="${escapeHtml(p.nombre||currentUser.nombre||'')}"></div>
                 <div class="form-row">
+                    <div class="form-group"><label>Deporte principal</label><select id="pf-f-deporte" onchange="pfRenderPerfil()">${sportOptions.map(s=>`<option value="${s}" ${deporteActual===s?'selected':''}>${s}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>${sportConfig.posicionLabel.replace('*','')}</label><select id="pf-f-posicion">${sportConfig.posicionOptions.map(pos=>`<option value="${pos}" ${posicionActual===pos?'selected':''}>${pos}</option>`).join('')}</select></div>
+                </div>
+                <div class="form-row">
                     <div class="form-group"><label>Edad</label><input type="number" id="pf-f-edad" value="${p.edad||''}" placeholder="22"></div>
-                    <div class="form-group"><label>Posición</label><select id="pf-f-posicion">${['Portero','Defensa Central','Lateral','Mediocampista','Extremo','Delantero'].map(pos=>`<option ${p.posicion===pos?'selected':''}>${pos}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Altura (cm)</label><input type="number" id="pf-f-altura" value="${p.altura||''}" placeholder="178"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Peso (kg)</label><input type="number" id="pf-f-peso" value="${p.peso||''}" placeholder="72"></div>
-                    <div class="form-group"><label>Altura (cm)</label><input type="number" id="pf-f-altura" value="${p.altura||''}" placeholder="178"></div>
+                    <div class="form-group" style="display:flex;align-items:flex-end"><span style="color:var(--text-muted);font-size:12px;display:block;width:100%">Tu selección de deporte se sincroniza con el registro inicial.</span></div>
                 </div>
                 <div class="form-actions"><button class="btn btn-primary" onclick="pfGuardarPerfil()">Guardar cambios</button></div>
             </div>
@@ -1084,9 +1161,21 @@ async function pfRenderPerfil() {
 
 async function pfGuardarPerfil() {
     const userId=currentUser.id;
-    const body={nombre:document.getElementById('pf-f-nombre').value.trim(),edad:Number(document.getElementById('pf-f-edad').value),posicion:document.getElementById('pf-f-posicion').value,peso:Number(document.getElementById('pf-f-peso').value),altura:Number(document.getElementById('pf-f-altura').value)};
+    const body={
+        nombre: document.getElementById('pf-f-nombre').value.trim(),
+        edad: Number(document.getElementById('pf-f-edad').value),
+        posicion: document.getElementById('pf-f-posicion').value,
+        peso: Number(document.getElementById('pf-f-peso').value),
+        altura: Number(document.getElementById('pf-f-altura').value),
+        deportePrincipal: document.getElementById('pf-f-deporte').value
+    };
     const res=await apiFetch(`${API}/panel/${userId}/perfil`,{method:'PUT',body:JSON.stringify(body)});
-    if(res.ok){showToast('Perfil actualizado');document.getElementById('pf-nombre').textContent=body.nombre.split(' ').slice(0,2).join(' ');}
+    if(res.ok){
+        showToast('Perfil actualizado');
+        currentUser.deporte_principal = body.deportePrincipal;
+        setSession(currentUser, getToken());
+        document.getElementById('pf-nombre').textContent = body.nombre.split(' ').slice(0,2).join(' ');
+    }
     else showToast('Error al guardar','error');
 }
 
@@ -1754,7 +1843,7 @@ async function pfOnboardingGuardar() {
     pfRenderView('plan');
 }
 
-// — MI PLAN (FUTBOLISTA) —
+// — MI PLAN (ATLETA) —
 async function pfRenderPlan() {
     const userId=currentUser.id;
     const main=document.getElementById('pf-content');
@@ -1780,7 +1869,7 @@ async function pfRenderPlan() {
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Mi Plan Personalizado</h1><p>Generado según tu perfil médico deportivo</p></div>
+            <div class="view-title"><h1>Mi Plan Personalizado</h1><p>Diseñado para tu rendimiento y recuperación</p></div>
             <button class="btn btn-ghost" onclick="pfRenderOnboarding()">⚙️ Actualizar perfil</button>
         </div>
 
@@ -1956,53 +2045,32 @@ function verVideoEjercicio(nombre) {
     `);
 }
 
-// — ASISTENTE IA (FUTBOLISTA) —
+// — ASISTENTE IA (ATLETA) —
 function pfRenderIA() {
     const main = document.getElementById('pf-content');
     const categorias = [
         {
-            titulo: '📊 Estado General',
+            titulo: '🏋️ Entrenamiento individual',
             preguntas: [
-                { tipo: 'estado_semana', label: '¿Cómo estoy esta semana?' },
-                { tipo: 'tendencia',     label: '¿Estoy mejorando?' },
-                { tipo: 'resumen',       label: 'Resumen semanal' }
-            ]
-        },
-        {
-            titulo: '🏃 Entrenamiento',
-            preguntas: [
+                { tipo: 'entrenamiento_personalizado', label: 'Crear mi rutina personalizada' },
                 { tipo: 'entrenar_hoy', label: '¿Puedo entrenar hoy?' },
-                { tipo: 'fatiga',       label: '¿Tengo fatiga alta?' },
-                { tipo: 'sobrecarga',   label: '¿Estoy sobreentrenando?' }
+                { tipo: 'fatiga', label: '¿Qué tan cargado estoy?' }
             ]
         },
         {
-            titulo: '😴 Descanso y Recuperación',
+            titulo: '🍽 Nutrición individual',
             preguntas: [
-                { tipo: 'sueno',        label: '¿Cómo está mi sueño?' },
-                { tipo: 'recuperacion', label: '¿Cómo está mi recuperación?' }
-            ]
-        },
-        {
-            titulo: '🍽 Nutrición',
-            preguntas: [
+                { tipo: 'alimentacion_personalizada', label: 'Crear mi plan nutricional' },
                 { tipo: 'nutricion', label: '¿Cómo va mi alimentación?' },
-                { tipo: 'calorias',  label: '¿Cuántas calorías consumí?' }
+                { tipo: 'calorias', label: '¿Cuántas calorías consumo?' }
             ]
         },
         {
-            titulo: '⚠️ Riesgos',
+            titulo: '📋 Mi plan real',
             preguntas: [
-                { tipo: 'riesgo',  label: '¿Estoy en riesgo de lesión?' },
-                { tipo: 'alertas', label: '¿Qué dicen mis alertas?' }
-            ]
-        },
-        {
-            titulo: '⚽ Partido y Planificación',
-            preguntas: [
-                { tipo: 'partido', label: '¿Cómo llego al próximo partido?' },
-                { tipo: 'plan',    label: 'Plan para la semana' },
-                { tipo: 'mejorar', label: '¿Cómo puedo mejorar?' }
+                { tipo: 'personalizado', label: 'Generar mi plan completo' },
+                { tipo: 'resumen', label: 'Resumen de mi semana' },
+                { tipo: 'mejorar', label: 'Qué necesito mejorar' }
             ]
         }
     ];
@@ -2010,7 +2078,7 @@ function pfRenderIA() {
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Asistente IA</h1><p>Análisis inteligente basado en tus datos reales</p></div>
+            <div class="view-title"><h1>Asistente IA</h1><p>Plan personalizado según tu perfil, tu deporte y tu objetivo</p></div>
         </div>
         <div class="ia-layout">
             <div class="ia-col-preguntas">
@@ -2027,7 +2095,7 @@ function pfRenderIA() {
                 <div id="ia-respuesta" class="ia-respuesta ia-placeholder">
                     <div class="ia-placeholder-inner">
                         <span class="ia-placeholder-icon">🤖</span>
-                        <p>Selecciona una pregunta<br>y aquí aparece tu análisis</p>
+                        <p>Selecciona una opción y la IA te generará un plan adaptado a ti.</p>
                     </div>
                 </div>
             </div>
@@ -2075,7 +2143,7 @@ async function ntRenderSoporte() {
         </div>
         <div class="card">
             <div class="card-header">
-                <h2>Tickets de nutrición y salud</h2>
+                <h2>Tickets de salud y rendimiento</h2>
                 <div style="display:flex;gap:8px">
                     <select id="nt-filter-estado" onchange="ntFiltrarSoporte()" style="font-size:13px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text)">
                         <option value="Todos">Todos</option>
@@ -2156,7 +2224,73 @@ async function ntEnviarRespuesta(id) {
     else showToast('Error al enviar respuesta','error');
 }
 
-// — SOPORTE (FUTBOLISTA) —
+const supportChatStore = {
+    'Administrador': [
+        { autor: 'Equipo', texto: 'Hola, ¿problemas con la app, login o sistema?', fecha: 'Hoy' },
+        { autor: 'Tú', texto: 'Necesito ayuda con un error de la aplicación.', fecha: 'Ahora' }
+    ],
+    'Nutricionista': [
+        { autor: 'Nutricionista', texto: 'Aquí puedes consultar alimentación, plan dietario y hábitos.', fecha: 'Hoy' },
+        { autor: 'Tú', texto: 'Quiero ajustar mi plan nutricional.', fecha: 'Ahora' }
+    ],
+    'Médico': [
+        { autor: 'Médico', texto: 'Para salud o recuperación, comparte síntomas y restricciones.', fecha: 'Hoy' },
+        { autor: 'Tú', texto: 'Tengo dudas sobre mi recuperación y carga.', fecha: 'Ahora' }
+    ]
+};
+
+function renderSupportChat(channel = 'Administrador') {
+    const messages = supportChatStore[channel] || [];
+    const list = document.getElementById('support-chat-messages');
+    const title = document.getElementById('support-chat-title');
+    const buttons = document.querySelectorAll('.support-channel-btn');
+
+    if (!list || !title) return;
+
+    title.textContent = `Canal directo · ${channel}`;
+    list.innerHTML = messages.map(m => `
+        <div class="support-chat-message ${m.autor === 'Tú' ? 'me' : 'them'}">
+            <div class="support-chat-author">${escapeHtml(m.autor)}</div>
+            <div class="support-chat-text">${escapeHtml(m.texto)}</div>
+            <div class="support-chat-time">${escapeHtml(m.fecha)}</div>
+        </div>
+    `).join('');
+    list.scrollTop = list.scrollHeight;
+
+    buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.channel === channel));
+}
+
+function pfOpenSupportChat(channel) {
+    renderSupportChat(channel);
+}
+
+function pfSendSupportChat() {
+    const input = document.getElementById('support-chat-input');
+    const channelEl = document.getElementById('support-chat-title');
+    const channel = channelEl ? channelEl.textContent.replace('Canal directo · ', '') : 'Administrador';
+    const texto = input?.value.trim();
+    if (!texto) return;
+
+    supportChatStore[channel] = supportChatStore[channel] || [];
+    supportChatStore[channel].push({ autor: 'Tú', texto, fecha: 'Ahora' });
+    renderSupportChat(channel);
+
+    const autoReply = {
+        Administrador: 'Gracias, revisaremos tu problema con el equipo técnico y te responderemos pronto.',
+        Nutricionista: 'Perfecto, te ayudamos a ajustar tu alimentación y plan nutricional.',
+        Médico: 'Para temas de salud, te recomendamos comentar síntomas, molestias y limitaciones concretas para recibir orientación segura.'
+    };
+
+    setTimeout(() => {
+        supportChatStore[channel].push({ autor: channel === 'Administrador' ? 'Equipo' : channel === 'Nutricionista' ? 'Nutricionista' : 'Médico', texto: autoReply[channel] || 'Gracias por escribirnos.', fecha: 'Ahora' });
+        renderSupportChat(channel);
+        if (input) input.value = '';
+    }, 300);
+
+    if (input) input.value = '';
+}
+
+// — SOPORTE (ATLETA) —
 async function pfRenderSoporte() {
     const userId=currentUser.id;
     const inc=await apiFetch(`${API}/incidencias?userId=${userId}`).then(r=>r.json()).catch(()=>[]);
@@ -2164,12 +2298,50 @@ async function pfRenderSoporte() {
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Soporte</h1><p>Envía y revisa tus tickets de ayuda</p></div>
+            <div class="view-title"><h1>Soporte</h1><p>Habla directo con el equipo correcto según tu problema</p></div>
             <button class="btn btn-primary" onclick="pfModalNuevaIncidencia()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Nuevo ticket
             </button>
         </div>
+
+        <div class="support-channel-grid">
+            <button class="support-channel-btn active" data-channel="Administrador" onclick="pfOpenSupportChat('Administrador')">
+                <span class="support-channel-icon">🛠️</span>
+                <span class="support-channel-name">Administrador</span>
+                <small>App / sistema</small>
+            </button>
+            <button class="support-channel-btn" data-channel="Nutricionista" onclick="pfOpenSupportChat('Nutricionista')">
+                <span class="support-channel-icon">🥗</span>
+                <span class="support-channel-name">Nutricionista</span>
+                <small>Alimentación</small>
+            </button>
+            <button class="support-channel-btn" data-channel="Médico" onclick="pfOpenSupportChat('Médico')">
+                <span class="support-channel-icon">🩺</span>
+                <span class="support-channel-name">Médico</span>
+                <small>Salud / recuperación</small>
+            </button>
+        </div>
+
+        <div class="support-chat-box">
+            <div class="support-chat-header">
+                <div id="support-chat-title">Canal directo · Administrador</div>
+            </div>
+            <div id="support-chat-messages" class="support-chat-messages">
+                ${supportChatStore['Administrador'].map(m => `
+                    <div class="support-chat-message ${m.autor === 'Tú' ? 'me' : 'them'}">
+                        <div class="support-chat-author">${escapeHtml(m.autor)}</div>
+                        <div class="support-chat-text">${escapeHtml(m.texto)}</div>
+                        <div class="support-chat-time">${escapeHtml(m.fecha)}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="support-chat-input-row">
+                <input id="support-chat-input" type="text" placeholder="Escribe tu mensaje..." maxlength="220">
+                <button class="btn btn-primary" onclick="pfSendSupportChat()">Enviar</button>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header"><h2>Mis tickets (${inc.length})</h2></div>
             <div style="padding:16px 20px">
@@ -2190,25 +2362,28 @@ function pfModalNuevaIncidencia() {
         <div class="form-group"><label>Título *</label><input type="text" id="inc-titulo" placeholder="Describe brevemente tu consulta o problema"></div>
         <div class="form-row">
             <div class="form-group">
-                <label>Categoría</label>
+                <label>Canal</label>
                 <select id="inc-categoria" onchange="pfActualizarDestinatario()">
+                    <optgroup label="→ Soporte">
+                        <option value="Problema técnico">Administrador</option>
+                        <option value="Error de app">Error de app</option>
+                        <option value="Consulta general">Consulta general</option>
+                    </optgroup>
                     <optgroup label="→ Nutricionista">
                         <option value="Nutrición">Nutrición</option>
                         <option value="Plan alimenticio">Plan alimenticio</option>
-                        <option value="Salud">Salud</option>
                         <option value="Alimentación">Alimentación</option>
                     </optgroup>
-                    <optgroup label="→ Soporte técnico">
-                        <option value="Bug">Bug / Error</option>
-                        <option value="Soporte técnico">Soporte técnico</option>
-                        <option value="Mejora">Sugerencia de mejora</option>
-                        <option value="Consulta">Consulta general</option>
+                    <optgroup label="→ Médico">
+                        <option value="Salud">Salud</option>
+                        <option value="Recuperación">Recuperación</option>
+                        <option value="Dolor o lesión">Dolor o lesión</option>
                     </optgroup>
                 </select>
             </div>
             <div class="form-group"><label>Prioridad</label><select id="inc-prioridad"><option value="baja">Baja</option><option value="media" selected>Media</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></div>
         </div>
-        <div id="inc-destinatario-info" style="font-size:12px;padding:6px 10px;border-radius:6px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;margin-bottom:8px">Tu consulta llegará al <strong>Nutricionista</strong></div>
+        <div id="inc-destinatario-info" style="font-size:12px;padding:6px 10px;border-radius:6px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;margin-bottom:8px">Tu consulta llegará al <strong>Administrador</strong></div>
         <div class="form-group"><label>Descripción</label><textarea id="inc-desc" placeholder="Explica con detalle qué está pasando o qué necesitas..."></textarea></div>
         <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="pfCrearIncidencia()">Enviar ticket</button></div>
     `);
@@ -2217,17 +2392,25 @@ function pfModalNuevaIncidencia() {
 function pfActualizarDestinatario() {
     const cat = document.getElementById('inc-categoria').value;
     const info = document.getElementById('inc-destinatario-info');
-    const esNutri = ['Nutrición','Plan alimenticio','Salud','Alimentación'].includes(cat);
-    info.innerHTML = `Tu consulta llegará al <strong>${esNutri ? 'Nutricionista' : 'Equipo de soporte técnico'}</strong>`;
-    info.style.background = esNutri ? '#f0fdf4' : '#eff6ff';
-    info.style.color       = esNutri ? '#166534' : '#1e40af';
-    info.style.borderColor = esNutri ? '#bbf7d0' : '#bfdbfe';
+    const isAdmin = ['Problema técnico', 'Error de app', 'Consulta general'].includes(cat);
+    const isNutri = ['Nutrición', 'Plan alimenticio', 'Alimentación'].includes(cat);
+    const isMedico = ['Salud', 'Recuperación', 'Dolor o lesión'].includes(cat);
+
+    let destino = 'Administrador';
+    if (isNutri) destino = 'Nutricionista';
+    if (isMedico) destino = 'Médico';
+
+    info.innerHTML = `Tu consulta llegará al <strong>${destino}</strong>`;
+    info.style.background = isMedico ? '#f0fdf4' : isNutri ? '#f0fdf4' : '#eff6ff';
+    info.style.color = isMedico ? '#166534' : isNutri ? '#166534' : '#1e40af';
+    info.style.borderColor = isMedico ? '#bbf7d0' : isNutri ? '#bbf7d0' : '#bfdbfe';
 }
 
 async function pfCrearIncidencia() {
     const titulo=document.getElementById('inc-titulo').value.trim();
     if(!titulo) return showToast('El título es obligatorio','error');
-    const body={titulo,categoria:document.getElementById('inc-categoria').value,prioridad:document.getElementById('inc-prioridad').value,descripcion:document.getElementById('inc-desc').value.trim()};
+    const categoria=document.getElementById('inc-categoria').value;
+    const body={titulo,categoria,prioridad:document.getElementById('inc-prioridad').value,descripcion:document.getElementById('inc-desc').value.trim()};
     const res=await apiFetch(`${API}/incidencias`,{method:'POST',body:JSON.stringify(body)});
     if(res.ok){closeModal();showToast('Ticket enviado correctamente');pfRenderSoporte();}
     else showToast('Error al enviar el ticket','error');

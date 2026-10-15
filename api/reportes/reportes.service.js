@@ -6,7 +6,7 @@ async function obtenerReporte() {
              COUNT(*) AS total,
              COUNT(*) FILTER (WHERE estado='Activo')        AS activos,
              COUNT(*) FILTER (WHERE estado='Inactivo')      AS inactivos,
-             COUNT(*) FILTER (WHERE rol='Futbolista')       AS futbolistas,
+             COUNT(*) FILTER (WHERE rol='Atleta' OR rol='Futbolista') AS futbolistas,
              COUNT(*) FILTER (WHERE rol='Nutricionista')    AS nutricionistas,
              COUNT(*) FILTER (WHERE rol='Administrador')    AS administradores
            FROM usuarios`),
@@ -28,7 +28,7 @@ async function obtenerReporte() {
     CROSS JOIN LATERAL (
       SELECT fatiga FROM salud WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1
     ) s
-    WHERE u.rol = 'Futbolista' AND u.estado = 'Activo'`);
+    WHERE (u.rol = 'Atleta' OR u.rol = 'Futbolista') AND u.estado = 'Activo'`);
 
   const actividadR = await query(`
     SELECT

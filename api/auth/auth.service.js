@@ -35,6 +35,10 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function registro(datos) {
   const { nombre, email, password } = datos;
+  const deportesValidos = ['Fútbol', 'Baloncesto', 'Tenis'];
+  const deportePrincipal = deportesValidos.includes(datos.deporte) ? datos.deporte : 'Fútbol';
+  const rolUsuario = ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
+
   if (!nombre || nombre.trim().length < 2)
     return { error: 'El nombre debe tener al menos 2 caracteres.', status: 400 };
   if (!EMAIL_RE.test(email)) return { error: 'El correo electrónico no tiene un formato válido.', status: 400 };
@@ -50,11 +54,11 @@ async function registro(datos) {
   const hashedPassword = await bcrypt.hash(password, 10);
   const { rows } = await query(
     `INSERT INTO usuarios
-       (nombre, email, password, rol, estado, peso, altura, fecha_nacimiento, posicion, frecuencia, pie, objetivo, fecha_registro)
-     VALUES ($1,$2,$3,'Futbolista','Activo',$4,$5,$6,$7,$8,$9,$10,$11)
+       (nombre, email, password, rol, estado, deporte_principal, peso, altura, fecha_nacimiento, posicion, frecuencia, pie, objetivo, fecha_registro)
+     VALUES ($1,$2,$3,$4,'Activo',$5,$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING *`,
     [
-      nombre, email, hashedPassword,
+      nombre, email, hashedPassword, rolUsuario, deportePrincipal,
       datos.peso || null, datos.altura || null, datos.fechaNacimiento || null,
       datos.posicion || null, datos.frecuencia || null, datos.pie || null,
       datos.objetivo || null, new Date().toLocaleDateString('es-CO')

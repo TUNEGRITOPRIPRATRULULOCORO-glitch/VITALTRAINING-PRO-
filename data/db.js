@@ -1,13 +1,25 @@
-const { Pool } = require('pg');
+let pool;
+let query;
 
-// SSL solo si es una conexión remota (Railway), no en local con Docker
-const esLocal = process.env.DATABASE_URL && process.env.DATABASE_URL.includes('@db:');
+if (process.env.DATABASE_URL) {
+  const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: (process.env.DATABASE_URL && !esLocal) ? { rejectUnauthorized: false } : false
-});
+  // SSL solo si es una conexión remota (Railway), no en local con Docker
+  const esLocal = process.env.DATABASE_URL.includes('@db:');
 
-const query = (text, params) => pool.query(text, params);
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: !esLocal && process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
+  });
+
+  query = (text, params) => pool.query(text, params);
+} else {
+  const { newDb } = require('pg-mem');
+  const db = newDb();
+  const { Pool: PgMemPool } = db.adapters.createPg();
+
+  pool = new PgMemPool();
+  query = (text, params) => pool.query(text, params);
+}
 
 module.exports = { query, pool };

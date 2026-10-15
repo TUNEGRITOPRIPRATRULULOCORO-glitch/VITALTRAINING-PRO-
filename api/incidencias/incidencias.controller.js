@@ -3,7 +3,7 @@ const svc = require('./incidencias.service');
 async function getIncidencias(req, res) {
   try {
     const filtros = { ...req.query };
-    if (req.user.rol === 'Futbolista')      filtros.userId = req.user.id;
+    if (req.user.rol === 'Atleta' || req.user.rol === 'Futbolista') filtros.userId = req.user.id;
     else if (req.user.rol === 'Nutricionista') filtros.destinatario = 'Nutricionista';
     // Administrador ve todo
     res.json(await svc.listar(filtros));

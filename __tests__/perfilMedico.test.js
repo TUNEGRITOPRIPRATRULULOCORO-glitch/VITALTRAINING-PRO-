@@ -95,6 +95,46 @@ describe('guardar', () => {
     });
   });
 
+  test('alto en proteína prioriza opciones proteicas y mantiene los filtros de alergias', async () => {
+    const perfil = await svc.guardar(12, {
+      condiciones: [], alergias: ['Pescado'], preferencia: 'Alto en proteína'
+    }, 'Delantero');
+
+    const comidas = perfil.planAlimenticio.semana.flatMap(dia => [
+      dia.desayuno, dia.meriendaMañana, dia.almuerzo, dia.meriendaTarde, dia.cena
+    ]);
+
+    expect(perfil.planAlimenticio.semana[0].almuerzo.proteina).toBeGreaterThanOrEqual(40);
+    comidas.forEach(comida => {
+      expect(comida.nombre.toLowerCase()).not.toMatch(/pescado|salmón|tilapia|atún|tuna/);
+    });
+  });
+
+  test('dieta mediterránea prioriza comidas acordes sin omitir alergias', async () => {
+    const perfil = await svc.guardar(14, {
+      condiciones: [], alergias: ['Pescado'], preferencia: 'Dieta mediterránea'
+    }, 'Mediocampista');
+
+    const almuerzos = perfil.planAlimenticio.semana.map(dia => dia.almuerzo);
+    expect(almuerzos[0].nombre).toContain('Bowl de quinoa');
+    almuerzos.forEach(comida => {
+      expect(comida.nombre.toLowerCase()).not.toMatch(/pescado|salmón|tilapia|atún|tuna/);
+    });
+  });
+
+  test('no usa comidas incompatibles como fallback si no hay opciones seguras', async () => {
+    const perfil = await svc.guardar(13, {
+      condiciones: [], alergias: svc.ALERGIAS, preferencia: 'Sin restricciones'
+    }, 'Mediocampista');
+
+    const comidas = perfil.planAlimenticio.semana.flatMap(dia => [
+      dia.desayuno, dia.meriendaMañana, dia.almuerzo, dia.meriendaTarde, dia.cena
+    ]);
+
+    expect(comidas.some(comida => comida.nombre === 'Sin opción segura disponible en el catálogo')).toBe(true);
+    expect(perfil.planAlimenticio.notas.join(' ')).toContain('Se dejaron sin asignar');
+  });
+
   test('rutina semanal tiene 7 días', async () => {
     const perfil = await svc.guardar(11, {
       condiciones: [], alergias: [], preferencia: 'Sin restricciones'

@@ -12,7 +12,9 @@ function tieneCond(conds, ...palabras) {
 
 // ── Dispatcher principal ───────────────────────────────────────────────────────
 async function consulta(userId, tipo) {
-  const [perfilR, pmR, saludR, comidasR, rutinasR, alertasR] = await Promise.all([
+  const tipoNorm = String(tipo || '').trim().toLowerCase();
+  const [usuarioR, perfilR, pmR, saludR, comidasR, rutinasR, alertasR] = await Promise.all([
+    query('SELECT * FROM usuarios WHERE id = $1', [userId]),
     query('SELECT * FROM perfiles WHERE user_id = $1', [userId]),
     query('SELECT * FROM perfiles_medicos WHERE user_id = $1', [userId]),
     query('SELECT id, user_id AS "userId", fecha, fatiga, sueno, recuperacion, notas, created_at AS "createdAt" FROM salud WHERE user_id = $1 ORDER BY fecha DESC', [userId]),
@@ -21,31 +23,36 @@ async function consulta(userId, tipo) {
     query('SELECT id, user_id AS "userId", tipo, mensaje, leida, fecha, created_at AS "createdAt" FROM alertas WHERE user_id = $1 ORDER BY created_at DESC', [userId])
   ]);
 
+  const usuario = usuarioR.rows[0] || {};
   const perfil  = perfilR.rows[0] || {};
   const pmRow   = pmR.rows[0];
-  const pm      = pmRow ? { condiciones: pmRow.condiciones || [], alergias: pmRow.alergias || [], preferencias: pmRow.preferencias } : null;
+  const pm      = pmRow ? { condiciones: pmRow.condiciones || [], alergias: pmRow.alergias || [], preferencias: pmRow.preferencias, planAlimenticio: pmRow.plan_alimenticio, rutinaSemanal: pmRow.rutina_semanal } : null;
   const salud   = saludR.rows;
   const comidas = comidasR.rows;
   const rutinas = rutinasR.rows;
   const alertas = alertasR.rows;
 
-  switch(tipo) {
-    case 'estado_semana':  return estadoSemana(salud, comidas, rutinas, pm);
-    case 'tendencia':      return tendencia(salud, pm);
-    case 'resumen':        return resumen(salud, comidas, rutinas, alertas, pm);
-    case 'entrenar_hoy':   return entrenarHoy(salud, rutinas, pm);
-    case 'fatiga':         return fatiga(salud, rutinas, pm);
-    case 'sobrecarga':     return sobrecarga(rutinas, salud, pm);
-    case 'sueno':          return sueno(salud, pm);
-    case 'recuperacion':   return recuperacion(salud, rutinas, pm);
-    case 'nutricion':      return nutricion(comidas, perfil, pm);
-    case 'calorias':       return calorias(comidas, pm);
-    case 'riesgo':         return riesgo(salud, rutinas, alertas, pm);
-    case 'alertas':        return alertasResumen(alertas);
-    case 'partido':        return prePartido(salud, comidas, perfil, pm);
-    case 'plan':           return planSemana(salud, perfil, pm);
-    case 'mejorar':        return mejorar(salud, comidas, rutinas, pm);
-    default:               return { respuesta: 'Consulta no reconocida.', tipo: 'warning' };
+  switch(tipoNorm) {
+    case 'estado_semana':                 return estadoSemana(salud, comidas, rutinas, pm);
+    case 'tendencia':                     return tendencia(salud, pm);
+    case 'resumen':                       return resumen(salud, comidas, rutinas, alertas, pm);
+    case 'entrenar_hoy':                  return entrenarHoy(salud, rutinas, pm);
+    case 'fatiga':                        return fatiga(salud, rutinas, pm);
+    case 'sobrecarga':                    return sobrecarga(rutinas, salud, pm);
+    case 'sueno':                         return sueno(salud, pm);
+    case 'recuperacion':                  return recuperacion(salud, rutinas, pm);
+    case 'nutricion':                     return nutricion(comidas, perfil, pm);
+    case 'calorias':                      return calorias(comidas, pm);
+    case 'riesgo':                        return riesgo(salud, rutinas, alertas, pm);
+    case 'alertas':                       return alertasResumen(alertas);
+    case 'partido':                       return prePartido(salud, comidas, perfil, pm);
+    case 'plan':                          return planSemana(salud, perfil, pm);
+    case 'mejorar':                       return mejorar(salud, comidas, rutinas, pm);
+    case 'personalizado':                 return planPersonalizado({ user: usuario, profile: perfil, pm, salud, comidas, rutinas, alertas, deporte: usuario?.deporte_principal || perfil?.deporte || 'Fútbol' });
+    case 'plan_personalizado':            return planPersonalizado({ user: usuario, profile: perfil, pm, salud, comidas, rutinas, alertas, deporte: usuario?.deporte_principal || perfil?.deporte || 'Fútbol' });
+    case 'entrenamiento_personalizado':   return planEntrenamientoPersonalizado({ user: usuario, pm, salud, rutinas, deporte: usuario?.deporte_principal || perfil?.deporte || 'Fútbol' });
+    case 'alimentacion_personalizada':    return planAlimentacionPersonalizada({ user: usuario, pm, comidas, salud, deporte: usuario?.deporte_principal || perfil?.deporte || 'Fútbol' });
+    default:                              return { respuesta: 'Consulta no reconocida.', tipo: 'warning' };
   }
 }
 
@@ -588,6 +595,244 @@ function mejorar(salud, comidas, rutinas, pm) {
   if (problemas.length>1) txt += `\n\nOtras áreas a mejorar: ${problemas.slice(1).map(p=>p.area).join(', ')}.`;
 
   return { respuesta: txt, tipo: 'warning', icono: '💡' };
+}
+
+function normalizarObjetivo(texto = '') {
+  const t = (texto || '').toLowerCase();
+  if (t.includes('masa') || t.includes('ganar') || t.includes('volumen')) return 'ganar masa muscular';
+  if (t.includes('peso') || t.includes('adelgazar') || t.includes('perder')) return 'perder grasa';
+  if (t.includes('rendimiento') || t.includes('competencia') || t.includes('partido')) return 'rendimiento deportivo';
+  if (t.includes('recuper') || t.includes('lesi')) return 'recuperación y prevención';
+  return 'mantenimiento y mejora general';
+}
+
+function getUserSnapshot(user, salud, pm) {
+  const actual = salud[0] || { fatiga: 5, sueno: 6, recuperacion: 5 };
+  const condiciones = Array.isArray(pm?.condiciones) ? pm.condiciones : [];
+  const alergias = Array.isArray(pm?.alergias) ? pm.alergias : [];
+  const objetivo = normalizarObjetivo(user?.objetivo || user?.meta || '');
+  const deporte = user?.deporte_principal || user?.deporte || 'Fútbol';
+  const posicion = user?.posicion || 'general';
+  const peso = Number(user?.peso || 70);
+  const altura = Number(user?.altura || 170);
+  const imc = altura > 0 ? peso / ((altura / 100) ** 2) : 22;
+
+  return { actual, condiciones, alergias, objetivo, deporte, posicion, peso, altura, imc };
+}
+
+function planEntrenamientoPersonalizado({ user, pm, salud, rutinas, deporte }) {
+  const snapshot = getUserSnapshot(user, salud, pm);
+  const fatiga = snapshot.actual.fatiga ?? 5;
+  const recuperacion = snapshot.actual.recuperacion ?? 5;
+  const objetivo = snapshot.objetivo;
+  const posicion = snapshot.posicion;
+  const deporteKey = (deporte || snapshot.deporte || 'Fútbol').toLowerCase();
+  const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+  if (pm?.rutinaSemanal?.semana?.length) {
+    const semana = pm.rutinaSemanal.semana;
+    const mensaje = semana.map(dia => {
+      const titulo = dia?.tipo || 'Entrenamiento';
+      const ejercicios = (dia?.ejercicios || []).slice(0, 4).map((e, i) => `${i + 1}. ${e?.nombre || 'Ejercicio'}`).join('; ');
+      return `• ${dia?.dia || 'Día'}: ${titulo}${ejercicios ? ` — ${ejercicios}` : ''}`;
+    }).join('\n');
+
+    return {
+      respuesta: `Rutina semanal personalizada para ${user?.nombre || 'este atleta'}\nPerfil: ${snapshot.deporte} · ${snapshot.posicion} · objetivo: ${objetivo}\nEstado actual: fatiga ${fatiga}/10, recuperación ${recuperacion}/10, sueño ${snapshot.actual.sueno ?? 6}/10.\n\n${mensaje}\n\nEsto es un plan individual, no una rutina estándar para todos.`,
+      tipo: fatiga >= 7 || recuperacion <= 3 ? 'warning' : 'success',
+      icono: '🏋️'
+    };
+  }
+
+  const isLowLoad = fatiga >= 8 || recuperacion <= 3;
+  const carga = isLowLoad ? 'carga reducida' : 'carga progresiva';
+
+  const baseMap = {
+    'ganar masa muscular': {
+      Lunes: 'Fuerza máxima + hipertrofia — 4-5 ejercicios compuestos, 3-4 series, 6-8 repeticiones, pausas controladas.',
+      Martes: 'Velocidad y técnica — sprints cortos, aceleraciones y trabajo específico del deporte con baja fatiga.',
+      Miércoles: 'Recuperación activa — 30-40 min de movilidad, caminata suave y estiramientos.',
+      Jueves: 'Fuerza de potencia — sentadillas, press, peso muerto y trabajo explosivo.',
+      Viernes: 'Técnica + resistencia — cambios de ritmo, conducción, pase y trabajo aeróbico moderado.',
+      Sábado: 'Volumen moderado — circuito de fuerza complementario y trabajo específico por posición.',
+      Domingo: 'Descanso o carga muy ligera — movilidad y recuperación respiratoria.'
+    },
+    'perder grasa': {
+      Lunes: 'Cardio de intensidad moderada + fuerza general — circuito con alta demanda metabólica.',
+      Martes: 'Técnica + intervalos — trabajo de velocidad con pausas y desplazamientos específicos.',
+      Miércoles: 'Recuperación activa — movilidad, caminata y sesiones de baja carga.',
+      Jueves: 'Fuerza con baja fatiga — ejercicios compuestos y alta repetición controlada.',
+      Viernes: 'Técnica-táctica + intensidad baja-media — mantener calidad sin sobrecargar.',
+      Sábado: 'Cardio intervalado + fuerza complementaria.',
+      Domingo: 'Descanso total o recuperación activa de 20-30 min.'
+    },
+    'rendimiento deportivo': {
+      Lunes: 'Potencia + fuerza — saltos, fuerza explosiva y aceleración.',
+      Martes: 'Técnica y patrones de juego — velocidad, reacción y precisión técnica.',
+      Miércoles: 'Recuperación o movilidad — trabajo de activación y descanso activo.',
+      Jueves: 'Resistencia específica — intervalos de alta intensidad con pausas.',
+      Viernes: 'Táctica + velocidad — simulación de situaciones del deporte.',
+      Sábado: 'Entrenamiento principal o partido — intensidad controlada.',
+      Domingo: 'Descanso completo y recuperación.'
+    },
+    default: {
+      Lunes: 'Fuerza general + trabajo explosivo — intensidad media-alta y técnica de movimiento.',
+      Martes: 'Técnica y velocidad — trabajo de desplazamiento y precisión.',
+      Miércoles: 'Recuperación activa — movilidad, estiramientos, caminata y trabajo respiratorio.',
+      Jueves: 'Fuerza complementaria — circuitos y control de progresión.',
+      Viernes: 'Táctica y resistencia — intensidad media con foco en ejecución.',
+      Sábado: 'Entrenamiento específico del deporte o simulación.',
+      Domingo: 'Descanso total o recuperación activa ligera.'
+    }
+  };
+
+  const sportSpecific = {
+    futbol: 'Si juegas fútbol, prioriza aceleraciones, cambios de dirección, fuerza de piernas y resistencia repetitiva.',
+    baloncesto: 'Si juegas baloncesto, prioriza saltos, explosividad, desplazamientos laterales y trabajo de corte y rebote.',
+    tenis: 'Si juegas tenis, prioriza fuerza de piernas, velocidad, coordinación y resistencia de intervalos cortos.',
+    natacion: 'Si nadas, prioriza fuerza de espalda y tronco, resistencia aeróbica y trabajo de técnica en el agua.',
+    default: 'El plan prioriza fuerza, velocidad, técnica y recuperación según tu nivel actual.'
+  };
+
+  const positionSpecific = {
+    portero: 'Como portero, mantén más trabajo de reacción, explosividad, estabilidad y técnica con menos volumen de carga general.',
+    delantero: 'Como delantero, enfatiza velocidad, aceleración, fuerza explosiva y trabajo de finalización.',
+    mediocampista: 'Como mediocampista, equilibras resistencia, fuerza, técnica y cambios de ritmo.',
+    defensa: 'Como defensa, prioriza potencia, fuerza de piernas, duelos y estabilidad.',
+    extremo: 'Como extremo, prioriza aceleraciones, cambios de dirección, potencia y resistencia repetitiva.',
+    default: 'La sesión se adapta a tu perfil general y al objetivo del plan.'
+  };
+
+  const plan = dias.map((dia, index) => {
+    let detalle = baseMap[objetivo]?.[dia] || baseMap.default[dia];
+    if (isLowLoad) {
+      detalle = `${detalle} Como hoy hay ${carga}, reduce la intensidad un 30-40%, evita máximos y prioriza técnica y movilidad.`;
+    }
+    return `• ${dia}: ${detalle}`;
+  });
+
+  let respuesta = `Rutina semanal personalizada para ${user?.nombre || 'este atleta'}\n`;
+  respuesta += `Perfil: ${snapshot.deporte} · ${snapshot.posicion} · objetivo: ${objetivo}\n`;
+  respuesta += `Estado actual: fatiga ${fatiga}/10, recuperación ${recuperacion}/10, sueño ${snapshot.actual.sueno ?? 6}/10.\n`;
+  respuesta += `${plan.join('\n')}\n`;
+  respuesta += `${sportSpecific[deporteKey] || sportSpecific.default}\n`;
+  respuesta += `${positionSpecific[posicion?.toLowerCase()] || positionSpecific.default}\n`;
+  respuesta += `\n¿Por qué este plan le sirve a esta persona?: porque está ajustado a su objetivo, a su deporte, a su posición y a su estado real de fatiga y recuperación, no a una rutina estándar para todos.`;
+
+  return { respuesta, tipo: isLowLoad ? 'warning' : 'success', icono: '🏋️' };
+}
+
+function planAlimentacionPersonalizada({ user, pm, comidas, salud, deporte }) {
+  const snapshot = getUserSnapshot(user, salud, pm);
+  const comidasSem = getSemana(comidas || []);
+  const calProm = comidasSem.length ? Math.round(comidasSem.reduce((a, c) => a + Number(c.calorias || 0), 0) / 7) : 2400;
+  const objetivo = snapshot.objetivo;
+  const conds = snapshot.condiciones;
+
+  if (pm?.planAlimenticio?.semana?.length) {
+    const dias = pm.planAlimenticio.semana;
+    const bloque = dias.map(dia => {
+      const slots = ['desayuno', 'meriendaMañana', 'almuerzo', 'meriendaTarde', 'cena'];
+      const comidas = slots.map(slot => {
+        const item = dia[slot];
+        return item ? `${slot === 'almuerzo' ? 'Almuerzo' : slot === 'cena' ? 'Cena' : slot === 'desayuno' ? 'Desayuno' : slot === 'meriendaMañana' ? 'Merienda mañana' : 'Merienda tarde'}: ${item.nombre || item.desc || 'Comida'} (${item.kcal || 0} kcal)` : null;
+      }).filter(Boolean).join(' · ');
+      return `• ${dia.dia}: ${comidas}`;
+    }).join('\n');
+
+    return {
+      respuesta: `Plan nutricional semanal personalizado para ${user?.nombre || 'este atleta'}\nPerfil: ${deporte} · objetivo ${objetivo} · IMC ${snapshot.imc.toFixed(1)}\n\n${bloque}\n\nSe respeta tu preferencia alimentaria y tus condiciones médicas.`,
+      tipo: 'info',
+      icono: '🥗'
+    };
+  }
+
+  let kcal = 2600;
+  if (objetivo === 'ganar masa muscular') kcal = 2900;
+  if (objetivo === 'perder grasa') kcal = 2200;
+  if (objetivo === 'rendimiento deportivo') kcal = 2800;
+  if (snapshot.imc > 27) kcal = Math.max(2100, kcal - 200);
+
+  let carbo = Math.round(kcal * 0.5 / 4);
+  let proteina = Math.round((snapshot.peso || 70) * 1.8);
+  let grasa = Math.round(kcal * 0.25 / 9);
+
+  if (objetivo === 'ganar masa muscular') {
+    carbo = Math.round(kcal * 0.55 / 4);
+    proteina = Math.round((snapshot.peso || 70) * 2.1);
+  }
+  if (objetivo === 'perder grasa') {
+    carbo = Math.round(kcal * 0.4 / 4);
+    proteina = Math.round((snapshot.peso || 70) * 2.2);
+  }
+
+  const pref = (pm?.preferencias || '').toLowerCase();
+  const esVegetariano = pref.includes('vegetariano');
+  const esVegano = pref.includes('vegano');
+  const baseAlmuerzo = esVegano ? 'tofu, legumbres, quinoa, verduras y arroz integral' : esVegetariano ? 'tofu, legumbres, quinoa, huevos si lo toleras y verduras' : 'pollo, pescado, tofu, quinoa, arroz integral y verduras';
+
+  let respuesta = `Plan nutricional personalizado para ${user?.nombre || 'este atleta'}\n`;
+  respuesta += `Perfil: ${deporte} · objetivo ${objetivo} · IMC ${snapshot.imc.toFixed(1)} · consumo actual promedio ${calProm} kcal/día\n`;
+  respuesta += `Meta calórica sugerida: ${kcal} kcal/día · Carbohidratos: ${carbo} g · Proteínas: ${proteina} g · Grasas: ${grasa} g\n\n`;
+  respuesta += `• Desayuno: avena, yogur o alternativas vegetales, fruta y semillas, sin violar tu preferencia.\n`;
+  respuesta += `• Almuerzo: ${baseAlmuerzo}.\n`;
+  respuesta += `• Snack: fruta, yogurt natural o batido de proteína según la hora y el nivel de carga del día.\n`;
+  respuesta += `• Cena: proteína magra + verdura + carbohidrato moderado o baja según el entrenamiento del siguiente día.\n`;
+  respuesta += `• Hidratación: 2 a 3 litros de agua al día y electrolitos si hay entrenamiento intenso o sudoración elevada.\n`;
+  if (conds.includes('diabetes')) respuesta += `• Ajuste: controla los carbohidratos simples y prioriza hidratos complejos para mantener mejor estabilidad glucémica.\n`;
+  if (conds.includes('hipertensión') || conds.includes('asma')) respuesta += `• Ajuste: baja el exceso de sal, alimentos ultraprocesados y prioriza opciones más estables para rendimiento y recuperación.\n`;
+  if (snapshot.alergias.length) respuesta += `• Alergias registradas: ${snapshot.alergias.join(', ')} — evita esos ingredientes y reemplázalos por opciones equivalentes.\n`;
+  respuesta += `\n¿Por qué este plan le sirve a esta persona?: porque está calculado sobre su objetivo, composición corporal, actividad y condiciones, y no como una dieta que sirve para todo el mundo.`;
+
+  return { respuesta, tipo: 'info', icono: '🥗' };
+}
+
+function planPersonalizado({ user, profile, pm, salud, comidas, rutinas, alertas, deporte }) {
+  const snapshot = getUserSnapshot(user || profile || {}, salud, pm);
+  const objetivo = snapshot.objetivo;
+  const fatiga = snapshot.actual.fatiga ?? 5;
+  const recuperacion = snapshot.actual.recuperacion ?? 5;
+
+  const planSemanal = pm?.rutinaSemanal?.semana?.length ? pm.rutinaSemanal.semana : null;
+  const planComida = pm?.planAlimenticio?.semana?.length ? pm.planAlimenticio.semana : null;
+
+  let respuesta = `Plan completo personalizado para ${user?.nombre || profile?.nombre || 'este atleta'}\n`;
+  respuesta += `Perfil: ${snapshot.deporte} · ${snapshot.posicion} · objetivo: ${objetivo} · IMC ${snapshot.imc.toFixed(1)}\n`;
+  respuesta += `Estado actual: fatiga ${fatiga}/10, recuperación ${recuperacion}/10, sueño ${snapshot.actual.sueno ?? 6}/10.\n\n`;
+
+  if (planSemanal) {
+    respuesta += 'ENTRENAMIENTO SEMANAL\n';
+    planSemanal.forEach(dia => {
+      const titulo = dia?.tipo || 'Entrenamiento';
+      const ejercicios = (dia?.ejercicios || []).slice(0, 4).map((e, i) => `${i + 1}. ${e?.nombre || 'Ejercicio'}`).join(' · ');
+      respuesta += `• ${dia?.dia || 'Día'}: ${titulo}${ejercicios ? ` — ${ejercicios}` : ''}\n`;
+    });
+  } else {
+    const entrenamiento = planEntrenamientoPersonalizado({ user: user || profile || {}, pm, salud, rutinas, deporte }).respuesta;
+    respuesta += `ENTRENAMIENTO\n${entrenamiento.split('\n').slice(1, 10).join('\n')}\n\n`;
+  }
+
+  if (planComida) {
+    respuesta += '\nNUTRICIÓN SEMANAL\n';
+    planComida.forEach(dia => {
+      const slots = ['desayuno', 'meriendaMañana', 'almuerzo', 'meriendaTarde', 'cena'];
+      const comidas = slots.map(slot => {
+        const item = dia[slot];
+        if (!item) return null;
+        const nombre = item.nombre || 'Comida';
+        const kcal = item.kcal ? ` (${item.kcal} kcal)` : '';
+        return `${nombre}${kcal}`;
+      }).filter(Boolean).join(' · ');
+      respuesta += `• ${dia.dia}: ${comidas}\n`;
+    });
+  } else {
+    const nutricion = planAlimentacionPersonalizada({ user: user || profile || {}, pm, comidas, salud, deporte }).respuesta;
+    respuesta += `\nNUTRICIÓN\n${nutricion.split('\n').slice(1, 10).join('\n')}\n\n`;
+  }
+
+  respuesta += `\nRecomendación final: este plan es individual porque toma en cuenta tu deporte, objetivo, historial, recuperación, condiciones y preferencias; por eso no puede ser igual para otra persona con una meta o situación distinta.`;
+
+  return { respuesta, tipo: fatiga >= 7 || recuperacion <= 3 ? 'warning' : 'success', icono: '🤖' };
 }
 
 module.exports = { consulta };

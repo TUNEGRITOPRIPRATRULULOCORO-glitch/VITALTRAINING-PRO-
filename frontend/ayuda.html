@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ayuda — Vital Training</title>
+<title>Ayuda — Vital Sports</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -18,18 +18,18 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: #f0fdf4;
+    color: #0f172a;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     font-size: 18px;
   }
 
   .topbar {
-    background: linear-gradient(135deg, #14532d, #0f172a 70%);
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 52%, #ffffff 100%);
     padding: 40px 24px 56px;
     text-align: center;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #e2e8f0;
   }
   .topbar .icon {
     width: 64px; height: 64px;
@@ -38,9 +38,9 @@
     display: flex; align-items:center; justify-content:center;
     margin: 0 auto 16px;
   }
-  .topbar h1 { font-size: 32px; font-weight: 700; }
+  .topbar h1 { font-size: 32px; font-weight: 800; color: #0f172a; }
   .topbar p {
-    color: var(--text-dim);
+    color: #64748b;
     font-size: 18px;
     margin-top: 8px;
     max-width: 480px;
@@ -55,12 +55,12 @@
     z-index: 5;
   }
   .search-box {
-    background: var(--bg-card);
-    border: 2px solid var(--border);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 16px;
     padding: 16px 20px;
     display:flex; align-items:center; gap:12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 6px 24px rgba(0,0,0,0.06);
   }
   .search-box input {
     background:none; border:none; outline:none;
@@ -79,14 +79,15 @@
   }
   .indice a {
     text-decoration:none;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 16px;
     padding: 20px 16px;
     display:flex; flex-direction:column; align-items:center; text-align:center;
     gap: 10px;
-    color: var(--text);
-    transition: transform .15s ease, border-color .15s ease;
+    color: #0f172a;
+    transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .indice a:hover { border-color: var(--green); transform: translateY(-2px); }
   .indice .emoji { font-size: 34px; }
@@ -123,10 +124,631 @@
 
   .captura {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 1px solid var(--border);
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     display: block;
+    background: #0f172a;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  }
+
+  .help-mockup {
+    --primary: #16a34a;
+    --primary-light: #22c55e;
+    --bg: #f0fdf4;
+    --bg-2: #ffffff;
+    --sidebar-bg: #0f1f14;
+    --sidebar-text: #a3c9b0;
+    --sidebar-hover: rgba(34, 197, 94, 0.12);
+    --sidebar-active: rgba(34, 197, 94, 0.18);
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 6px 24px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.09), 0 20px 40px rgba(0,0,0,0.10);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --sidebar-w: 260px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    min-height: 320px;
+  }
+
+  .mock-app-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 580px;
+    max-width: 920px;
+    margin: 0 auto;
+    background: var(--bg-2);
+    box-shadow: var(--shadow-md);
+  }
+
+  .mock-brand-panel {
+    background: linear-gradient(160deg, #0c1d10 0%, #091508 60%, #060e05 100%);
+    padding: 48px 40px;
+    border-right: 1px solid rgba(34,197,94,0.12);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mock-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(22,163,74,0.45);
+    flex-shrink: 0;
+  }
+
+  .mock-brand-name {
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .mock-brand-panel h3 {
+    font-size: 34px;
+    line-height: 1.12;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 14px;
+    letter-spacing: -1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-brand-panel h3 span {
+    color: #22c55e;
+  }
+
+  .mock-brand-panel .tagline {
+    color: rgba(255,255,255,0.38);
+    font-size: 13px;
+    max-width: 300px;
+    margin-top: 8px;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-brand-features {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 26px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-brand-feature {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .mock-brand-feature-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(34,197,94,0.10);
+    border: 1px solid rgba(34,197,94,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .mock-brand-feature strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.88);
+    margin-bottom: 2px;
+  }
+
+  .mock-brand-feature span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.4;
+  }
+
+  .mock-brand-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0 28px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-brand-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ecfdf5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .mock-auth-panel {
+    background: #ffffff;
+    padding: 48px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mock-auth-box {
+    width: 100%;
+    max-width: 390px;
+    color: #0f172a;
+  }
+
+  .mock-auth-box h4 {
+    font-size: 26px;
+    margin-bottom: 6px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    color: #0f172a;
+  }
+
+  .mock-auth-box .subtitle {
+    color: #64748b;
+    margin-bottom: 22px;
+    font-size: 13px;
+  }
+
+  .mock-progress {
+    margin-bottom: 22px;
+  }
+
+  .mock-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .mock-progress-pct {
+    color: #22c55e;
+  }
+
+  .mock-progress-bar {
+    height: 3px;
+    background: rgba(15,23,42,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .mock-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    border-radius: 10px;
+    width: 50%;
+  }
+
+  .mock-label {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    margin: 16px 0 8px;
+  }
+
+  .mock-input {
+    height: 52px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px 0 44px;
+    color: #0f172a;
+    font-size: 14px;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(15,23,42,0.02);
+  }
+
+  .mock-input::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: rgba(15,23,42,0.08);
+  }
+
+  .mock-btn {
+    width: 100%;
+    margin-top: 18px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #22c55e, #15803d);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+    box-shadow: 0 10px 32px rgba(22,163,74,0.45);
+  }
+
+  .mock-layout {
+    display: flex;
+    min-height: 360px;
+    background: var(--bg-2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .mock-sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mock-sidebar::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .mock-sidebar .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-sidebar .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px 12px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mock-sidebar .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--sidebar-text);
+    background: transparent;
+    font-family: inherit;
+    border: none;
+    text-align: left;
+  }
+
+  .mock-sidebar .nav-item.active {
+    background: var(--sidebar-active);
+    color: var(--primary-light);
+    font-weight: 600;
+  }
+
+  .mock-main {
+    flex: 1;
+    background: var(--bg);
+    padding: 36px 40px;
+    overflow-y: auto;
+  }
+
+  .mock-view-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 60%, #dcfce7 100%);
+    border: 1px solid rgba(22,163,74,0.1);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(22,163,74,0.06);
+    margin-bottom: 22px;
+  }
+
+  .mock-view-title h4 {
+    font-size: 28px;
+    color: #0f172a;
+    letter-spacing: -0.04em;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .mock-view-title p {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  .mock-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border: 1px solid rgba(22,163,74,0.2);
+    background: rgba(22,163,74,0.08);
+    color: #166534;
+  }
+
+  .mock-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .mock-stat {
+    background: var(--bg-2);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid var(--border);
+    min-height: 110px;
+  }
+
+  .mock-stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .mock-stat-icon.green { background: linear-gradient(135deg, #bbf7d0, #86efac); }
+  .mock-stat-icon.blue { background: linear-gradient(135deg, #bae6fd, #7dd3fc); }
+  .mock-stat-icon.red { background: linear-gradient(135deg, #fecaca, #fca5a5); }
+
+  .mock-stat strong {
+    display: block;
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .mock-stat span {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 5px;
+  }
+
+  .mock-card {
+    background: var(--bg-2);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    margin-top: 20px;
+  }
+
+  .mock-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mock-card-header h5 {
+    font-size: 16px;
+    color: var(--text);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .mock-card-body {
+    padding: 18px 20px;
+  }
+
+  .mock-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 14px;
+  }
+
+  .mock-row:last-child { border-bottom: none; }
+
+  .mock-mini-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .mock-mini-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  }
+
+  .mock-mini-item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+
+  .mock-mini-item-icon.green { background: #dcfce7; }
+  .mock-mini-item-icon.blue { background: #e0f2fe; }
+  .mock-mini-item-icon.red { background: #fee2e2; }
+  .mock-mini-item-icon.yellow { background: #fef3c7; }
+  .mock-mini-item-icon.purple { background: #ede9fe; }
+
+  .mock-mini-item-body { flex: 1; min-width: 0; }
+  .mock-mini-item-title { font-weight: 600; color: #0f172a; }
+  .mock-mini-item-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .mock-mini-item-right { color: #64748b; font-size: 11px; }
+
+  .mock-form {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    max-width: 540px;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+  }
+
+  .mock-form-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .mock-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .mock-field,
+  .mock-select {
+    height: 38px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+  }
+
+  .mock-form .button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    font-weight: 700;
+  }
+
+  .mock-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 0 16px;
+  }
+
+  .mock-kpi {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+
+  .mock-kpi-value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+    letter-spacing: -0.8px;
+  }
+
+  .mock-kpi-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 620px) {
+    .mock-app-shell,
+    .mock-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .mock-sidebar {
+      border-right: none;
+      border-bottom: 1px solid rgba(148,163,184,0.15);
+    }
   }
 
   .tip {
@@ -197,7 +819,7 @@
       <svg width="30" height="30" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg>
     </div>
     <h1>¿En qué te ayudamos?</h1>
-    <p>Aquí te explicamos, paso a paso, cómo usar Vital Training. No necesitas saber nada de computadores, solo sigue las imágenes y los pasos.</p>
+    <p>Aquí te explicamos, paso a paso, cómo usar Vital Sports. No necesitas saber nada de computadores, solo sigue las imágenes y los pasos.</p>
   </div>
 
   <div class="search-wrap">
@@ -210,7 +832,7 @@
   <main>
 
     <div class="indice" id="indice">
-      <a href="#entrar"><span class="emoji">🔑</span><span class="label">Entrar a mi cuenta</span></a>
+      <a href="#entrar"><span class="emoji">🔑</span><span class="label">Inicio y registro</span></a>
       <a href="#dashboard"><span class="emoji">🏠</span><span class="label">Mi pantalla principal</span></a>
       <a href="#perfil"><span class="emoji">🙋</span><span class="label">Mi perfil</span></a>
       <a href="#comidas"><span class="emoji">🍽️</span><span class="label">Mis comidas</span></a>
@@ -223,14 +845,73 @@
     </div>
 
     <!-- 1. ENTRAR -->
-    <section class="seccion" id="entrar" data-tema="entrar cuenta login clave contraseña iniciar sesion registro">
-      <div class="seccion-header"><div class="num">1</div><h2>Cómo entrar a tu cuenta</h2></div>
+    <section class="seccion" id="entrar" data-tema="entrar cuenta login clave contraseña iniciar sesion registro inicio">
+      <div class="seccion-header"><div class="num">1</div><h2>Inicio y registro de sesión</h2></div>
 
       <div class="paso">
-        <div class="titulo-paso"><span class="dot"></span>Si ya tienes cuenta</div>
-        <img src="img/login.png" alt="Pantalla de inicio de sesión de Vital Training" class="captura">
-        <p>Abre Vital Training. Vas a ver dos cajitas: una dice <strong>Correo electrónico</strong> y otra dice <strong>Contraseña</strong>.</p>
-        <p>Escribe tu correo en la primera cajita, y tu clave secreta en la segunda. Luego presiona el botón verde que dice <span class="etiqueta-boton">Iniciar sesión →</span></p>
+        <div class="titulo-paso"><span class="dot"></span>Antes de entrar a cualquier pantalla</div>
+        <div class="help-mockup">
+          <div class="mock-app-shell">
+            <div class="mock-brand-panel">
+              <div class="mock-brand-row">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div>
+                <h3>Entrena.<br>Nutre.<br><span>Supérate.</span></h3>
+                <div class="tagline">La plataforma integral para atletas y equipos de alto rendimiento.</div>
+                <div class="mock-brand-chips">
+                  <span class="mock-brand-chip">⚽ Fútbol</span>
+                  <span class="mock-brand-chip">🏀 Baloncesto</span>
+                  <span class="mock-brand-chip">🎾 Tenis</span>
+                </div>
+                <div class="mock-brand-features">
+                  <div class="mock-brand-feature">
+                    <div class="mock-brand-feature-icon">⚡</div>
+                    <div>
+                      <strong>Plan personalizado</strong>
+                      <span>Rutinas y nutrición adaptadas a tu posición</span>
+                    </div>
+                  </div>
+                  <div class="mock-brand-feature">
+                    <div class="mock-brand-feature-icon">📊</div>
+                    <div>
+                      <strong>Seguimiento en tiempo real</strong>
+                      <span>Monitorea tu salud y rendimiento diario</span>
+                    </div>
+                  </div>
+                  <div class="mock-brand-feature">
+                    <div class="mock-brand-feature-icon">🤖</div>
+                    <div>
+                      <strong>Asistente IA</strong>
+                      <span>Análisis inteligente de tu progreso atlético</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mock-auth-panel">
+              <div class="mock-auth-box">
+                <div class="mock-progress">
+                  <div class="mock-progress-labels">
+                    <span>Bienvenido</span>
+                    <span class="mock-progress-pct">Login</span>
+                  </div>
+                  <div class="mock-progress-bar"><div class="mock-progress-fill"></div></div>
+                </div>
+                <h4>Bienvenido de vuelta</h4>
+                <div class="subtitle">Ingresa tus credenciales para acceder</div>
+                <div class="mock-label">Correo electrónico</div>
+                <div class="mock-input">correo@vitalsports.com</div>
+                <div class="mock-label">Contraseña</div>
+                <div class="mock-input">••••••••</div>
+                <button class="mock-btn">Iniciar sesión</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p>Esta es la primera pantalla que ves al abrir Vital Sports. Aquí es donde empiezas tu sesión o creas tu cuenta.</p>
+        <p>Vas a ver dos cajitas: una dice <strong>Correo electrónico</strong> y otra dice <strong>Contraseña</strong>. Si ya tienes cuenta, escribe tus datos y presiona <span class="etiqueta-boton">Iniciar sesión →</span>.</p>
         <div class="tip"><span class="icono">💡</span><p>Si escribes tu correo o clave mal, la pantalla te lo va a decir con un mensaje. No te preocupes, solo inténtalo de nuevo con calma.</p></div>
       </div>
 
@@ -246,7 +927,45 @@
     <section class="seccion" id="dashboard" data-tema="dashboard inicio pantalla principal resumen">
       <div class="seccion-header"><div class="num">2</div><h2>Tu pantalla principal (Dashboard)</h2></div>
       <div class="paso">
-        <img src="img/dashboard.png" alt="Pantalla principal del panel del futbolista" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item active">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item">Historial</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Atleta</div>
+                  <h4>Bienvenido, Carlos</h4>
+                  <p>Tu resumen diario está listo.</p>
+                </div>
+              </div>
+              <div class="mock-stats-grid">
+                <div class="mock-stat"><div class="mock-stat-icon green">🍽</div><div><strong>2</strong><span>Comidas</span></div></div>
+                <div class="mock-stat"><div class="mock-stat-icon blue">🏃</div><div><strong>1</strong><span>Rutinas</span></div></div>
+                <div class="mock-stat"><div class="mock-stat-icon red">🔔</div><div><strong>1</strong><span>Avisos</span></div></div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>📊 Últimas comidas</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon green">🥣</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Avena con frutas</div><div class="mock-mini-item-sub">Desayuno · 8:30</div></div><div class="mock-mini-item-right">✓</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon blue">🥗</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Arroz con pollo</div><div class="mock-mini-item-sub">Almuerzo · 13:15</div></div><div class="mock-mini-item-right">✓</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Cuando entras, esta es la primera pantalla que ves. Es como el resumen del día: te dice qué has comido, qué ejercicios hiciste, y si tienes algún aviso nuevo.</p>
       </div>
       <div class="paso">
@@ -262,7 +981,41 @@
     <section class="seccion" id="perfil" data-tema="perfil datos personales editar nombre edad peso altura posicion">
       <div class="seccion-header"><div class="num">3</div><h2>Tu perfil</h2></div>
       <div class="paso">
-        <img src="img/perfil.png" alt="Pantalla de Mi Perfil" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item active">Mi Perfil</div>
+                <div class="nav-item">Historial</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Perfil</div>
+                  <h4>Mi Perfil</h4>
+                  <p>Tu información deportiva y de rendimiento.</p>
+                </div>
+              </div>
+              <div class="mock-form">
+                <div class="mock-form-grid">
+                  <div class="mock-field"></div>
+                  <div class="mock-field"></div>
+                  <div class="mock-form-row"><div class="mock-field"></div><div class="mock-field"></div></div>
+                  <div class="mock-select"></div>
+                  <div class="mock-form-row"><div class="mock-field"></div><div class="mock-field"></div></div>
+                </div>
+                <div class="button">Guardar cambios</div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Aquí guardas tus datos: tu nombre, tu edad, tu peso, tu altura y en qué posición juegas.</p>
         <p>Para llegar aquí, busca en el menú de la izquierda el botón que dice <span class="etiqueta-menu">🙋 Mi Perfil</span></p>
       </div>
@@ -277,7 +1030,41 @@
     <section class="seccion" id="comidas" data-tema="comidas comida nutricion desayuno almuerzo cena plan alimenticio">
       <div class="seccion-header"><div class="num">4</div><h2>Tus comidas</h2></div>
       <div class="paso">
-        <img src="img/comidas.png" alt="Pantalla del plan de comidas" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item active">Comidas</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Nutrición</div>
+                  <h4>Tu plan de comidas</h4>
+                  <p>Diseñado para tu energía y recuperación.</p>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>🍽 Plan alimenticio</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon green">🥣</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Desayuno</div><div class="mock-mini-item-sub">Avena con frutas y yogur</div></div><div class="mock-mini-item-right">8:30</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon blue">🥗</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Almuerzo</div><div class="mock-mini-item-sub">Arroz, pollo y vegetales</div></div><div class="mock-mini-item-right">13:15</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon purple">🐟</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Cena</div><div class="mock-mini-item-sub">Salmón con quinoa y ensalada</div></div><div class="mock-mini-item-right">20:00</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Aquí puedes ver tu plan de comidas de la semana: qué desayunar, qué almorzar, qué cenar. Lo prepara tu nutricionista pensando en ti.</p>
       </div>
       <div class="tip"><span class="icono">💡</span><p>Si tienes alguna alergia (por ejemplo a los frutos secos), avísale a tu nutricionista para que la anote en tu perfil médico. Así el plan de comidas siempre la va a tener en cuenta.</p></div>
@@ -287,7 +1074,46 @@
     <section class="seccion" id="rutinas" data-tema="rutinas ejercicio entrenamiento gimnasio">
       <div class="seccion-header"><div class="num">5</div><h2>Tus rutinas de entrenamiento</h2></div>
       <div class="paso">
-        <img src="img/rutinas.png" alt="Pantalla de rutinas de entrenamiento" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item active">Rutinas</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Entrenamiento</div>
+                  <h4>Tu rutina semanal</h4>
+                  <p>Ejercicios adaptados a tu plan actual.</p>
+                </div>
+              </div>
+              <div class="mock-kpis">
+                <div class="mock-kpi"><span class="mock-kpi-value">3</span><span class="mock-kpi-label">Sesiones</span></div>
+                <div class="mock-kpi"><span class="mock-kpi-value">48</span><span class="mock-kpi-label">Minutos</span></div>
+                <div class="mock-kpi"><span class="mock-kpi-value">4/5</span><span class="mock-kpi-label">Carga</span></div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>🏃 Rutina</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon green">🏋</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Lunes</div><div class="mock-mini-item-sub">Sentadilla + press de banca</div></div><div class="mock-mini-item-right">45 min</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon blue">🏃</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Martes</div><div class="mock-mini-item-sub">Carrera + fuerza de piernas</div></div><div class="mock-mini-item-right">50 min</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon yellow">🧘</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Miércoles</div><div class="mock-mini-item-sub">Descanso activo</div></div><div class="mock-mini-item-right">30 min</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Aquí ves qué ejercicios te tocan cada día de la semana: cuántas series, cuántas repeticiones, y cuánto tiempo debes hacer cada uno.</p>
         <p>Si un día dice <strong>Descanso</strong>, significa que ese día no hay que entrenar. ¡Descansar también es parte de mejorar!</p>
       </div>
@@ -297,7 +1123,41 @@
     <section class="seccion" id="alertas" data-tema="alertas avisos notificaciones mensajes">
       <div class="seccion-header"><div class="num">6</div><h2>Tus avisos</h2></div>
       <div class="paso">
-        <img src="img/alertas.png" alt="Pantalla de avisos" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item active">Avisos</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Avisos</div>
+                  <h4>Tus avisos</h4>
+                  <p>Recordatorios y mensajes importantes.</p>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>🔔 Notificaciones</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon yellow">💧</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Recuerda tomar agua</div><div class="mock-mini-item-sub">Durante tu sesión de hoy</div></div><div class="mock-mini-item-right">Nuevos</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon green">✅</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Felicitaciones</div><div class="mock-mini-item-sub">Llevas 3 días seguidos</div></div><div class="mock-mini-item-right">Hace 1h</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon blue">🧑‍⚕️</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">Actualización del plan</div><div class="mock-mini-item-sub">Tu nutricionista cambió tu menú</div></div><div class="mock-mini-item-right">Hoy</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Aquí llegan mensajes importantes para ti, como recordatorios de tomar agua, o felicitaciones cuando llevas varios días entrenando seguido.</p>
         <p>Si un aviso tiene un puntito de color, significa que todavía no lo has leído.</p>
       </div>
@@ -307,7 +1167,41 @@
     <section class="seccion" id="historial" data-tema="historial pasado registros anteriores">
       <div class="seccion-header"><div class="num">7</div><h2>Tu historial</h2></div>
       <div class="paso">
-        <img src="img/historial.png" alt="Pantalla de historial" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item active">Historial</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">Historial</div>
+                  <h4>Mi historial</h4>
+                  <p>Todo lo que has hecho y registrado.</p>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>📖 Registro</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon green">🥣</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">25/09</div><div class="mock-mini-item-sub">Desayuno · avena con frutas</div></div><div class="mock-mini-item-right">✓</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon blue">🏋</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">24/09</div><div class="mock-mini-item-sub">Rutina · fuerza de piernas</div></div><div class="mock-mini-item-right">✓</div></div>
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon yellow">💧</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">23/09</div><div class="mock-mini-item-sub">Aviso · hidratación recordada</div></div><div class="mock-mini-item-right">✓</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Aquí puedes ver todo lo que has hecho antes: comidas de días pasados, entrenamientos anteriores, y avisos viejos. Es como un cuaderno donde queda guardado todo tu camino.</p>
       </div>
     </section>
@@ -316,7 +1210,39 @@
     <section class="seccion" id="asistente" data-tema="asistente chatbot ia inteligencia artificial preguntar chat">
       <div class="seccion-header"><div class="num">8</div><h2>El asistente</h2></div>
       <div class="paso">
-        <img src="img/asistente.png" alt="Pantalla del asistente de inteligencia artificial" class="captura">
+        <div class="help-mockup">
+          <div class="mock-layout">
+            <aside class="mock-sidebar">
+              <div class="brand">
+                <div class="mock-logo">VT</div>
+                <div class="mock-brand-name">Vital Sports</div>
+              </div>
+              <div class="nav">
+                <div class="nav-item">Dashboard</div>
+                <div class="nav-item">Mi Perfil</div>
+                <div class="nav-item active">Asistente</div>
+                <div class="nav-item">Ayuda</div>
+              </div>
+            </aside>
+            <main class="mock-main">
+              <div class="mock-view-header">
+                <div class="mock-view-title">
+                  <div class="mock-pill">IA</div>
+                  <h4>Asistente IA</h4>
+                  <p>Consulta tu progreso y dudas del día.</p>
+                </div>
+              </div>
+              <div class="mock-card">
+                <div class="mock-card-header"><h5>💬 Pregunta</h5></div>
+                <div class="mock-card-body">
+                  <div class="mock-mini-list">
+                    <div class="mock-mini-item"><div class="mock-mini-item-icon purple">🤖</div><div class="mock-mini-item-body"><div class="mock-mini-item-title">¿Puedo entrenar hoy?</div><div class="mock-mini-item-sub">Sí, tienes descanso activo y recuperación adecuada.</div></div><div class="mock-mini-item-right">IA</div></div>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+        </div>
         <p>Es como un amigo dentro de la aplicación que conoce tus datos y te puede responder preguntas, como:</p>
         <p>💬 "¿Puedo entrenar hoy?"</p>
         <p>💬 "¿Cómo estuve esta semana?"</p>

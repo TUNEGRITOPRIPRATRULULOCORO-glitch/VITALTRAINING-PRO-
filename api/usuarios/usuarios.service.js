@@ -43,11 +43,12 @@ async function crear(datos) {
   const plain  = datos.password;
   const hashed = await bcrypt.hash(plain, 10);
 
+  const rolUsuario = ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
   const { rows } = await query(
     `INSERT INTO usuarios (nombre, email, password, rol, estado)
      VALUES ($1,$2,$3,$4,'Activo')
      RETURNING id, nombre, email, rol, estado`,
-    [datos.nombre, datos.email, hashed, datos.rol || 'Futbolista']
+    [datos.nombre, datos.email, hashed, rolUsuario]
   );
   return rows[0];
 }

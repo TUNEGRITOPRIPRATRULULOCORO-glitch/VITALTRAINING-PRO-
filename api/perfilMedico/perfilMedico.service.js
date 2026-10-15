@@ -235,29 +235,56 @@ const RUTINAS_BASE = {
 // GENERADORES
 // ═══════════════════════════════════════════════════════════════
 function filtrarComidas(pool, alergias, preferencia, condiciones) {
-  const alergenos = alergias.map(a => {
-    if (a.includes('Gluten'))    return 'gluten';
-    if (a.includes('Lácteos'))   return 'lactosa';
-    if (a.includes('Huevo'))     return 'huevo';
-    if (a.includes('Mariscos'))  return 'mariscos';
-    if (a.includes('Pescado'))   return 'pescado';
-    if (a.includes('Frutos secos')) return 'frutos-secos';
-    if (a.includes('Cacahuetes')) return 'maní';
-    if (a.includes('Soya'))      return 'soya';
-    if (a.includes('Maíz'))      return 'maíz';
-    return a.toLowerCase().split(' ')[0];
-  });
+  const reglasAlergias = [
+    { patron: /gluten/i, clave: 'gluten', palabras: ['gluten'] },
+    { patron: /lácteos|lactosa/i, clave: 'lactosa', palabras: ['lácteos', 'lactosa', 'leche', 'yogur', 'queso', 'whey', 'suero'] },
+    { patron: /huevo/i, clave: 'huevo', palabras: ['huevo', 'clara'] },
+    { patron: /mariscos/i, clave: 'mariscos', palabras: ['marisco', 'camarón', 'langostino', 'cangrejo'] },
+    { patron: /pescado/i, clave: 'pescado', palabras: ['pescado', 'salmón', 'tilapia', 'atún', 'tuna'] },
+    { patron: /frutos secos/i, clave: 'frutos-secos', palabras: ['nueces', 'almendra', 'piñones', 'pistacho', 'anacardo'] },
+    { patron: /cacahuetes|maní/i, clave: 'maní', palabras: ['maní', 'cacahuate', 'mantequilla de maní'] },
+    { patron: /soya|soja/i, clave: 'soya', palabras: ['soya', 'soja', 'tofu', 'edamame', 'tamari'] },
+    { patron: /maíz/i, clave: 'maíz', palabras: ['maíz', 'maiz'] },
+    { patron: /cítricos/i, palabras: ['cítrico', 'limón', 'naranja', 'lima'] },
+    { patron: /fresas|frutos rojos/i, palabras: ['fresa', 'berries', 'frutos rojos'] },
+    { patron: /chocolate|cacao/i, palabras: ['chocolate', 'cacao'] },
+    { patron: /sulfitos/i, palabras: ['sulfito'] },
+    { patron: /sésamo|ajonjolí/i, palabras: ['sésamo', 'ajonjolí', 'tahini'] },
+    { patron: /mostaza/i, palabras: ['mostaza', 'dijon'] },
+    { patron: /apio/i, palabras: ['apio'] }
+  ];
+  const reglasUsuario = alergias.map(alergia => reglasAlergias.find(regla => regla.patron.test(alergia))).filter(Boolean);
 
   const pref = preferencia.toLowerCase();
   const prefKey = pref.includes('vegetariano') ? 'vegetariano'
     : pref.includes('vegano') ? 'vegano'
     : pref.includes('bajo en carbohidratos') ? 'bajo-carbohidratos'
+    : pref.includes('alto en proteína') ? 'alto-proteina'
+    : pref.includes('mediterránea') ? 'mediterranea'
     : 'none';
 
-  return pool.filter(c => {
-    // Excluir si tiene alérgeno del usuario
-    const tieneAlergeno = alergenos.some(al => !c.sinAlergenos.includes(al));
-    if (tieneAlergeno) return false;
+  const comidasCompatibles = pool.filter(c => {
+    const ingredientes = `${c.nombre || ''} ${c.desc || ''}`.toLowerCase();
+    const restricciones = c.condicionesEvitar || [];
+    const alergiaIncompatible = reglasUsuario.some(regla => {
+      if (regla.clave && !(c.sinAlergenos || []).includes(regla.clave)) return true;
+      return restricciones.some(restriccion => regla.palabras.some(palabra => restriccion.toLowerCase().includes(palabra)))
+        || regla.palabras.some(palabra => ingredientes.includes(palabra));
+    });
+    if (alergiaIncompatible) return false;
+
+    // Forzar compatibilidad estricta con la preferencia alimentaria del usuario.
+    if (prefKey === 'vegetariano') {
+      const nombre = (c.nombre || '').toLowerCase();
+      if (nombre.includes('pollo') || nombre.includes('pescado') || nombre.includes('salmón') || nombre.includes('atún') || nombre.includes('res ') || nombre.includes('carne') || nombre.includes('pavo') || nombre.includes('muslo') || nombre.includes('filete') || nombre.includes('lomo')) return false;
+      if (c.noApto.includes('vegetariano') || c.noApto.includes('vegetariano-estricto')) return false;
+    }
+    if (prefKey === 'vegano') {
+      const nombre = (c.nombre || '').toLowerCase();
+      if (nombre.includes('pollo') || nombre.includes('pescado') || nombre.includes('salmón') || nombre.includes('atún') || nombre.includes('res ') || nombre.includes('carne') || nombre.includes('pavo') || nombre.includes('huevo') || nombre.includes('yogur') || nombre.includes('queso') || nombre.includes('leche')) return false;
+      if (c.noApto.includes('vegano')) return false;
+    }
+
     // Excluir si no aplica preferencia
     if (prefKey !== 'none' && c.noApto.includes(prefKey)) return false;
     // Excluir si condición es incompatible
@@ -265,6 +292,18 @@ function filtrarComidas(pool, alergias, preferencia, condiciones) {
     if (condIncompatible) return false;
     return true;
   });
+
+  if (prefKey === 'alto-proteina') return comidasCompatibles.sort((a, b) => b.proteina - a.proteina);
+  if (prefKey === 'mediterranea') {
+    const puntajeMediterraneo = comida => {
+      const texto = `${comida.nombre || ''} ${comida.desc || ''}`.toLowerCase();
+      const positivos = (texto.match(/aceite de oliva|salmón|pescado|quinoa|garbanzos|lentejas|verduras|vegetales|espinaca|tomate|aguacate|nueces|almendra/g) || []).length;
+      const negativos = (texto.match(/res |carne|chorizo|embutido/g) || []).length;
+      return positivos - negativos;
+    };
+    return comidasCompatibles.sort((a, b) => puntajeMediterraneo(b) - puntajeMediterraneo(a));
+  }
+  return comidasCompatibles;
 }
 
 function pick(arr, idx) { return arr[idx % arr.length]; }
@@ -278,11 +317,15 @@ function generarPlanAlimenticio(perfilMedico, posicion) {
   const cOk = filtrarComidas(CENAS,     alergias, preferencias, condiciones);
   const mOk = filtrarComidas(MERIENDAS, alergias, preferencias, condiciones);
 
-  const usarFallback = (pool, fallback) => pool.length ? pool : fallback;
-  const B = usarFallback(bOk, DESAYUNOS);
-  const A = usarFallback(aOk, ALMUERZOS);
-  const C = usarFallback(cOk, CENAS);
-  const M = usarFallback(mOk, MERIENDAS);
+  const sinOpcionSegura = {
+    nombre: 'Sin opción segura disponible en el catálogo',
+    desc: 'Consulta con tu nutricionista para añadir una alternativa compatible con tus restricciones.',
+    kcal: 0, proteina: 0, carbs: 0, grasa: 0
+  };
+  const B = bOk.length ? bOk : [sinOpcionSegura];
+  const A = aOk.length ? aOk : [sinOpcionSegura];
+  const C = cOk.length ? cOk : [sinOpcionSegura];
+  const M = mOk.length ? mOk : [sinOpcionSegura];
 
   const notas = [];
   if (condiciones.includes('Diabetes tipo 1') || condiciones.includes('Diabetes tipo 2'))
@@ -297,6 +340,8 @@ function generarPlanAlimenticio(perfilMedico, posicion) {
     notas.push('🍽 Come despacio, mastica bien y evita comidas copiosas antes de entrenar.');
   if (alergias.length)
     notas.push(`🚫 Alergias registradas: ${alergias.join(', ')}. Revisa siempre etiquetas de productos.`);
+  if (!bOk.length || !aOk.length || !cOk.length || !mOk.length)
+    notas.push('⚠️ El catálogo no tiene opciones seguras para una o más comidas. Se dejaron sin asignar para evitar recomendar alimentos incompatibles; consulta a tu nutricionista.');
   notas.push('💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.');
   notas.push('🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar.');
 

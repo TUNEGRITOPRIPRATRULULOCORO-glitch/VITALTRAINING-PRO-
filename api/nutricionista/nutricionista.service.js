@@ -10,7 +10,7 @@ async function listarFutbolistas() {
        (SELECT COUNT(*)::int FROM rutinas WHERE user_id = u.id) AS "totalRutinas"
      FROM usuarios u
      LEFT JOIN perfiles p ON p.user_id = u.id
-     WHERE u.rol = 'Futbolista' AND u.estado = 'Activo'`
+     WHERE (u.rol = 'Atleta' OR u.rol = 'Futbolista') AND u.estado = 'Activo'`
   );
   return rows;
 }
@@ -21,7 +21,7 @@ async function detalleFutbolista(userId) {
     [Number(userId)]
   );
   const usuario = users[0];
-  if (!usuario || usuario.rol !== 'Futbolista') return null;
+  if (!usuario || (usuario.rol !== 'Atleta' && usuario.rol !== 'Futbolista')) return null;
 
   const [perfilR, saludR, comidasR, rutinasR, alertasR, notasR] = await Promise.all([
     query('SELECT * FROM perfiles WHERE user_id = $1', [usuario.id]),

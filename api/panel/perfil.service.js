@@ -2,7 +2,11 @@ const { query } = require('../../data/db');
 
 async function obtenerPerfil(userId) {
   const { rows } = await query(
-    'SELECT id, user_id AS "userId", nombre, edad, peso, altura, posicion, updated_at AS "updatedAt" FROM perfiles WHERE user_id = $1',
+    `SELECT p.id, p.user_id AS "userId", p.nombre, p.edad, p.peso, p.altura, p.posicion, p.updated_at AS "updatedAt",
+            u.deporte_principal AS "deportePrincipal"
+     FROM perfiles p
+     LEFT JOIN usuarios u ON u.id = p.user_id
+     WHERE p.user_id = $1`,
     [userId]
   );
   return rows[0] || null;
@@ -22,7 +26,17 @@ async function actualizarPerfil(userId, datos) {
      RETURNING id, user_id AS "userId", nombre, edad, peso, altura, posicion, updated_at AS "updatedAt"`,
     [userId, datos.nombre || null, datos.edad || null, datos.peso || null, datos.altura || null, datos.posicion || null]
   );
-  return rows[0];
+
+  const perfil = rows[0];
+  if (datos.deportePrincipal) {
+    const { rows: deporteRows } = await query(
+      'UPDATE usuarios SET deporte_principal = $1 WHERE id = $2 RETURNING deporte_principal AS "deportePrincipal"',
+      [datos.deportePrincipal, userId]
+    );
+    perfil.deportePrincipal = deporteRows[0]?.deportePrincipal || datos.deportePrincipal;
+  }
+
+  return perfil;
 }
 
 module.exports = { obtenerPerfil, actualizarPerfil };

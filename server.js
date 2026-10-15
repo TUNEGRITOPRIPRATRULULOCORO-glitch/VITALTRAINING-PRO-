@@ -22,7 +22,7 @@ setupDatabase()
   .then(() => {
     app.listen(PORT, () => {
       console.log('');
-      console.log('🚀 Vital Training — Servidor iniciado');
+      console.log('🚀 Vital Sports — Servidor iniciado');
       console.log(`📡 http://localhost:${PORT}`);
       console.log('');
     });

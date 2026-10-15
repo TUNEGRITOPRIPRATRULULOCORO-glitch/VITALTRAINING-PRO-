@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vital Training</title>
+    <title>Vital Sports</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -25,36 +25,18 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo">VT</div>
-                    <span class="auth-logo-name">Vital Training</span>
+                    <span class="auth-logo-name">Vital Sports</span>
                 </div>
-                <h1>Entrena.<br>Nutre.<br><span>Supérate.</span></h1>
-                <p class="auth-tagline">La plataforma integral para atletas de alto rendimiento.</p>
-                <div class="auth-features">
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon">⚡</div>
-                        <div class="auth-feature-text">
-                            <strong>Plan personalizado</strong>
-                            <span>Rutinas y nutrición adaptadas a tu posición</span>
-                        </div>
-                    </div>
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon">📊</div>
-                        <div class="auth-feature-text">
-                            <strong>Seguimiento en tiempo real</strong>
-                            <span>Monitorea tu salud y rendimiento diario</span>
-                        </div>
-                    </div>
-                    <div class="auth-feature">
-                        <div class="auth-feature-icon">🤖</div>
-                        <div class="auth-feature-text">
-                            <strong>Asistente IA</strong>
-                            <span>Análisis inteligente de tu progreso atlético</span>
-                        </div>
-                    </div>
+                <h1>Tu progreso<br>en una sola app.</h1>
+                <p class="auth-tagline">Entrena mejor, cuida tu salud y sigue tu plan sin complicaciones.</p>
+                <div class="auth-mini-badges" aria-label="Áreas clave">
+                    <span>🏃 Entrenamiento</span>
+                    <span>🥗 Nutrición</span>
+                    <span>🩺 Salud</span>
                 </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -68,7 +50,7 @@
                     <label>Correo electrónico</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <input type="email" id="login-email" placeholder="correo@vitaltraining.com" autocomplete="email">
+                        <input type="email" id="login-email" placeholder="correo@vitalsports.com" autocomplete="email">
                     </div>
                 </div>
                 <div class="auth-input-group">
@@ -92,14 +74,19 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VT</div>
-                    <span class="auth-logo-name">Vital Training</span>
+                    <div class="auth-logo">VS</div>
+                    <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Crea tu<br>perfil de<br><span>atleta.</span></h1>
                 <p class="auth-tagline">Únete a la plataforma de gestión deportiva profesional.</p>
+                <div class="brand-chip-row" aria-label="Deportes disponibles">
+                    <span class="brand-chip">⚽ Fútbol</span>
+                    <span class="brand-chip">🏀 Baloncesto</span>
+                    <span class="brand-chip">🎾 Tenis</span>
+                </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -165,14 +152,19 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VT</div>
-                    <span class="auth-logo-name">Vital Training</span>
+                    <div class="auth-logo">VS</div>
+                    <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Perfil<br><span>deportivo.</span></h1>
                 <p class="auth-tagline">Último paso para personalizar tu experiencia.</p>
+                <div class="brand-chip-row" aria-label="Deportes disponibles">
+                    <span class="brand-chip">⚽ Fútbol</span>
+                    <span class="brand-chip">🏀 Baloncesto</span>
+                    <span class="brand-chip">🎾 Tenis</span>
+                </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -189,15 +181,35 @@
             </div>
             <div class="auth-form">
                 <div class="auth-input-group">
-                    <label>Posición *</label>
-                    <select id="reg-posicion">
-                        <option value="">Selecciona tu posición</option>
-                        <option>Portero</option><option>Defensa Central</option><option>Lateral</option>
-                        <option>Mediocampista</option><option>Extremo</option><option>Delantero</option>
+                    <label>Deporte principal *</label>
+                    <select id="reg-deporte" onchange="updateSportSpecificFields()">
+                        <option value="">Selecciona tu deporte</option>
+                        <option value="Fútbol">Fútbol</option>
+                        <option value="Baloncesto">Baloncesto</option>
+                        <option value="Tenis">Tenis</option>
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label>Frecuencia de juego *</label>
+                    <label id="reg-posicion-label">Posición *</label>
+                    <select id="reg-posicion">
+                        <option value="">Selecciona tu posición</option>
+                        <option value="Portero">Portero</option>
+                        <option value="Defensa Central">Defensa Central</option>
+                        <option value="Lateral">Lateral</option>
+                        <option value="Mediocampista">Mediocampista</option>
+                        <option value="Extremo">Extremo</option>
+                        <option value="Delantero">Delantero</option>
+                        <option value="Base">Base</option>
+                        <option value="Escolta">Escolta</option>
+                        <option value="Alero">Alero</option>
+                        <option value="Pívot">Pívot</option>
+                        <option value="Right-handed">Right-handed</option>
+                        <option value="Left-handed">Left-handed</option>
+                        <option value="Backhand">Backhand</option>
+                    </select>
+                </div>
+                <div class="auth-input-group">
+                    <label id="reg-frecuencia-label">Frecuencia de juego *</label>
                     <select id="reg-frecuencia">
                         <option value="">¿Cuántas veces juegas por semana?</option>
                         <option>1-2 veces por semana</option><option>3-4 veces por semana</option>
@@ -205,12 +217,12 @@
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label>Pie dominante *</label>
+                    <label id="reg-pie-label">Pie dominante *</label>
                     <select id="reg-pie">
-                        <option value="">Selecciona tu pie dominante</option>
+                        <option value="">Selecciona tu dominante</option>
                         <option>Derecho</option>
                         <option>Izquierdo</option>
-                        <option>Ambos (ambidiestro)</option>
+                        <option>Ambos</option>
                     </select>
                 </div>
                 <div class="auth-input-group">
@@ -249,14 +261,19 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VT</div>
-                    <span class="auth-logo-name">Vital Training</span>
+                    <div class="auth-logo">VS</div>
+                    <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Listo para<br><span>comenzar.</span></h1>
                 <p class="auth-tagline">Tu perfil ha sido creado exitosamente.</p>
+                <div class="brand-chip-row" aria-label="Deportes disponibles">
+                    <span class="brand-chip">⚽ Fútbol</span>
+                    <span class="brand-chip">🏀 Baloncesto</span>
+                    <span class="brand-chip">🎾 Tenis</span>
+                </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Training · Todos los derechos reservados</p>
+                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card auth-success-card">
@@ -281,13 +298,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('app')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Training</span>
+        <span class="mobile-topbar-title">Vital Sports</span>
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Training</span>
+                <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Admin Panel</span>
             </div>
         </div>
@@ -336,13 +353,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('panel-nutricionista')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Training</span>
+        <span class="mobile-topbar-title">Vital Sports</span>
     </div>
     <aside class="sidebar sidebar-nutri">
         <div class="sidebar-header">
             <div class="logo-icon logo-nutri"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Training</span>
+                <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Nutricionista</span>
             </div>
         </div>
@@ -354,7 +371,7 @@
             </button>
             <button class="nav-btn" data-nt-view="pacientes" onclick="ntRenderView('pacientes')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Mis Futbolistas
+                Mis Atletas
             </button>
             <button class="nav-btn" data-nt-view="soporte" onclick="ntRenderView('soporte')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -379,20 +396,20 @@
 
 
 <!-- ========================= -->
-<!-- PANEL FUTBOLISTA          -->
+<!-- PANEL ATLETA              -->
 <!-- ========================= -->
 <div id="panel-futbolista" class="hidden">
     <div class="mobile-topbar">
         <button class="hamburger-btn" onclick="toggleSidebar('panel-futbolista')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Training</span>
+        <span class="mobile-topbar-title">Vital Sports</span>
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Training</span>
+                <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Mi Panel</span>
             </div>
         </div>
@@ -419,9 +436,6 @@
          Mi Plan
               </button>
 
-             <a href="ayuda.html" class="nav-btn" style="text-decoration:none; display:flex; align-items:center;">
-    ❓ Ayuda
-              </a>
             <button class="nav-btn" data-pf-view="ia" onclick="pfRenderView('ia')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
                 Asistente IA
@@ -434,8 +448,8 @@
         <div class="sidebar-footer">
             <div class="admin-avatar" id="pf-avatar">--</div>
             <div class="admin-info">
-                <span class="admin-name" id="pf-nombre">Futbolista</span>
-                <span class="admin-role">Futbolista</span>
+                <span class="admin-name" id="pf-nombre">Atleta</span>
+                <span class="admin-role">Atleta</span>
             </div>
             <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-3"></button>
             <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">

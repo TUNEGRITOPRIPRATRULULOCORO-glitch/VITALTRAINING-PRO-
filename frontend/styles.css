@@ -303,6 +303,26 @@ body {
     line-height: 1.2;
 }
 
+.sport-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    border: 1px solid rgba(22,163,74,0.2);
+    background: rgba(22,163,74,0.08);
+    color: #166534;
+    margin-bottom: 10px;
+}
+
+.sport-pill-futbol { background: rgba(14,165,233,0.12); border-color: rgba(14,165,233,0.25); color: #0369a1; }
+.sport-pill-baloncesto { background: rgba(249,115,22,0.12); border-color: rgba(249,115,22,0.25); color: #9a4d0d; }
+.sport-pill-tenis { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.25); color: #6d28d9; }
+
 .view-title p {
     font-size: 13px;
     color: var(--text-muted);
@@ -1112,7 +1132,7 @@ td {
 }
 
 .auth-brand h1 {
-    font-size: 34px;
+    font-size: 28px;
     font-weight: 800;
     color: #ffffff;
     line-height: 1.12;
@@ -1126,8 +1146,53 @@ td {
     font-size: 13px;
     color: rgba(255,255,255,0.38);
     font-weight: 400;
-    margin-bottom: 40px;
+    margin-bottom: 22px;
     line-height: 1.6;
+}
+
+.auth-mini-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.auth-mini-badges span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ecfdf5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.brand-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.brand-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ecfdf5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
 }
 
 .auth-features {
@@ -2385,6 +2450,148 @@ input[type="range"].range-green  { accent-color: var(--primary); }
 .ia-btn:hover      { border-color: var(--primary); color: var(--primary); background: rgba(22,163,74,0.06); }
 .ia-btn-active     { border-color: var(--primary); background: var(--primary); color: white; }
 .ia-btn-active:hover { background: var(--primary-dark); color: white; }
+
+.support-channel-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+}
+
+.support-channel-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 16px;
+    font-family: var(--font);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: var(--shadow);
+}
+
+.support-channel-btn:hover,
+.support-channel-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(180deg, rgba(22,163,74,0.06), rgba(14,165,233,0.04));
+}
+
+.support-channel-icon {
+    font-size: 28px;
+}
+
+.support-channel-name {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.support-channel-btn small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.support-chat-box {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.support-chat-header {
+    padding: 16px 18px;
+    background: linear-gradient(135deg, rgba(22,163,74,0.08), rgba(14,165,233,0.04));
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.support-chat-messages {
+    max-height: 280px;
+    overflow-y: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.02);
+}
+
+.support-chat-message {
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.support-chat-message.me {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.support-chat-message.them {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.support-chat-author {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.support-chat-text {
+    background: #e2e8f0;
+    border-radius: 14px 14px 14px 4px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.support-chat-message.me .support-chat-text {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border-radius: 14px 14px 4px 14px;
+}
+
+.support-chat-time {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.support-chat-input-row {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px 16px;
+    background: var(--bg-2);
+    border-top: 1px solid var(--border);
+}
+
+.support-chat-input-row input {
+    flex: 1;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: var(--font);
+    font-size: 14px;
+}
+
+@media (max-width: 860px) {
+    .support-channel-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
 .ia-respuesta {
     margin-top: 24px;
