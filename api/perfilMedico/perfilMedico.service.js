@@ -404,6 +404,17 @@ function generarRutina(perfilMedico, posicion) {
 // ═══════════════════════════════════════════════════════════════
 // CRUD
 // ═══════════════════════════════════════════════════════════════
+async function listarAtletas() {
+  const { rows } = await query(
+    `SELECT u.id, u.nombre, u.email, pm.completado
+       FROM usuarios u
+       LEFT JOIN perfiles_medicos pm ON pm.user_id = u.id
+      WHERE u.rol IN ('Atleta', 'Futbolista') AND u.estado = 'Activo'
+      ORDER BY u.nombre`
+  );
+  return rows;
+}
+
 async function obtener(userId) {
   const { rows } = await query(
     'SELECT * FROM perfiles_medicos WHERE user_id = $1',
@@ -465,4 +476,4 @@ async function guardar(userId, datos, posicion) {
   };
 }
 
-module.exports = { obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS };
+module.exports = { listarAtletas, obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS };

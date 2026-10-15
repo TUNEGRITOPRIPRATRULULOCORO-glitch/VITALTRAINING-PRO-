@@ -43,7 +43,8 @@ async function crear(datos) {
   const plain  = datos.password;
   const hashed = await bcrypt.hash(plain, 10);
 
-  const rolUsuario = ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
+  const rolesValidos = ['Atleta', 'Futbolista', 'Nutricionista', 'Administrador', 'Medico'];
+  const rolUsuario = rolesValidos.includes(datos.rol) ? datos.rol : 'Atleta';
   const { rows } = await query(
     `INSERT INTO usuarios (nombre, email, password, rol, estado)
      VALUES ($1,$2,$3,$4,'Activo')

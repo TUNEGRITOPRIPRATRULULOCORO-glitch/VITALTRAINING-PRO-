@@ -26,6 +26,7 @@ async function seedUsuarios() {
     { nombre: 'Admin Sistema', email: 'admin@vital.com',  password: 'admin123',  rol: 'Administrador', deporte_principal: 'Fútbol' },
     { nombre: 'Maria Gomez',   email: 'maria@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Baloncesto' },
     { nombre: 'Pedro Lopez',   email: 'pedro@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Tenis' },
+    { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' },
     { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' },
     { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' },
   ];

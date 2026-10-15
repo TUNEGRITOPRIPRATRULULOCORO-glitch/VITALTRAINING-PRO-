@@ -8,6 +8,15 @@ beforeEach(() => {
 });
 
 // ─── obtener ──────���────────────────────────────────────────────────────────────
+describe('listarAtletas', () => {
+  test('devuelve atletas con el estado de su ficha médica', async () => {
+    const atletas = [{ id: 5, nombre: 'Carlos', email: 'carlos@vital.com', completado: true }];
+    query.mockResolvedValueOnce({ rows: atletas });
+    expect(await svc.listarAtletas()).toEqual(atletas);
+    expect(query.mock.calls[0][0]).toContain('LEFT JOIN perfiles_medicos');
+  });
+});
+
 describe('obtener', () => {
   test('devuelve el perfil existente del usuario', async () => {
     query.mockResolvedValueOnce({ rows: [{

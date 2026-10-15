@@ -57,6 +57,7 @@ vital-training/
 |---|---|
 | **Administrador** | Dashboard global · Gestión de usuarios · Reportes · Soporte |
 | **Nutricionista** | Panel de pacientes · Estado de salud · Alertas |
+| **Médico** | Consulta de expedientes médicos de atletas |
 | **Futbolista** | Mi Salud · Mi Plan · Historial · Asistente IA · Soporte |
 
 ---
@@ -122,6 +123,7 @@ Abrir en el navegador: **http://localhost:4000**
 | Administrador | `admin@vital.com` | `admin123` |
 | Nutricionista | `maria@vital.com` | `nutri123` |
 | Nutricionista | `pedro@vital.com` | `nutri123` |
+| Médico | `medico@vital.com` | `medico123` |
 | Futbolista | `carlos@vital.com` | `futbol123` |
 | Futbolista | `diego@vital.com` | `futbol123` |
 

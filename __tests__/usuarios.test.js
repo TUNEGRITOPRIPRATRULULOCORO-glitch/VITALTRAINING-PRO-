@@ -83,6 +83,13 @@ describe('crear', () => {
     expect(res.passwordInicial).toBe('segura123');
   });
 
+  test('conserva el rol Medico al crear la cuenta', async () => {
+    query.mockResolvedValueOnce({ rows: [] });
+    query.mockResolvedValueOnce({ rows: [{ id: 8, nombre: 'Dr. Vital', email: 'medico@vital.com', rol: 'Medico', estado: 'Activo' }] });
+    await svc.crear({ nombre: 'Dr. Vital', email: 'medico@vital.com', password: 'medico123', rol: 'Medico' });
+    expect(query.mock.calls[1][1][3]).toBe('Medico');
+  });
+
   test('lanza error si falta nombre', async () => {
     await expect(svc.crear({ email: 'ok@test.com' })).rejects.toThrow(/nombre/i);
   });

@@ -1,5 +1,13 @@
 const svc = require('./perfilMedico.service');
 
+async function getAtletas(req, res) {
+  try {
+    res.json({ ok: true, atletas: await svc.listarAtletas() });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+}
+
 async function getObtener(req, res) {
   try {
     const userId = Number(req.params.userId);
@@ -31,4 +39,4 @@ function getCatalogos(req, res) {
   });
 }
 
-module.exports = { getObtener, postGuardar, getCatalogos };
+module.exports = { getAtletas, getObtener, postGuardar, getCatalogos };

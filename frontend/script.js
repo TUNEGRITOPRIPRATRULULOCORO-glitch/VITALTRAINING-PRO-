@@ -95,11 +95,13 @@ function routeUser(user, token) {
     hideAllPanels();
     if      (isAtletaRole(user.rol))       showPanelFutbolista(user);
     else if (user.rol === 'Nutricionista') showPanelNutricionista(user);
-    else                                   showPanel(user);
+    else if (['Medico', 'Médico'].includes(user.rol)) showPanelMedico(user);
+    else if (user.rol === 'Administrador') showPanel(user);
+    else { clearSession(); showAuthPanel(); }
 }
 
 function hideAllPanels() {
-    ['app','panel-nutricionista','panel-futbolista','auth-screen'].forEach(id => {
+    ['app','panel-nutricionista','panel-medico','panel-futbolista','auth-screen'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
 }
@@ -185,11 +187,14 @@ function avatarColor(name) {
     let h=0; for(let x of name) h=(h*31+x.charCodeAt(0))%c.length; return c[h];
 }
 
-function normalizeDisplayRole(rol) { return ['Futbolista', 'Atleta'].includes(rol) ? 'Atleta' : rol; }
+function normalizeDisplayRole(rol) {
+    if (['Futbolista', 'Atleta'].includes(rol)) return 'Atleta';
+    return ['Medico', 'Médico'].includes(rol) ? 'Médico' : rol;
+}
 function getSportIcon(sport) { const map = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾' }; return map[sport] || '🏅'; }
 function getSportLabel(sport) { return sport || 'Deporte'; }
 function getSportBadge(sport) { const map = { 'Fútbol':'⚽ Fútbol', 'Baloncesto':'🏀 Baloncesto', 'Tenis':'🎾 Tenis' }; return map[sport] || `🏅 ${sport || 'Deporte'}`; }
-function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
+function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador','Medico':'badge-medico','Médico':'badge-medico'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
 function getSportBadgeNeutral(sport) { return getSportBadge(sport || 'Fútbol'); }
 function estadoBadge(e)     { const m={'Activo':'badge-activo','Inactivo':'badge-inactivo'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
 function prioridadBadge(p)  { const m={'alta':'badge-alta','media':'badge-media','baja':'badge-baja','critica':'badge-critica'}; return `<span class="badge ${m[p]||''}">${p}</span>`; }
@@ -462,7 +467,7 @@ async function renderUsuarios() {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                         <input type="text" id="search-u" placeholder="Buscar..." oninput="filtrarUsuarios()">
                     </div>
-                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option value="Futbolista">Atleta</option><option>Nutricionista</option><option>Administrador</option></select>
+                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option value="Futbolista">Atleta</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select>
                     <select id="filter-estado" onchange="filtrarUsuarios()"><option>Todos los estados</option><option>Activo</option><option>Inactivo</option></select>
                 </div>
             </div>
@@ -490,7 +495,7 @@ function modalNuevoUsuario() {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" placeholder="Ej: Juan Pérez"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" placeholder="juan@email.com"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol"><option value="Futbolista">Atleta</option><option>Nutricionista</option><option>Administrador</option></select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol"><option value="Futbolista">Atleta</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activo</option><option>Inactivo</option></select></div>
         </div>
         <div class="form-group"><label>Contraseña inicial (mín. 8 caracteres)</label><input type="text" id="f-password" placeholder="Mínimo 8 caracteres"></div>
@@ -516,7 +521,7 @@ async function modalEditarUsuario(id) {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" value="${escapeHtml(u.nombre)}"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" value="${escapeHtml(u.email)}"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Nutricionista','Administrador'].map(r=>`<option value="${r}" ${r===u.rol?'selected':''}>${r === 'Futbolista' ? 'Atleta' : r}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Nutricionista','Medico','Administrador'].map(r=>`<option value="${r}" ${r===u.rol?'selected':''}>${r === 'Futbolista' ? 'Atleta' : r === 'Medico' ? 'Médico' : r}</option>`).join('')}</select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado">${['Activo','Inactivo'].map(e=>`<option ${e===u.estado?'selected':''}>${e}</option>`).join('')}</select></div>
         </div>
         <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="guardarEdicionUsuario(${id})">Guardar</button></div>
@@ -1017,6 +1022,94 @@ function switchTab(btn, tabId) {
     btn.closest('.modal').querySelectorAll('.detalle-tab-content').forEach(t=>t.classList.add('hidden'));
     btn.classList.add('active');
     document.getElementById(tabId).classList.remove('hidden');
+}
+
+// ────────────────────────────────────────────────
+// PANEL MEDICO
+// ────────────────────────────────────────────────
+let _medicoAtletas = [];
+
+function showPanelMedico(user) {
+    setTitle('Expedientes médicos');
+    currentUser = user;
+    hideAllPanels();
+    document.getElementById('panel-medico').classList.remove('hidden');
+    document.getElementById('md-avatar').textContent = getInitials(user.nombre);
+    document.getElementById('md-nombre').textContent = user.nombre.split(' ').slice(0, 2).join(' ');
+    medicoRenderAtletas();
+}
+
+async function medicoRenderAtletas() {
+    closeSidebar();
+    const main = document.getElementById('md-content');
+    main.innerHTML = showLoading();
+
+    try {
+        const response = await apiFetch(`${API}/perfil-medico/atletas`);
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudieron cargar los atletas.');
+        _medicoAtletas = data.atletas || [];
+        main.innerHTML = `
+        <div class="view-enter">
+            <div class="view-header">
+                <div class="view-title"><h1>Expedientes médicos</h1><p>${_medicoAtletas.length} atletas activos</p></div>
+                <button class="btn btn-ghost" onclick="medicoRenderAtletas()">Actualizar</button>
+            </div>
+            <div class="card">
+                <div class="card-header"><h2>Atletas</h2></div>
+                <div class="table-wrap"><table><thead><tr><th>Atleta</th><th>Ficha médica</th><th></th></tr></thead><tbody>
+                    ${_medicoAtletas.length ? _medicoAtletas.map(atleta => `
+                        <tr>
+                            <td><div class="user-name">${escapeHtml(atleta.nombre)}</div><div class="user-email">${escapeHtml(atleta.email)}</div></td>
+                            <td>${atleta.completado ? '<span class="badge badge-activo">Completa</span>' : '<span class="badge badge-inactivo">Pendiente</span>'}</td>
+                            <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="medicoVerPerfil(${Number(atleta.id)})">Ver expediente</button></td>
+                        </tr>`).join('') : '<tr><td colspan="3"><div class="empty-state"><p>No hay atletas activos.</p></div></td></tr>'}
+                </tbody></table></div>
+            </div>
+        </div>`;
+    } catch (error) {
+        main.innerHTML = showError(escapeHtml(error.message), 'medicoRenderAtletas()');
+    }
+}
+
+function medicoListarValores(value) {
+    if (Array.isArray(value)) return value;
+    if (typeof value !== 'string' || !value) return [];
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [value];
+    } catch {
+        return [value];
+    }
+}
+
+async function medicoVerPerfil(userId) {
+    const main = document.getElementById('md-content');
+    const atleta = _medicoAtletas.find(item => Number(item.id) === Number(userId));
+    main.innerHTML = showLoading();
+
+    try {
+        const response = await apiFetch(`${API}/perfil-medico/${userId}`);
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudo cargar el expediente.');
+        const perfil = data.perfil;
+        const condiciones = medicoListarValores(perfil?.condiciones);
+        const alergias = medicoListarValores(perfil?.alergias);
+        main.innerHTML = `
+        <div class="view-enter">
+            <div class="view-header">
+                <div class="view-title"><h1>${escapeHtml(atleta?.nombre || 'Expediente')}</h1><p>Ficha médica del atleta</p></div>
+                <button class="btn btn-ghost" onclick="medicoRenderAtletas()">Volver a expedientes</button>
+            </div>
+            ${perfil ? `<div class="stats-grid">
+                <div class="card"><div class="card-header"><h2>Condiciones</h2></div><div class="card-body">${condiciones.length ? condiciones.map(item => `<p>${escapeHtml(item)}</p>`).join('') : '<p>Sin condiciones registradas.</p>'}</div></div>
+                <div class="card"><div class="card-header"><h2>Alergias</h2></div><div class="card-body">${alergias.length ? alergias.map(item => `<p>${escapeHtml(item)}</p>`).join('') : '<p>Sin alergias registradas.</p>'}</div></div>
+                <div class="card"><div class="card-header"><h2>Preferencias alimentarias</h2></div><div class="card-body"><p>${escapeHtml(perfil.preferencias || 'Sin restricciones')}</p></div></div>
+            </div>` : '<div class="card"><div class="card-body"><p>Este atleta aún no ha completado su perfil médico.</p></div></div>'}
+        </div>`;
+    } catch (error) {
+        main.innerHTML = showError(escapeHtml(error.message), `medicoVerPerfil(${Number(userId)})`);
+    }
 }
 
 // ────────────────────────────────────────────────
@@ -1721,7 +1814,7 @@ function pfOnboardingStep1() {
         </div>
         <div class="onb-header">
             <h1>Tu Perfil Médico Deportivo</h1>
-            <p>Para personalizar tu plan de entrenamiento y nutrición necesitamos conocer tu estado de salud. Esta información es confidencial y solo la verá tu nutricionista.</p>
+            <p>Para personalizar tu plan de entrenamiento y nutrición necesitamos conocer tu estado de salud. Esta información es confidencial y solo podrán consultarla el equipo médico, tu nutricionista y administradores autorizados.</p>
         </div>
         <div class="onb-section-title">¿Tienes alguna de estas condiciones de salud?</div>
         <p class="onb-hint">Selecciona las que apliquen. Cada categoría tiene su botón <strong>Ninguna</strong> si no aplica ninguna de ese grupo.</p>

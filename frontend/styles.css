@@ -1772,6 +1772,21 @@ td {
     background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
 }
 
+/* Panel médico */
+#panel-medico { display: flex; height: 100vh; overflow: hidden; }
+#panel-medico.hidden { display: none; }
+
+.sidebar-medico {
+    --sidebar-hover: rgba(14, 165, 233, 0.14);
+    --sidebar-active: rgba(14, 165, 233, 0.20);
+}
+
+.sidebar-medico::before { background: radial-gradient(circle, rgba(14,165,233,0.18) 0%, transparent 70%); }
+.logo-medico { background: linear-gradient(135deg, #38bdf8, #0284c7) !important; }
+.sidebar-medico .nav-btn.active, .sidebar-medico .nav-btn.active svg { color: #7dd3fc; }
+.avatar-medico { background: linear-gradient(135deg, #0284c7, #075985) !important; }
+.badge-medico { background: #e0f2fe; color: #075985; }
+
 /* Panel futbolista */
 #panel-futbolista { display: flex; height: 100vh; overflow: hidden; }
 #panel-futbolista.hidden { display: none; }
@@ -3335,7 +3350,7 @@ input[type="range"].range-green  { accent-color: var(--primary); }
     .detalle-grid { grid-template-columns: 1fr; }
 
     /* ── Mobile sidebar ── */
-    #app, #panel-nutricionista, #panel-futbolista {
+    #app, #panel-nutricionista, #panel-medico, #panel-futbolista {
         flex-direction: column;
         overflow: visible;
     }
