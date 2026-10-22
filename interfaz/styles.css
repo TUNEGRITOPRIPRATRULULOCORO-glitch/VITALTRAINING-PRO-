@@ -4232,3 +4232,10 @@ body.dark .rd-aviso { border-color: rgba(239,68,68,0.4); }
     .rd-barra-fila { grid-template-columns: 84px 1fr; }
     .rd-barra-leyenda { padding-left: 94px; }
 }
+
+/* Cuerpo genérico de tarjeta (lo usa el área médica; no tenía estilos y el texto iba pegado al borde) */
+.card-body { padding: 16px 20px; font-size: 14px; color: var(--text); line-height: 1.6; }
+.card-body p { margin: 0 0 6px; }
+.card-body p:last-child { margin-bottom: 0; }
+.ficha-deportiva { flex-wrap: wrap; row-gap: 6px; }
+.ficha-falta { font-style: italic; opacity: 0.7; }

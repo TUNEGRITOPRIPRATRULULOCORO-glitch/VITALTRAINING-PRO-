@@ -8,7 +8,7 @@ const fotos = require('./fotos.routes');
 module.exports = {
   router: require('./usuarios.routes'),
   cuentaRouter: fotos.cuenta,     // /api/cuenta  → cada usuario gestiona su foto
-  fotosRouter:  fotos.publicas,   // /api/fotos   → imágenes públicas para <img>
+  fotosRouter:  fotos.ver,   // /api/fotos   → imagen de cualquier usuario (requiere sesión)
   buscarIdPorEmail:  svc.buscarIdPorEmail,
   registrarAtleta:   svc.registrarAtleta,
   actualizarDeporte: svc.actualizarDeporte,

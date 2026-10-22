@@ -120,6 +120,28 @@ function showAuthScreen(id) {
     if (el) { el.classList.remove('hidden'); el.style.animation='none'; void el.offsetWidth; el.style.animation=''; }
 }
 
+/**
+ * Datos deportivos del atleta (deporte, posición o especialidad, peso, altura, edad).
+ * Los textos cambian según el deporte: en tenis es "Especialidad", en baloncesto "Mano dominante"...
+ */
+function fichaDeportivaHTML(ficha, { compacta = false } = {}) {
+    if (!ficha) return '';
+    const cfg = getSportFieldConfig(ficha.deporte);
+    const etiqueta = txt => txt.replace(' *', '');
+    const falta = txt => `<span class="ficha-falta">${txt}</span>`;
+    const datos = [
+        `<span title="Deporte">${getSportIcon(ficha.deporte)} ${escapeHtml(ficha.deporte)}</span>`,
+        `<span title="${etiqueta(cfg.posicionLabel)}">🎯 ${ficha.posicion ? escapeHtml(ficha.posicion) : falta(`Sin ${etiqueta(cfg.posicionLabel).toLowerCase()}`)}</span>`,
+        `<span title="Peso">⚖️ ${ficha.peso ? `${ficha.peso} kg` : falta('Peso sin registrar')}</span>`,
+        `<span title="Altura">📏 ${ficha.altura ? `${ficha.altura} cm` : falta('Altura sin registrar')}</span>`
+    ];
+    if (!compacta) {
+        if (ficha.edad) datos.push(`<span title="Edad">🎂 ${ficha.edad} años</span>`);
+        if (ficha.lateralidad) datos.push(`<span title="${etiqueta(cfg.pieLabel)}">✋ ${escapeHtml(etiqueta(cfg.pieLabel))}: ${escapeHtml(ficha.lateralidad)}</span>`);
+    }
+    return `<div class="paciente-hero-meta ficha-deportiva">${datos.join('')}</div>`;
+}
+
 function getSportFieldConfig(deporte) {
     const config = {
         'Fútbol': {
@@ -175,17 +197,50 @@ function getInitials(name) { return name.split(' ').slice(0,2).map(n=>n[0]).join
 // — FOTOS DE PERFIL —
 // Mismas reglas que comprueba el servidor (servidor/api/usuarios/fotos.service.js)
 const FOTO_REGLAS = { formatos:['image/jpeg','image/png','image/webp'], maxArchivoMB:5, minLado:200, lado:400, maxKB:300 };
-const _fotoVersion = {}; // para saltarse la caché del navegador tras cambiar una foto
+const _fotoVersion = {}; // cambia al subir/quitar la propia foto para no usar la copia guardada
 
 function fotoUrl(id) {
     return `${API}/fotos/${id}${_fotoVersion[id] ? `?v=${_fotoVersion[id]}` : ''}`;
 }
 
-/** Iniciales + foto encima; si la persona no tiene foto, la imagen se quita sola y quedan las iniciales. */
+/**
+ * Iniciales + hueco para la foto. Las fotos solo se sirven con sesión iniciada y un <img> no
+ * puede enviar el token, así que cargarFotosPendientes() las pide con el token y las pinta.
+ * Si la persona no tiene foto, la imagen se quita y quedan las iniciales.
+ */
 function avatarContenido(id, nombre) {
-    const foto = id ? `<img class="avatar-foto" src="${fotoUrl(id)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+    const foto = id ? `<img class="avatar-foto" data-foto="${Number(id)}" alt="" hidden>` : '';
     return `${escapeHtml(getInitials(nombre || '?'))}${foto}`;
 }
+
+const FOTO_CACHE_MS = 5 * 60 * 1000;
+const _fotoCache = new Map(); // url → { promesa de objectURL o null, hora }
+
+function obtenerFoto(url) {
+    const guardada = _fotoCache.get(url);
+    if (guardada && Date.now() - guardada.hora < FOTO_CACHE_MS) return guardada.promesa;
+    const promesa = fetch(url, { headers: { Authorization: `Bearer ${getToken()}` } })
+        .then(r => (r.ok ? r.blob() : null))
+        .then(blob => (blob ? URL.createObjectURL(blob) : null))
+        .catch(() => null);
+    _fotoCache.set(url, { promesa, hora: Date.now() });
+    return promesa;
+}
+
+function cargarFotosPendientes(raiz = document) {
+    if (!getToken()) return;
+    raiz.querySelectorAll?.('img[data-foto]:not([data-pedida])').forEach(img => {
+        img.dataset.pedida = '1';
+        obtenerFoto(fotoUrl(img.dataset.foto)).then(src => {
+            if (!src) return img.remove();
+            img.src = src;
+            img.hidden = false;
+        });
+    });
+}
+
+// Cualquier avatar que aparezca en pantalla (vistas, chat, ventanas) carga su foto solo
+new MutationObserver(() => cargarFotosPendientes()).observe(document.documentElement, { childList: true, subtree: true });
 
 const AVATAR_PROPIO = ['sidebar-avatar', 'nt-avatar', 'md-avatar', 'pf-avatar'];
 
@@ -439,6 +494,7 @@ function doLogout() {
     if(!confirm('¿Cerrar sesión?')) return;
     stopPolling();
     stopBadgePolling();
+    _fotoCache.clear();
     clearSession(); currentUser=null;
     Object.values(chartInstances).forEach(c=>c.destroy()); chartInstances={};
     showAuthPanel();
@@ -937,6 +993,16 @@ function ntFiltrarPacientes() {
         `<div class="empty-state" style="grid-column:1/-1"><p>Sin resultados</p></div>`;
 }
 
+// "⚽ Delantero · 72 kg · 178 cm" para la tarjeta del atleta
+function ntResumenFicha(ficha) {
+    if (!ficha) return 'Sin datos deportivos';
+    const cfg = getSportFieldConfig(ficha.deporte);
+    const partes = [ficha.posicion ? escapeHtml(ficha.posicion) : `Sin ${cfg.posicionLabel.replace(' *', '').toLowerCase()}`];
+    if (ficha.peso) partes.push(`${ficha.peso} kg`);
+    if (ficha.altura) partes.push(`${ficha.altura} cm`);
+    return `${getSportIcon(ficha.deporte)} ${partes.join(' · ')}`;
+}
+
 function ntCardFutbolista(f) {
     const[c1,c2]=avatarColor(f.nombre);
     const salud=f.ultimaSalud;
@@ -947,7 +1013,7 @@ function ntCardFutbolista(f) {
             <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(f.id,f.nombre)}</div>
             <div class="paciente-info">
                 <div class="paciente-nombre">${escapeHtml(f.nombre)}</div>
-                <div class="paciente-pos">${escapeHtml(f.posicion||'Sin posición definida')}</div>
+                <div class="paciente-pos">${ntResumenFicha(f.ficha)}</div>
             </div>
         </div>
         <div class="paciente-stats">
@@ -1074,11 +1140,7 @@ async function ntVerDetalle(userId) {
                 <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(d.id,d.nombre)}</div>
                 <div class="paciente-hero-info">
                     <h3>${escapeHtml(d.nombre)}</h3>
-                    <div class="paciente-hero-meta">
-                        <span>⚽ ${escapeHtml(d.perfil?.posicion||'Posición no definida')}</span>
-                        <span>⚖️ ${escapeHtml(String(d.perfil?.peso||'—'))} kg</span>
-                        <span>📏 ${escapeHtml(String(d.perfil?.altura||'—'))} cm</span>
-                    </div>
+                    ${fichaDeportivaHTML(d.ficha)}
                 </div>
             </div>
             <div class="detalle-tabs">
@@ -1266,8 +1328,9 @@ async function medicoVerPerfil(userId) {
         <div class="view-enter">
             <div class="view-header">
                 <div class="view-title"><h1>${escapeHtml(atleta?.nombre || 'Expediente')}</h1><p>Ficha médica del atleta</p></div>
-                <button class="btn btn-ghost" onclick="medicoRenderAtletas()">Volver a expedientes</button>
+                <button class="btn btn-ghost" onclick="medicoRenderAtletas()">← Volver a expedientes</button>
             </div>
+            ${data.ficha ? `<div class="card" style="margin-bottom:20px"><div class="card-header"><h2>🏅 Ficha deportiva</h2></div><div class="card-body">${fichaDeportivaHTML(data.ficha)}</div></div>` : ''}
             ${perfil ? `<div class="stats-grid">
                 <div class="card"><div class="card-header"><h2>Condiciones</h2></div><div class="card-body">${condiciones.length ? condiciones.map(item => `<p>${escapeHtml(item)}</p>`).join('') : '<p>Sin condiciones registradas.</p>'}</div></div>
                 <div class="card"><div class="card-header"><h2>Alergias</h2></div><div class="card-body">${alergias.length ? alergias.map(item => `<p>${escapeHtml(item)}</p>`).join('') : '<p>Sin alergias registradas.</p>'}</div></div>

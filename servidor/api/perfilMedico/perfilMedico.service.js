@@ -1,4 +1,5 @@
 const { query } = require('../../../base-de-datos/db');
+const panel = require('../panel');
 
 // ═══════════════════════════════════════════════════════════════
 // CATÁLOGOS
@@ -415,6 +416,15 @@ async function listarAtletas() {
   return rows;
 }
 
+/** Ficha deportiva (deporte, posición, peso, altura...) para el expediente del médico. */
+async function obtenerFicha(userId) {
+  const [{ rows: u }, { rows: p }] = await Promise.all([
+    query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia FROM usuarios WHERE id = $1', [userId]),
+    query('SELECT posicion, edad, peso, altura FROM perfiles WHERE user_id = $1', [userId])
+  ]);
+  return u[0] ? panel.fichaDeportiva(u[0], p[0]) : null;
+}
+
 async function obtener(userId) {
   const { rows } = await query(
     'SELECT * FROM perfiles_medicos WHERE user_id = $1',
@@ -476,4 +486,4 @@ async function guardar(userId, datos, posicion) {
   };
 }
 
-module.exports = { listarAtletas, obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS };
+module.exports = { listarAtletas, obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS, obtenerFicha };

@@ -11,8 +11,8 @@ async function getAtletas(req, res) {
 async function getObtener(req, res) {
   try {
     const userId = Number(req.params.userId);
-    const perfil = await svc.obtener(userId);
-    res.json({ ok: true, perfil: perfil || null });
+    const [perfil, ficha] = await Promise.all([svc.obtener(userId), svc.obtenerFicha(userId)]);
+    res.json({ ok: true, perfil: perfil || null, ficha });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }

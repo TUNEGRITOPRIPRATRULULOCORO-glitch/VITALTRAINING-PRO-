@@ -2,9 +2,8 @@
  * Fotos de perfil (cualquier usuario con sesión gestiona la suya):
  * PUT    /api/cuenta/foto   → Subir o cambiar mi foto { foto: "data:image/jpeg;base64,..." }
  * DELETE /api/cuenta/foto   → Quitar mi foto
- *
- * Pública (las etiquetas <img> no pueden enviar el token):
- * GET    /api/fotos/:userId → La imagen, o 404 si no tiene foto
+ * GET    /api/fotos/:userId → La imagen, o 404 si no tiene foto (solo con sesión iniciada;
+ *                              la interfaz la pide con el token y la muestra como blob)
  */
 const express = require('express');
 const svc     = require('./fotos.service');
@@ -29,9 +28,9 @@ cuenta.delete('/foto', async (req, res) => {
   }
 });
 
-const publicas = express.Router();
+const ver = express.Router();
 
-publicas.get('/:userId', async (req, res) => {
+ver.get('/:userId', async (req, res) => {
   try {
     const foto = await svc.obtener(req.params.userId);
     if (!foto) return res.status(404).end();
@@ -46,4 +45,4 @@ publicas.get('/:userId', async (req, res) => {
   }
 });
 
-module.exports = { cuenta, publicas };
+module.exports = { cuenta, ver };

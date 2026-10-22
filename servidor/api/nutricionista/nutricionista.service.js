@@ -4,7 +4,9 @@ const panel = require('../panel');
 // Sin subconsultas correlacionadas: pg-mem (la base en memoria de desarrollo) no las soporta
 async function listarFutbolistas() {
   const { rows: atletas } = await query(
-    `SELECT u.id, u.nombre, u.email, u.rol, u.estado, p.posicion, p.edad, p.peso, p.altura
+    `SELECT u.id, u.nombre, u.email, u.rol, u.estado, u.deporte_principal, u.posicion AS reg_posicion,
+            u.peso AS reg_peso, u.altura AS reg_altura, u.fecha_nacimiento, u.pie, u.frecuencia,
+            p.posicion, p.edad, p.peso, p.altura
      FROM usuarios u
      LEFT JOIN perfiles p ON p.user_id = u.id
      WHERE (u.rol = 'Atleta' OR u.rol = 'Futbolista') AND u.estado = 'Activo'`
@@ -25,8 +27,12 @@ async function listarFutbolistas() {
   const totalComidas = totales(comidas.rows);
   const totalRutinas = totales(rutinas.rows);
 
-  return atletas.map(a => ({
+  return atletas.map(({ reg_posicion, reg_peso, reg_altura, fecha_nacimiento, pie, frecuencia, ...a }) => ({
     ...a,
+    ficha: panel.fichaDeportiva(
+      { deporte_principal: a.deporte_principal, posicion: reg_posicion, peso: reg_peso, altura: reg_altura, fecha_nacimiento, pie, frecuencia },
+      { posicion: a.posicion, edad: a.edad, peso: a.peso, altura: a.altura }
+    ),
     ultimaSalud:  ultimaSalud[a.id] || null,
     totalComidas: totalComidas[a.id] || 0,
     totalRutinas: totalRutinas[a.id] || 0
@@ -54,6 +60,7 @@ async function detalleFutbolista(userId) {
   return {
     ...u,
     perfil:  perfilR.rows[0] || null,
+    ficha:   panel.fichaDeportiva(usuario, perfilR.rows[0]),
     salud:   saludR.rows,
     comidas: comidasR.rows,
     rutinas: rutinasR.rows,

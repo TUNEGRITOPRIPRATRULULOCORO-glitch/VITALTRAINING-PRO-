@@ -1,16 +1,28 @@
 const { query } = require('../../../base-de-datos/db');
 const usuarios = require('../usuarios');
+const { edadDesde } = require('./ficha');
 
+// Parte del usuario (registro) y completa con Mi Perfil; ver ficha.js
 async function obtenerPerfil(userId) {
   const { rows } = await query(
-    `SELECT p.id, p.user_id AS "userId", p.nombre, p.edad, p.peso, p.altura, p.posicion, p.updated_at AS "updatedAt",
-            u.deporte_principal AS "deportePrincipal"
-     FROM perfiles p
-     LEFT JOIN usuarios u ON u.id = p.user_id
-     WHERE p.user_id = $1`,
+    `SELECT u.id AS "userId", p.id,
+            COALESCE(p.nombre, u.nombre) AS nombre,
+            p.edad,
+            COALESCE(p.peso, u.peso) AS peso,
+            COALESCE(p.altura, u.altura) AS altura,
+            COALESCE(p.posicion, u.posicion) AS posicion,
+            u.fecha_nacimiento AS "fechaNacimiento",
+            u.deporte_principal AS "deportePrincipal",
+            p.updated_at AS "updatedAt"
+     FROM usuarios u
+     LEFT JOIN perfiles p ON p.user_id = u.id
+     WHERE u.id = $1`,
     [userId]
   );
-  return rows[0] || null;
+  const perfil = rows[0];
+  if (!perfil) return null;
+  if (!Number(perfil.edad)) perfil.edad = edadDesde(perfil.fechaNacimiento);
+  return perfil;
 }
 
 async function actualizarPerfil(userId, datos) {
