@@ -21,6 +21,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `incidencias` | `incidencias` | — |
 | `reportes` | — (solo lectura) | — |
 | `ia` | — (solo lectura) | — |
+| `rendimiento` | — (solo lectura) | — |
 
 ## Las 3 reglas
 

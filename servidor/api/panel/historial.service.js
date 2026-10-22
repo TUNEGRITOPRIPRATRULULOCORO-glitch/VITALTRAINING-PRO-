@@ -111,7 +111,8 @@ async function eliminarRutina(userId, rutinaId) {
 
 async function getCumplimiento(userId) {
   const { rows } = await query(
-    `SELECT id, user_id AS "userId", fecha, dia_semana AS "diaSemana", tipo, notas, creado_en AS "creadoEn"
+    `SELECT id, user_id AS "userId", fecha, dia_semana AS "diaSemana", tipo, notas, estado, rpe,
+            duracion_minutos AS "duracionMinutos", creado_en AS "creadoEn"
      FROM cumplimiento WHERE user_id = $1 ORDER BY fecha DESC`,
     [userId]
   );
@@ -129,12 +130,23 @@ async function registrarCumplimiento(userId, datos) {
   if (existe.length > 0) return existe[0];
 
   const { rows } = await query(
-    `INSERT INTO cumplimiento (user_id, fecha, dia_semana, tipo, notas)
-     VALUES ($1,$2,$3,$4,$5)
-     RETURNING id, user_id AS "userId", fecha, dia_semana AS "diaSemana", tipo, notas, creado_en AS "creadoEn"`,
-    [userId, fecha, diaSemana, datos.tipo || '', datos.notas || '']
+    `INSERT INTO cumplimiento (user_id, fecha, dia_semana, tipo, notas, estado, rpe, duracion_minutos)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+     RETURNING id, user_id AS "userId", fecha, dia_semana AS "diaSemana", tipo, notas, estado, rpe,
+               duracion_minutos AS "duracionMinutos", creado_en AS "creadoEn"`,
+    [
+      userId, fecha, diaSemana, datos.tipo || '', datos.notas || '',
+      datos.estado === 'parcial' ? 'parcial' : 'completo',
+      enteroEnRango(datos.rpe, 1, 10),
+      enteroEnRango(datos.duracionMinutos, 1, 300)
+    ]
   );
   return rows[0];
+}
+
+function enteroEnRango(valor, min, max) {
+  const n = Math.round(Number(valor));
+  return Number.isFinite(n) && n >= min && n <= max ? n : null;
 }
 
 async function crearAlerta(userId, tipo, mensaje, fecha) {

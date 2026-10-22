@@ -772,7 +772,11 @@ async function ntRenderDashboard() {
 let _ntTodosPacientes = [];
 
 async function ntRenderPacientes() {
-    _ntTodosPacientes = await apiFetch(`${API}/nutricionista/futbolistas`).then(r=>r.json()).catch(()=>[]);
+    const [pacientes, rendimiento] = await Promise.all([
+        apiFetch(`${API}/nutricionista/futbolistas`).then(r=>r.json()).catch(()=>[]),
+        rdCargarEquipo()
+    ]);
+    _ntTodosPacientes = pacientes.map(f => ({ ...f, rendimiento: rendimiento[f.id] || null }));
     const main = document.getElementById('nt-content');
     main.innerHTML=`
     <div class="view-enter">
@@ -829,6 +833,12 @@ function ntCardFutbolista(f) {
             <div class="paciente-stat"><span class="paciente-stat-val">${f.totalRutinas}</span><span class="paciente-stat-lab">Rutinas</span></div>
             <div class="paciente-stat"><span class="paciente-stat-val" style="color:${fatigaColor}">${salud?salud.fatiga+'/10':'—'}</span><span class="paciente-stat-lab">Fatiga</span></div>
         </div>
+        ${f.rendimiento ? `
+        <div class="rd-paciente">
+            <div><span class="rd-paciente-lab">Listo hoy</span>${rdBadgeListo(f.rendimiento.listo)}</div>
+            <div><span class="rd-paciente-lab">Carga</span>${rdBadgeRiesgo(f.rendimiento.carga)}</div>
+            <div><span class="rd-paciente-lab">Plan</span><strong>${f.rendimiento.cumplimiento.porcentaje != null ? f.rendimiento.cumplimiento.porcentaje + '%' : '—'}</strong></div>
+        </div>` : ''}
         <div class="paciente-footer">
             <span class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">Ver detalle →</span>
         </div>
@@ -1045,25 +1055,38 @@ async function medicoRenderAtletas() {
     main.innerHTML = showLoading();
 
     try {
-        const response = await apiFetch(`${API}/perfil-medico/atletas`);
+        const [response, rendimiento] = await Promise.all([apiFetch(`${API}/perfil-medico/atletas`), rdCargarEquipo()]);
         const data = await response.json();
         if (!response.ok || !data.ok) throw new Error(data.error || 'No se pudieron cargar los atletas.');
         _medicoAtletas = data.atletas || [];
+        const enRiesgo = _medicoAtletas.filter(a => rendimiento[a.id]?.carga.riesgo === 'alto');
+        const noListos = _medicoAtletas.filter(a => rendimiento[a.id]?.listo.nivel === 'bajo');
         main.innerHTML = `
         <div class="view-enter">
             <div class="view-header">
                 <div class="view-title"><h1>Expedientes médicos</h1><p>${_medicoAtletas.length} atletas activos</p></div>
                 <button class="btn btn-ghost" onclick="medicoRenderAtletas()">Actualizar</button>
             </div>
+            ${enRiesgo.length || noListos.length ? `
+            <div class="rd-aviso">
+                ${enRiesgo.length ? `<div>⚠️ <strong>${enRiesgo.length} ${enRiesgo.length === 1 ? 'atleta' : 'atletas'} con riesgo alto de lesión por carga:</strong> ${enRiesgo.map(a => escapeHtml(a.nombre)).join(', ')}</div>` : ''}
+                ${noListos.length ? `<div>🛑 <strong>${noListos.length} ${noListos.length === 1 ? 'atleta necesita' : 'atletas necesitan'} descanso hoy:</strong> ${noListos.map(a => escapeHtml(a.nombre)).join(', ')}</div>` : ''}
+            </div>` : ''}
             <div class="card">
                 <div class="card-header"><h2>Atletas</h2></div>
-                <div class="table-wrap"><table><thead><tr><th>Atleta</th><th>Ficha médica</th><th></th></tr></thead><tbody>
-                    ${_medicoAtletas.length ? _medicoAtletas.map(atleta => `
+                <div class="table-wrap"><table><thead><tr><th>Atleta</th><th>Listo hoy</th><th>Carga</th><th>Cumplimiento</th><th>Ficha médica</th><th></th></tr></thead><tbody>
+                    ${_medicoAtletas.length ? _medicoAtletas.map(atleta => {
+                        const rd = rendimiento[atleta.id];
+                        return `
                         <tr>
                             <td><div class="user-name">${escapeHtml(atleta.nombre)}</div><div class="user-email">${escapeHtml(atleta.email)}</div></td>
+                            <td>${rd ? rdBadgeListo(rd.listo) : '—'}</td>
+                            <td>${rd ? rdBadgeRiesgo(rd.carga) : '—'}</td>
+                            <td>${rd?.cumplimiento.porcentaje != null ? rd.cumplimiento.porcentaje + '%' : '—'}</td>
                             <td>${atleta.completado ? '<span class="badge badge-activo">Completa</span>' : '<span class="badge badge-inactivo">Pendiente</span>'}</td>
                             <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="medicoVerPerfil(${Number(atleta.id)})">Ver expediente</button></td>
-                        </tr>`).join('') : '<tr><td colspan="3"><div class="empty-state"><p>No hay atletas activos.</p></div></td></tr>'}
+                        </tr>`;
+                    }).join('') : '<tr><td colspan="6"><div class="empty-state"><p>No hay atletas activos.</p></div></td></tr>'}
                 </tbody></table></div>
             </div>
         </div>`;
@@ -1153,12 +1176,16 @@ function pfRenderView(view) {
 // — DASHBOARD —
 async function pfRenderDashboard() {
     const userId=currentUser.id;
-    const data=await apiFetch(`${API}/panel/${userId}/dashboard`).then(r=>r.json()).catch(()=>null);
+    const [data, saludData, rdData] = await Promise.all([
+        apiFetch(`${API}/panel/${userId}/dashboard`).then(r=>r.json()).catch(()=>null),
+        apiFetch(`${API}/salud/${userId}`).then(r=>r.json()).catch(()=>[]),
+        apiFetch(`${API}/rendimiento/${userId}`).then(r=>r.json()).catch(()=>null)
+    ]);
     const main=document.getElementById('pf-content');
     if(!data?.ok){main.innerHTML=showError('No se pudo cargar el dashboard.','pfRenderView(\'dashboard\')');return;}
     const{perfil,ultimasComidas,ultimasRutinas,alertasRecientes}=data.resumen;
-    const saludData=await apiFetch(`${API}/salud/${userId}`).then(r=>r.json()).catch(()=>[]);
     const ultimaSalud=saludData[0]||null;
+    const rendimiento=rdData?.ok?rdData.resumen:null;
 
     const deporteActual = currentUser.deporte_principal || 'Fútbol';
     main.innerHTML=`
@@ -1171,6 +1198,7 @@ async function pfRenderDashboard() {
             </div>
             <button class="btn btn-primary" onclick="pfRenderView('salud')">+ Registrar salud</button>
         </div>
+        ${rendimiento?rdSeccionDashboard(rendimiento):''}
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon blue">🍽</div><div class="stat-info"><div class="stat-value">${ultimasComidas.length}</div><div class="stat-label">Comidas recientes</div></div></div>
             <div class="stat-card"><div class="stat-icon green">🏃</div><div class="stat-info"><div class="stat-value">${ultimasRutinas.length}</div><div class="stat-label">Rutinas recientes</div></div></div>
@@ -1179,7 +1207,7 @@ async function pfRenderDashboard() {
         </div>
         ${ultimaSalud?`
         <div class="card" style="margin-bottom:24px">
-            <div class="card-header"><h2>📊 Mi estado físico hoy</h2><span class="inc-fecha">${ultimaSalud.fecha}</span></div>
+            <div class="card-header"><h2>📊 Mi estado físico hoy</h2><span class="inc-fecha">${formatFecha(ultimaSalud.fecha)}</span></div>
             <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
                 ${saludMeterBig('Fatiga',ultimaSalud.fatiga,'danger')}
                 ${saludMeterBig('Sueño',ultimaSalud.sueno,'blue')}
@@ -1208,12 +1236,137 @@ async function pfRenderDashboard() {
             </div>`).join('')}
         </div></div>`:''}
     </div>`;
+    if(rendimiento) rdDibujarCarga(rendimiento.carga.serie);
 }
 
 function saludMeterBig(label, val, color) {
     const pct=Math.round(val/10*100);
     const colors={danger:'#ef4444',blue:'#0ea5e9',green:'#16a34a'};
     return `<div style="text-align:center"><div style="font-size:2rem;font-weight:700;color:${colors[color]};font-family:var(--mono)">${val}<span style="font-size:1rem;color:var(--text-muted)">/10</span></div><div class="meter-bar" style="margin:8px auto;max-width:100px"><div class="meter-fill" style="width:${pct}%;background:${colors[color]}"></div></div><div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.6px">${label}</div></div>`;
+}
+
+// — RENDIMIENTO (listo para entrenar · carga · cumplimiento) —
+const RD_NIVEL = {
+    alto:        { clase:'rd-ok',   etiqueta:'Listo' },
+    medio:       { clase:'rd-warn', etiqueta:'Moderado' },
+    bajo:        { clase:'rd-bad',  etiqueta:'Descanso' },
+    'sin-datos': { clase:'rd-none', etiqueta:'Sin registro' }
+};
+const RD_RIESGO = {
+    optimo:      { clase:'rd-ok',   etiqueta:'Óptima' },
+    precaucion:  { clase:'rd-warn', etiqueta:'Precaución' },
+    alto:        { clase:'rd-bad',  etiqueta:'Riesgo alto' },
+    bajo:        { clase:'rd-warn', etiqueta:'Carga baja' },
+    'sin-datos': { clase:'rd-none', etiqueta:'Sin datos' }
+};
+const RD_CUMPL = {
+    completo:'Completado', parcial:'Parcial', fallado:'No realizado', pendiente:'Pendiente hoy',
+    descanso:'Descanso', 'sin-plan':'Sin plan'
+};
+
+function rdBadgeListo(listo) {
+    const n = RD_NIVEL[listo?.nivel] || RD_NIVEL['sin-datos'];
+    return `<span class="rd-badge ${n.clase}">${listo?.puntaje ?? '—'} · ${n.etiqueta}</span>`;
+}
+
+function rdBadgeRiesgo(carga) {
+    const r = RD_RIESGO[carga?.riesgo] || RD_RIESGO['sin-datos'];
+    const ratio = carga?.ratio != null ? `${String(carga.ratio).replace('.', ',')} · ` : '';
+    return `<span class="rd-badge ${r.clase}">${ratio}${r.etiqueta}</span>`;
+}
+
+function rdTarjetaListo(listo) {
+    const n = RD_NIVEL[listo.nivel] || RD_NIVEL['sin-datos'];
+    const pct = listo.puntaje ?? 0;
+    const circ = 2 * Math.PI * 42;
+    return `
+    <div class="card rd-card">
+        <div class="card-header"><h2>⚡ Listo para entrenar</h2></div>
+        <div class="rd-card-body rd-listo">
+            <svg class="rd-anillo ${n.clase}" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="42" class="rd-anillo-fondo"/>
+                <circle cx="50" cy="50" r="42" class="rd-anillo-valor" stroke-dasharray="${circ}" stroke-dashoffset="${circ * (1 - pct / 100)}"/>
+                <text x="50" y="50" class="rd-anillo-num">${listo.puntaje ?? '—'}</text>
+            </svg>
+            <div>
+                <span class="rd-badge ${n.clase}">${n.etiqueta}</span>
+                <p class="rd-mensaje">${escapeHtml(listo.mensaje)}</p>
+                ${listo.nivel === 'sin-datos' ? `<button class="btn btn-primary btn-sm" onclick="pfRenderView('salud')">Registrar salud</button>` : ''}
+            </div>
+        </div>
+    </div>`;
+}
+
+function rdTarjetaCarga(carga) {
+    const ratio = carga.ratio != null ? String(carga.ratio).replace('.', ',') : '—';
+    return `
+    <div class="card rd-card">
+        <div class="card-header"><h2>📈 Carga de entrenamiento</h2>${rdBadgeRiesgo(carga)}</div>
+        <div class="rd-card-body">
+            <div class="rd-carga-cifras">
+                <div><span class="rd-cifra">${ratio}</span><span class="rd-cifra-lab">Ratio semana / mes</span></div>
+                <div><span class="rd-cifra">${carga.aguda}</span><span class="rd-cifra-lab">Carga 7 días</span></div>
+            </div>
+            <p class="rd-mensaje">${escapeHtml(carga.mensaje)}</p>
+            <div class="rd-chart"><canvas id="chart-carga" aria-label="Carga diaria de los últimos 28 días"></canvas></div>
+            <p class="rd-nota">Carga = minutos × esfuerzo (1-10). Zona óptima: 0,8 – 1,3.</p>
+        </div>
+    </div>`;
+}
+
+function rdTarjetaCumplimiento(cumpl, racha) {
+    const celdas = cumpl.dias.map(d =>
+        `<div class="rd-dia rd-dia-${d.estado}" title="${d.dia} ${formatFecha(d.fecha)} · ${RD_CUMPL[d.estado]}">${d.dia[0]}</div>`
+    ).join('');
+    const leyenda = ['completo','parcial','fallado','descanso'].map(e =>
+        `<span><i class="rd-dia rd-dia-${e}"></i>${RD_CUMPL[e]}</span>`).join('');
+    return `
+    <div class="card rd-card">
+        <div class="card-header"><h2>📅 Cumplimiento · 4 semanas</h2>${racha ? `<span class="rd-racha">🔥 ${racha} ${racha === 1 ? 'día' : 'días'}</span>` : ''}</div>
+        <div class="rd-card-body">
+            <div class="rd-carga-cifras">
+                <div><span class="rd-cifra">${cumpl.porcentaje ?? '—'}${cumpl.porcentaje != null ? '%' : ''}</span><span class="rd-cifra-lab">Del plan cumplido</span></div>
+                <div><span class="rd-cifra">${cumpl.completos}<small>/${cumpl.completos + cumpl.parciales + cumpl.fallados}</small></span><span class="rd-cifra-lab">Sesiones completas</span></div>
+            </div>
+            <div class="rd-calendario">${celdas}</div>
+            <div class="rd-leyenda">${leyenda}</div>
+        </div>
+    </div>`;
+}
+
+function rdSeccionDashboard(r) {
+    return `<div class="rd-grid">${rdTarjetaListo(r.listo)}${rdTarjetaCarga(r.carga)}${rdTarjetaCumplimiento(r.cumplimiento, r.racha)}</div>`;
+}
+
+function rdDibujarCarga(serie) {
+    const canvas = document.getElementById('chart-carga');
+    if (!canvas || typeof Chart === 'undefined') return;
+    const ultimos7 = serie.length - 7;
+    chartInstances['carga'] = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: serie.map(d => formatFecha(d.fecha)),
+            datasets: [{
+                label: 'Carga',
+                data: serie.map(d => d.carga),
+                backgroundColor: serie.map((_, i) => i >= ultimos7 ? '#16a34a' : '#86efac'),
+                borderRadius: 3, borderSkipped: false
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { display: false } },
+                y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.15)' }, ticks: { font: { family: 'Outfit', size: 10 }, maxTicksLimit: 4 } }
+            },
+            maintainAspectRatio: false
+        }
+    });
+}
+
+async function rdCargarEquipo() {
+    const data = await apiFetch(`${API}/rendimiento/equipo`).then(r => r.json()).catch(() => null);
+    return Object.fromEntries((data?.atletas || []).map(a => [a.id, a]));
 }
 
 // — PERFIL —
@@ -2067,7 +2220,7 @@ async function pfRenderPlanRutina() {
 
     const rutinaHTML=semanaRutina.length?semanaRutina.map(dia=>{
         const esDescanso=!dia.ejercicios||dia.ejercicios.length===0;
-        const yaCompleto=cumplidos.some(c=>c.diaSemana===dia.dia&&c.fecha===hoy);
+        const yaCompleto=cumplidos.some(c=>c.diaSemana===dia.dia&&String(c.fecha||'').slice(0,10)===hoy);
         const esHoy=dia.dia===diaHoy;
         const ejercHTML=esDescanso
             ?`<span style="color:var(--text-muted);font-size:13px">Descanso activo · estiramientos suaves</span>`
@@ -2082,7 +2235,7 @@ async function pfRenderPlanRutina() {
             :yaCompleto
                 ?`<span class="cumpl-badge cumpl-ok">✅ Completado hoy</span>`
                 :esHoy
-                    ?`<button class="btn btn-primary btn-sm cumpl-btn" onclick="pfMarcarCumplimiento('${dia.dia}','${dia.tipo||''}')">✓ Marcar como completado</button>`
+                    ?`<button class="btn btn-primary btn-sm cumpl-btn" onclick="pfModalCumplimiento('${dia.dia}','${(dia.tipo||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✓ Marcar como completado</button>`
                     :``;
         return `
         <div class="plan-rutina-dia ${yaCompleto?'plan-dia-completo':''}">
@@ -2115,11 +2268,34 @@ async function pfRenderPlanRutina() {
     </div>`;
 }
 
+const RPE_ETIQUETAS = ['', 'Muy fácil', 'Muy fácil', 'Fácil', 'Fácil', 'Moderado', 'Moderado', 'Duro', 'Duro', 'Muy duro', 'Máximo'];
+
+function pfModalCumplimiento(diaSemana, tipo) {
+    const diaEsc=diaSemana.replace(/'/g,"\\'"), tipoEsc=tipo.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    openModal(`Sesión del ${diaSemana}`, `
+        <div class="form-group"><label>¿Cómo te fue?</label>
+            <div class="rd-opciones">
+                <label class="rd-opcion"><input type="radio" name="cumpl-estado" value="completo" checked><span class="rd-radio"></span>La hice completa</label>
+                <label class="rd-opcion"><input type="radio" name="cumpl-estado" value="parcial"><span class="rd-radio"></span>La hice a medias</label>
+            </div>
+        </div>
+        <div class="form-group"><label>Duración (minutos)</label><input type="number" id="cumpl-minutos" value="60" min="1" max="300"></div>
+        <div class="form-group"><label>¿Qué tan dura fue? <strong id="cumpl-rpe-lab">6 · Moderado</strong></label>
+            <input type="range" id="cumpl-rpe" class="range-green" min="1" max="10" value="6" oninput="document.getElementById('cumpl-rpe-lab').textContent=this.value+' · '+RPE_ETIQUETAS[this.value]">
+            <div class="rd-rango-lab"><span>1 · Muy fácil</span><span>10 · Máximo</span></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="pfMarcarCumplimiento('${diaEsc}','${tipoEsc}')">Guardar</button></div>`);
+}
+
 async function pfMarcarCumplimiento(diaSemana, tipo) {
     const userId=currentUser.id;
     const fecha=new Date().toISOString().slice(0,10);
-    const res=await apiFetch(`${API}/panel/${userId}/cumplimiento`,{method:'POST',body:JSON.stringify({diaSemana,tipo,fecha})}).then(r=>r.json()).catch(()=>null);
-    if(res?.ok){showToast(`¡${diaSemana} completado! 💪`);pfRenderPlanRutina();}
+    const estado=document.querySelector('input[name="cumpl-estado"]:checked')?.value||'completo';
+    const duracionMinutos=Number(document.getElementById('cumpl-minutos')?.value)||60;
+    const rpe=Number(document.getElementById('cumpl-rpe')?.value)||null;
+    const res=await apiFetch(`${API}/panel/${userId}/cumplimiento`,{method:'POST',body:JSON.stringify({diaSemana,tipo,fecha,estado,duracionMinutos,rpe})}).then(r=>r.json()).catch(()=>null);
+    closeModal();
+    if(res?.ok){showToast(estado==='parcial'?`${diaSemana} registrado como parcial`:`¡${diaSemana} completado! 💪`);pfRenderPlanRutina();}
     else showToast('Error al registrar cumplimiento','error');
 }
 

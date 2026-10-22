@@ -49,6 +49,7 @@ vital-training/
 │       ├── salud/          # Registros diarios de salud
 │       ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
 │       ├── ia/             # Asistente IA + contexto para n8n
+│       ├── rendimiento/    # Listo para entrenar · carga y riesgo de lesión · cumplimiento
 │       ├── nutricionista/  # Panel nutricionista
 │       ├── incidencias/    # Soporte / tickets
 │       └── reportes/       # Estadísticas admin

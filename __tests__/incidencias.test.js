@@ -101,14 +101,29 @@ describe('incidencias — agregarComentario', () => {
 describe('nutricionista — listarFutbolistas', () => {
   test('retorna solo futbolistas activos con datos agregados', async () => {
     query.mockResolvedValueOnce({ rows: [
-      { id: 1, nombre: 'Carlos', rol: 'Futbolista', estado: 'Activo', email: 'carlos@vital.com', totalComidas: 2, totalRutinas: 1, ultimaSalud: null }
+      { id: 1, nombre: 'Carlos', rol: 'Futbolista', estado: 'Activo', email: 'carlos@vital.com' },
+      { id: 2, nombre: 'Diego',  rol: 'Atleta',     estado: 'Activo', email: 'diego@vital.com' }
     ]});
+    query.mockResolvedValueOnce({ rows: [ // salud, más reciente primero
+      { user_id: 1, fatiga: 8, created_at: '2026-10-22' },
+      { user_id: 1, fatiga: 3, created_at: '2026-10-21' }
+    ]});
+    query.mockResolvedValueOnce({ rows: [{ user_id: 1, total: '2' }] }); // comidas
+    query.mockResolvedValueOnce({ rows: [{ user_id: 1, total: '1' }] }); // rutinas
     const res = await nutrSvc.listarFutbolistas();
-    expect(res).toHaveLength(1);
+    expect(res).toHaveLength(2);
     expect(res[0].nombre).toBe('Carlos');
     expect(res[0].password).toBeUndefined();
     expect(res[0].totalComidas).toBe(2);
     expect(res[0].totalRutinas).toBe(1);
+    expect(res[0].ultimaSalud.fatiga).toBe(8);
+    expect(res[1]).toMatchObject({ totalComidas: 0, totalRutinas: 0, ultimaSalud: null });
+  });
+
+  test('sin atletas activos no hace más consultas', async () => {
+    query.mockResolvedValueOnce({ rows: [] });
+    expect(await nutrSvc.listarFutbolistas()).toEqual([]);
+    expect(query).toHaveBeenCalledTimes(1);
   });
 });
 

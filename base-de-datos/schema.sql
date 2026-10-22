@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS rutinas (
   intensidad       VARCHAR(50) DEFAULT 'media',
   descripcion      TEXT DEFAULT '',
   fecha            DATE,
+  rpe              INTEGER,
   registrado_por   VARCHAR(255),
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
@@ -110,6 +111,9 @@ CREATE TABLE IF NOT EXISTS cumplimiento (
   dia_semana VARCHAR(50) DEFAULT '',
   tipo       VARCHAR(100) DEFAULT '',
   notas      TEXT DEFAULT '',
+  estado     VARCHAR(20) DEFAULT 'completo',
+  rpe        INTEGER,
+  duracion_minutos INTEGER,
   creado_en  TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, fecha, dia_semana)
 );

@@ -11,11 +11,41 @@ async function setupDatabase() {
     .filter(stmt => stmt && !stmt.startsWith('--'));
 
   for (const statement of statements) {
-    await query(statement);
+    try {
+      await query(statement);
+    } catch (err) {
+      // En una base ya creada, los ADD CONSTRAINT fallan porque la restricción ya existe
+      if (!yaExiste(err)) throw err;
+    }
   }
 
+  await aplicarMigraciones();
   await seedUsuarios();
   console.log('✅ Base de datos lista');
+}
+
+// Columnas añadidas después de la primera versión del esquema.
+// En bases nuevas ya vienen en schema.sql; aquí se añaden a las bases existentes.
+const MIGRACIONES = [
+  'ALTER TABLE rutinas      ADD COLUMN rpe INTEGER',
+  "ALTER TABLE cumplimiento ADD COLUMN estado VARCHAR(20) DEFAULT 'completo'",
+  'ALTER TABLE cumplimiento ADD COLUMN rpe INTEGER',
+  'ALTER TABLE cumplimiento ADD COLUMN duracion_minutos INTEGER',
+];
+
+async function aplicarMigraciones() {
+  for (const sql of MIGRACIONES) {
+    try {
+      await query(sql);
+    } catch (err) {
+      if (!yaExiste(err)) throw err;
+    }
+  }
+}
+
+// 42701 = columna duplicada, 42710 = objeto duplicado (PostgreSQL); pg-mem solo da el mensaje
+function yaExiste(err) {
+  return ['42701', '42710'].includes(err.code) || /already exists|ya existe/i.test(err.message);
 }
 
 async function seedUsuarios() {
