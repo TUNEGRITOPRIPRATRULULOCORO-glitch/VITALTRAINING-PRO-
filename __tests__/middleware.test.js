@@ -16,7 +16,7 @@ describe('authMiddleware', () => {
   test('llama next() con token válido', () => {
     const payload = { id: 1, rol: 'Futbolista' };
     jwt.verify.mockReturnValue(payload);
-    const req  = { headers: { authorization: 'Bearer token-valido' } };
+    const req  = { path: '/panel/1', headers: { authorization: 'Bearer token-valido' } };
     const res  = makeRes();
     const next = jest.fn();
 
@@ -28,7 +28,7 @@ describe('authMiddleware', () => {
   });
 
   test('retorna 401 si no hay header de autorización', () => {
-    const req  = { headers: {} };
+    const req  = { path: '/panel/1', headers: {} };
     const res  = makeRes();
     const next = jest.fn();
 
@@ -40,7 +40,7 @@ describe('authMiddleware', () => {
   });
 
   test('retorna 401 si el header no empieza con Bearer', () => {
-    const req  = { headers: { authorization: 'Basic abc123' } };
+    const req  = { path: '/panel/1', headers: { authorization: 'Basic abc123' } };
     const res  = makeRes();
     const next = jest.fn();
 
@@ -52,7 +52,7 @@ describe('authMiddleware', () => {
 
   test('retorna 401 si el token es inválido o expirado', () => {
     jwt.verify.mockImplementation(() => { throw new Error('invalid token'); });
-    const req  = { headers: { authorization: 'Bearer token-invalido' } };
+    const req  = { path: '/panel/1', headers: { authorization: 'Bearer token-invalido' } };
     const res  = makeRes();
     const next = jest.fn();
 
@@ -61,6 +61,17 @@ describe('authMiddleware', () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: expect.stringMatching(/expir/i) }));
     expect(next).not.toHaveBeenCalled();
+  });
+
+  test('deja pasar sin token la ruta de contexto para n8n', () => {
+    const req  = { path: '/ia/n8n-contexto/5', headers: {} };
+    const res  = makeRes();
+    const next = jest.fn();
+
+    authMiddleware(req, res, next);
+
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(res.status).not.toHaveBeenCalled();
   });
 });
 

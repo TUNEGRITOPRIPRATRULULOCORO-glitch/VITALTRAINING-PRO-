@@ -3,7 +3,7 @@ const { query } = require('../base-de-datos/db');
 const svc = require('../servidor/api/usuarios/usuarios.service');
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  jest.resetAllMocks(); // también descarta respuestas mockResolvedValueOnce no consumidas
   query.mockResolvedValue({ rows: [] });
 });
 
@@ -64,23 +64,28 @@ describe('crear', () => {
   test('crea usuario y retorna sin contraseña', async () => {
     query.mockResolvedValueOnce({ rows: [] }); // no existe
     query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Nuevo', email: 'nuevo@test.com', rol: 'Futbolista', estado: 'Activo' }] }); // INSERT
-    const res = await svc.crear({ nombre: 'Nuevo', email: 'nuevo@test.com', rol: 'Futbolista' });
+    const res = await svc.crear({ nombre: 'Nuevo', email: 'nuevo@test.com', password: 'segura123', rol: 'Futbolista' });
     expect(res.nombre).toBe('Nuevo');
     expect(res.password).toBeUndefined();
   });
 
-  test('usa contraseña por defecto "1234" si no se envía', async () => {
+  test('lanza error si no se envía contraseña', async () => {
     query.mockResolvedValueOnce({ rows: [] });
-    query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Test', email: 'test@test.com', rol: 'Futbolista', estado: 'Activo' }] });
-    const res = await svc.crear({ nombre: 'Test', email: 'test@test.com' });
-    expect(res.passwordInicial).toBe('1234');
+    await expect(svc.crear({ nombre: 'Test', email: 'test@test.com' })).rejects.toThrow(/contraseña/i);
   });
 
-  test('usa la contraseña enviada como passwordInicial', async () => {
+  test('lanza error si la contraseña tiene menos de 8 caracteres', async () => {
+    query.mockResolvedValueOnce({ rows: [] });
+    await expect(svc.crear({ nombre: 'Test', email: 'test@test.com', password: '1234' })).rejects.toThrow(/8 caracteres/);
+  });
+
+  test('guarda la contraseña hasheada, nunca en texto plano', async () => {
     query.mockResolvedValueOnce({ rows: [] });
     query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Test2', email: 'test2@test.com', rol: 'Futbolista', estado: 'Activo' }] });
-    const res = await svc.crear({ nombre: 'Test2', email: 'test2@test.com', password: 'segura123' });
-    expect(res.passwordInicial).toBe('segura123');
+    await svc.crear({ nombre: 'Test2', email: 'test2@test.com', password: 'segura123' });
+    const passwordGuardada = query.mock.calls[1][1][2];
+    expect(passwordGuardada).not.toBe('segura123');
+    expect(passwordGuardada).toMatch(/^\$2b\$/);
   });
 
   test('conserva el rol Medico al crear la cuenta', async () => {
