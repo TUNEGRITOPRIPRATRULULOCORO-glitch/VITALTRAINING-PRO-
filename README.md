@@ -50,6 +50,7 @@ vital-training/
 │       ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
 │       ├── ia/             # Asistente IA + contexto para n8n
 │       ├── rendimiento/    # Listo para entrenar · carga y riesgo de lesión · cumplimiento
+│       ├── mensajes/       # Chat atleta ↔ nutricionista/médico, equipo ↔ administración
 │       ├── nutricionista/  # Panel nutricionista
 │       ├── incidencias/    # Soporte / tickets
 │       └── reportes/       # Estadísticas admin

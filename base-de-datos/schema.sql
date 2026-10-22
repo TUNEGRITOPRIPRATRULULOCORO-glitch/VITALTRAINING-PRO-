@@ -128,6 +128,15 @@ CREATE TABLE IF NOT EXISTS notas_nutricionista (
   created_at           TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS mensajes (
+  id              BIGSERIAL PRIMARY KEY,
+  remitente_id    BIGINT NOT NULL,
+  destinatario_id BIGINT NOT NULL,
+  texto           TEXT NOT NULL,
+  leido           BOOLEAN DEFAULT FALSE,
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -137,3 +146,5 @@ ALTER TABLE rutinas ADD CONSTRAINT rutinas_user_id_fkey FOREIGN KEY (user_id) RE
 ALTER TABLE incidencias ADD CONSTRAINT incidencias_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE cumplimiento ADD CONSTRAINT cumplimiento_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE notas_nutricionista ADD CONSTRAINT notas_nutricionista_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE mensajes ADD CONSTRAINT mensajes_remitente_id_fkey FOREIGN KEY (remitente_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE mensajes ADD CONSTRAINT mensajes_destinatario_id_fkey FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE;

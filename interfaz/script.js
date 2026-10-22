@@ -317,6 +317,7 @@ async function doRegistro() {
 function doLogout() {
     if(!confirm('¿Cerrar sesión?')) return;
     stopPolling();
+    stopBadgePolling();
     clearSession(); currentUser=null;
     Object.values(chartInstances).forEach(c=>c.destroy()); chartInstances={};
     showAuthPanel();
@@ -334,11 +335,7 @@ function showPanel(user) {
     document.getElementById('sidebar-avatar').textContent=getInitials(user.nombre);
     document.getElementById('sidebar-name').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     document.getElementById('sidebar-role').textContent=user.rol;
-    apiFetch(`${API}/incidencias`).then(r=>r.json()).then(inc=>{
-        const ab=inc.filter(i=>i.estado==='abierta').length;
-        const badge=document.getElementById('badge-soporte');
-        if(ab>0){badge.textContent=ab;badge.classList.add('visible');}
-    }).catch(()=>{});
+    startBadgePolling();
     renderView('dashboard');
 }
 
@@ -585,11 +582,17 @@ async function renderSoporte() {
     const inc=await apiFetch(`${API}/incidencias`).then(r=>r.json()).catch(()=>[]);
     const main=document.getElementById('content');
     const abiertas=inc.filter(i=>i.estado==='abierta').length, criticas=inc.filter(i=>i.prioridad==='critica').length;
-    const badge=document.getElementById('badge-soporte');
-    if(abiertas>0){badge.textContent=abiertas;badge.classList.add('visible');}else badge.classList.remove('visible');
+    const sinLeer=(await apiFetch(`${API}/mensajes/no-leidos`).then(r=>r.json()).catch(()=>null))?.total||0;
     main.innerHTML=`
     <div class="view-enter">
-        <div class="view-header"><div class="view-title"><h1>Soporte al Usuario</h1><p>${inc.length} incidencias · ${abiertas} abiertas</p></div></div>
+        <div class="view-header"><div class="view-title"><h1>Soporte</h1><p>${sinLeer ? `${sinLeer} ${sinLeer===1?'mensaje':'mensajes'} del equipo sin leer · ` : ''}${inc.length} tickets · ${abiertas} abiertos</p></div></div>
+        <div class="card msg-prioridad">
+            <div class="card-header">
+                <div><h2>⭐ Mensajes del equipo · prioridad</h2><p class="msg-ayuda">Nutricionistas y médicos. Se atienden antes que los tickets de atletas.</p></div>
+            </div>
+            <div style="padding:16px 20px"><div id="admin-mensajes"></div></div>
+        </div>
+        <h2 class="msg-seccion-titulo">🎫 Tickets de atletas</h2>
         <div class="stats-grid">
             <div class="stat-card"><div class="stat-icon red">🎫</div><div class="stat-info"><div class="stat-value">${inc.length}</div><div class="stat-label">Total</div></div></div>
             <div class="stat-card"><div class="stat-icon yellow">🔓</div><div class="stat-info"><div class="stat-value">${abiertas}</div><div class="stat-label">Abiertas</div></div></div>
@@ -606,6 +609,8 @@ async function renderSoporte() {
             <div style="padding:16px 20px" id="lista-incidencias">${renderListaIncidencias(inc)}</div>
         </div>
     </div>`;
+    msgActualizarBadges();
+    await msgMontar('admin-mensajes');
 }
 
 function renderListaIncidencias(lista) {
@@ -675,12 +680,12 @@ function showPanelNutricionista(user) {
     document.getElementById('nt-nombre').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     setupCounterObservers();
     ntRenderView('dashboard');
-    ntActualizarBadgeSoporte();
+    startBadgePolling();
 }
 
 function ntRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', soporte:'Consultas de atletas' };
+    const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', soporte:'Mensajes' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-nutricionista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.ntView===view));
@@ -690,13 +695,8 @@ function ntRenderView(view) {
     else if(view==='soporte')   ntRenderSoporte();
 }
 
-async function ntActualizarBadgeSoporte() {
-    const inc = await apiFetch(`${API}/incidencias`).then(r=>r.json()).catch(()=>[]);
-    const abiertas = inc.filter(i=>i.estado==='abierta').length;
-    const badge = document.getElementById('badge-nt-soporte');
-    if (!badge) return;
-    if (abiertas > 0) { badge.textContent = abiertas; badge.classList.remove('hidden'); }
-    else badge.classList.add('hidden');
+function ntActualizarBadgeSoporte() {
+    return msgActualizarBadges();
 }
 
 async function ntRenderDashboard() {
@@ -1046,7 +1046,29 @@ function showPanelMedico(user) {
     document.getElementById('panel-medico').classList.remove('hidden');
     document.getElementById('md-avatar').textContent = getInitials(user.nombre);
     document.getElementById('md-nombre').textContent = user.nombre.split(' ').slice(0, 2).join(' ');
-    medicoRenderAtletas();
+    startBadgePolling();
+    medicoRenderView('expedientes');
+}
+
+function medicoRenderView(view) {
+    closeSidebar();
+    stopPolling();
+    setTitle(view === 'mensajes' ? 'Mensajes' : 'Expedientes médicos');
+    document.querySelectorAll('#panel-medico .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mdView === view));
+    if (view === 'mensajes') medicoRenderMensajes();
+    else medicoRenderAtletas();
+}
+
+async function medicoRenderMensajes() {
+    const main = document.getElementById('md-content');
+    main.innerHTML = `
+    <div class="view-enter">
+        <div class="view-header">
+            <div class="view-title"><h1>Mensajes</h1><p>Habla con tus atletas, con los nutricionistas y con administración</p></div>
+        </div>
+        <div id="md-mensajes"></div>
+    </div>`;
+    await msgMontar('md-mensajes');
 }
 
 async function medicoRenderAtletas() {
@@ -1146,6 +1168,7 @@ async function showPanelAtleta(user) {
     document.getElementById('pf-avatar').textContent=getInitials(user.nombre);
     document.getElementById('pf-nombre').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     setupCounterObservers();
+    startBadgePolling();
     // Server-side check — cannot be bypassed client-side
     const check=await apiFetch(`${API}/perfil-medico/${user.id}`).then(r=>r.json()).catch(()=>null);
     if (!check?.perfil) {
@@ -1159,9 +1182,10 @@ const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', ia:'Asistente IA', soporte:'Soporte' };
+    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', ia:'Asistente IA', soporte:'Mensajes y soporte' };
     setTitle(titles[view] || view);
-    document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.pfView===view));
+    stopPolling();
+    document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
     document.getElementById('pf-content').innerHTML=showLoading();
     Object.values(chartInstances).forEach(c=>c.destroy()); chartInstances={};
     if(view==='dashboard')  pfRenderDashboard();
@@ -1923,14 +1947,37 @@ async function pfEliminarRutina(userId, rutinaId) {
 let _onbCat  = null;
 let _onbDatos = {};
 
-async function pfRenderOnboarding() {
-    document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=true; b.classList.remove('active'); });
+// actualizando=true cuando el atleta ya tiene perfil y entra desde "Actualizar perfil":
+// el menú sigue activo, se puede volver sin guardar y se parte de sus respuestas actuales.
+let _onbActualizando = false;
+
+async function pfRenderOnboarding(actualizando = false) {
+    _onbActualizando = actualizando;
+    document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{
+        b.disabled = !actualizando;
+        b.classList.toggle('active', actualizando && b.dataset.pfView === 'plan');
+    });
     const main=document.getElementById('pf-content');
     main.innerHTML=showLoading();
-    _onbCat=await apiFetch(`${API}/perfil-medico/catalogos`).then(r=>r.json()).catch(()=>null);
-    if(!_onbCat?.ok){ main.innerHTML=showError('No se pudo cargar el catálogo médico.','pfRenderOnboarding()'); return; }
-    _onbDatos={ condiciones:[], alergias:[], preferencia:'Sin restricciones' };
+    const [catalogo, actual] = await Promise.all([
+        apiFetch(`${API}/perfil-medico/catalogos`).then(r=>r.json()).catch(()=>null),
+        actualizando ? apiFetch(`${API}/perfil-medico/${currentUser.id}`).then(r=>r.json()).catch(()=>null) : null
+    ]);
+    _onbCat = catalogo;
+    if(!_onbCat?.ok){ main.innerHTML=showError('No se pudo cargar el catálogo médico.',`pfRenderOnboarding(${actualizando})`); return; }
+    const p = actual?.perfil;
+    _onbDatos={
+        condiciones: p?.condiciones || [],
+        alergias:    p?.alergias || [],
+        preferencia: p?.preferencias || 'Sin restricciones'
+    };
     pfOnboardingStep1();
+}
+
+function pfOnbVolverHTML() {
+    return _onbActualizando
+        ? `<button class="btn btn-ghost btn-sm onb-volver" onclick="pfRenderView('plan')">← Volver a mi plan sin guardar cambios</button>`
+        : '';
 }
 
 function pfOnboardingStep1() {
@@ -1958,6 +2005,7 @@ function pfOnboardingStep1() {
         </div>`).join('');
     document.getElementById('pf-content').innerHTML=`
     <div class="onb-wizard view-enter">
+        ${pfOnbVolverHTML()}
         <div class="onb-progress">
             <div class="onb-step onb-step-active">1. Condiciones</div>
             <div class="onb-step-line"></div>
@@ -2013,6 +2061,7 @@ function pfOnboardingStep2() {
         </div>`).join('');
     document.getElementById('pf-content').innerHTML=`
     <div class="onb-wizard view-enter">
+        ${pfOnbVolverHTML()}
         <div class="onb-progress">
             <div class="onb-step onb-step-done">✓ Condiciones</div>
             <div class="onb-step-line onb-step-line-done"></div>
@@ -2046,6 +2095,7 @@ function pfOnboardingStep3() {
         </label>`).join('');
     document.getElementById('pf-content').innerHTML=`
     <div class="onb-wizard view-enter">
+        ${pfOnbVolverHTML()}
         <div class="onb-progress">
             <div class="onb-step onb-step-done">✓ Condiciones</div>
             <div class="onb-step-line onb-step-line-done"></div>
@@ -2085,7 +2135,7 @@ async function pfOnboardingGuardar() {
     });
     if(!res.ok){ showToast('Error al guardar el perfil médico. Intenta de nuevo.','error'); pfOnboardingStep3(); return; }
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>b.disabled=false);
-    showToast('¡Perfil médico completado! Tu plan personalizado ha sido generado.','success',5000);
+    showToast(_onbActualizando?'Perfil actualizado. Tu plan se ha regenerado.':'¡Perfil médico completado! Tu plan personalizado ha sido generado.','success',5000);
     pfRenderView('plan');
 }
 
@@ -2116,7 +2166,7 @@ async function pfRenderPlan() {
     <div class="view-enter">
         <div class="view-header">
             <div class="view-title"><h1>Mi Plan Personalizado</h1><p>Diseñado para tu rendimiento y recuperación</p></div>
-            <button class="btn btn-ghost" onclick="pfRenderOnboarding()">⚙️ Actualizar perfil</button>
+            <button class="btn btn-ghost" onclick="pfRenderOnboarding(true)">⚙️ Actualizar perfil</button>
         </div>
 
         <div class="card" style="margin-bottom:24px">
@@ -2402,17 +2452,13 @@ async function ntRenderSoporte() {
     const main = document.getElementById('nt-content');
     const inc = await apiFetch(`${API}/incidencias`).then(r=>r.json()).catch(()=>[]);
     const abiertas = inc.filter(i=>i.estado==='abierta').length;
-    const badge = document.getElementById('badge-nt-soporte');
-    if (badge) { if(abiertas>0){badge.textContent=abiertas;badge.classList.remove('hidden');}else badge.classList.add('hidden'); }
 
-    main.innerHTML=`
-    <div class="view-enter">
-        <div class="view-header">
-            <div class="view-title"><h1>Consultas de atletas</h1><p>${inc.length} tickets · ${abiertas} sin responder</p></div>
-        </div>
+    // Los atletas ya no abren tickets al nutricionista (ahora escriben por chat);
+    // los tickets antiguos se siguen mostrando mientras existan
+    const ticketsHTML = inc.length ? `
         <div class="card">
             <div class="card-header">
-                <h2>Tickets de salud y rendimiento</h2>
+                <h2>Tickets anteriores · ${abiertas} sin resolver</h2>
                 <div style="display:flex;gap:8px">
                     <select id="nt-filter-estado" onchange="ntFiltrarSoporte()" style="font-size:13px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text)">
                         <option value="Todos">Todos</option>
@@ -2425,8 +2471,17 @@ async function ntRenderSoporte() {
             <div style="padding:16px 20px" id="nt-lista-soporte">
                 ${ntRenderListaSoporte(inc)}
             </div>
+        </div>` : '';
+
+    main.innerHTML=`
+    <div class="view-enter">
+        <div class="view-header">
+            <div class="view-title"><h1>Mensajes</h1><p>Habla con tus atletas, con el equipo médico y con administración</p></div>
         </div>
+        <div id="nt-mensajes"></div>
+        ${ticketsHTML}
     </div>`;
+    await msgMontar('nt-mensajes');
 }
 
 function ntRenderListaSoporte(lista) {
@@ -2493,73 +2548,233 @@ async function ntEnviarRespuesta(id) {
     else showToast('Error al enviar respuesta','error');
 }
 
-const supportChatStore = {
-    'Administrador': [
-        { autor: 'Equipo', texto: 'Hola, ¿problemas con la app, login o sistema?', fecha: 'Hoy' },
-        { autor: 'Tú', texto: 'Necesito ayuda con un error de la aplicación.', fecha: 'Ahora' }
-    ],
-    'Nutricionista': [
-        { autor: 'Nutricionista', texto: 'Aquí puedes consultar alimentación, plan dietario y hábitos.', fecha: 'Hoy' },
-        { autor: 'Tú', texto: 'Quiero ajustar mi plan nutricional.', fecha: 'Ahora' }
-    ],
-    'Médico': [
-        { autor: 'Médico', texto: 'Para salud o recuperación, comparte síntomas y restricciones.', fecha: 'Hoy' },
-        { autor: 'Tú', texto: 'Tengo dudas sobre mi recuperación y carga.', fecha: 'Ahora' }
-    ]
+// — MENSAJES (chat directo entre roles) —
+// Quién puede hablar con quién lo decide el servidor (servidor/api/mensajes/mensajes.permisos.js)
+const MSG_ROL = {
+    Atleta:        { grupo:'Atletas',        etiqueta:'Atleta' },
+    Nutricionista: { grupo:'Nutricionistas', etiqueta:'Nutricionista' },
+    Medico:        { grupo:'Médicos',        etiqueta:'Médico' },
+    Administrador: { grupo:'Administración', etiqueta:'Administración' }
+};
+// Orden de los grupos de contactos según quién mira
+const MSG_ORDEN_GRUPOS = {
+    Atleta:        ['Nutricionista', 'Medico'],
+    Nutricionista: ['Atleta', 'Medico', 'Administrador'],
+    Medico:        ['Atleta', 'Nutricionista', 'Administrador'],
+    Administrador: ['Nutricionista', 'Medico']
+};
+const MSG_BADGE_POR_ROL = {
+    Atleta: 'badge-pf-mensajes', Nutricionista: 'badge-nt-soporte', Medico: 'badge-md-mensajes', Administrador: 'badge-soporte'
 };
 
-function renderSupportChat(channel = 'Administrador') {
-    const messages = supportChatStore[channel] || [];
-    const list = document.getElementById('support-chat-messages');
-    const title = document.getElementById('support-chat-title');
-    const buttons = document.querySelectorAll('.support-channel-btn');
+let _msg = { contenedor:null, contactos:[], activo:null, filtro:'', ultimoId:null };
+let badgeInterval = null;
 
-    if (!list || !title) return;
-
-    title.textContent = `Canal directo · ${channel}`;
-    list.innerHTML = messages.map(m => `
-        <div class="support-chat-message ${m.autor === 'Tú' ? 'me' : 'them'}">
-            <div class="support-chat-author">${escapeHtml(m.autor)}</div>
-            <div class="support-chat-text">${escapeHtml(m.texto)}</div>
-            <div class="support-chat-time">${escapeHtml(m.fecha)}</div>
-        </div>
-    `).join('');
-    list.scrollTop = list.scrollHeight;
-
-    buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.channel === channel));
+function msgRolActual() {
+    const r = normalizeRole(currentUser?.rol);
+    return r === 'Médico' ? 'Medico' : r;
 }
 
-function pfOpenSupportChat(channel) {
-    renderSupportChat(channel);
+function setNavBadge(id, n) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = n > 99 ? '99+' : n;
+    el.classList.toggle('visible', n > 0);
+    el.classList.toggle('hidden', !(n > 0));
 }
 
-function pfSendSupportChat() {
-    const input = document.getElementById('support-chat-input');
-    const channelEl = document.getElementById('support-chat-title');
-    const channel = channelEl ? channelEl.textContent.replace('Canal directo · ', '') : 'Administrador';
+function msgHora(fecha) {
+    const d = new Date(fecha);
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleTimeString('es-CO', { hour:'2-digit', minute:'2-digit' });
+}
+
+function msgDia(fecha) {
+    const d = new Date(fecha), hoy = new Date();
+    const ayer = new Date(); ayer.setDate(hoy.getDate() - 1);
+    if (d.toDateString() === hoy.toDateString()) return 'Hoy';
+    if (d.toDateString() === ayer.toDateString()) return 'Ayer';
+    return d.toLocaleDateString('es-CO', { day:'numeric', month:'short' });
+}
+
+function msgAvatar(nombre, extra = '') {
+    const [c1, c2] = avatarColor(nombre);
+    return `<span class="msg-avatar ${extra}" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(nombre)}</span>`;
+}
+
+/** Monta la bandeja de mensajes dentro del elemento indicado. */
+async function msgMontar(contenedorId) {
+    const el = document.getElementById(contenedorId);
+    if (!el) return;
+    _msg = { contenedor:contenedorId, contactos:[], activo:null, filtro:'', ultimoId:null };
+    el.innerHTML = `
+    <div class="msg-box" id="msg-box">
+        <aside class="msg-lista">
+            <div class="msg-buscar"><input type="text" id="msg-buscar" placeholder="Buscar persona..." oninput="msgFiltrar(this.value)" aria-label="Buscar persona"></div>
+            <div id="msg-contactos" class="msg-contactos">${showLoading()}</div>
+        </aside>
+        <section class="msg-chat" id="msg-chat">
+            <div class="msg-chat-vacio"><div class="msg-chat-vacio-icono">💬</div><p>Elige a alguien de la lista para empezar a conversar.</p></div>
+        </section>
+    </div>`;
+    await msgCargarContactos();
+    startPolling(msgRefrescar, 8);
+}
+
+async function msgCargarContactos() {
+    const data = await apiFetch(`${API}/mensajes/contactos`).then(r => r.json()).catch(() => null);
+    _msg.contactos = data?.contactos || [];
+    msgPintarContactos();
+}
+
+function msgFiltrar(texto) {
+    _msg.filtro = texto.toLowerCase();
+    msgPintarContactos();
+}
+
+function msgPintarContactos() {
+    const lista = document.getElementById('msg-contactos');
+    if (!lista) return;
+    const visibles = _msg.contactos.filter(c => !_msg.filtro || c.nombre.toLowerCase().includes(_msg.filtro));
+    if (!_msg.contactos.length) {
+        lista.innerHTML = `<p class="msg-sin-contactos">No hay personas disponibles para chatear.</p>`;
+        return;
+    }
+    const grupos = (MSG_ORDEN_GRUPOS[msgRolActual()] || []).map(rol => {
+        const items = visibles.filter(c => c.rol === rol);
+        if (!items.length) return '';
+        return `
+        <div class="msg-grupo">
+            <div class="msg-grupo-titulo">${MSG_ROL[rol]?.grupo || rol}</div>
+            ${items.map(c => `
+            <button class="msg-contacto ${c.id === _msg.activo ? 'activo' : ''} ${c.noLeidos ? 'con-noleidos' : ''}" onclick="msgAbrir(${c.id})">
+                ${msgAvatar(c.nombre)}
+                <span class="msg-contacto-info">
+                    <span class="msg-contacto-nombre">${escapeHtml(c.nombre)}</span>
+                    <span class="msg-contacto-ultimo">${c.ultimoMensaje ? (c.ultimoMensaje.mio ? 'Tú: ' : '') + escapeHtml(c.ultimoMensaje.texto) : 'Sin mensajes todavía'}</span>
+                </span>
+                <span class="msg-contacto-lado">
+                    ${c.ultimoMensaje ? `<span class="msg-contacto-hora">${msgDia(c.ultimoMensaje.fecha) === 'Hoy' ? msgHora(c.ultimoMensaje.fecha) : msgDia(c.ultimoMensaje.fecha)}</span>` : ''}
+                    ${c.noLeidos ? `<span class="msg-noleidos">${c.noLeidos}</span>` : ''}
+                </span>
+            </button>`).join('')}
+        </div>`;
+    }).join('');
+    lista.innerHTML = grupos || `<p class="msg-sin-contactos">Nadie coincide con “${escapeHtml(_msg.filtro)}”.</p>`;
+}
+
+async function msgAbrir(id) {
+    _msg.activo = id;
+    _msg.ultimoId = null;
+    document.getElementById('msg-box')?.classList.add('msg-con-chat');
+    const chat = document.getElementById('msg-chat');
+    const contacto = _msg.contactos.find(c => c.id === id);
+    if (!chat || !contacto) return;
+    chat.innerHTML = `
+        <header class="msg-chat-header">
+            <button class="msg-volver" onclick="msgCerrarChat()" aria-label="Volver a la lista">←</button>
+            ${msgAvatar(contacto.nombre)}
+            <div class="msg-chat-quien"><strong>${escapeHtml(contacto.nombre)}</strong><span>${MSG_ROL[contacto.rol]?.etiqueta || contacto.rol}</span></div>
+        </header>
+        <div class="msg-mensajes" id="msg-mensajes">${showLoading()}</div>
+        <form class="msg-enviar" onsubmit="msgEnviar(event)">
+            <textarea id="msg-texto" rows="1" maxlength="1000" placeholder="Escribe un mensaje..." aria-label="Mensaje"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.requestSubmit();}"></textarea>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+        </form>`;
+    contacto.noLeidos = 0;
+    msgPintarContactos();
+    await msgCargarConversacion(true);
+    document.getElementById('msg-texto')?.focus();
+    msgActualizarBadges();
+}
+
+function msgCerrarChat() {
+    _msg.activo = null;
+    document.getElementById('msg-box')?.classList.remove('msg-con-chat');
+    msgPintarContactos();
+}
+
+async function msgCargarConversacion(forzar = false) {
+    const id = _msg.activo;
+    if (!id) return;
+    const data = await apiFetch(`${API}/mensajes/${id}`).then(r => r.json()).catch(() => null);
+    const cont = document.getElementById('msg-mensajes');
+    if (!cont || id !== _msg.activo) return;
+    if (!data?.ok) { cont.innerHTML = `<p class="msg-sin-contactos">${escapeHtml(data?.error || 'No se pudo cargar la conversación.')}</p>`; return; }
+
+    const mensajes = data.mensajes;
+    const ultimoId = mensajes.at(-1)?.id ?? 0;
+    if (!forzar && ultimoId === _msg.ultimoId) return; // nada nuevo: no tocar la vista
+    _msg.ultimoId = ultimoId;
+
+    if (!mensajes.length) {
+        cont.innerHTML = `<div class="msg-chat-vacio"><p>Todavía no hay mensajes. ¡Escribe el primero!</p></div>`;
+        return;
+    }
+    let diaAnterior = '';
+    cont.innerHTML = mensajes.map(m => {
+        const dia = msgDia(m.fecha);
+        const separador = dia !== diaAnterior ? `<div class="msg-dia"><span>${dia}</span></div>` : '';
+        diaAnterior = dia;
+        return `${separador}
+        <div class="msg-burbuja ${m.mio ? 'mio' : 'suyo'}">
+            <div class="msg-burbuja-texto">${escapeHtml(m.texto)}</div>
+            <div class="msg-burbuja-meta">${msgHora(m.fecha)}${m.mio ? `<span class="msg-visto ${m.leido ? 'leido' : ''}" title="${m.leido ? 'Leído' : 'Enviado'}">${m.leido ? '✓✓' : '✓'}</span>` : ''}</div>
+        </div>`;
+    }).join('');
+    cont.scrollTop = cont.scrollHeight;
+}
+
+async function msgEnviar(event) {
+    event.preventDefault();
+    const input = document.getElementById('msg-texto');
     const texto = input?.value.trim();
-    if (!texto) return;
-
-    supportChatStore[channel] = supportChatStore[channel] || [];
-    supportChatStore[channel].push({ autor: 'Tú', texto, fecha: 'Ahora' });
-    renderSupportChat(channel);
-
-    const autoReply = {
-        Administrador: 'Gracias, revisaremos tu problema con el equipo técnico y te responderemos pronto.',
-        Nutricionista: 'Perfecto, te ayudamos a ajustar tu alimentación y plan nutricional.',
-        Médico: 'Para temas de salud, te recomendamos comentar síntomas, molestias y limitaciones concretas para recibir orientación segura.'
-    };
-
-    setTimeout(() => {
-        supportChatStore[channel].push({ autor: channel === 'Administrador' ? 'Equipo' : channel === 'Nutricionista' ? 'Nutricionista' : 'Médico', texto: autoReply[channel] || 'Gracias por escribirnos.', fecha: 'Ahora' });
-        renderSupportChat(channel);
-        if (input) input.value = '';
-    }, 300);
-
-    if (input) input.value = '';
+    if (!texto || !_msg.activo) return;
+    const boton = event.target.querySelector('button[type=submit]');
+    boton.disabled = true;
+    const res = await apiFetch(`${API}/mensajes/${_msg.activo}`, { method:'POST', body:JSON.stringify({ texto }) })
+        .then(r => r.json()).catch(() => null);
+    boton.disabled = false;
+    if (!res?.ok) return showToast(res?.error || 'No se pudo enviar el mensaje', 'error');
+    input.value = '';
+    input.focus();
+    await Promise.all([msgCargarConversacion(true), msgCargarContactos()]);
 }
 
-// — SOPORTE (ATLETA) —
+/** Se ejecuta cada pocos segundos mientras la bandeja está abierta. */
+async function msgRefrescar() {
+    if (!document.getElementById('msg-box')) return stopPolling(); // el usuario se fue a otra vista
+    await Promise.all([msgCargarContactos(), msgCargarConversacion()]);
+    msgActualizarBadges();
+}
+
+async function msgActualizarBadges() {
+    if (!currentUser) return;
+    const rol = msgRolActual();
+    const data = await apiFetch(`${API}/mensajes/no-leidos`).then(r => r.json()).catch(() => null);
+    const sinLeer = data?.total || 0;
+    if (rol === 'Administrador') {
+        // El contador de Soporte suma los mensajes del equipo y los tickets abiertos
+        const inc = await apiFetch(`${API}/incidencias`).then(r => r.json()).catch(() => []);
+        setNavBadge('badge-soporte', sinLeer + (Array.isArray(inc) ? inc.filter(i => i.estado === 'abierta').length : 0));
+    } else {
+        setNavBadge(MSG_BADGE_POR_ROL[rol], sinLeer);
+    }
+}
+
+function startBadgePolling() {
+    stopBadgePolling();
+    msgActualizarBadges();
+    badgeInterval = setInterval(msgActualizarBadges, 30000);
+}
+
+function stopBadgePolling() {
+    if (badgeInterval) { clearInterval(badgeInterval); badgeInterval = null; }
+}
+
+// — MENSAJES Y SOPORTE (ATLETA) —
+const CATEGORIAS_TICKET = ['Problema técnico', 'Error de app', 'Cuenta o acceso', 'Consulta general'];
+
 async function pfRenderSoporte() {
     const userId=currentUser.id;
     const inc=await apiFetch(`${API}/incidencias?userId=${userId}`).then(r=>r.json()).catch(()=>[]);
@@ -2567,52 +2782,19 @@ async function pfRenderSoporte() {
     main.innerHTML=`
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Soporte</h1><p>Habla directo con el equipo correcto según tu problema</p></div>
-            <button class="btn btn-primary" onclick="pfModalNuevaIncidencia()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuevo ticket
-            </button>
+            <div class="view-title"><h1>Mensajes y soporte</h1><p>Habla directo con tu nutricionista y tu médico. Para problemas con la app, abre un ticket.</p></div>
         </div>
 
-        <div class="support-channel-grid">
-            <button class="support-channel-btn active" data-channel="Administrador" onclick="pfOpenSupportChat('Administrador')">
-                <span class="support-channel-icon">🛠️</span>
-                <span class="support-channel-name">Administrador</span>
-                <small>App / sistema</small>
-            </button>
-            <button class="support-channel-btn" data-channel="Nutricionista" onclick="pfOpenSupportChat('Nutricionista')">
-                <span class="support-channel-icon">🥗</span>
-                <span class="support-channel-name">Nutricionista</span>
-                <small>Alimentación</small>
-            </button>
-            <button class="support-channel-btn" data-channel="Médico" onclick="pfOpenSupportChat('Médico')">
-                <span class="support-channel-icon">🩺</span>
-                <span class="support-channel-name">Médico</span>
-                <small>Salud / recuperación</small>
-            </button>
-        </div>
-
-        <div class="support-chat-box">
-            <div class="support-chat-header">
-                <div id="support-chat-title">Canal directo · Administrador</div>
-            </div>
-            <div id="support-chat-messages" class="support-chat-messages">
-                ${supportChatStore['Administrador'].map(m => `
-                    <div class="support-chat-message ${m.autor === 'Tú' ? 'me' : 'them'}">
-                        <div class="support-chat-author">${escapeHtml(m.autor)}</div>
-                        <div class="support-chat-text">${escapeHtml(m.texto)}</div>
-                        <div class="support-chat-time">${escapeHtml(m.fecha)}</div>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="support-chat-input-row">
-                <input id="support-chat-input" type="text" placeholder="Escribe tu mensaje..." maxlength="220">
-                <button class="btn btn-primary" onclick="pfSendSupportChat()">Enviar</button>
-            </div>
-        </div>
+        <div id="pf-mensajes"></div>
 
         <div class="card">
-            <div class="card-header"><h2>Mis tickets (${inc.length})</h2></div>
+            <div class="card-header">
+                <div><h2>🛠️ Soporte técnico</h2><p class="msg-ayuda">Los tickets llegan a la bandeja del equipo de administración y los atiende el primero que esté disponible.</p></div>
+                <button class="btn btn-primary btn-sm" onclick="pfModalNuevaIncidencia()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Nuevo ticket
+                </button>
+            </div>
             <div style="padding:16px 20px">
                 ${inc.length?inc.map(i=>`
                 <div class="incidencia-card" onclick="pfVerIncidencia(${i.id})">
@@ -2620,59 +2802,27 @@ async function pfRenderSoporte() {
                         <div class="inc-meta">${incEstadoBadge(i.estado)}${prioridadBadge(i.prioridad)}<span class="badge" style="background:#f1f5f9;color:#64748b">${escapeHtml(i.categoria)}</span></div>
                     </div>
                     <div class="inc-actions"><span class="inc-fecha">${i.fecha}</span></div>
-                </div>`).join(''):`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Aún no tienes tickets abiertos</p></div>`}
+                </div>`).join(''):`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No tienes tickets abiertos</p></div>`}
             </div>
         </div>
     </div>`;
+    await msgMontar('pf-mensajes');
 }
 
 function pfModalNuevaIncidencia() {
-    openModal('Nuevo ticket',`
-        <div class="form-group"><label>Título *</label><input type="text" id="inc-titulo" placeholder="Describe brevemente tu consulta o problema"></div>
+    openModal('Nuevo ticket de soporte',`
+        <div class="form-group"><label>Título *</label><input type="text" id="inc-titulo" placeholder="Describe brevemente el problema"></div>
         <div class="form-row">
             <div class="form-group">
-                <label>Canal</label>
-                <select id="inc-categoria" onchange="pfActualizarDestinatario()">
-                    <optgroup label="→ Soporte">
-                        <option value="Problema técnico">Administrador</option>
-                        <option value="Error de app">Error de app</option>
-                        <option value="Consulta general">Consulta general</option>
-                    </optgroup>
-                    <optgroup label="→ Nutricionista">
-                        <option value="Nutrición">Nutrición</option>
-                        <option value="Plan alimenticio">Plan alimenticio</option>
-                        <option value="Alimentación">Alimentación</option>
-                    </optgroup>
-                    <optgroup label="→ Médico">
-                        <option value="Salud">Salud</option>
-                        <option value="Recuperación">Recuperación</option>
-                        <option value="Dolor o lesión">Dolor o lesión</option>
-                    </optgroup>
-                </select>
+                <label>Tipo</label>
+                <select id="inc-categoria">${CATEGORIAS_TICKET.map(c=>`<option>${c}</option>`).join('')}</select>
             </div>
             <div class="form-group"><label>Prioridad</label><select id="inc-prioridad"><option value="baja">Baja</option><option value="media" selected>Media</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></div>
         </div>
-        <div id="inc-destinatario-info" style="font-size:12px;padding:6px 10px;border-radius:6px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;margin-bottom:8px">Tu consulta llegará al <strong>Administrador</strong></div>
-        <div class="form-group"><label>Descripción</label><textarea id="inc-desc" placeholder="Explica con detalle qué está pasando o qué necesitas..."></textarea></div>
+        <div class="msg-aviso-ticket">Llegará a la bandeja de <strong>Administración</strong>. Para dudas de alimentación o salud, escribe directamente a tu nutricionista o a tu médico.</div>
+        <div class="form-group"><label>Descripción</label><textarea id="inc-desc" placeholder="Explica qué pasó, en qué pantalla y qué esperabas que ocurriera..."></textarea></div>
         <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="pfCrearIncidencia()">Enviar ticket</button></div>
     `);
-}
-
-function pfActualizarDestinatario() {
-    const cat = document.getElementById('inc-categoria').value;
-    const info = document.getElementById('inc-destinatario-info');
-    const isAdmin = ['Problema técnico', 'Error de app', 'Consulta general'].includes(cat);
-    const isNutri = ['Nutrición', 'Plan alimenticio', 'Alimentación'].includes(cat);
-    const isMedico = ['Salud', 'Recuperación', 'Dolor o lesión'].includes(cat);
-
-    let destino = 'Administrador';
-    if (isNutri) destino = 'Nutricionista';
-    if (isMedico) destino = 'Médico';
-
-    info.innerHTML = `Tu consulta llegará al <strong>${destino}</strong>`;
-    info.style.background = isMedico ? '#f0fdf4' : isNutri ? '#f0fdf4' : '#eff6ff';
-    info.style.color = isMedico ? '#166534' : isNutri ? '#166534' : '#1e40af';
-    info.style.borderColor = isMedico ? '#bbf7d0' : isNutri ? '#bbf7d0' : '#bfdbfe';
 }
 
 async function pfCrearIncidencia() {

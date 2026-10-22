@@ -375,7 +375,7 @@
             </button>
             <button class="nav-btn" data-nt-view="soporte" onclick="ntRenderView('soporte')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Consultas <span id="badge-nt-soporte" class="nav-badge hidden"></span>
+                Mensajes <span id="badge-nt-soporte" class="nav-badge"></span>
             </button>
         </nav>
         <div class="sidebar-footer">
@@ -415,9 +415,13 @@
         </div>
         <nav class="sidebar-nav">
             <span class="nav-label">Consultorio</span>
-            <button class="nav-btn active" onclick="medicoRenderAtletas()">
+            <button class="nav-btn active" data-md-view="expedientes" onclick="medicoRenderView('expedientes')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7"/></svg>
                 Expedientes
+            </button>
+            <button class="nav-btn" data-md-view="mensajes" onclick="medicoRenderView('mensajes')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Mensajes <span id="badge-md-mensajes" class="nav-badge"></span>
             </button>
         </nav>
         <div class="sidebar-footer">
@@ -474,9 +478,9 @@
                 Historial
             </button>
             <button class="nav-btn" data-pf-view="plan" onclick="pfRenderView('plan')">
-         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="..."/></svg>
-         Mi Plan
-              </button>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>
+                Mi Plan
+            </button>
 
             <button class="nav-btn" data-pf-view="ia" onclick="pfRenderView('ia')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
@@ -484,7 +488,7 @@
             </button>
             <button class="nav-btn" data-pf-view="soporte" onclick="pfRenderView('soporte')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Soporte
+                Mensajes <span id="badge-pf-mensajes" class="nav-badge"></span>
             </button>
         </nav>
         <div class="sidebar-footer">

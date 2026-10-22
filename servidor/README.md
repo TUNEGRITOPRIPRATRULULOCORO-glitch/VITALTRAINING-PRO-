@@ -22,12 +22,24 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `reportes` | — (solo lectura) | — |
 | `ia` | — (solo lectura) | — |
 | `rendimiento` | — (solo lectura) | — |
+| `mensajes` | `mensajes` | — |
 
 ## Las 3 reglas
 
 1. **Cada tabla tiene un dueño.** Solo el módulo dueño hace `INSERT`, `UPDATE` o `DELETE` en ella. Los demás pueden leerla con `SELECT`/`JOIN`, pero si necesitan escribir, llaman a una función del dueño.
 2. **Cada módulo tiene un `index.js` público.** Desde otro módulo solo se importa `require('../<modulo>')`, nunca un archivo interno como `require('../panel/historial.service')`.
 3. **Lo común va en `compartido/`.** Si algo lo usan varios módulos y no pertenece a ninguno, va ahí.
+
+## Quién puede hablar con quién (módulo `mensajes`)
+
+| De  A | Atleta | Nutricionista | Médico | Administración |
+|---|---|---|---|---|
+| **Atleta** | — | ✅ chat | ✅ chat | 🎫 solo por ticket |
+| **Nutricionista** | ✅ | — | ✅ | ✅ (prioridad) |
+| **Médico** | ✅ | ✅ | — | ✅ (prioridad) |
+| **Administración** | — | ✅ | ✅ | — |
+
+Las reglas viven en `api/mensajes/mensajes.permisos.js`. Los tickets de atletas llegan a la bandeja común de administración, no a un administrador concreto. En la pantalla de Soporte del admin, los mensajes de nutricionistas y médicos aparecen arriba, antes que los tickets.
 
 ## Agregar un módulo nuevo
 
