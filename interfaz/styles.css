@@ -4071,6 +4071,9 @@ body { transition: background 0.3s ease, color 0.3s ease; }
 .rd-dia-completo  { background: var(--primary); border-color: var(--primary); color: #fff; }
 .rd-dia-parcial   { background: var(--warning); border-color: var(--warning); color: #fff; }
 .rd-dia-fallado   { background: var(--danger-dim); border-color: var(--danger); color: var(--danger); }
+.rd-dia-proximo   { border: 2px dashed color-mix(in srgb, var(--primary) 55%, transparent); color: var(--primary); background: transparent; }
+.rd-dia-hoy       { box-shadow: 0 0 0 2px var(--bg-2), 0 0 0 4px var(--text); }
+.rd-dia-cab { font-size: 11px; font-weight: 700; color: var(--text-muted); text-align: center; padding-bottom: 2px; }
 .rd-dia-pendiente { border: 2px dashed var(--primary); color: var(--primary); }
 .rd-dia-sin-plan  { opacity: 0.4; }
 
@@ -4156,4 +4159,76 @@ body.dark .rd-aviso { border-color: rgba(239,68,68,0.4); }
     .rd-grid { grid-template-columns: 1fr; }
     .rd-listo { flex-direction: column; text-align: center; }
     .rd-opciones { grid-template-columns: 1fr; }
+}
+
+/* ===========================
+   CARGA (versión atleta) · TARJETAS ACCIONABLES · FOTOS
+=========================== */
+.rd-carga-estado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--rd-color);
+}
+.rd-barras { display: flex; flex-direction: column; gap: 8px; }
+.rd-barra-fila { display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 10px; }
+.rd-barra-lab { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.rd-barra-pista { position: relative; height: 14px; border-radius: 7px; background: var(--bg); border: 1px solid var(--border); overflow: hidden; }
+.rd-barra-zona { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--primary) 18%, transparent); border-left: 2px solid var(--primary); border-right: 2px solid var(--primary); }
+.rd-barra-valor { position: relative; height: 100%; border-radius: 7px; background: var(--rd-color); transition: width 0.6s ease; }
+.rd-barra-valor.rd-normal { background: #94a3b8; }
+.rd-barra-leyenda { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding-left: 110px; }
+.rd-barra-leyenda i { width: 14px; height: 8px; border-radius: 2px; background: color-mix(in srgb, var(--primary) 18%, transparent); border-left: 2px solid var(--primary); border-right: 2px solid var(--primary); }
+.rd-consejo {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    border-left: 3px solid var(--primary);
+    color: var(--text);
+}
+.rd-explicacion { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.rd-explicacion summary { cursor: pointer; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+
+/* Tarjetas del dashboard que llevan a una acción */
+.stat-card-accion { width: 100%; text-align: left; font-family: var(--font); color: inherit; cursor: pointer; }
+.stat-card-accion:hover { border-color: var(--primary); transform: translateY(-2px); }
+.stat-card-accion:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.stat-value small { font-size: 0.55em; color: var(--text-muted); font-weight: 600; }
+.stat-detalle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.stat-accion { font-size: 12px; font-weight: 700; color: var(--primary); margin-top: 6px; }
+
+/* Fotos de perfil: la imagen tapa las iniciales; si no hay foto se elimina y quedan las iniciales */
+.admin-avatar, .user-avatar-sm, .paciente-avatar, .mini-item-icon, .msg-avatar, .perfil-foto, .foto-preview { position: relative; overflow: hidden; }
+.avatar-foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.avatar-editable { cursor: pointer; transition: box-shadow 0.15s; }
+.avatar-editable:hover, .avatar-editable:focus-visible { box-shadow: 0 0 0 2px var(--primary-light); outline: none; }
+
+.foto-editor { display: flex; gap: 20px; align-items: center; margin-bottom: 16px; }
+.foto-preview, .perfil-foto {
+    flex: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    background: linear-gradient(135deg, #16a34a, #059669);
+}
+.foto-preview { width: 120px; height: 120px; font-size: 36px; }
+.foto-reglas { font-size: 13px; color: var(--text); line-height: 1.6; }
+.foto-reglas ul { margin: 6px 0; padding-left: 18px; }
+.foto-reglas p { margin: 0; font-size: 12px; color: var(--text-muted); }
+.perfil-foto-fila { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.perfil-foto { width: 72px; height: 72px; font-size: 22px; }
+.perfil-foto-fila p { margin: 2px 0 8px; }
+
+@media (max-width: 600px) {
+    .foto-editor { flex-direction: column; text-align: center; }
+    .foto-reglas ul { text-align: left; }
+    .rd-barra-fila { grid-template-columns: 84px 1fr; }
+    .rd-barra-leyenda { padding-left: 94px; }
 }

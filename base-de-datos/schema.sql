@@ -128,6 +128,13 @@ CREATE TABLE IF NOT EXISTS notas_nutricionista (
   created_at           TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS fotos_perfil (
+  user_id     BIGINT PRIMARY KEY,
+  mime        VARCHAR(20) NOT NULL,
+  datos       TEXT NOT NULL,
+  actualizado TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS mensajes (
   id              BIGSERIAL PRIMARY KEY,
   remitente_id    BIGINT NOT NULL,
@@ -148,3 +155,4 @@ ALTER TABLE cumplimiento ADD CONSTRAINT cumplimiento_user_id_fkey FOREIGN KEY (u
 ALTER TABLE notas_nutricionista ADD CONSTRAINT notas_nutricionista_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE mensajes ADD CONSTRAINT mensajes_remitente_id_fkey FOREIGN KEY (remitente_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE mensajes ADD CONSTRAINT mensajes_destinatario_id_fkey FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE fotos_perfil ADD CONSTRAINT fotos_perfil_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

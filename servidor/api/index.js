@@ -4,6 +4,7 @@ const { requireRol } = require('../compartido/middleware/roles');
 
 // Rutas públicas (no requieren token)
 router.use('/auth', require('./auth').router);
+router.use('/fotos', require('./usuarios').fotosRouter);
 
 // Todas las rutas siguientes requieren sesión iniciada
 router.use(auth);
@@ -18,5 +19,6 @@ router.use('/ia',            require('./ia').router);
 router.use('/perfil-medico', require('./perfilMedico').router);
 router.use('/rendimiento',   require('./rendimiento').router);
 router.use('/mensajes',      require('./mensajes').router);
+router.use('/cuenta',        require('./usuarios').cuentaRouter);
 
 module.exports = router;

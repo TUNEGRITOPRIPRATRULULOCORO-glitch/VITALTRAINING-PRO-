@@ -172,6 +172,127 @@ function updateSportSpecificFields() {
 // ── Utilidades ─────────────────────────────────
 function getInitials(name) { return name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase(); }
 
+// — FOTOS DE PERFIL —
+// Mismas reglas que comprueba el servidor (servidor/api/usuarios/fotos.service.js)
+const FOTO_REGLAS = { formatos:['image/jpeg','image/png','image/webp'], maxArchivoMB:5, minLado:200, lado:400, maxKB:300 };
+const _fotoVersion = {}; // para saltarse la caché del navegador tras cambiar una foto
+
+function fotoUrl(id) {
+    return `${API}/fotos/${id}${_fotoVersion[id] ? `?v=${_fotoVersion[id]}` : ''}`;
+}
+
+/** Iniciales + foto encima; si la persona no tiene foto, la imagen se quita sola y quedan las iniciales. */
+function avatarContenido(id, nombre) {
+    const foto = id ? `<img class="avatar-foto" src="${fotoUrl(id)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+    return `${escapeHtml(getInitials(nombre || '?'))}${foto}`;
+}
+
+const AVATAR_PROPIO = ['sidebar-avatar', 'nt-avatar', 'md-avatar', 'pf-avatar'];
+
+function pintarAvatarPropio() {
+    if (!currentUser) return;
+    for (const id of AVATAR_PROPIO) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.innerHTML = avatarContenido(currentUser.id, currentUser.nombre);
+        el.classList.add('avatar-editable');
+        el.title = 'Cambiar foto de perfil';
+        el.setAttribute('role', 'button');
+        el.tabIndex = 0;
+        el.onclick = modalFotoPerfil;
+        el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); modalFotoPerfil(); } };
+    }
+    const grande = document.getElementById('perfil-foto');
+    if (grande) grande.innerHTML = avatarContenido(currentUser.id, currentUser.nombre);
+}
+
+function modalFotoPerfil() {
+    openModal('Foto de perfil', `
+        <div class="foto-editor">
+            <div class="foto-preview" id="foto-preview">${avatarContenido(currentUser.id, currentUser.nombre)}</div>
+            <div class="foto-reglas">
+                <strong>Requisitos de la foto</strong>
+                <ul>
+                    <li>Formato <strong>JPG, PNG o WebP</strong></li>
+                    <li>Peso máximo <strong>${FOTO_REGLAS.maxArchivoMB} MB</strong></li>
+                    <li>Mínimo <strong>${FOTO_REGLAS.minLado} × ${FOTO_REGLAS.minLado} px</strong></li>
+                    <li>Se recorta cuadrada y se ajusta a ${FOTO_REGLAS.lado} × ${FOTO_REGLAS.lado} px</li>
+                </ul>
+                <p>La verán tu equipo y las personas con las que chateas.</p>
+            </div>
+        </div>
+        <input type="file" id="foto-input" accept="${FOTO_REGLAS.formatos.join(',')}" hidden onchange="fotoElegida(this)">
+        <div class="form-actions">
+            <button class="btn btn-ghost" onclick="quitarFotoPerfil()">Quitar foto</button>
+            <button class="btn btn-primary" id="btn-elegir-foto" onclick="document.getElementById('foto-input').click()">Elegir foto</button>
+        </div>`);
+}
+
+function cargarImagen(archivo) {
+    return new Promise((ok, ko) => {
+        const url = URL.createObjectURL(archivo);
+        const img = new Image();
+        img.onload  = () => { URL.revokeObjectURL(url); ok(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); ko(new Error('imagen ilegible')); };
+        img.src = url;
+    });
+}
+
+/** Recorta al centro en cuadrado, redimensiona y comprime a JPEG hasta quedar bajo el límite. */
+function recortarFoto(img) {
+    const lado = FOTO_REGLAS.lado;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = lado;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; // fondo blanco para PNG con transparencia
+    ctx.fillRect(0, 0, lado, lado);
+    const s = Math.min(img.naturalWidth, img.naturalHeight);
+    ctx.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, lado, lado);
+    let dataUrl = '';
+    for (const calidad of [0.85, 0.75, 0.6, 0.45]) {
+        dataUrl = canvas.toDataURL('image/jpeg', calidad);
+        const bytes = Math.ceil((dataUrl.length - dataUrl.indexOf(',') - 1) * 3 / 4);
+        if (bytes <= FOTO_REGLAS.maxKB * 1024) break;
+    }
+    return dataUrl;
+}
+
+async function fotoElegida(input) {
+    const archivo = input.files?.[0];
+    input.value = '';
+    if (!archivo) return;
+    if (!FOTO_REGLAS.formatos.includes(archivo.type)) return showToast('Formato no permitido. Usa JPG, PNG o WebP.', 'error');
+    if (archivo.size > FOTO_REGLAS.maxArchivoMB * 1024 * 1024) return showToast(`La foto pesa más de ${FOTO_REGLAS.maxArchivoMB} MB.`, 'error');
+
+    let img;
+    try { img = await cargarImagen(archivo); } catch { return showToast('No se pudo leer la imagen.', 'error'); }
+    if (Math.min(img.naturalWidth, img.naturalHeight) < FOTO_REGLAS.minLado)
+        return showToast(`La foto es muy pequeña: mínimo ${FOTO_REGLAS.minLado} × ${FOTO_REGLAS.minLado} px.`, 'error');
+
+    const foto = recortarFoto(img);
+    const preview = document.getElementById('foto-preview');
+    if (preview) preview.innerHTML = `<img class="avatar-foto" src="${foto}" alt="Vista previa">`;
+    const boton = document.getElementById('btn-elegir-foto');
+    if (boton) { boton.disabled = true; boton.textContent = 'Subiendo...'; }
+
+    const res = await apiFetch(`${API}/cuenta/foto`, { method:'PUT', body:JSON.stringify({ foto }) }).then(r => r.json()).catch(() => null);
+    if (boton) { boton.disabled = false; boton.textContent = 'Elegir otra'; }
+    if (!res?.ok) return showToast(res?.error || 'No se pudo guardar la foto.', 'error');
+    _fotoVersion[currentUser.id] = res.version;
+    pintarAvatarPropio();
+    showToast('Foto de perfil actualizada');
+}
+
+async function quitarFotoPerfil() {
+    const res = await apiFetch(`${API}/cuenta/foto`, { method:'DELETE' }).then(r => r.json()).catch(() => null);
+    if (!res?.ok) return showToast('No se pudo quitar la foto.', 'error');
+    _fotoVersion[currentUser.id] = Date.now();
+    pintarAvatarPropio();
+    const preview = document.getElementById('foto-preview');
+    if (preview) preview.innerHTML = avatarContenido(null, currentUser.nombre);
+    showToast('Foto quitada');
+}
+
 function formatFecha(str) {
     if (!str) return '—';
     // ISO yyyy-mm-dd → dd/mm/yyyy
@@ -332,7 +453,7 @@ function showPanel(user) {
     hideAllPanels();
     document.getElementById('app').classList.remove('hidden');
     setupCounterObservers();
-    document.getElementById('sidebar-avatar').textContent=getInitials(user.nombre);
+    pintarAvatarPropio();
     document.getElementById('sidebar-name').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     document.getElementById('sidebar-role').textContent=user.rol;
     startBadgePolling();
@@ -477,7 +598,7 @@ function renderFilasUsuarios(users) {
     if(!users.length) return `<tr><td colspan="4"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>Sin resultados</p></div></td></tr>`;
     return users.map(u=>{
         const[c1,c2]=avatarColor(u.nombre);
-        return `<tr><td><div class="td-user"><div class="user-avatar-sm" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(u.nombre)}</div><div><div class="user-name">${escapeHtml(u.nombre)}</div><div class="user-email">${escapeHtml(u.email)}</div></div></div></td><td>${rolBadge(u.rol)}</td><td>${estadoBadge(u.estado)}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" data-tooltip="Editar usuario" onclick="modalEditarUsuario(${u.id})">✏ Editar</button><button class="btn btn-danger btn-sm" data-tooltip="Eliminar permanentemente" onclick="eliminarUsuario(${u.id},'${u.nombre.replace(/'/g,"\\'")}')">✕ Eliminar</button></div></td></tr>`;
+        return `<tr><td><div class="td-user"><div class="user-avatar-sm" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(u.id,u.nombre)}</div><div><div class="user-name">${escapeHtml(u.nombre)}</div><div class="user-email">${escapeHtml(u.email)}</div></div></div></td><td>${rolBadge(u.rol)}</td><td>${estadoBadge(u.estado)}</td><td><div class="td-actions"><button class="btn btn-ghost btn-sm" data-tooltip="Editar usuario" onclick="modalEditarUsuario(${u.id})">✏ Editar</button><button class="btn btn-danger btn-sm" data-tooltip="Eliminar permanentemente" onclick="eliminarUsuario(${u.id},'${u.nombre.replace(/'/g,"\\'")}')">✕ Eliminar</button></div></td></tr>`;
     }).join('');
 }
 
@@ -677,7 +798,7 @@ function showPanelNutricionista(user) {
     currentUser=user;
     hideAllPanels();
     document.getElementById('panel-nutricionista').classList.remove('hidden');
-    document.getElementById('nt-avatar').textContent=getInitials(user.nombre);
+    pintarAvatarPropio();
     document.getElementById('nt-nombre').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     setupCounterObservers();
     ntRenderView('dashboard');
@@ -739,7 +860,7 @@ async function ntRenderDashboard() {
                     const color=s?(s.fatiga>=8?'var(--danger)':s.fatiga>=5?'var(--warning)':'var(--primary)'):'var(--text-muted)';
                     const [c1,c2]=avatarColor(f.nombre);
                     return `<div class="mini-item" style="cursor:pointer" onclick="ntVerDetalle(${f.id})">
-                        <div class="mini-item-icon" style="background:linear-gradient(135deg,${c1},${c2});color:white;font-weight:700;font-size:11px">${getInitials(f.nombre)}</div>
+                        <div class="mini-item-icon" style="background:linear-gradient(135deg,${c1},${c2});color:white;font-weight:700;font-size:11px">${avatarContenido(f.id,f.nombre)}</div>
                         <div class="mini-item-body">
                             <div class="mini-item-title">${escapeHtml(f.nombre)}</div>
                             <div class="mini-item-sub">${escapeHtml(f.perfil?.posicion||'Sin posición')} · ${f.totalComidas} comidas · ${f.totalRutinas} rutinas</div>
@@ -823,7 +944,7 @@ function ntCardFutbolista(f) {
     return `
     <div class="paciente-card" onclick="ntVerDetalle(${f.id})">
         <div class="paciente-header">
-            <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(f.nombre)}</div>
+            <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(f.id,f.nombre)}</div>
             <div class="paciente-info">
                 <div class="paciente-nombre">${escapeHtml(f.nombre)}</div>
                 <div class="paciente-pos">${escapeHtml(f.posicion||'Sin posición definida')}</div>
@@ -950,7 +1071,7 @@ async function ntVerDetalle(userId) {
         document.getElementById('modal-title').textContent=d.nombre;
         document.getElementById('modal-body').innerHTML=`
             <div class="paciente-hero">
-                <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(d.nombre)}</div>
+                <div class="paciente-avatar" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(d.id,d.nombre)}</div>
                 <div class="paciente-hero-info">
                     <h3>${escapeHtml(d.nombre)}</h3>
                     <div class="paciente-hero-meta">
@@ -1045,7 +1166,7 @@ function showPanelMedico(user) {
     currentUser = user;
     hideAllPanels();
     document.getElementById('panel-medico').classList.remove('hidden');
-    document.getElementById('md-avatar').textContent = getInitials(user.nombre);
+    pintarAvatarPropio();
     document.getElementById('md-nombre').textContent = user.nombre.split(' ').slice(0, 2).join(' ');
     startBadgePolling();
     medicoRenderView('expedientes');
@@ -1166,7 +1287,7 @@ async function showPanelAtleta(user) {
     currentUser=user;
     hideAllPanels();
     document.getElementById('panel-futbolista').classList.remove('hidden');
-    document.getElementById('pf-avatar').textContent=getInitials(user.nombre);
+    pintarAvatarPropio();
     document.getElementById('pf-nombre').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     setupCounterObservers();
     startBadgePolling();
@@ -1210,6 +1331,7 @@ async function pfRenderDashboard() {
     if(!data?.ok){main.innerHTML=showError('No se pudo cargar el dashboard.','pfRenderView(\'dashboard\')');return;}
     const{perfil,ultimasComidas,ultimasRutinas,alertasRecientes}=data.resumen;
     const ultimaSalud=saludData[0]||null;
+    const saludHoy=ultimaSalud&&String(ultimaSalud.fecha).slice(0,10)===new Date().toISOString().slice(0,10)?ultimaSalud:null;
     const rendimiento=rdData?.ok?rdData.resumen:null;
 
     const deporteActual = currentUser.deporte_principal || 'Fútbol';
@@ -1224,12 +1346,7 @@ async function pfRenderDashboard() {
             <button class="btn btn-primary" onclick="pfRenderView('salud')">+ Registrar salud</button>
         </div>
         ${rendimiento?rdSeccionDashboard(rendimiento):''}
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon blue">🍽</div><div class="stat-info"><div class="stat-value">${ultimasComidas.length}</div><div class="stat-label">Comidas recientes</div></div></div>
-            <div class="stat-card"><div class="stat-icon green">🏃</div><div class="stat-info"><div class="stat-value">${ultimasRutinas.length}</div><div class="stat-label">Rutinas recientes</div></div></div>
-            <div class="stat-card"><div class="stat-icon yellow">🔔</div><div class="stat-info"><div class="stat-value">${alertasRecientes.filter(a=>!a.leida).length}</div><div class="stat-label">Alertas</div></div></div>
-            <div class="stat-card"><div class="stat-icon ${ultimaSalud&&ultimaSalud.fatiga>=7?'red':'green'}">💪</div><div class="stat-info"><div class="stat-value">${ultimaSalud?ultimaSalud.fatiga+'/10':'—'}</div><div class="stat-label">Fatiga hoy</div></div></div>
-        </div>
+        ${pfTarjetasResumen(data.resumen.hoy, saludHoy)}
         ${ultimaSalud?`
         <div class="card" style="margin-bottom:24px">
             <div class="card-header"><h2>📊 Mi estado físico hoy</h2><span class="inc-fecha">${formatFecha(ultimaSalud.fecha)}</span></div>
@@ -1251,7 +1368,7 @@ async function pfRenderDashboard() {
             </div></div>
         </div>
         ${alertasRecientes.length?`
-        <div class="card"><div class="card-header"><h2>🔔 Alertas recientes</h2>
+        <div class="card" id="pf-alertas"><div class="card-header"><h2>🔔 Alertas recientes</h2>
             ${alertasRecientes.some(a=>!a.leida)?`<button class="btn btn-ghost btn-sm" onclick="pfLeerTodas()">Marcar todas leídas</button>`:''}
         </div><div style="padding:16px">
             ${alertasRecientes.map(a=>`
@@ -1261,7 +1378,53 @@ async function pfRenderDashboard() {
             </div>`).join('')}
         </div></div>`:''}
     </div>`;
-    if(rendimiento) rdDibujarCarga(rendimiento.carga.serie);
+}
+
+// Tarjetas del dashboard del atleta: cada una muestra un dato útil y lleva a donde se actúa
+function pfTarjetasResumen(hoy = {}, saludHoy) {
+    const tarjeta = ({ icono, color, valor, etiqueta, detalle, accion, onclick }) => `
+        <button class="stat-card stat-card-accion" onclick="${onclick}">
+            <div class="stat-icon ${color}">${icono}</div>
+            <div class="stat-info">
+                <div class="stat-value">${valor}</div>
+                <div class="stat-label">${etiqueta}</div>
+                ${detalle ? `<div class="stat-detalle">${detalle}</div>` : ''}
+                <div class="stat-accion">${accion}</div>
+            </div>
+        </button>`;
+    const entrenos = hoy.diasEntrenadosSemana ?? 0;
+    const alertas = hoy.alertasSinLeer ?? 0;
+    return `<div class="stats-grid">
+        ${tarjeta({
+            icono:'🍽', color:'blue', valor: hoy.comidas ?? 0,
+            etiqueta: (hoy.comidas === 1 ? 'Comida' : 'Comidas') + ' hoy',
+            detalle: hoy.calorias ? `${hoy.calorias} kcal` : 'Aún no registras comidas',
+            accion: '+ Registrar comida', onclick: "pfGoToHistorial('comidas')"
+        })}
+        ${tarjeta({
+            icono:'🏃', color:'green', valor: `${entrenos}<small>/7</small>`,
+            etiqueta: 'Días entrenados',
+            detalle: 'Últimos 7 días',
+            accion: '+ Registrar entreno', onclick: "pfGoToHistorial('rutinas')"
+        })}
+        ${tarjeta({
+            icono:'🔔', color: alertas ? 'yellow' : 'green', valor: alertas,
+            etiqueta: alertas === 1 ? 'Alerta sin leer' : 'Alertas sin leer',
+            detalle: alertas ? 'Revisa lo que te avisamos' : 'Todo al día ✓',
+            accion: alertas ? 'Ver alertas ↓' : 'Ver historial →',
+            onclick: alertas ? "document.getElementById('pf-alertas')?.scrollIntoView({behavior:'smooth'})" : "pfGoToHistorial()"
+        })}
+        ${saludHoy ? tarjeta({
+            icono:'💪', color: saludHoy.fatiga >= 7 ? 'red' : saludHoy.fatiga >= 4 ? 'yellow' : 'green',
+            valor: `${saludHoy.fatiga}<small>/10</small>`, etiqueta: 'Fatiga hoy',
+            detalle: `Sueño ${saludHoy.sueno} · Recuperación ${saludHoy.recuperacion}`,
+            accion: 'Ver mi salud →', onclick: "pfRenderView('salud')"
+        }) : tarjeta({
+            icono:'💪', color:'purple', valor: '—', etiqueta: 'Fatiga hoy',
+            detalle: 'No has registrado tu salud hoy',
+            accion: '+ Registrar ahora', onclick: "pfRenderView('salud')"
+        })}
+    </div>`;
 }
 
 function saludMeterBig(label, val, color) {
@@ -1286,7 +1449,7 @@ const RD_RIESGO = {
 };
 const RD_CUMPL = {
     completo:'Completado', parcial:'Parcial', fallado:'No realizado', pendiente:'Pendiente hoy',
-    descanso:'Descanso', 'sin-plan':'Sin plan'
+    proximo:'Próximo', descanso:'Descanso', 'sin-plan':'Sin plan'
 };
 
 function rdBadgeListo(listo) {
@@ -1322,28 +1485,62 @@ function rdTarjetaListo(listo) {
     </div>`;
 }
 
+// "+35 %", "el doble", "un 20 % menos"... comparado con su semana normal
+function rdComparacionSemana(cambio) {
+    if (cambio == null) return '';
+    if (cambio >= 90)  return 'Esta semana entrenaste <strong>casi el doble</strong> que en una semana normal tuya.';
+    if (cambio >= 5)   return `Esta semana entrenaste <strong>un ${cambio} % más</strong> que en una semana normal tuya.`;
+    if (cambio <= -5)  return `Esta semana entrenaste <strong>un ${Math.abs(cambio)} % menos</strong> que en una semana normal tuya.`;
+    return 'Esta semana entrenaste <strong>lo mismo</strong> que en una semana normal tuya.';
+}
+
+// Versión para el atleta: sin ratios, comparando "esta semana" con "tu semana normal"
 function rdTarjetaCarga(carga) {
-    const ratio = carga.ratio != null ? String(carga.ratio).replace('.', ',') : '—';
+    const r = RD_RIESGO[carga.riesgo] || RD_RIESGO['sin-datos'];
+    const iconos = { optimo:'🟢', precaucion:'🟡', alto:'🔴', bajo:'🔵', 'sin-datos':'⚪' };
+    const conDatos = carga.cronica != null;
+    // Escala de las barras: que quepan la semana actual y la zona segura (hasta 1,3 × normal)
+    const tope = conDatos ? Math.max(carga.aguda, carga.cronica * 1.6, 1) : 1;
+    const pct = v => Math.min(100, Math.round(v / tope * 100));
     return `
     <div class="card rd-card">
-        <div class="card-header"><h2>📈 Carga de entrenamiento</h2>${rdBadgeRiesgo(carga)}</div>
+        <div class="card-header"><h2>📈 Mi carga de entrenamiento</h2></div>
         <div class="rd-card-body">
-            <div class="rd-carga-cifras">
-                <div><span class="rd-cifra">${ratio}</span><span class="rd-cifra-lab">Ratio semana / mes</span></div>
-                <div><span class="rd-cifra">${carga.aguda}</span><span class="rd-cifra-lab">Carga 7 días</span></div>
-            </div>
-            <p class="rd-mensaje">${escapeHtml(carga.mensaje)}</p>
-            <div class="rd-chart"><canvas id="chart-carga" aria-label="Carga diaria de los últimos 28 días"></canvas></div>
-            <p class="rd-nota">Carga = minutos × esfuerzo (1-10). Zona óptima: 0,8 – 1,3.</p>
+            <div class="rd-carga-estado ${r.clase}"><span>${iconos[carga.riesgo] || '⚪'}</span>${escapeHtml(carga.titulo || r.etiqueta)}</div>
+            <p class="rd-mensaje">${conDatos
+                ? rdComparacionSemana(carga.cambioPorcentaje) + (carga.riesgo === 'alto' ? ' Subir tanto de golpe aumenta el riesgo de lesión.' : '')
+                : escapeHtml(carga.mensaje)}</p>
+            ${conDatos ? `
+            <div class="rd-barras" aria-label="Comparación de carga">
+                <div class="rd-barra-fila">
+                    <span class="rd-barra-lab">Esta semana</span>
+                    <div class="rd-barra-pista">
+                        <div class="rd-barra-valor ${r.clase}" style="width:${pct(carga.aguda)}%"></div>
+                        <div class="rd-barra-zona" style="left:${pct(carga.cronica * 0.8)}%;width:${pct(carga.cronica * 1.3) - pct(carga.cronica * 0.8)}%" title="Zona segura"></div>
+                    </div>
+                </div>
+                <div class="rd-barra-fila">
+                    <span class="rd-barra-lab">Semana normal</span>
+                    <div class="rd-barra-pista"><div class="rd-barra-valor rd-normal" style="width:${pct(carga.cronica)}%"></div></div>
+                </div>
+                <div class="rd-barra-leyenda"><i></i> Zona segura</div>
+            </div>` : ''}
+            <div class="rd-consejo"><strong>Qué hacer:</strong> ${escapeHtml(carga.consejo || '')}</div>
+            <details class="rd-explicacion">
+                <summary>¿Cómo se calcula?</summary>
+                Cada sesión suma <em>minutos × lo dura que fue (1 a 10)</em>, el número que eliges al marcarla como completada.
+                Comparamos tus últimos 7 días con tu semana promedio del último mes. Subir mucho de golpe es lo que más aumenta el riesgo de lesión.
+            </details>
         </div>
     </div>`;
 }
 
 function rdTarjetaCumplimiento(cumpl, racha) {
+    const cabecera = ['L','M','X','J','V','S','D'].map(d => `<div class="rd-dia-cab">${d}</div>`).join('');
     const celdas = cumpl.dias.map(d =>
-        `<div class="rd-dia rd-dia-${d.estado}" title="${d.dia} ${formatFecha(d.fecha)} · ${RD_CUMPL[d.estado]}">${d.dia[0]}</div>`
+        `<div class="rd-dia rd-dia-${d.estado} ${d.hoy ? 'rd-dia-hoy' : ''}" title="${d.dia} ${formatFecha(d.fecha)} · ${RD_CUMPL[d.estado]}">${Number(d.fecha.slice(8))}</div>`
     ).join('');
-    const leyenda = ['completo','parcial','fallado','descanso'].map(e =>
+    const leyenda = ['completo','parcial','fallado','proximo','descanso'].map(e =>
         `<span><i class="rd-dia rd-dia-${e}"></i>${RD_CUMPL[e]}</span>`).join('');
     return `
     <div class="card rd-card">
@@ -1353,7 +1550,7 @@ function rdTarjetaCumplimiento(cumpl, racha) {
                 <div><span class="rd-cifra">${cumpl.porcentaje ?? '—'}${cumpl.porcentaje != null ? '%' : ''}</span><span class="rd-cifra-lab">Del plan cumplido</span></div>
                 <div><span class="rd-cifra">${cumpl.completos}<small>/${cumpl.completos + cumpl.parciales + cumpl.fallados}</small></span><span class="rd-cifra-lab">Sesiones completas</span></div>
             </div>
-            <div class="rd-calendario">${celdas}</div>
+            <div class="rd-calendario">${cabecera}${celdas}</div>
             <div class="rd-leyenda">${leyenda}</div>
         </div>
     </div>`;
@@ -1361,32 +1558,6 @@ function rdTarjetaCumplimiento(cumpl, racha) {
 
 function rdSeccionDashboard(r) {
     return `<div class="rd-grid">${rdTarjetaListo(r.listo)}${rdTarjetaCarga(r.carga)}${rdTarjetaCumplimiento(r.cumplimiento, r.racha)}</div>`;
-}
-
-function rdDibujarCarga(serie) {
-    const canvas = document.getElementById('chart-carga');
-    if (!canvas || typeof Chart === 'undefined') return;
-    const ultimos7 = serie.length - 7;
-    chartInstances['carga'] = new Chart(canvas.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: serie.map(d => formatFecha(d.fecha)),
-            datasets: [{
-                label: 'Carga',
-                data: serie.map(d => d.carga),
-                backgroundColor: serie.map((_, i) => i >= ultimos7 ? '#16a34a' : '#86efac'),
-                borderRadius: 3, borderSkipped: false
-            }]
-        },
-        options: {
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { display: false }, ticks: { display: false } },
-                y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.15)' }, ticks: { font: { family: 'Outfit', size: 10 }, maxTicksLimit: 4 } }
-            },
-            maintainAspectRatio: false
-        }
-    });
 }
 
 async function rdCargarEquipo() {
@@ -1411,6 +1582,10 @@ async function pfRenderPerfil() {
         <div class="card" style="max-width:560px">
             <div class="card-header"><h2>Datos del perfil</h2></div>
             <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+                <div class="perfil-foto-fila">
+                    <div class="perfil-foto" id="perfil-foto">${avatarContenido(currentUser.id,currentUser.nombre)}</div>
+                    <div><strong>Foto de perfil</strong><p class="msg-ayuda">JPG, PNG o WebP · máx. ${FOTO_REGLAS.maxArchivoMB} MB · mín. ${FOTO_REGLAS.minLado}×${FOTO_REGLAS.minLado} px</p><button type="button" class="btn btn-ghost btn-sm" onclick="modalFotoPerfil()">📷 Cambiar foto</button></div>
+                </div>
                 <div class="form-group"><label>Nombre completo</label><input type="text" id="pf-f-nombre" value="${escapeHtml(p.nombre||currentUser.nombre||'')}"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Deporte principal</label><select id="pf-f-deporte" onchange="pfRenderPerfil()">${sportOptions.map(s=>`<option value="${s}" ${deporteActual===s?'selected':''}>${s}</option>`).join('')}</select></div>
@@ -2597,9 +2772,9 @@ function msgDia(fecha) {
     return d.toLocaleDateString('es-CO', { day:'numeric', month:'short' });
 }
 
-function msgAvatar(nombre, extra = '') {
+function msgAvatar(id, nombre, extra = '') {
     const [c1, c2] = avatarColor(nombre);
-    return `<span class="msg-avatar ${extra}" style="background:linear-gradient(135deg,${c1},${c2})">${getInitials(nombre)}</span>`;
+    return `<span class="msg-avatar ${extra}" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(id, nombre)}</span>`;
 }
 
 /** Monta la bandeja de mensajes dentro del elemento indicado. */
@@ -2648,7 +2823,7 @@ function msgPintarContactos() {
             <div class="msg-grupo-titulo">${MSG_ROL[rol]?.grupo || rol}</div>
             ${items.map(c => `
             <button class="msg-contacto ${c.id === _msg.activo ? 'activo' : ''} ${c.noLeidos ? 'con-noleidos' : ''}" onclick="msgAbrir(${c.id})">
-                ${msgAvatar(c.nombre)}
+                ${msgAvatar(c.id, c.nombre)}
                 <span class="msg-contacto-info">
                     <span class="msg-contacto-nombre">${escapeHtml(c.nombre)}</span>
                     <span class="msg-contacto-ultimo">${c.ultimoMensaje ? (c.ultimoMensaje.mio ? 'Tú: ' : '') + escapeHtml(c.ultimoMensaje.texto) : 'Sin mensajes todavía'}</span>
@@ -2673,7 +2848,7 @@ async function msgAbrir(id) {
     chat.innerHTML = `
         <header class="msg-chat-header">
             <button class="msg-volver" onclick="msgCerrarChat()" aria-label="Volver a la lista">←</button>
-            ${msgAvatar(contacto.nombre)}
+            ${msgAvatar(contacto.id, contacto.nombre)}
             <div class="msg-chat-quien"><strong>${escapeHtml(contacto.nombre)}</strong><span>${MSG_ROL[contacto.rol]?.etiqueta || contacto.rol}</span></div>
         </header>
         <div class="msg-mensajes" id="msg-mensajes">${showLoading()}</div>

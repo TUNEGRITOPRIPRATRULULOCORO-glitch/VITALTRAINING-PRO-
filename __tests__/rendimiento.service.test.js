@@ -34,7 +34,7 @@ test('obtenerResumen combina salud, carga, cumplimiento y racha de un atleta', a
   expect(r.carga.riesgo).toBe('optimo');
   expect(r.carga.ratio).toBe(0.9); // 6 sesiones en 7 días (hoy aún no) frente a 7 por semana de media
   expect(r.cumplimiento.parciales).toBe(1);
-  expect(r.cumplimiento.dias.at(-1).estado).toBe('pendiente'); // hoy toca y aún no registra
+  expect(r.cumplimiento.dias.find(d => d.hoy).estado).toBe('pendiente'); // hoy toca y aún no registra
   expect(r.racha).toBe(2);
 });
 

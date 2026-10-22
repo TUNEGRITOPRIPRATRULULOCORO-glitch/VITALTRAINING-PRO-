@@ -176,3 +176,58 @@ describe('calcularRacha', () => {
     expect(calc.calcularRacha(['2026-10-20'], HOY)).toBe(0);
   });
 });
+
+// ─── semanas de lunes a domingo ───────────────────────────────────────────────
+describe('calendario de lunes a domingo', () => {
+  const plan = { semana: [{ dia: 'Lunes', ejercicios: [{}] }, { dia: 'Sábado', ejercicios: [{}] }] };
+
+  test('lunesDe devuelve el lunes de la semana (domingo pertenece a la semana anterior)', () => {
+    expect(calc.lunesDe('2026-10-22')).toBe('2026-10-19'); // jueves
+    expect(calc.lunesDe('2026-10-19')).toBe('2026-10-19'); // lunes
+    expect(calc.lunesDe('2026-10-25')).toBe('2026-10-19'); // domingo
+  });
+
+  test('siempre empieza en lunes y termina en el domingo de esta semana', () => {
+    for (const hoy of ['2026-10-19', '2026-10-22', '2026-10-25']) {
+      const { dias } = calc.calcularCumplimiento(plan, [], hoy, '2026-09-01');
+      expect(dias).toHaveLength(28);
+      expect(dias[0].dia).toBe('Lunes');
+      expect(dias[27].dia).toBe('Domingo');
+      expect(dias[27].fecha).toBe('2026-10-25');
+      expect(dias.filter(d => d.hoy).map(d => d.fecha)).toEqual([hoy]);
+    }
+  });
+
+  test('los días de entreno que aún no llegan son "proximo" y no cuentan como fallados', () => {
+    const r = calc.calcularCumplimiento(plan, [], '2026-10-22', '2026-09-01');
+    expect(r.dias.find(d => d.fecha === '2026-10-24').estado).toBe('proximo');  // sábado
+    expect(r.dias.find(d => d.fecha === '2026-10-25').estado).toBe('descanso'); // domingo
+    expect(r.dias.find(d => d.fecha === '2026-10-19').estado).toBe('fallado');  // lunes pasado
+    expect(r.dias.some(d => d.fecha > '2026-10-22' && d.estado === 'fallado')).toBe(false);
+  });
+});
+
+// ─── textos de carga para el atleta ───────────────────────────────────────────
+describe('textos de carga', () => {
+  test('cada riesgo trae título, mensaje y consejo', () => {
+    for (const ratio of [null, 0.5, 1, 1.4, 1.8]) {
+      const r = calc.clasificarRatio(ratio);
+      expect(r.titulo).toBeTruthy();
+      expect(r.mensaje).toBeTruthy();
+      expect(r.consejo).toBeTruthy();
+    }
+  });
+
+  test('cambioPorcentaje compara esta semana con la semana normal', () => {
+    const sesiones = Array.from({ length: 28 }, (_, i) => ({
+      fecha: calc.sumarDias(HOY, -i), minutos: 60, rpe: i < 7 ? 6 : 5
+    }));
+    const r = calc.calcularCarga(sesiones, HOY);
+    expect(r.cambioPorcentaje).toBe(Math.round((r.ratio - 1) * 100));
+    expect(r.cambioPorcentaje).toBeGreaterThan(0);
+  });
+
+  test('sin historial suficiente no hay comparación', () => {
+    expect(calc.calcularCarga([], HOY)).toMatchObject({ cambioPorcentaje: null, titulo: 'Aún sin datos' });
+  });
+});

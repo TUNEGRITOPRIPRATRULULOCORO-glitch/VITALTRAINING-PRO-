@@ -59,24 +59,48 @@ function calcularCarga(sesiones, hoy) {
 
   if (diasConHistorial < MIN_DIAS_CARGA) {
     return {
-      aguda, cronica: null, ratio: null, riesgo: 'sin-datos', serie,
-      mensaje: `Necesitamos al menos ${MIN_DIAS_CARGA} días de entrenamientos registrados para calcular tu carga.`
+      aguda, cronica: null, ratio: null, cambioPorcentaje: null, riesgo: 'sin-datos', serie,
+      titulo: 'Aún sin datos',
+      mensaje: `Necesitamos ${MIN_DIAS_CARGA} días de entrenamientos registrados para comparar tus semanas.`,
+      consejo: 'Marca tus sesiones como completadas en Mi Plan.'
     };
   }
 
   // Promedio semanal sobre los días que realmente hay historial (máx. 28)
   const cronica = Math.round(total / (diasConHistorial / 7));
   const ratio = cronica > 0 ? Math.round((aguda / cronica) * 100) / 100 : null;
-  const { riesgo, mensaje } = clasificarRatio(ratio);
-  return { aguda, cronica, ratio, riesgo, serie, mensaje };
+  // Cuánto más (o menos) entrenó esta semana respecto a su semana normal, en %
+  const cambioPorcentaje = ratio === null ? null : Math.round((ratio - 1) * 100);
+  return { aguda, cronica, ratio, cambioPorcentaje, serie, ...clasificarRatio(ratio) };
 }
 
+/** Riesgo + textos en lenguaje sencillo para el atleta. */
 function clasificarRatio(ratio) {
-  if (ratio === null) return { riesgo: 'sin-datos', mensaje: 'Sin entrenamientos recientes.' };
-  if (ratio > 1.5)    return { riesgo: 'alto',       mensaje: 'Subiste la carga demasiado rápido esta semana. Riesgo de lesión elevado.' };
-  if (ratio > 1.3)    return { riesgo: 'precaucion', mensaje: 'La carga está subiendo. Evita aumentarla más esta semana.' };
-  if (ratio >= 0.8)   return { riesgo: 'optimo',     mensaje: 'Tu carga está en la zona óptima.' };
-  return { riesgo: 'bajo', mensaje: 'Estás entrenando menos de lo habitual. Puedes perder forma física.' };
+  if (ratio === null) return {
+    riesgo: 'sin-datos', titulo: 'Sin entrenamientos recientes',
+    mensaje: 'No registraste entrenamientos en las últimas semanas.',
+    consejo: 'Marca tus sesiones como completadas en Mi Plan.'
+  };
+  if (ratio > 1.5) return {
+    riesgo: 'alto', titulo: 'Demasiada carga',
+    mensaje: 'Esta semana entrenaste mucho más de lo normal para ti. Así aumenta el riesgo de lesión.',
+    consejo: 'Baja la intensidad durante 2 o 3 días.'
+  };
+  if (ratio > 1.3) return {
+    riesgo: 'precaucion', titulo: 'Carga en aumento',
+    mensaje: 'Estás entrenando más de lo habitual.',
+    consejo: 'Mantén este nivel y no subas más esta semana.'
+  };
+  if (ratio >= 0.8) return {
+    riesgo: 'optimo', titulo: 'Carga equilibrada',
+    mensaje: 'Entrenas parecido a tu semana normal.',
+    consejo: 'Sigue así: es la zona más segura para mejorar.'
+  };
+  return {
+    riesgo: 'bajo', titulo: 'Carga baja',
+    mensaje: 'Esta semana entrenaste menos de lo normal.',
+    consejo: 'Si no tienes molestias, retoma tu plan poco a poco.'
+  };
 }
 
 // ─── Listo para entrenar ──────────────────────────────────────────────────────
@@ -100,9 +124,17 @@ function calcularListo(saludHoy, riesgoCarga) {
 
 // ─── Cumplimiento ─────────────────────────────────────────────────────────────
 
+/** Lunes de la semana de una fecha (las semanas van de lunes a domingo). */
+function lunesDe(fechaISO) {
+  const diaSemana = new Date(`${fechaISO}T00:00:00Z`).getUTCDay(); // 0 = domingo
+  return sumarDias(fechaISO, -((diaSemana + 6) % 7));
+}
+
 /**
- * Estado de cada uno de los últimos 28 días:
- * completo | parcial | fallado (tocaba entrenar y no se registró) | pendiente (hoy, aún sin registrar)
+ * Calendario de 4 semanas completas, de lunes a domingo, terminando en el domingo
+ * de la semana actual (así cada día queda siempre en la misma columna).
+ * Estados: completo | parcial | fallado (tocaba entrenar y no se registró)
+ * | pendiente (hoy, aún sin registrar) | proximo (día de entreno que aún no llega)
  * | descanso | sin-plan (antes de tener plan)
  */
 function calcularCumplimiento(rutinaSemanal, registros, hoy, inicioPlan) {
@@ -117,15 +149,17 @@ function calcularCumplimiento(rutinaSemanal, registros, hoy, inicioPlan) {
   }
   const inicio = aFechaISO(inicioPlan);
 
-  const dias = ultimosDias(hoy, VENTANA_DIAS).map(fecha => {
+  const domingo = sumarDias(lunesDe(hoy), 6);
+  const dias = ultimosDias(domingo, VENTANA_DIAS).map(fecha => {
     const dia = nombreDia(fecha);
     let estado;
     if (registroPorFecha[fecha])        estado = registroPorFecha[fecha];
     else if (inicio && fecha < inicio)  estado = 'sin-plan';
     else if (!diasConEntreno.has(dia))  estado = 'descanso';
+    else if (fecha > hoy)               estado = 'proximo';
     else if (fecha === hoy)             estado = 'pendiente';
     else                                estado = 'fallado';
-    return { fecha, dia, estado };
+    return { fecha, dia, estado, hoy: fecha === hoy };
   });
 
   const cuenta = e => dias.filter(d => d.estado === e).length;
@@ -154,6 +188,6 @@ function calcularRacha(fechasSalud, hoy) {
 module.exports = {
   aFechaISO, sumarDias, nombreDia,
   cargaSesion, calcularCarga, clasificarRatio,
-  calcularListo, calcularCumplimiento, calcularRacha,
+  calcularListo, calcularCumplimiento, calcularRacha, lunesDe,
   VENTANA_DIAS
 };

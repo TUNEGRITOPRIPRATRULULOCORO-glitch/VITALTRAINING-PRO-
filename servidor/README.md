@@ -13,7 +13,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | Módulo | Tablas propias (solo él escribe) | Expone a otros módulos |
 |---|---|---|
 | `auth` | — | — |
-| `usuarios` | `usuarios` | `buscarIdPorEmail`, `registrarAtleta`, `actualizarDeporte` |
+| `usuarios` | `usuarios`, `fotos_perfil` | `buscarIdPorEmail`, `registrarAtleta`, `actualizarDeporte` |
 | `panel` | `perfiles`, `comidas`, `rutinas`, `alertas`, `cumplimiento` | `crearAlerta`, `registrarComidaAsignada`, `registrarRutinaAsignada` |
 | `salud` | `salud` | — |
 | `perfilMedico` | `perfiles_medicos` | — |

@@ -1,11 +1,14 @@
 /**
  * Módulo USUARIOS — gestión de cuentas (panel admin).
- * Tablas propias: usuarios
+ * Tablas propias: usuarios, fotos_perfil
  */
 const svc = require('./usuarios.service');
+const fotos = require('./fotos.routes');
 
 module.exports = {
   router: require('./usuarios.routes'),
+  cuentaRouter: fotos.cuenta,     // /api/cuenta  → cada usuario gestiona su foto
+  fotosRouter:  fotos.publicas,   // /api/fotos   → imágenes públicas para <img>
   buscarIdPorEmail:  svc.buscarIdPorEmail,
   registrarAtleta:   svc.registrarAtleta,
   actualizarDeporte: svc.actualizarDeporte,

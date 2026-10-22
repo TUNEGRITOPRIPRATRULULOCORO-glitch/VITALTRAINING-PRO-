@@ -45,6 +45,23 @@ describe('obtenerResumen', () => {
     expect(res.ultimasComidas).toHaveLength(0);
   });
 
+  test('calcula las cifras de hoy: comidas, calorías, días entrenados y alertas sin leer', async () => {
+    mockDashboard();
+    query.mockResolvedValueOnce({ rows: [{ calorias: 450 }, { calorias: '300' }, { calorias: null }] }); // comidas de hoy
+    query.mockResolvedValueOnce({ rows: [{ fecha: '2026-10-20' }, { fecha: '2026-10-21' }] });           // rutinas 7 días
+    query.mockResolvedValueOnce({ rows: [{ fecha: '2026-10-21' }, { fecha: '2026-10-22' }] });           // sesiones del plan
+    query.mockResolvedValueOnce({ rows: [{ total: '2' }] });                                              // alertas sin leer
+
+    const res = await dashSvc.obtenerResumen(1);
+    expect(res.hoy).toEqual({ comidas: 3, calorias: 750, diasEntrenadosSemana: 3, alertasSinLeer: 2 });
+  });
+
+  test('sin datos, las cifras de hoy son cero', async () => {
+    mockDashboard();
+    const res = await dashSvc.obtenerResumen(1);
+    expect(res.hoy).toEqual({ comidas: 0, calorias: 0, diasEntrenadosSemana: 0, alertasSinLeer: 0 });
+  });
+
   test('limita a 3 comidas recientes', async () => {
     mockDashboard({
       comidas: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, userId: 1, nombre: `Comida ${i}`, createdAt: HOY }))
