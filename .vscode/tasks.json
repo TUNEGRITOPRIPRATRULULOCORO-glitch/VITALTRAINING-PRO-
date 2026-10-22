@@ -4,7 +4,7 @@
 		{
 			"label": "Run Vital Sports on 4001",
 			"type": "shell",
-			"command": "$env:PORT='4001'; node server.js",
+			"command": "$env:PORT='4001'; node servidor/server.js",
 			"isBackground": true,
 			"problemMatcher": [],
 			"group": "build"

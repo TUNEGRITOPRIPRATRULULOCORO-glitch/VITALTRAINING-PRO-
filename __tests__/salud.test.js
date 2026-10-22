@@ -1,6 +1,6 @@
-jest.mock('../data/db');
-const { query } = require('../data/db');
-const saludService = require('../api/salud/salud.service');
+jest.mock('../base-de-datos/db');
+const { query } = require('../base-de-datos/db');
+const saludService = require('../servidor/api/salud/salud.service');
 
 const HOY = new Date().toISOString().slice(0, 10);
 

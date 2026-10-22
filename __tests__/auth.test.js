@@ -1,7 +1,7 @@
-jest.mock('../data/db');
-const { query } = require('../data/db');
+jest.mock('../base-de-datos/db');
+const { query } = require('../base-de-datos/db');
 const bcrypt = require('bcrypt');
-const authService = require('../api/auth/auth.service');
+const authService = require('../servidor/api/auth/auth.service');
 
 let hashedPassword;
 

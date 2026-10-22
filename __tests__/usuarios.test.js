@@ -1,6 +1,6 @@
-jest.mock('../data/db');
-const { query } = require('../data/db');
-const svc = require('../api/usuarios/usuarios.service');
+jest.mock('../base-de-datos/db');
+const { query } = require('../base-de-datos/db');
+const svc = require('../servidor/api/usuarios/usuarios.service');
 
 beforeEach(() => {
   jest.clearAllMocks();

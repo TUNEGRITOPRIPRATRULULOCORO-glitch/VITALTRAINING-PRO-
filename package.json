@@ -2,10 +2,10 @@
   "name": "vital-training",
   "version": "1.0.0",
   "description": "Sistema de gestión deportiva para futbolistas, nutricionistas y administradores",
-  "main": "server.js",
+  "main": "servidor/server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "start": "node servidor/server.js",
+    "dev": "node servidor/server.js",
     "test": "jest --forceExit",
     "test:coverage": "jest --coverage --forceExit",
     "test:watch": "jest --watch"
@@ -39,11 +39,10 @@
     ],
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
-      "api/**/*.service.js",
-      "data/db.js",
-      "middleware/auth.js",
-      "!api/ia/ia.service.js",
-      "!data/migration.js"
+      "servidor/api/**/*.service.js",
+      "base-de-datos/db.js",
+      "servidor/middleware/auth.js",
+      "!servidor/api/ia/ia.service.js"
     ],
     "coverageThreshold": {
       "global": {

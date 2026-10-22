@@ -1,7 +1,7 @@
-jest.mock('../data/db');
-const { query } = require('../data/db');
-const incSvc  = require('../api/incidencias/incidencias.service');
-const nutrSvc = require('../api/nutricionista/nutricionista.service');
+jest.mock('../base-de-datos/db');
+const { query } = require('../base-de-datos/db');
+const incSvc  = require('../servidor/api/incidencias/incidencias.service');
+const nutrSvc = require('../servidor/api/nutricionista/nutricionista.service');
 
 const HOY = new Date().toISOString();
 

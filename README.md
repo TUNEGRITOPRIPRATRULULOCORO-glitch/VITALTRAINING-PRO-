@@ -21,32 +21,47 @@ Plataforma web para la gestión integral de futbolistas, nutricionistas y admini
 
 ## Arquitectura
 
+El proyecto está dividido en 4 bloques:
+
+| Bloque | Carpeta | ¿Para qué? |
+|---|---|---|
+| 🖥️ **Interfaz** | [`interfaz/`](interfaz/) | Lo que ve el usuario: pantallas HTML, estilos y JS del navegador |
+| 🗄️ **Servidor** | [`servidor/`](servidor/) | API REST con Express: rutas, lógica de negocio, permisos |
+| ✉️ **Servicios** | [`servicios/`](servicios/) | Integraciones externas: correo, pagos, IA (n8n) |
+| 💾 **Base de datos** | [`base-de-datos/`](base-de-datos/) | Conexión a PostgreSQL, tablas (`schema.sql`) y datos iniciales |
+
 ```
 vital-training/
-├── frontend/           # SPA — HTML, CSS, JS
+├── interfaz/               # 🖥️ INTERFAZ — SPA en HTML, CSS y JS
 │   ├── index.html
+│   ├── ayuda.html
 │   ├── styles.css
-│   └── script.js
-├── api/                # Backend REST — rutas por feature
-│   ├── auth/           # Login · Registro
-│   ├── usuarios/       # CRUD usuarios (Admin)
-│   ├── panel/          # Dashboard · Historial · Salud · Cumplimiento
-│   ├── salud/          # Registros diarios de salud
-│   ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
-│   ├── ia/             # Asistente IA basado en perfil médico
-│   ├── nutricionista/  # Panel nutricionista
-│   ├── incidencias/    # Soporte / tickets
-│   └── reportes/       # Estadísticas admin
-├── data/               # Capa de datos
-│   ├── db.js           # readDB / writeDB
-│   ├── migration.js    # Auto-hash de contraseñas en texto plano
-│   └── store.js
-├── middleware/
-│   ├── auth.js         # Verificación JWT
-│   └── cors.js
-├── __tests__/          # Pruebas unitarias Jest
-├── database.json       # Base de datos (JSON)
-├── server.js           # Punto de entrada
+│   ├── script.js
+│   └── img/
+│
+├── servidor/               # 🗄️ SERVIDOR — Node.js + Express
+│   ├── server.js           # Punto de entrada
+│   ├── middleware/         # auth (JWT) · roles · cors
+│   └── api/                # Un módulo por funcionalidad (routes → controller → service)
+│       ├── auth/           # Login · Registro
+│       ├── usuarios/       # CRUD usuarios (Admin)
+│       ├── panel/          # Dashboard · Historial · Perfil
+│       ├── salud/          # Registros diarios de salud
+│       ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
+│       ├── ia/             # Asistente IA + contexto para n8n
+│       ├── nutricionista/  # Panel nutricionista
+│       ├── incidencias/    # Soporte / tickets
+│       └── reportes/       # Estadísticas admin
+│
+├── servicios/              # ✉️ SERVICIOS — integraciones con terceros
+│
+├── base-de-datos/          # 💾 BASE DE DATOS — PostgreSQL
+│   ├── db.js               # Conexión (PostgreSQL real o pg-mem en memoria)
+│   ├── schema.sql          # Definición de tablas
+│   └── setup.js            # Crea tablas y usuarios de prueba al arrancar
+│
+├── __tests__/              # Pruebas unitarias Jest
+├── scripts/                # Utilidades sueltas (no forman parte de la app)
 ├── Dockerfile
 └── docker-compose.yml
 ```
@@ -199,7 +214,7 @@ Los reportes de cobertura se generan en `coverage/lcov-report/index.html`.
 ```dockerfile
 # Imagen base: Node 20 Alpine
 # Puerto expuesto: 4000
-# Comando: node server.js
+# Comando: node servidor/server.js
 ```
 
 ```bash

@@ -18,7 +18,7 @@ El sistema sigue una arquitectura de **3 capas separadas**:
 ┌─────────────────────────────────────────────────────────┐
 │                     CLIENTE (Navegador)                   │
 │           Frontend: HTML + CSS + JavaScript              │
-│           Archivo único: frontend/index.html             │
+│           Archivo único: interfaz/index.html             │
 └──────────────────────────┬──────────────────────────────┘
                            │ HTTP REST (JSON)
                            │ Authorization: Bearer <token>
@@ -57,7 +57,7 @@ El sistema sigue una arquitectura de **3 capas separadas**:
 Neon es una plataforma de PostgreSQL serverless. La conexión se configura mediante la variable de entorno `DATABASE_URL` (connection string completo). Se usa SSL obligatorio (`rejectUnauthorized: false`) porque Neon exige conexión encriptada.
 
 ```js
-// data/db.js
+// base-de-datos/db.js
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
@@ -66,7 +66,7 @@ const pool = new Pool({
 
 ### Inicialización automática
 
-Al arrancar el servidor, `data/setup.js` ejecuta `data/schema.sql` con `CREATE TABLE IF NOT EXISTS` — esto significa que las tablas se crean solas si no existen. Si la base de datos está vacía también inserta 5 usuarios de prueba con contraseñas hasheadas.
+Al arrancar el servidor, `base-de-datos/setup.js` ejecuta `base-de-datos/schema.sql` con `CREATE TABLE IF NOT EXISTS` — esto significa que las tablas se crean solas si no existen. Si la base de datos está vacía también inserta 5 usuarios de prueba con contraseñas hasheadas.
 
 ### Tablas y relaciones
 
@@ -111,26 +111,27 @@ Al arrancar el servidor, `data/setup.js` ejecuta `data/schema.sql` con `CREATE T
 ### Estructura de carpetas del backend
 
 ```
-server.js                    ← Punto de entrada, configura middleware global
-api/
-  index.js                   ← Router principal, aplica auth en todas las rutas
-  auth/
-    auth.routes.js            ← POST /login, POST /registro
-    auth.controller.js        ← Recibe request, llama al service
-    auth.service.js           ← Lógica: bcrypt, JWT, validaciones
-  usuarios/                  ← CRUD de usuarios (solo Admin)
-  panel/                     ← Dashboard, perfil, historial, alertas, cumplimiento
-  salud/                     ← Registros diarios de salud
-  nutricionista/             ← Endpoints exclusivos del nutricionista
-  incidencias/               ← Sistema de tickets de soporte
-  reportes/                  ← Estadísticas globales (solo Admin)
-  ia/                        ← Asistente IA local basado en reglas
-  perfilMedico/              ← Perfil médico y generación de plan/rutina
-middleware/
-  auth.js                    ← Verifica JWT en cada request protegida
-  roles.js                   ← requireRol() y requireOwnerOrRol()
-  cors.js                    ← Configuración de CORS
-data/
+servidor/
+  server.js                    ← Punto de entrada, configura middleware global
+  api/
+    index.js                   ← Router principal, aplica auth en todas las rutas
+    auth/
+      auth.routes.js            ← POST /login, POST /registro
+      auth.controller.js        ← Recibe request, llama al service
+      auth.service.js           ← Lógica: bcrypt, JWT, validaciones
+    usuarios/                  ← CRUD de usuarios (solo Admin)
+    panel/                     ← Dashboard, perfil, historial, alertas, cumplimiento
+    salud/                     ← Registros diarios de salud
+    nutricionista/             ← Endpoints exclusivos del nutricionista
+    incidencias/               ← Sistema de tickets de soporte
+    reportes/                  ← Estadísticas globales (solo Admin)
+    ia/                        ← Asistente IA local basado en reglas
+    perfilMedico/              ← Perfil médico y generación de plan/rutina
+  middleware/
+    auth.js                    ← Verifica JWT en cada request protegida
+    roles.js                   ← requireRol() y requireOwnerOrRol()
+    cors.js                    ← Configuración de CORS
+base-de-datos/
   db.js                      ← Pool de conexiones PostgreSQL
   schema.sql                 ← DDL de todas las tablas
   setup.js                   ← Inicializa BD y seed de usuarios
@@ -259,13 +260,13 @@ El nutricionista solo ve tickets de las 4 categorías que le corresponden. El ad
 
 **¿Por qué vanilla y no React/Vue?**
 - Sin build tools, sin npm en frontend → se despliega como archivos estáticos simples.
-- El backend sirve el frontend directamente con `express.static('frontend')`.
+- El backend sirve el frontend directamente con `express.static('interfaz')`.
 - Todo en un repositorio unificado.
 
 ### Estructura del frontend
 
 ```
-frontend/
+interfaz/
   index.html    ← Contiene todos los paneles (admin, nutricionista, futbolista) ocultos con CSS
   script.js     ← Toda la lógica: auth, routing de vistas, llamadas API, renderizado
   styles.css    ← Estilos: variables CSS, dark mode, componentes reutilizables

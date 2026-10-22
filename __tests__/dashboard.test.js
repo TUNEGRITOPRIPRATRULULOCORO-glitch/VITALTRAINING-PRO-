@@ -1,7 +1,7 @@
-jest.mock('../data/db');
-const { query } = require('../data/db');
-const dashSvc   = require('../api/panel/dashboard.service');
-const perfilSvc = require('../api/panel/perfil.service');
+jest.mock('../base-de-datos/db');
+const { query } = require('../base-de-datos/db');
+const dashSvc   = require('../servidor/api/panel/dashboard.service');
+const perfilSvc = require('../servidor/api/panel/perfil.service');
 
 const HOY = new Date().toISOString();
 
