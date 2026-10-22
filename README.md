@@ -26,7 +26,7 @@ El proyecto está dividido en 4 bloques:
 | Bloque | Carpeta | ¿Para qué? |
 |---|---|---|
 | 🖥️ **Interfaz** | [`interfaz/`](interfaz/) | Lo que ve el usuario: pantallas HTML, estilos y JS del navegador |
-| 🗄️ **Servidor** | [`servidor/`](servidor/) | API REST con Express: rutas, lógica de negocio, permisos |
+| 🗄️ **Servidor** | [`servidor/`](servidor/) | API REST con Express, organizada como monolito modular ([reglas](servidor/README.md)) |
 | ✉️ **Servicios** | [`servicios/`](servicios/) | Integraciones externas: correo, pagos, IA (n8n) |
 | 💾 **Base de datos** | [`base-de-datos/`](base-de-datos/) | Conexión a PostgreSQL, tablas (`schema.sql`) y datos iniciales |
 
@@ -41,8 +41,8 @@ vital-training/
 │
 ├── servidor/               # 🗄️ SERVIDOR — Node.js + Express
 │   ├── server.js           # Punto de entrada
-│   ├── middleware/         # auth (JWT) · roles · cors
-│   └── api/                # Un módulo por funcionalidad (routes → controller → service)
+│   ├── compartido/         # middleware común: auth (JWT) · roles · cors
+│   └── api/                # Monolito modular: un módulo por funcionalidad, cada uno con index.js público
 │       ├── auth/           # Login · Registro
 │       ├── usuarios/       # CRUD usuarios (Admin)
 │       ├── panel/          # Dashboard · Historial · Perfil

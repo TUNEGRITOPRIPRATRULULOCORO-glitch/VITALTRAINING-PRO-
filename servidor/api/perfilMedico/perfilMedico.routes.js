@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const ctrl   = require('./perfilMedico.controller');
-const { requireOwnerOrRol, requireRol } = require('../../middleware/roles');
+const { requireOwnerOrRol, requireRol } = require('../../compartido/middleware/roles');
 
 router.get('/catalogos', ctrl.getCatalogos);
 router.get('/atletas', requireRol('Medico'), ctrl.getAtletas);

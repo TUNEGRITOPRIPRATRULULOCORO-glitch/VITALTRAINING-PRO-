@@ -1,7 +1,7 @@
 jest.mock('jsonwebtoken');
 const jwt = require('jsonwebtoken');
-const authMiddleware = require('../servidor/middleware/auth');
-const { requireRol, requireOwnerOrRol } = require('../servidor/middleware/roles');
+const authMiddleware = require('../servidor/compartido/middleware/auth');
+const { requireRol, requireOwnerOrRol } = require('../servidor/compartido/middleware/roles');
 
 function makeRes() {
   const res = {};

@@ -127,7 +127,7 @@ servidor/
     reportes/                  ← Estadísticas globales (solo Admin)
     ia/                        ← Asistente IA local basado en reglas
     perfilMedico/              ← Perfil médico y generación de plan/rutina
-  middleware/
+  compartido/middleware/
     auth.js                    ← Verifica JWT en cada request protegida
     roles.js                   ← requireRol() y requireOwnerOrRol()
     cors.js                    ← Configuración de CORS

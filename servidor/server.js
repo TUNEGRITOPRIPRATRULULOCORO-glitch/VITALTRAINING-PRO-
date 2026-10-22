@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '50kb' }));
-app.use(require('./middleware/cors'));
+app.use(require('./compartido/middleware/cors'));
 app.use(express.static(path.join(__dirname, '..', 'interfaz')));
 
 app.use('/api', require('./api'));

@@ -137,10 +137,50 @@ async function registrarCumplimiento(userId, datos) {
   return rows[0];
 }
 
+async function crearAlerta(userId, tipo, mensaje, fecha) {
+  await query(
+    `INSERT INTO alertas (user_id, tipo, mensaje, leida, fecha) VALUES ($1,$2,$3,false,$4)`,
+    [userId, tipo, mensaje, fecha]
+  );
+}
+
+// Comidas y rutinas asignadas por un nutricionista (quedan marcadas con registrado_por)
+async function registrarComidaAsignada(userId, registradoPor, datos) {
+  const { rows } = await query(
+    `INSERT INTO comidas (user_id, nombre, tipo, calorias, fecha, hora, registrado_por)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)
+     RETURNING id, user_id AS "userId", nombre, tipo, calorias, fecha, hora, registrado_por, created_at AS "createdAt"`,
+    [
+      Number(userId), datos.nombre,
+      datos.tipo || 'almuerzo', Number(datos.calorias) || 0,
+      datos.fecha || new Date().toISOString().slice(0, 10),
+      datos.hora  || new Date().toTimeString().slice(0, 5),
+      registradoPor
+    ]
+  );
+  return rows[0];
+}
+
+async function registrarRutinaAsignada(userId, registradoPor, datos) {
+  const { rows } = await query(
+    `INSERT INTO rutinas (user_id, nombre, tipo, duracion_minutos, intensidad, descripcion, fecha, registrado_por)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+     RETURNING id, user_id AS "userId", nombre, tipo, duracion_minutos AS "duracionMinutos", intensidad, descripcion, fecha, registrado_por, created_at AS "createdAt"`,
+    [
+      Number(userId), datos.nombre,
+      datos.tipo || 'entrenamiento', Number(datos.duracionMinutos) || 60,
+      datos.intensidad  || 'media', datos.descripcion || '',
+      datos.fecha || new Date().toISOString().slice(0, 10),
+      registradoPor
+    ]
+  );
+  return rows[0];
+}
+
 module.exports = {
   historialComidas, historialRutinas, historialAlertas,
-  marcarAlertaLeida, marcarTodasLeidas,
-  registrarComida, eliminarComida,
-  registrarRutina, eliminarRutina,
+  marcarAlertaLeida, marcarTodasLeidas, crearAlerta,
+  registrarComida, eliminarComida, registrarComidaAsignada,
+  registrarRutina, eliminarRutina, registrarRutinaAsignada,
   getCumplimiento, registrarCumplimiento
 };

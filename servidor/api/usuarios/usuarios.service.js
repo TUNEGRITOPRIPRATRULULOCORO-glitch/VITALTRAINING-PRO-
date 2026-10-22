@@ -76,4 +76,37 @@ async function eliminar(id) {
   return rows[0] ? { nombre: rows[0].nombre } : null;
 }
 
-module.exports = { listar, crear, actualizar, eliminar };
+async function buscarIdPorEmail(email) {
+  const { rows } = await query(
+    'SELECT id FROM usuarios WHERE LOWER(email) = LOWER($1)',
+    [email]
+  );
+  return rows[0]?.id ?? null;
+}
+
+// Alta de un atleta desde el registro público (la contraseña ya llega hasheada)
+async function registrarAtleta({ nombre, email, hashedPassword, rol, deportePrincipal, datos }) {
+  const { rows } = await query(
+    `INSERT INTO usuarios
+       (nombre, email, password, rol, estado, deporte_principal, peso, altura, fecha_nacimiento, posicion, frecuencia, pie, objetivo, fecha_registro)
+     VALUES ($1,$2,$3,$4,'Activo',$5,$6,$7,$8,$9,$10,$11,$12,$13)
+     RETURNING *`,
+    [
+      nombre, email, hashedPassword, rol, deportePrincipal,
+      datos.peso || null, datos.altura || null, datos.fechaNacimiento || null,
+      datos.posicion || null, datos.frecuencia || null, datos.pie || null,
+      datos.objetivo || null, new Date().toLocaleDateString('es-CO')
+    ]
+  );
+  return rows[0];
+}
+
+async function actualizarDeporte(id, deportePrincipal) {
+  const { rows } = await query(
+    'UPDATE usuarios SET deporte_principal = $1 WHERE id = $2 RETURNING deporte_principal AS "deportePrincipal"',
+    [deportePrincipal, id]
+  );
+  return rows[0]?.deportePrincipal ?? null;
+}
+
+module.exports = { listar, crear, actualizar, eliminar, buscarIdPorEmail, registrarAtleta, actualizarDeporte };

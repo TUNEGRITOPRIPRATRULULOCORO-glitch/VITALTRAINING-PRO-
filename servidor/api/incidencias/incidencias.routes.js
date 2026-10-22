@@ -6,7 +6,7 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./incidencias.controller');
-const { requireRol } = require('../../middleware/roles');
+const { requireRol } = require('../../compartido/middleware/roles');
 
 router.get('/',                 ctrl.getIncidencias);
 router.post('/',                ctrl.postIncidencia);

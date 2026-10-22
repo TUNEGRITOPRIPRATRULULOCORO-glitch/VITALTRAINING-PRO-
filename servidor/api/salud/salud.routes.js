@@ -4,7 +4,7 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./salud.controller');
-const { requireOwnerOrRol } = require('../../middleware/roles');
+const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
 
 router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
 

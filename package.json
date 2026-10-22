@@ -41,7 +41,7 @@
     "collectCoverageFrom": [
       "servidor/api/**/*.service.js",
       "base-de-datos/db.js",
-      "servidor/middleware/auth.js",
+      "servidor/compartido/middleware/auth.js",
       "!servidor/api/ia/ia.service.js"
     ],
     "coverageThreshold": {

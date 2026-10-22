@@ -1,4 +1,5 @@
 const { query } = require('../../../base-de-datos/db');
+const panel = require('../panel');
 
 async function listar(userId) {
   const { rows } = await query(
@@ -47,22 +48,13 @@ async function crear(userId, datos) {
 
   const fecha = new Date().toLocaleDateString('es-CO');
   if (fatiga >= 8) {
-    await query(
-      `INSERT INTO alertas (user_id, tipo, mensaje, leida, fecha) VALUES ($1,'fatiga',$2,false,$3)`,
-      [userId, `Fatiga alta detectada (${fatiga}/10). Considera un día de recuperación.`, fecha]
-    );
+    await panel.crearAlerta(userId, 'fatiga', `Fatiga alta detectada (${fatiga}/10). Considera un día de recuperación.`, fecha);
   }
   if (recuperacion <= 3) {
-    await query(
-      `INSERT INTO alertas (user_id, tipo, mensaje, leida, fecha) VALUES ($1,'recuperacion',$2,false,$3)`,
-      [userId, `Recuperación baja (${recuperacion}/10). Revisa tu descanso y alimentación.`, fecha]
-    );
+    await panel.crearAlerta(userId, 'recuperacion', `Recuperación baja (${recuperacion}/10). Revisa tu descanso y alimentación.`, fecha);
   }
   if (sueno <= 4) {
-    await query(
-      `INSERT INTO alertas (user_id, tipo, mensaje, leida, fecha) VALUES ($1,'sueno',$2,false,$3)`,
-      [userId, `Sueño insuficiente (${sueno}/10). El descanso es clave para el rendimiento.`, fecha]
-    );
+    await panel.crearAlerta(userId, 'sueno', `Sueño insuficiente (${sueno}/10). El descanso es clave para el rendimiento.`, fecha);
   }
 
   return registro;

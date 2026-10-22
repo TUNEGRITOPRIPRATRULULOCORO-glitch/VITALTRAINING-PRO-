@@ -1,4 +1,5 @@
 const { query } = require('../../../base-de-datos/db');
+const usuarios = require('../usuarios');
 
 async function obtenerPerfil(userId) {
   const { rows } = await query(
@@ -29,11 +30,8 @@ async function actualizarPerfil(userId, datos) {
 
   const perfil = rows[0];
   if (datos.deportePrincipal) {
-    const { rows: deporteRows } = await query(
-      'UPDATE usuarios SET deporte_principal = $1 WHERE id = $2 RETURNING deporte_principal AS "deportePrincipal"',
-      [datos.deportePrincipal, userId]
-    );
-    perfil.deportePrincipal = deporteRows[0]?.deportePrincipal || datos.deportePrincipal;
+    const deporte = await usuarios.actualizarDeporte(userId, datos.deportePrincipal);
+    perfil.deportePrincipal = deporte || datos.deportePrincipal;
   }
 
   return perfil;

@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const ctrl   = require('./ia.controller');
-const { requireOwnerOrRol } = require('../../middleware/roles');
+const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
 const n8nContextController = require('./n8nContext.controller');
 
 router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));

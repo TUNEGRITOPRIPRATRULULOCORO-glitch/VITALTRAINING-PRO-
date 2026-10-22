@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt    = require('jsonwebtoken');
 const { query } = require('../../../base-de-datos/db');
+const usuarios = require('../usuarios');
 
 const JWT_SECRET  = process.env.JWT_SECRET || 'vt-super-secret-key-2026';
 const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '8h';
@@ -45,27 +46,15 @@ async function registro(datos) {
   if (!password || password.length < 8)
     return { error: 'La contraseña debe tener al menos 8 caracteres.', status: 400 };
 
-  const { rows: existe } = await query(
-    'SELECT id FROM usuarios WHERE LOWER(email) = LOWER($1)',
-    [email]
-  );
-  if (existe.length > 0) return { error: 'Ya existe una cuenta con ese correo.', status: 409 };
+  if (await usuarios.buscarIdPorEmail(email) !== null)
+    return { error: 'Ya existe una cuenta con ese correo.', status: 409 };
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const { rows } = await query(
-    `INSERT INTO usuarios
-       (nombre, email, password, rol, estado, deporte_principal, peso, altura, fecha_nacimiento, posicion, frecuencia, pie, objetivo, fecha_registro)
-     VALUES ($1,$2,$3,$4,'Activo',$5,$6,$7,$8,$9,$10,$11,$12,$13)
-     RETURNING *`,
-    [
-      nombre, email, hashedPassword, rolUsuario, deportePrincipal,
-      datos.peso || null, datos.altura || null, datos.fechaNacimiento || null,
-      datos.posicion || null, datos.frecuencia || null, datos.pie || null,
-      datos.objetivo || null, new Date().toLocaleDateString('es-CO')
-    ]
-  );
+  const nuevo = await usuarios.registrarAtleta({
+    nombre, email, hashedPassword, rol: rolUsuario, deportePrincipal, datos
+  });
 
-  const { password: _, ...usuarioSeguro } = rows[0];
+  const { password: _, ...usuarioSeguro } = nuevo;
   return { usuario: usuarioSeguro };
 }
 
