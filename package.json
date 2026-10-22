@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node servidor/server.js",
     "dev": "node servidor/server.js",
+    "demo": "node scripts/datos-demo.js",
     "test": "jest --forceExit",
     "test:coverage": "jest --coverage --forceExit",
     "test:watch": "jest --watch"
@@ -20,6 +21,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^4.22.1",

@@ -21,9 +21,11 @@ async function getObtener(req, res) {
 async function postGuardar(req, res) {
   try {
     const userId   = Number(req.params.userId);
-    const posicion = req.body.posicion || 'Mediocampista';
-    const datos    = req.body;
-    const result   = await svc.guardar(userId, datos, posicion);
+    // Deporte y posición salen de la ficha del atleta (registro + Mi Perfil), no del navegador
+    const ficha    = await svc.obtenerFicha(userId);
+    const posicion = ficha?.posicion || req.body.posicion || null;
+    const deporte  = ficha?.deporte || 'Fútbol';
+    const result   = await svc.guardar(userId, req.body, posicion, deporte);
     res.json({ ok: true, ...result });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });

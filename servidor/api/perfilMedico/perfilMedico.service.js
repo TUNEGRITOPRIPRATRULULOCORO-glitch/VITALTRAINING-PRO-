@@ -1,5 +1,6 @@
 const { query } = require('../../../base-de-datos/db');
 const panel = require('../panel');
+const { generarRutina } = require('./rutinas');
 
 // ═══════════════════════════════════════════════════════════════
 // CATÁLOGOS
@@ -115,122 +116,6 @@ const MERIENDAS = [
   { nombre:'Pepino con limón, sal y chamoy natural', desc:'1 pepino en rodajas con jugo de limón, sal y chamoy natural bajo en azúcar', kcal:60, proteina:2, carbs:12, grasa:0, sinAlergenos:['gluten','lactosa','huevo','mariscos','pescado','frutos-secos','maní','soya'], noApto:[], condicionesOk:['Sobrepeso / Obesidad','Diabetes tipo 2','Hipertensión arterial'], condicionesEvitar:['Cítricos (naranja, limón)'] },
   { nombre:'Tuna en agua con galletas de arroz', desc:'1 lata de atún en agua, 3 galletas de arroz, limón y perejil', kcal:180, proteina:24, carbs:18, grasa:2, sinAlergenos:['gluten','lactosa','huevo','mariscos','frutos-secos','maní','soya'], noApto:['vegano','vegetariano'], condicionesOk:['Alto en proteína','Sobrepeso / Obesidad'], condicionesEvitar:['Pescado','Cítricos (naranja, limón)'] }
 ];
-
-// ═══════════════════════════════════════════════════════════════
-// EJERCICIOS POR POSICIÓN Y CONDICIÓN
-// ═══════════════════════════════════════════════════════════════
-const EJERCICIOS = {
-  fuerzaTren: [
-    { nombre:'Sentadilla con peso corporal', impacto:'medio', evitar:['Condromalacia rotuliana','Lesión de menisco','Hernia discal','Dolor lumbar crónico'] },
-    { nombre:'Prensa de piernas', impacto:'medio', evitar:['Condromalacia rotuliana','Lesión de menisco'] },
-    { nombre:'Peso muerto rumano', impacto:'alto', evitar:['Hernia discal','Dolor lumbar crónico','Escoliosis'] },
-    { nombre:'Zancadas hacia adelante', impacto:'medio', evitar:['Tendinitis de Aquiles','Fascitis plantar','Lesión de menisco'] },
-    { nombre:'Hip thrust con banda', impacto:'bajo', evitar:[] },
-    { nombre:'Elevaciones de talón', impacto:'bajo', evitar:['Tendinitis de Aquiles','Fascitis plantar'] },
-    { nombre:'Puente de glúteos', impacto:'bajo', evitar:[] },
-  ],
-  fuerzaTronco: [
-    { nombre:'Plancha frontal 60 seg', impacto:'bajo', evitar:['Hernia discal','Escoliosis'] },
-    { nombre:'Plancha lateral', impacto:'bajo', evitar:['Escoliosis'] },
-    { nombre:'Dead bug', impacto:'bajo', evitar:[] },
-    { nombre:'Rotaciones con banda elástica', impacto:'bajo', evitar:['Hernia discal'] },
-    { nombre:'Superman en suelo', impacto:'bajo', evitar:['Hernia discal','Dolor lumbar crónico'] },
-    { nombre:'Crunch abdominal en suelo', impacto:'bajo', evitar:['Hernia discal'] },
-    { nombre:'Rollout con rueda abdominal', impacto:'medio', evitar:['Hernia discal','Dolor lumbar crónico'] },
-  ],
-  cardio: [
-    { nombre:'Carrera continua 20-30 min', impacto:'alto', evitar:['Fascitis plantar','Periostitis tibial (shin splints)','Tendinitis de Aquiles','Condromalacia rotuliana'] },
-    { nombre:'Trote suave 15 min', impacto:'medio', evitar:['Fascitis plantar','Periostitis tibial (shin splints)'] },
-    { nombre:'Bicicleta estática 25 min', impacto:'bajo', evitar:['Condromalacia rotuliana'] },
-    { nombre:'Natación 30 min', impacto:'bajo', evitar:[] },
-    { nombre:'Elíptica 25 min', impacto:'bajo', evitar:[] },
-    { nombre:'Saltar cuerda 10 min', impacto:'alto', evitar:['Fascitis plantar','Tendinitis de Aquiles','Periostitis tibial (shin splints)','Esguince de tobillo recurrente'] },
-    { nombre:'Remo ergómetro 20 min', impacto:'bajo', evitar:['Hernia discal','Dolor lumbar crónico'] },
-  ],
-  tecnica: [
-    { nombre:'Control de balón — toque suave', impacto:'bajo', evitar:[] },
-    { nombre:'Pases cortos en parejas', impacto:'bajo', evitar:[] },
-    { nombre:'Conducción con cambio de dirección', impacto:'medio', evitar:['Esguince de tobillo recurrente'] },
-    { nombre:'Dominio de balón', impacto:'bajo', evitar:[] },
-    { nombre:'Tiro a portería con pierna dominante', impacto:'medio', evitar:['Pubalgia deportiva','Tendinitis de Aquiles'] },
-    { nombre:'Tiro con pierna débil', impacto:'medio', evitar:['Pubalgia deportiva'] },
-    { nombre:'Paredes y pases al primer toque', impacto:'bajo', evitar:[] },
-  ],
-  velocidadAgilidad: [
-    { nombre:'Sprints 10m x 8 repeticiones', impacto:'alto', evitar:['Fascitis plantar','Periostitis tibial (shin splints)','Tendinitis de Aquiles','Arritmia cardíaca leve','Hipertensión arterial'] },
-    { nombre:'Escalera de agilidad', impacto:'medio', evitar:['Esguince de tobillo recurrente','Fascitis plantar'] },
-    { nombre:'Conos en zigzag', impacto:'medio', evitar:['Esguince de tobillo recurrente'] },
-    { nombre:'Saltos pliométricos en caja', impacto:'alto', evitar:['Condromalacia rotuliana','Fascitis plantar','Tendinitis de Aquiles','Bursitis de cadera'] },
-    { nombre:'Arranques cortos 5m', impacto:'alto', evitar:['Fascitis plantar','Tendinitis de Aquiles'] },
-    { nombre:'Carrera lateral en cono', impacto:'medio', evitar:['Esguince de tobillo recurrente','Síndrome de la banda iliotibial'] },
-  ],
-  recuperacion: [
-    { nombre:'Elongación de cuádriceps — 30 seg c/lado', impacto:'bajo', evitar:[] },
-    { nombre:'Estiramiento de isquiotibiales en suelo', impacto:'bajo', evitar:[] },
-    { nombre:'Foam roller en pantorrillas', impacto:'bajo', evitar:[] },
-    { nombre:'Movilidad de cadera — 10 repeticiones', impacto:'bajo', evitar:[] },
-    { nombre:'Respiración diafragmática — 5 min', impacto:'bajo', evitar:[] },
-    { nombre:'Caminata activa 15 min', impacto:'bajo', evitar:['Fascitis plantar'] },
-    { nombre:'Yoga restaurativo — 20 min', impacto:'bajo', evitar:[] },
-  ]
-};
-
-const RUTINAS_BASE = {
-  Portero: [
-    { dia:'Lunes',    tipo:'Fuerza + Core',        grupos:['fuerzaTren','fuerzaTronco'] },
-    { dia:'Martes',   tipo:'Técnica + Reflejos',   grupos:['tecnica','velocidadAgilidad'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',  grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Cardio + Fuerza',      grupos:['cardio','fuerzaTren'] },
-    { dia:'Viernes',  tipo:'Técnica específica',   grupos:['tecnica','fuerzaTronco'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',  grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',    grupos:[] }
-  ],
-  'Defensa Central': [
-    { dia:'Lunes',    tipo:'Fuerza + Resistencia', grupos:['fuerzaTren','cardio'] },
-    { dia:'Martes',   tipo:'Técnica defensiva',    grupos:['tecnica'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',  grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Fuerza + Core',        grupos:['fuerzaTren','fuerzaTronco'] },
-    { dia:'Viernes',  tipo:'Velocidad + Técnica',  grupos:['velocidadAgilidad','tecnica'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',  grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',    grupos:[] }
-  ],
-  Lateral: [
-    { dia:'Lunes',    tipo:'Cardio + Velocidad',   grupos:['cardio','velocidadAgilidad'] },
-    { dia:'Martes',   tipo:'Fuerza + Técnica',     grupos:['fuerzaTren','tecnica'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',  grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Resistencia aeróbica', grupos:['cardio','fuerzaTronco'] },
-    { dia:'Viernes',  tipo:'Agilidad + Técnica',   grupos:['velocidadAgilidad','tecnica'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',  grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',    grupos:[] }
-  ],
-  Mediocampista: [
-    { dia:'Lunes',    tipo:'Resistencia aeróbica', grupos:['cardio','fuerzaTronco'] },
-    { dia:'Martes',   tipo:'Técnica + Pases',      grupos:['tecnica','velocidadAgilidad'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',  grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Fuerza + Cardio',      grupos:['fuerzaTren','cardio'] },
-    { dia:'Viernes',  tipo:'Técnica táctica',      grupos:['tecnica','fuerzaTronco'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',  grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',    grupos:[] }
-  ],
-  Extremo: [
-    { dia:'Lunes',    tipo:'Velocidad + Explosividad', grupos:['velocidadAgilidad','cardio'] },
-    { dia:'Martes',   tipo:'Técnica + Regate',         grupos:['tecnica','velocidadAgilidad'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',      grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Fuerza + Velocidad',       grupos:['fuerzaTren','velocidadAgilidad'] },
-    { dia:'Viernes',  tipo:'Técnica de finalización',  grupos:['tecnica','fuerzaTronco'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',      grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',        grupos:[] }
-  ],
-  Delantero: [
-    { dia:'Lunes',    tipo:'Explosividad + Fuerza',  grupos:['velocidadAgilidad','fuerzaTren'] },
-    { dia:'Martes',   tipo:'Técnica de gol',         grupos:['tecnica','velocidadAgilidad'] },
-    { dia:'Miércoles',tipo:'Recuperación activa',    grupos:['recuperacion'] },
-    { dia:'Jueves',   tipo:'Fuerza + Core',          grupos:['fuerzaTren','fuerzaTronco'] },
-    { dia:'Viernes',  tipo:'Finalización + Técnica', grupos:['tecnica'] },
-    { dia:'Sábado',   tipo:'Partido / Simulacro',    grupos:['tecnica'] },
-    { dia:'Domingo',  tipo:'Descanso completo',      grupos:[] }
-  ]
-};
 
 // ═══════════════════════════════════════════════════════════════
 // GENERADORES
@@ -360,48 +245,6 @@ function generarPlanAlimenticio(perfilMedico, posicion) {
   };
 }
 
-const SERIES_DEFAULT = { bajo: { series: 3, repeticiones: null, tiempo: '30-40 seg' }, medio: { series: 3, repeticiones: 12, tiempo: null }, alto: { series: 4, repeticiones: 10, tiempo: null } };
-
-function filtrarEjercicios(grupo, condiciones) {
-  return (EJERCICIOS[grupo] || [])
-    .filter(e => !e.evitar.some(ev => condiciones.some(c => c.includes(ev) || ev.includes(c.split(' ')[0]))))
-    .slice(0, 4)
-    .map(e => ({ nombre: e.nombre, impacto: e.impacto, ...SERIES_DEFAULT[e.impacto] }));
-}
-
-function generarRutina(perfilMedico, posicion) {
-  const { condiciones = [] } = perfilMedico;
-  const base = RUTINAS_BASE[posicion] || RUTINAS_BASE['Mediocampista'];
-  const notas = [];
-
-  if (condiciones.includes('Asma inducida por ejercicio') || condiciones.includes('Asma alérgica'))
-    notas.push('🫁 Calentamiento prolongado de 15 min antes de cualquier actividad intensa. Lleva inhalador.');
-  if (condiciones.some(c=>c.includes('rodilla') || c.includes('menisco') || c.includes('Condromalacia')))
-    notas.push('🦵 Evita impacto directo en rodilla. Prioriza bicicleta y elíptica sobre correr.');
-  if (condiciones.some(c=>c.includes('lumbar') || c.includes('Hernia discal') || c.includes('Escoliosis')))
-    notas.push('🔙 Sin pesos muertos ni movimientos que hiperextiendan la columna.');
-  if (condiciones.some(c=>c.includes('Aquiles') || c.includes('plantar') || c.includes('tibial')))
-    notas.push('🦶 Usa calzado con soporte. Evita superficies duras. Estira siempre pantorrillas.');
-  if (condiciones.some(c=>c.includes('Arritmia') || c.includes('cardíaco') || c.includes('Hipertensión')))
-    notas.push('❤️ Monitorea frecuencia cardíaca. No superar 75% FC máxima sin autorización médica.');
-  if (condiciones.includes('Diabetes tipo 1') || condiciones.includes('Diabetes tipo 2'))
-    notas.push('🩸 Mide glucosa antes de entrenar. Ten snack rápido disponible (glucosa, jugo).');
-  if (!notas.length) notas.push('✅ Sin restricciones especiales. Sigue el plan completo con buena técnica.');
-
-  return {
-    descripcion: `Rutina para ${posicion}${condiciones.length ? ' · adaptada a condiciones' : ''}`,
-    semana: base.map(sesion => ({
-      dia:       sesion.dia,
-      tipo:      sesion.tipo,
-      ejercicios: sesion.grupos.length
-        ? sesion.grupos.flatMap(g => filtrarEjercicios(g, condiciones))
-        : [],
-      descanso: sesion.grupos.length === 0
-    })),
-    notas
-  };
-}
-
 // ═══════════════════════════════════════════════════════════════
 // CRUD
 // ═══════════════════════════════════════════════════════════════
@@ -444,7 +287,7 @@ async function obtener(userId) {
   };
 }
 
-async function guardar(userId, datos, posicion) {
+async function guardar(userId, datos, posicion, deporte = 'Fútbol') {
   const datosNorm = {
     condiciones:  datos.condiciones  || [],
     alergias:     datos.alergias     || [],
@@ -452,7 +295,7 @@ async function guardar(userId, datos, posicion) {
   };
 
   const planAlimenticio = generarPlanAlimenticio(datosNorm, posicion);
-  const rutinaSemanal   = generarRutina(datosNorm, posicion);
+  const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte);
 
   await query(
     `INSERT INTO perfiles_medicos (user_id, condiciones, alergias, preferencias, completado, plan_alimenticio, rutina_semanal)

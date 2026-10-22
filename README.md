@@ -103,11 +103,24 @@ npm install
 cp .env.example .env
 # Editar .env si es necesario
 
-# 4. Iniciar servidor
+# 4. (Opcional) Cargar datos de ejemplo
+npm run demo
+
+# 5. Iniciar servidor
 npm start
 ```
 
 Abrir en el navegador: **http://localhost:4000**
+
+**Dónde se guardan los datos:**
+
+| Situación | Base de datos | ¿Se conserva al reiniciar? |
+|---|---|---|
+| `DATABASE_URL` en `.env` | PostgreSQL real | Sí |
+| Desarrollo sin `DATABASE_URL` | PGlite (PostgreSQL en un archivo) en `base-de-datos/datos-locales/` | Sí |
+| Tests (`npm test`) | pg-mem en memoria | No (cada test empieza vacío) |
+
+Para empezar de cero en local, borra la carpeta `base-de-datos/datos-locales/`. Esa carpeta no se sube a GitHub.
 
 ### Con Docker
 

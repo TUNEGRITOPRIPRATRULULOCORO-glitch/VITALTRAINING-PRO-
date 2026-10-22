@@ -4239,3 +4239,220 @@ body.dark .rd-aviso { border-color: rgba(239,68,68,0.4); }
 .card-body p:last-child { margin-bottom: 0; }
 .ficha-deportiva { flex-wrap: wrap; row-gap: 6px; }
 .ficha-falta { font-style: italic; opacity: 0.7; }
+
+/* Editor de recorte de la foto de perfil */
+.recorte-ayuda { font-size: 13px; color: var(--text-muted); margin: 0 0 14px; text-align: center; }
+.recorte-visor {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #0f172a;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+.recorte-visor.arrastrando { cursor: grabbing; }
+.recorte-visor:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.recorte-visor img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    pointer-events: none;
+}
+/* Oscurece todo menos el círculo que será la foto */
+.recorte-mascara {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 0 200px rgba(15, 23, 42, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+}
+.recorte-zoom-fila { display: flex; align-items: center; gap: 12px; max-width: 280px; margin: 16px auto 4px; color: var(--text-muted); font-weight: 700; }
+.recorte-zoom-fila input { flex: 1; }
+
+/* ===========================
+   LOGO
+=========================== */
+.logo-svg { width: 100%; height: 100%; color: #fff; display: block; }
+.logo-icon { background: linear-gradient(135deg, #22c55e, #0891b2); padding: 7px; }
+.logo-icon.logo-nutri  { background: linear-gradient(135deg, #a855f7, #6366f1); }
+.logo-icon.logo-medico { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+
+/* ===========================
+   PORTADA (login y registro) — capas animadas
+=========================== */
+#auth-screen { position: relative; overflow: hidden; isolation: isolate; perspective: 1400px; }
+.auth-fondo { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+
+.auth-aurora {
+    position: absolute;
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.45;
+    mix-blend-mode: screen;
+}
+.auth-aurora-1 { background: #16a34a; top: -25vmax; left: -15vmax; animation: aurora-1 18s ease-in-out infinite alternate; }
+.auth-aurora-2 { background: #0891b2; bottom: -30vmax; right: -20vmax; animation: aurora-2 22s ease-in-out infinite alternate; }
+.auth-aurora-3 { background: #65a30d; width: 35vmax; height: 35vmax; top: 30%; left: 45%; opacity: 0.25; animation: aurora-3 26s ease-in-out infinite alternate; }
+@keyframes aurora-1 { to { transform: translate(18vmax, 12vmax) scale(1.15); } }
+@keyframes aurora-2 { to { transform: translate(-16vmax, -10vmax) scale(1.2); } }
+@keyframes aurora-3 { to { transform: translate(-25vmax, 8vmax) scale(0.8); } }
+
+/* Cuadrícula en perspectiva, como el suelo de un estadio */
+.auth-rejilla {
+    position: absolute;
+    left: -50%;
+    right: -50%;
+    bottom: -10%;
+    height: 60%;
+    background-image:
+        linear-gradient(rgba(34,197,94,0.35) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,197,94,0.35) 1px, transparent 1px);
+    background-size: 60px 60px;
+    transform: rotateX(70deg);
+    transform-origin: bottom;
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent 85%);
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent 85%);
+    animation: rejilla-avanza 3s linear infinite;
+}
+@keyframes rejilla-avanza { to { background-position: 0 60px, 0 0; } }
+
+/* Pulso cardíaco que se dibuja de lado a lado con brillo neón */
+.auth-pulso { position: absolute; left: 0; width: 100%; top: 18%; height: 22vh; opacity: 0.85; }
+.auth-pulso path {
+    fill: none;
+    stroke: #4ade80;
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 1700;
+    stroke-dashoffset: 1700;
+    filter: drop-shadow(0 0 6px #22c55e) drop-shadow(0 0 18px #22c55e);
+    animation: pulso-dibuja 4.5s cubic-bezier(.6,.05,.3,1) infinite;
+    vector-effect: non-scaling-stroke;
+}
+@keyframes pulso-dibuja {
+    0%   { stroke-dashoffset: 1700; opacity: 0; }
+    10%  { opacity: 1; }
+    70%  { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: -1700; opacity: 0; }
+}
+#auth-chispas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* Tarjeta: cristal, borde con brillo que gira e inclinación 3D con el ratón */
+@property --giro { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.auth-container {
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--inclina-x, 0deg)) rotateY(var(--inclina-y, 0deg));
+    transition: transform 0.25s ease-out;
+    background: rgba(7, 9, 15, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+.auth-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--giro), transparent 0deg, #22c55e 60deg, #06b6d4 120deg, transparent 180deg, transparent 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    animation: borde-gira 5s linear infinite;
+    pointer-events: none;
+    z-index: 3;
+}
+@keyframes borde-gira { to { --giro: 360deg; } }
+.auth-brand { background: linear-gradient(160deg, rgba(12,29,16,0.92) 0%, rgba(9,21,8,0.85) 60%, rgba(6,14,5,0.8) 100%); }
+.auth-card  { background: rgba(13, 16, 23, 0.88); }
+
+/* Logo de la portada: se dibuja, late y un brillo lo recorre */
+.auth-logo {
+    position: relative;
+    overflow: hidden;
+    padding: 9px;
+    background: linear-gradient(135deg, #22c55e, #0891b2);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 10px 30px rgba(34,197,94,0.55), 0 0 60px rgba(8,145,178,0.35);
+    animation: logo-late 2.4s ease-in-out infinite;
+}
+.auth-logo::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.55) 50%, transparent 60%);
+    transform: translateX(-100%);
+    animation: logo-brillo 3.5s ease-in-out infinite;
+}
+.auth-logo .logo-trazo { stroke-dasharray: 80; stroke-dashoffset: 80; animation: logo-traza 1.4s 0.2s ease-out forwards; }
+@keyframes logo-traza  { to { stroke-dashoffset: 0; } }
+@keyframes logo-brillo { 0%, 55% { transform: translateX(-100%); } 85%, 100% { transform: translateX(100%); } }
+@keyframes logo-late   { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.08); } 24% { transform: scale(1); } 36% { transform: scale(1.05); } }
+
+/* Título que entra línea por línea; la última con degradado animado */
+.auth-titulo { font-size: 44px !important; line-height: 1.02 !important; letter-spacing: -1.6px !important; margin-bottom: 18px !important; }
+.auth-titulo .auth-linea { display: block; overflow: hidden; padding-bottom: 4px; }
+.auth-titulo .auth-linea > span {
+    display: inline-block;
+    color: #fff;
+    transform: translateY(110%);
+    animation: linea-sube 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.auth-titulo .auth-linea:nth-child(2) > span { animation-delay: 0.15s; }
+.auth-titulo .auth-linea > .auth-degradado {
+    color: transparent;
+    background: linear-gradient(90deg, #4ade80, #22d3ee, #a3e635, #4ade80);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: linea-sube 0.8s 0.3s cubic-bezier(.2,.8,.2,1) forwards, degradado-corre 6s linear infinite;
+}
+@keyframes linea-sube { to { transform: translateY(0); } }
+@keyframes degradado-corre { to { background-position: 300% 0; } }
+
+/* Palabra que va cambiando: fútbol, baloncesto, tenis */
+.auth-rotador { display: inline-block; color: #4ade80; font-weight: 700; }
+.auth-rotador span { display: inline-block; animation: rotador-entra 0.45s ease-out; }
+@keyframes rotador-entra { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } }
+
+.auth-tagline { color: rgba(255,255,255,0.6) !important; font-size: 14px !important; }
+.auth-mini-badges span { transition: transform 0.2s, background 0.2s; }
+.auth-mini-badges span:hover { transform: translateY(-2px); background: rgba(34,197,94,0.18); }
+
+/* Botón principal con reflejo al pasar */
+.auth-btn { position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(22,163,74,0.35); }
+.auth-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(110deg, transparent, rgba(255,255,255,0.45), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s ease;
+}
+.auth-btn:hover::after { left: 120%; }
+
+@media (max-width: 760px) {
+    .auth-titulo { font-size: 34px !important; }
+    .auth-pulso { top: 4%; }
+}
+
+/* Quien pide menos movimiento ve la portada quieta */
+@media (prefers-reduced-motion: reduce) {
+    .auth-aurora, .auth-rejilla, .auth-pulso path, .auth-container::before,
+    .auth-logo, .auth-logo::after, .auth-degradado, .auth-rotador span { animation: none !important; }
+    .auth-pulso path, .auth-logo .logo-trazo { stroke-dashoffset: 0; animation: none !important; }
+    .auth-titulo .auth-linea > span { transform: none; animation: none !important; }
+    .auth-container { transform: none !important; }
+}

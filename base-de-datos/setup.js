@@ -21,7 +21,7 @@ async function setupDatabase() {
 
   await aplicarMigraciones();
   await seedUsuarios();
-  console.log('✅ Base de datos lista');
+  console.log(`✅ Base de datos lista · ${require('./db').motor}`);
 }
 
 // Columnas añadidas después de la primera versión del esquema.

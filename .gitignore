@@ -26,3 +26,6 @@ Thumbs.db
 # Build outputs
 dist/
 build/
+
+# Base de datos local de desarrollo (PGlite)
+base-de-datos/datos-locales/

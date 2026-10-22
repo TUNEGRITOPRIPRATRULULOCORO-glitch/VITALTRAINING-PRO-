@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Vital Sports">
+  <!-- Logo de Vital Sports: una "V" cuyo trazo derecho se convierte en un pulso que sube como una flecha -->
+  <defs>
+    <linearGradient id="vs-fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#0891b2"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="13" fill="url(#vs-fondo)"/>
+  <path d="M9 13 L19 35 L25 21 L29 28 L35 12" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M29.5 12.6 L35 12 L36.4 17.4" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

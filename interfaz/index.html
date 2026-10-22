@@ -10,25 +10,50 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2316a34a'/><text x='50%25' y='57%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='13' fill='white'>VT</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="img/logo.svg">
 </head>
 <body>
+
+<!-- Logo de Vital Sports: "V" cuyo trazo derecho es un pulso que sube como flecha. Se usa con <use href="#logo-marca"> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="logo-marca" viewBox="0 0 48 48">
+        <path class="logo-trazo" d="M9 13 L19 35 L25 21 L29 28 L35 12" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="logo-trazo" d="M29.5 12.6 L35 12 L36.4 17.4" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+</svg>
 
 <!-- ========================= -->
 <!-- PANTALLA AUTH             -->
 <!-- ========================= -->
 <div id="auth-screen">
 
+    <!-- Fondo animado: aurora, cuadrícula de estadio, pulso cardíaco y chispas -->
+    <div class="auth-fondo" aria-hidden="true">
+        <div class="auth-aurora auth-aurora-1"></div>
+        <div class="auth-aurora auth-aurora-2"></div>
+        <div class="auth-aurora auth-aurora-3"></div>
+        <div class="auth-rejilla"></div>
+        <svg class="auth-pulso" viewBox="0 0 1200 200" preserveAspectRatio="none">
+            <path d="M0 120 H30 L50 120 L68 60 L90 178 L112 18 L134 152 L150 120 H1040 L1058 120 L1074 70 L1094 172 L1116 22 L1138 150 L1154 120 H1200"/>
+        </svg>
+        <canvas id="auth-chispas"></canvas>
+    </div>
+
     <!-- LOGIN -->
     <div id="screen-login" class="auth-container">
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VT</div>
+                    <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
                     <span class="auth-logo-name">Vital Sports</span>
                 </div>
-                <h1>Tu progreso<br>en una sola app.</h1>
-                <p class="auth-tagline">Entrena mejor, cuida tu salud y sigue tu plan sin complicaciones.</p>
+                <h1 class="auth-titulo">
+                    <span class="auth-linea"><span>Entrena.</span></span>
+                    <span class="auth-linea"><span>Recupera.</span></span>
+                    <span class="auth-linea"><span class="auth-degradado">Rinde más.</span></span>
+                </h1>
+                <p class="auth-tagline">Tu equipo de nutrición, salud y entrenamiento conectado para
+                    <span class="auth-rotador" aria-live="polite"><span id="auth-deporte">fútbol</span></span></p>
                 <div class="auth-mini-badges" aria-label="Áreas clave">
                     <span>🏃 Entrenamiento</span>
                     <span>🥗 Nutrición</span>
@@ -74,7 +99,7 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VS</div>
+                    <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
                     <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Crea tu<br>perfil de<br><span>atleta.</span></h1>
@@ -152,7 +177,7 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VS</div>
+                    <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
                     <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Perfil<br><span>deportivo.</span></h1>
@@ -261,7 +286,7 @@
         <div class="auth-brand">
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
-                    <div class="auth-logo">VS</div>
+                    <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
                     <span class="auth-logo-name">Vital Sports</span>
                 </div>
                 <h1>Listo para<br><span>comenzar.</span></h1>
@@ -302,7 +327,7 @@
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
+            <div class="logo-icon"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
                 <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Admin Panel</span>
@@ -357,7 +382,7 @@
     </div>
     <aside class="sidebar sidebar-nutri">
         <div class="sidebar-header">
-            <div class="logo-icon logo-nutri"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
+            <div class="logo-icon logo-nutri"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
                 <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Nutricionista</span>
@@ -407,7 +432,7 @@
     </div>
     <aside class="sidebar sidebar-medico">
         <div class="sidebar-header">
-            <div class="logo-icon logo-medico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></div>
+            <div class="logo-icon logo-medico"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
                 <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Área médica</span>
@@ -453,7 +478,7 @@
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo-icon"><svg width="22" height="22" viewBox="0 0 72 72"><path d="M36 14 L46 14 L38 34 L48 34 L28 58 L34 38 L24 38 Z" fill="#ECFDF5"/></svg></div>
+            <div class="logo-icon"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
                 <span class="logo-main">Vital Sports</span>
                 <span class="logo-sub">Mi Panel</span>

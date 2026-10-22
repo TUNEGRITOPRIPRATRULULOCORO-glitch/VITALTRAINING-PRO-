@@ -271,7 +271,7 @@ function modalFotoPerfil() {
                     <li>Formato <strong>JPG, PNG o WebP</strong></li>
                     <li>Peso máximo <strong>${FOTO_REGLAS.maxArchivoMB} MB</strong></li>
                     <li>Mínimo <strong>${FOTO_REGLAS.minLado} × ${FOTO_REGLAS.minLado} px</strong></li>
-                    <li>Se recorta cuadrada y se ajusta a ${FOTO_REGLAS.lado} × ${FOTO_REGLAS.lado} px</li>
+                    <li>Después podrás moverla y acercarla para encuadrarla</li>
                 </ul>
                 <p>La verán tu equipo y las personas con las que chateas.</p>
             </div>
@@ -287,29 +287,145 @@ function cargarImagen(archivo) {
     return new Promise((ok, ko) => {
         const url = URL.createObjectURL(archivo);
         const img = new Image();
-        img.onload  = () => { URL.revokeObjectURL(url); ok(img); };
+        img.onload  = () => ok({ img, url });
         img.onerror = () => { URL.revokeObjectURL(url); ko(new Error('imagen ilegible')); };
         img.src = url;
     });
 }
 
-/** Recorta al centro en cuadrado, redimensiona y comprime a JPEG hasta quedar bajo el límite. */
-function recortarFoto(img) {
-    const lado = FOTO_REGLAS.lado;
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = lado;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff'; // fondo blanco para PNG con transparencia
-    ctx.fillRect(0, 0, lado, lado);
-    const s = Math.min(img.naturalWidth, img.naturalHeight);
-    ctx.drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, lado, lado);
+// Editor de recorte: la foto se arrastra dentro del círculo y se acerca con la barra o la rueda
+const RECORTE_VISOR = 280; // px del círculo en pantalla
+let _recorte = null;       // { img, url, escalaMin, zoom, x, y } — x, y: esquina de la foto dentro del visor
+
+function recorteEscala() { return _recorte.escalaMin * _recorte.zoom; }
+
+function recorteLimitar() {
+    const r = _recorte, e = recorteEscala();
+    r.x = Math.min(0, Math.max(RECORTE_VISOR - r.img.naturalWidth * e, r.x));
+    r.y = Math.min(0, Math.max(RECORTE_VISOR - r.img.naturalHeight * e, r.y));
+}
+
+function recortePintar() {
+    const el = document.getElementById('recorte-img');
+    if (el) el.style.transform = `translate(${_recorte.x}px, ${_recorte.y}px) scale(${recorteEscala()})`;
+}
+
+/** Cambia el zoom manteniendo fijo el centro del círculo. */
+function recorteZoom(nuevo) {
+    const r = _recorte;
+    const antes = recorteEscala();
+    const cx = (RECORTE_VISOR / 2 - r.x) / antes, cy = (RECORTE_VISOR / 2 - r.y) / antes;
+    r.zoom = Math.min(4, Math.max(1, Number(nuevo)));
+    const despues = recorteEscala();
+    r.x = RECORTE_VISOR / 2 - cx * despues;
+    r.y = RECORTE_VISOR / 2 - cy * despues;
+    recorteLimitar();
+    recortePintar();
+    const barra = document.getElementById('recorte-zoom');
+    if (barra && Number(barra.value) !== r.zoom) barra.value = r.zoom;
+}
+
+function recorteMover(dx, dy) {
+    _recorte.x += dx;
+    _recorte.y += dy;
+    recorteLimitar();
+    recortePintar();
+}
+
+function abrirRecorte({ img, url }) {
+    const escalaMin = RECORTE_VISOR / Math.min(img.naturalWidth, img.naturalHeight); // la foto siempre cubre el círculo
+    _recorte = { img, url, escalaMin, zoom: 1, x: 0, y: 0 };
+    _recorte.x = (RECORTE_VISOR - img.naturalWidth * escalaMin) / 2;
+    _recorte.y = (RECORTE_VISOR - img.naturalHeight * escalaMin) / 2;
+
+    openModal('Ajusta tu foto', `
+        <p class="recorte-ayuda">Arrastra la foto para colocarla y usa la barra (o la rueda del ratón) para acercar.</p>
+        <div class="recorte-visor" id="recorte-visor" tabindex="0" aria-label="Arrastra la foto o usa las flechas para moverla; + y - para el zoom">
+            <img id="recorte-img" src="${url}" alt="" draggable="false">
+            <div class="recorte-mascara"></div>
+        </div>
+        <div class="recorte-zoom-fila">
+            <span aria-hidden="true">−</span>
+            <input type="range" id="recorte-zoom" class="range-green" min="1" max="4" step="0.01" value="1" oninput="recorteZoom(this.value)" aria-label="Zoom">
+            <span aria-hidden="true">+</span>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-ghost" onclick="cerrarRecorte(); modalFotoPerfil()">Cancelar</button>
+            <button class="btn btn-primary" id="btn-guardar-recorte" onclick="guardarRecorte()">Guardar foto</button>
+        </div>`);
+    recortePintar();
+
+    const visor = document.getElementById('recorte-visor');
+    let arrastre = null;
+    visor.addEventListener('pointerdown', e => {
+        arrastre = { x: e.clientX, y: e.clientY };
+        visor.setPointerCapture(e.pointerId);
+        visor.classList.add('arrastrando');
+    });
+    visor.addEventListener('pointermove', e => {
+        if (!arrastre) return;
+        recorteMover(e.clientX - arrastre.x, e.clientY - arrastre.y);
+        arrastre = { x: e.clientX, y: e.clientY };
+    });
+    const soltar = () => { arrastre = null; visor.classList.remove('arrastrando'); };
+    visor.addEventListener('pointerup', soltar);
+    visor.addEventListener('pointercancel', soltar);
+    visor.addEventListener('wheel', e => {
+        e.preventDefault();
+        recorteZoom(_recorte.zoom - Math.sign(e.deltaY) * 0.1);
+    }, { passive: false });
+    visor.addEventListener('keydown', e => {
+        const paso = 10;
+        const acciones = {
+            ArrowLeft: () => recorteMover(paso, 0), ArrowRight: () => recorteMover(-paso, 0),
+            ArrowUp: () => recorteMover(0, paso),   ArrowDown: () => recorteMover(0, -paso),
+            '+': () => recorteZoom(_recorte.zoom + 0.1), '-': () => recorteZoom(_recorte.zoom - 0.1)
+        };
+        if (acciones[e.key]) { e.preventDefault(); acciones[e.key](); }
+    });
+    visor.focus();
+}
+
+function cerrarRecorte() {
+    if (_recorte) URL.revokeObjectURL(_recorte.url);
+    _recorte = null;
+}
+
+/** Comprime a JPEG bajando la calidad hasta quedar bajo el límite del servidor. */
+function comprimirCanvas(canvas) {
     let dataUrl = '';
-    for (const calidad of [0.85, 0.75, 0.6, 0.45]) {
+    for (const calidad of [0.88, 0.8, 0.7, 0.55, 0.4]) {
         dataUrl = canvas.toDataURL('image/jpeg', calidad);
         const bytes = Math.ceil((dataUrl.length - dataUrl.indexOf(',') - 1) * 3 / 4);
         if (bytes <= FOTO_REGLAS.maxKB * 1024) break;
     }
     return dataUrl;
+}
+
+async function guardarRecorte() {
+    if (!_recorte) return;
+    const r = _recorte, lado = FOTO_REGLAS.lado, factor = lado / RECORTE_VISOR, e = recorteEscala();
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = lado;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; // fondo blanco para PNG con transparencia
+    ctx.fillRect(0, 0, lado, lado);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(r.img, r.x * factor, r.y * factor, r.img.naturalWidth * e * factor, r.img.naturalHeight * e * factor);
+    const foto = comprimirCanvas(canvas);
+
+    const boton = document.getElementById('btn-guardar-recorte');
+    if (boton) { boton.disabled = true; boton.textContent = 'Guardando...'; }
+    const res = await apiFetch(`${API}/cuenta/foto`, { method:'PUT', body:JSON.stringify({ foto }) }).then(x => x.json()).catch(() => null);
+    if (!res?.ok) {
+        if (boton) { boton.disabled = false; boton.textContent = 'Guardar foto'; }
+        return showToast(res?.error || 'No se pudo guardar la foto.', 'error');
+    }
+    cerrarRecorte();
+    _fotoVersion[currentUser.id] = res.version;
+    pintarAvatarPropio();
+    modalFotoPerfil();
+    showToast('Foto de perfil actualizada');
 }
 
 async function fotoElegida(input) {
@@ -319,23 +435,13 @@ async function fotoElegida(input) {
     if (!FOTO_REGLAS.formatos.includes(archivo.type)) return showToast('Formato no permitido. Usa JPG, PNG o WebP.', 'error');
     if (archivo.size > FOTO_REGLAS.maxArchivoMB * 1024 * 1024) return showToast(`La foto pesa más de ${FOTO_REGLAS.maxArchivoMB} MB.`, 'error');
 
-    let img;
-    try { img = await cargarImagen(archivo); } catch { return showToast('No se pudo leer la imagen.', 'error'); }
-    if (Math.min(img.naturalWidth, img.naturalHeight) < FOTO_REGLAS.minLado)
+    let cargada;
+    try { cargada = await cargarImagen(archivo); } catch { return showToast('No se pudo leer la imagen.', 'error'); }
+    if (Math.min(cargada.img.naturalWidth, cargada.img.naturalHeight) < FOTO_REGLAS.minLado) {
+        URL.revokeObjectURL(cargada.url);
         return showToast(`La foto es muy pequeña: mínimo ${FOTO_REGLAS.minLado} × ${FOTO_REGLAS.minLado} px.`, 'error');
-
-    const foto = recortarFoto(img);
-    const preview = document.getElementById('foto-preview');
-    if (preview) preview.innerHTML = `<img class="avatar-foto" src="${foto}" alt="Vista previa">`;
-    const boton = document.getElementById('btn-elegir-foto');
-    if (boton) { boton.disabled = true; boton.textContent = 'Subiendo...'; }
-
-    const res = await apiFetch(`${API}/cuenta/foto`, { method:'PUT', body:JSON.stringify({ foto }) }).then(r => r.json()).catch(() => null);
-    if (boton) { boton.disabled = false; boton.textContent = 'Elegir otra'; }
-    if (!res?.ok) return showToast(res?.error || 'No se pudo guardar la foto.', 'error');
-    _fotoVersion[currentUser.id] = res.version;
-    pintarAvatarPropio();
-    showToast('Foto de perfil actualizada');
+    }
+    abrirRecorte(cargada);
 }
 
 async function quitarFotoPerfil() {
@@ -631,7 +737,7 @@ async function renderUsuarios() {
             <div class="stat-card"><div class="stat-icon green">👥</div><div class="stat-info"><div class="stat-value">${users.length}</div><div class="stat-label">Total usuarios</div></div></div>
             <div class="stat-card"><div class="stat-icon blue">✅</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.estado==='Activo').length}</div><div class="stat-label">Activos</div></div></div>
             <div class="stat-card"><div class="stat-icon red">⏸</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.estado==='Inactivo').length}</div><div class="stat-label">Inactivos</div></div></div>
-            <div class="stat-card"><div class="stat-icon purple">⚽</div><div class="stat-info"><div class="stat-value">${users.filter(u=>u.rol==='Futbolista').length}</div><div class="stat-label">Atletas</div></div></div>
+            <div class="stat-card"><div class="stat-icon purple">🏅</div><div class="stat-info"><div class="stat-value">${users.filter(u=>['Atleta','Futbolista'].includes(u.rol)).length}</div><div class="stat-label">Atletas</div></div></div>
         </div>
         <div class="card">
             <div class="card-header">
@@ -738,7 +844,7 @@ async function renderReportes() {
         </div>
         <div class="card"><div class="card-header"><h2>Estado general</h2></div><div style="padding:24px">
             <div class="stats-grid" style="margin-bottom:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
-                <div class="stat-card"><div class="stat-icon green">⚽</div><div class="stat-info"><div class="stat-value">${stats.porRol.Futbolista}</div><div class="stat-label">Atletas</div></div></div>
+                <div class="stat-card"><div class="stat-icon green">🏅</div><div class="stat-info"><div class="stat-value">${stats.porRol.Futbolista}</div><div class="stat-label">Atletas</div></div></div>
                 <div class="stat-card"><div class="stat-icon purple">🥗</div><div class="stat-info"><div class="stat-value">${stats.porRol.Nutricionista}</div><div class="stat-label">Nutricionistas</div></div></div>
                 <div class="stat-card"><div class="stat-icon blue">🩺</div><div class="stat-info"><div class="stat-value">${stats.porRol.Medico||0}</div><div class="stat-label">Médicos</div></div></div>
                 <div class="stat-card"><div class="stat-icon yellow">🛡</div><div class="stat-info"><div class="stat-value">${stats.porRol.Administrador}</div><div class="stat-label">Administradores</div></div></div>
@@ -895,7 +1001,7 @@ async function ntRenderDashboard() {
             </div>
         </div>
         <div class="stats-grid" style="margin-bottom:24px">
-            <div class="stat-card"><div class="stat-icon purple">⚽</div><div class="stat-info"><div class="stat-value">${futbolistas.length}</div><div class="stat-label">Atletas activos</div></div></div>
+            <div class="stat-card"><div class="stat-icon purple">🏅</div><div class="stat-info"><div class="stat-value">${futbolistas.length}</div><div class="stat-label">Atletas activos</div></div></div>
             <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><div class="stat-value">${conSalud}</div><div class="stat-label">Con datos de salud</div></div></div>
             <div class="stat-card"><div class="stat-icon red">🔥</div><div class="stat-info"><div class="stat-value">${fatigaAlta}</div><div class="stat-label">Fatiga alta (≥8)</div></div></div>
             <div class="stat-card"><div class="stat-icon yellow">⚠️</div><div class="stat-info"><div class="stat-value">${sinDatos}</div><div class="stat-label">Sin registro</div></div></div>
@@ -919,7 +1025,7 @@ async function ntRenderDashboard() {
                         <div class="mini-item-icon" style="background:linear-gradient(135deg,${c1},${c2});color:white;font-weight:700;font-size:11px">${avatarContenido(f.id,f.nombre)}</div>
                         <div class="mini-item-body">
                             <div class="mini-item-title">${escapeHtml(f.nombre)}</div>
-                            <div class="mini-item-sub">${escapeHtml(f.perfil?.posicion||'Sin posición')} · ${f.totalComidas} comidas · ${f.totalRutinas} rutinas</div>
+                            <div class="mini-item-sub">${ntResumenFicha(f.ficha)} · ${f.totalComidas} comidas · ${f.totalRutinas} rutinas</div>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px">
                             <div style="color:${color};font-weight:700;font-family:var(--mono)">${s?s.fatiga+'/10':'—'}</div>
@@ -2514,9 +2620,11 @@ async function pfRenderPlanRutina() {
         const ejercHTML=esDescanso
             ?`<span style="color:var(--text-muted);font-size:13px">Descanso activo · estiramientos suaves</span>`
             :dia.ejercicios.map(e=>{
-                const det=e.series
-                    ? (e.repeticiones ? `${e.series}×${e.repeticiones} reps` : `${e.series}×${e.tiempo||''}`)
-                    : (e.tiempo||e.impacto||'');
+                const det=!e.series ? (e.tiempo||'')
+                    : e.repeticiones===1 ? `${e.series} series`
+                    : e.repeticiones ? `${e.series}×${e.repeticiones} reps`
+                    : e.series===1 ? (e.tiempo||'')
+                    : `${e.series}×${e.tiempo||''}`;
                 const nombreEsc=e.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;');
                 return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${e.nombre}</span><span class="plan-ejercicio-series">${det}</span></div><button class="btn-video" onclick="verVideoEjercicio('${nombreEsc}')">▶ Ver video</button></div>`;
             }).join('');
@@ -3084,6 +3192,80 @@ async function pfVerIncidencia(id) {
         <div class="comments-section"><h4>Respuestas del equipo (${i.comentarios.length})</h4><div id="comments-list">${comentariosHTML}</div></div>
     `);
 }
+
+// ────────────────────────────────────────────────
+// PORTADA ANIMADA (login y registro)
+// ────────────────────────────────────────────────
+const MENOS_MOVIMIENTO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function portadaVisible() {
+    const el = document.getElementById('auth-screen');
+    return el && !el.classList.contains('hidden') && !document.hidden;
+}
+
+// Palabra que va cambiando en el subtítulo
+(function rotarDeporte() {
+    const deportes = ['fútbol', 'baloncesto', 'tenis', 'tu equipo'];
+    let i = 0;
+    setInterval(() => {
+        const el = document.getElementById('auth-deporte');
+        if (!el || !portadaVisible() || MENOS_MOVIMIENTO) return;
+        i = (i + 1) % deportes.length;
+        const nuevo = el.cloneNode(); // se reemplaza el nodo para que la animación de entrada se repita
+        nuevo.textContent = deportes[i];
+        el.replaceWith(nuevo);
+    }, 2200);
+})();
+
+// La tarjeta se inclina levemente siguiendo el ratón
+document.addEventListener('pointermove', e => {
+    if (MENOS_MOVIMIENTO || !portadaVisible() || e.pointerType !== 'mouse') return;
+    const x = e.clientX / window.innerWidth - 0.5, y = e.clientY / window.innerHeight - 0.5;
+    document.querySelectorAll('#auth-screen .auth-container').forEach(c => {
+        c.style.setProperty('--inclina-y', `${(x * 6).toFixed(2)}deg`);
+        c.style.setProperty('--inclina-x', `${(-y * 6).toFixed(2)}deg`);
+    });
+});
+
+// Chispas de luz que suben desde la cuadrícula
+(function chispas() {
+    const canvas = document.getElementById('auth-chispas');
+    if (!canvas || MENOS_MOVIMIENTO) return;
+    const ctx = canvas.getContext('2d');
+    let ancho = 0, alto = 0, particulas = [];
+    const nueva = () => ({
+        x: Math.random() * ancho, y: alto + Math.random() * alto * 0.3,
+        r: Math.random() * 1.8 + 0.4, v: Math.random() * 0.6 + 0.25,
+        deriva: (Math.random() - 0.5) * 0.3, tono: Math.random() < 0.7 ? '74,222,128' : '34,211,238'
+    });
+    function medir() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        ancho = canvas.clientWidth; alto = canvas.clientHeight;
+        canvas.width = ancho * dpr; canvas.height = alto * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const cantidad = Math.round(Math.min(90, ancho / 16));
+        particulas = Array.from({ length: cantidad }, () => ({ ...nueva(), y: Math.random() * alto }));
+    }
+    function cuadro() {
+        requestAnimationFrame(cuadro);
+        if (!portadaVisible()) return; // no gasta batería con la app abierta
+        if (canvas.clientWidth !== ancho || canvas.clientHeight !== alto) medir();
+        ctx.clearRect(0, 0, ancho, alto);
+        for (const p of particulas) {
+            p.y -= p.v; p.x += p.deriva;
+            if (p.y < -10) Object.assign(p, nueva());
+            const brillo = Math.min(1, p.y / alto + 0.15);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${p.tono},${(0.85 * brillo).toFixed(2)})`;
+            ctx.shadowColor = `rgba(${p.tono},0.9)`;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+        }
+    }
+    medir();
+    cuadro();
+})();
 
 // ────────────────────────────────────────────────
 // INIT
