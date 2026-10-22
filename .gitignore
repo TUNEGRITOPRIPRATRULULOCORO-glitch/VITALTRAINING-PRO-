@@ -4,6 +4,10 @@ node_modules/
 # Variables de entorno (NUNCA subir al repo)
 .env
 
+# Datos locales de la aplicación
+database.json
+.database.local.json
+
 # Cobertura de tests
 coverage/
 
