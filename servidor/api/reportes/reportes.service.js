@@ -1,78 +1,94 @@
 const { query } = require('../../../base-de-datos/db');
+const { hoyISO, aFechaISO, ultimosDias } = require('../../compartido/fechas');
+
+// Consultas simples y conteo en JavaScript: así funciona igual en PostgreSQL y en
+// pg-mem (la base en memoria de desarrollo), que no soporta FILTER, LATERAL ni generate_series.
+
+const ES_ATLETA = rol => rol === 'Atleta' || rol === 'Futbolista';
+const ES_MEDICO = rol => rol === 'Medico' || rol === 'Médico';
+const DIAS_ACTIVIDAD = 7;
+
+function sumar(filas, condicion) {
+  return filas.filter(condicion).reduce((total, f) => total + Number(f.total), 0);
+}
+
+function contarPorDia(filas, dias) {
+  const cuenta = Object.fromEntries(dias.map(d => [d, 0]));
+  for (const f of filas) {
+    const dia = aFechaISO(f.fecha);
+    if (dia in cuenta) cuenta[dia] += Number(f.total);
+  }
+  return cuenta;
+}
+
+/** Última fatiga registrada de cada atleta activo (solo los que tienen algún registro). */
+async function fatigaActual(atletas) {
+  if (!atletas.length) return [];
+  const ids = atletas.map(a => a.id);
+  const { rows } = await query(
+    `SELECT user_id, fatiga FROM salud
+     WHERE user_id IN (${ids.map((_, i) => `$${i + 1}`).join(', ')})
+     ORDER BY created_at DESC, id DESC`,
+    ids
+  );
+  const ultima = {};
+  for (const r of rows) if (!(r.user_id in ultima)) ultima[r.user_id] = r.fatiga;
+  return atletas
+    .filter(a => a.id in ultima)
+    .map(a => ({ nombre: a.nombre.split(' ')[0], fatiga: ultima[a.id] }));
+}
 
 async function obtenerReporte() {
-  const [usuariosR, incidenciasR, totalComidasR, totalRutinasR, totalSaludR] = await Promise.all([
-    query(`SELECT
-             COUNT(*) AS total,
-             COUNT(*) FILTER (WHERE estado='Activo')        AS activos,
-             COUNT(*) FILTER (WHERE estado='Inactivo')      AS inactivos,
-             COUNT(*) FILTER (WHERE rol='Atleta' OR rol='Futbolista') AS futbolistas,
-             COUNT(*) FILTER (WHERE rol='Nutricionista')    AS nutricionistas,
-             COUNT(*) FILTER (WHERE rol='Administrador')    AS administradores
-           FROM usuarios`),
-    query(`SELECT
-             COUNT(*) AS total,
-             COUNT(*) FILTER (WHERE estado='abierta')      AS abiertas,
-             COUNT(*) FILTER (WHERE estado='en progreso')  AS en_progreso,
-             COUNT(*) FILTER (WHERE estado='resuelta')     AS resueltas,
-             COUNT(*) FILTER (WHERE prioridad='critica')   AS criticas
-           FROM incidencias`),
+  const dias = ultimosDias(hoyISO(), DIAS_ACTIVIDAD);
+  const desde = dias[0];
+
+  const [usuariosR, incidenciasR, totalComidasR, totalRutinasR, totalSaludR, atletasR, comidasDiaR, rutinasDiaR, saludDiaR] = await Promise.all([
+    query('SELECT rol, estado, COUNT(*) AS total FROM usuarios GROUP BY rol, estado'),
+    query('SELECT estado, prioridad, COUNT(*) AS total FROM incidencias GROUP BY estado, prioridad'),
     query('SELECT COUNT(*) AS total FROM comidas'),
     query('SELECT COUNT(*) AS total FROM rutinas'),
-    query('SELECT COUNT(*) AS total FROM salud')
+    query('SELECT COUNT(*) AS total FROM salud'),
+    query("SELECT id, nombre FROM usuarios WHERE rol IN ('Atleta', 'Futbolista') AND estado = 'Activo'"),
+    query('SELECT fecha, COUNT(*) AS total FROM comidas WHERE fecha >= $1 GROUP BY fecha', [desde]),
+    query('SELECT fecha, COUNT(*) AS total FROM rutinas WHERE fecha >= $1 GROUP BY fecha', [desde]),
+    query('SELECT fecha, COUNT(*) AS total FROM salud   WHERE fecha >= $1 GROUP BY fecha', [desde])
   ]);
 
-  const fatigaR = await query(`
-    SELECT SPLIT_PART(u.nombre, ' ', 1) AS nombre, s.fatiga
-    FROM usuarios u
-    CROSS JOIN LATERAL (
-      SELECT fatiga FROM salud WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1
-    ) s
-    WHERE (u.rol = 'Atleta' OR u.rol = 'Futbolista') AND u.estado = 'Activo'`);
+  const u = usuariosR.rows;
+  const inc = incidenciasR.rows;
+  const porEstado = estado => sumar(inc, i => i.estado === estado);
 
-  const actividadR = await query(`
-    SELECT
-      d.dia,
-      COALESCE(c.cnt, 0) AS comidas,
-      COALESCE(r.cnt, 0) AS rutinas,
-      COALESCE(s.cnt, 0) AS salud
-    FROM (
-      SELECT generate_series(CURRENT_DATE - 6, CURRENT_DATE, '1 day'::interval)::date::text AS dia
-    ) d
-    LEFT JOIN (SELECT fecha::text, COUNT(*)::int AS cnt FROM comidas WHERE fecha >= CURRENT_DATE - 6 GROUP BY fecha) c ON c.fecha = d.dia
-    LEFT JOIN (SELECT fecha::text, COUNT(*)::int AS cnt FROM rutinas WHERE fecha >= CURRENT_DATE - 6 GROUP BY fecha) r ON r.fecha = d.dia
-    LEFT JOIN (SELECT fecha::text, COUNT(*)::int AS cnt FROM salud  WHERE fecha >= CURRENT_DATE - 6 GROUP BY fecha) s ON s.fecha = d.dia
-    ORDER BY d.dia`);
-
-  const u = usuariosR.rows[0];
-  const i = incidenciasR.rows[0];
+  const comidasDia = contarPorDia(comidasDiaR.rows, dias);
+  const rutinasDia = contarPorDia(rutinasDiaR.rows, dias);
+  const saludDia   = contarPorDia(saludDiaR.rows, dias);
 
   return {
-    totalUsuarios: parseInt(u.total),
-    activos:       parseInt(u.activos),
-    inactivos:     parseInt(u.inactivos),
+    totalUsuarios: sumar(u, () => true),
+    activos:       sumar(u, r => r.estado === 'Activo'),
+    inactivos:     sumar(u, r => r.estado === 'Inactivo'),
     porRol: {
-      Futbolista:    parseInt(u.futbolistas),
-      Nutricionista: parseInt(u.nutricionistas),
-      Administrador: parseInt(u.administradores)
+      Futbolista:    sumar(u, r => ES_ATLETA(r.rol)),
+      Nutricionista: sumar(u, r => r.rol === 'Nutricionista'),
+      Medico:        sumar(u, r => ES_MEDICO(r.rol)),
+      Administrador: sumar(u, r => r.rol === 'Administrador')
     },
-    totalIncidencias:    parseInt(i.total),
-    incidenciasAbiertas: parseInt(i.abiertas),
-    incidenciasCriticas: parseInt(i.criticas),
+    totalIncidencias:    sumar(inc, () => true),
+    incidenciasAbiertas: porEstado('abierta'),
+    incidenciasCriticas: sumar(inc, i => i.prioridad === 'critica'),
     incidenciasPorEstado: {
-      abierta:       parseInt(i.abiertas),
-      'en progreso': parseInt(i.en_progreso),
-      resuelta:      parseInt(i.resueltas)
+      abierta:       porEstado('abierta'),
+      'en progreso': porEstado('en progreso'),
+      resuelta:      porEstado('resuelta')
     },
-    totalComidas: parseInt(totalComidasR.rows[0].total),
-    totalRutinas: parseInt(totalRutinasR.rows[0].total),
-    totalSalud:   parseInt(totalSaludR.rows[0].total),
-    fatigaPorAtleta: fatigaR.rows,
-    actividadPorDia: actividadR.rows.map(r => ({
-      dia:     r.dia.slice(5),
-      comidas: r.comidas,
-      rutinas: r.rutinas,
-      salud:   r.salud
+    totalComidas: Number(totalComidasR.rows[0].total),
+    totalRutinas: Number(totalRutinasR.rows[0].total),
+    totalSalud:   Number(totalSaludR.rows[0].total),
+    fatigaPorAtleta: await fatigaActual(atletasR.rows),
+    actividadPorDia: dias.map(dia => ({
+      dia:     dia.slice(5),
+      comidas: comidasDia[dia],
+      rutinas: rutinasDia[dia],
+      salud:   saludDia[dia]
     }))
   };
 }

@@ -15,22 +15,7 @@ const MIN_DIAS_CARGA = 14; // con menos historial, la comparación aguda/crónic
 
 // ─── Fechas ───────────────────────────────────────────────────────────────────
 
-function aFechaISO(valor) {
-  if (!valor) return null;
-  if (typeof valor === 'string') return valor.slice(0, 10);
-  const d = new Date(valor);
-  if (Number.isNaN(d.getTime())) return null;
-  // pg-mem devuelve medianoche UTC; node-pg devuelve medianoche en la hora local del servidor
-  if (d.getUTCHours() === 0 && d.getUTCMinutes() === 0) return d.toISOString().slice(0, 10);
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-function sumarDias(fechaISO, dias) {
-  const d = new Date(`${fechaISO}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + dias);
-  return d.toISOString().slice(0, 10);
-}
+const { aFechaISO, sumarDias, ultimosDias } = require('../../compartido/fechas');
 
 function nombreDia(fechaISO) {
   return DIAS[new Date(`${fechaISO}T00:00:00Z`).getUTCDay()];
@@ -38,11 +23,6 @@ function nombreDia(fechaISO) {
 
 function diasEntre(desdeISO, hastaISO) {
   return Math.round((new Date(`${hastaISO}T00:00:00Z`) - new Date(`${desdeISO}T00:00:00Z`)) / 86400000);
-}
-
-// Últimos `n` días terminando en `hoy`, del más antiguo al más reciente
-function ultimosDias(hoy, n) {
-  return Array.from({ length: n }, (_, i) => sumarDias(hoy, i - n + 1));
 }
 
 // ─── Carga de entrenamiento ───────────────────────────────────────────────────

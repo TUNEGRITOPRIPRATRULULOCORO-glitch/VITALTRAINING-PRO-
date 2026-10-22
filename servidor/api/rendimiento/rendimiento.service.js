@@ -1,12 +1,9 @@
 const { query } = require('../../../base-de-datos/db');
 const calc = require('./rendimiento.calculos');
+const { hoyISO } = require('../../compartido/fechas');
 
 // La racha puede ir más atrás que la ventana de 28 días
 const DIAS_HISTORIAL_SALUD = 90;
-
-function hoyISO() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 /** Lee en 4 consultas los datos de todos los usuarios pedidos y los agrupa por usuario. */
 async function leerDatos(userIds, hoy) {

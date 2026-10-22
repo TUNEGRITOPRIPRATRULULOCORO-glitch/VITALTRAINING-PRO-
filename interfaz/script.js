@@ -391,7 +391,7 @@ async function renderDashboardAdmin() {
                 ${inc.slice(0,4).map(i=>`<div class="mini-item" onclick="renderView('soporte')"><div class="mini-item-body"><div class="mini-item-title">${i.titulo}</div><div class="mini-item-sub">${i.usuario} · ${i.fecha}</div></div><div class="mini-item-right">${prioridadBadge(i.prioridad)}</div></div>`).join('')||'<p style="color:var(--text-muted);font-size:13px;padding:4px 0">Sin incidencias</p>'}
             </div></div>
             <div class="card"><div class="card-header"><h2>Estado del sistema</h2></div><div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-                ${[['Atletas',stats.porRol.Futbolista,'#0ea5e9'],['Nutricionistas',stats.porRol.Nutricionista,'#8b5cf6'],['Admins',stats.porRol.Administrador,'#f59e0b']].map(([l,v,c])=>`
+                ${[['Atletas',stats.porRol.Futbolista,'#0ea5e9'],['Nutricionistas',stats.porRol.Nutricionista,'#8b5cf6'],['Médicos',stats.porRol.Medico||0,'#075985'],['Admins',stats.porRol.Administrador,'#f59e0b']].map(([l,v,c])=>`
                 <div class="meter-wrap"><span class="meter-label">${l}</span><div class="meter-bar"><div class="meter-fill" style="width:${stats.totalUsuarios?Math.round(v/stats.totalUsuarios*100):0}%;background:${c}"></div></div><span class="meter-val">${v}</span></div>`).join('')}
                 <div class="insight-box" style="margin-top:8px"><strong>📊 Plataforma</strong>${stats.activos} activos · ${stats.totalSalud} registros de salud · ${stats.incidenciasAbiertas} tickets pendientes</div>
             </div></div>
@@ -411,7 +411,7 @@ async function renderDashboardAdmin() {
     // Chart roles
     chartInstances['rd'] = new Chart(document.getElementById('chart-roles-dash').getContext('2d'),{
         type:'doughnut',
-        data:{labels:['Atletas','Nutricionistas','Admins'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},
+        data:{labels:['Atletas','Nutricionistas','Médicos','Admins'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Medico||0,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#075985','#f59e0b'],borderWidth:0,hoverOffset:6}]},
         options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}
     });
     // Chart fatiga
@@ -560,10 +560,11 @@ async function renderReportes() {
             <div class="card"><div class="card-header"><h2>Incidencias por estado</h2></div><div style="padding:20px"><div class="chart-wrap"><canvas id="chart-incidencias"></canvas></div></div></div>
         </div>
         <div class="card"><div class="card-header"><h2>Estado general</h2></div><div style="padding:24px">
-            <div class="stats-grid" style="margin-bottom:0">
+            <div class="stats-grid" style="margin-bottom:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
                 <div class="stat-card"><div class="stat-icon green">⚽</div><div class="stat-info"><div class="stat-value">${stats.porRol.Futbolista}</div><div class="stat-label">Atletas</div></div></div>
                 <div class="stat-card"><div class="stat-icon purple">🥗</div><div class="stat-info"><div class="stat-value">${stats.porRol.Nutricionista}</div><div class="stat-label">Nutricionistas</div></div></div>
-                <div class="stat-card"><div class="stat-icon blue">🛡</div><div class="stat-info"><div class="stat-value">${stats.porRol.Administrador}</div><div class="stat-label">Administradores</div></div></div>
+                <div class="stat-card"><div class="stat-icon blue">🩺</div><div class="stat-info"><div class="stat-value">${stats.porRol.Medico||0}</div><div class="stat-label">Médicos</div></div></div>
+                <div class="stat-card"><div class="stat-icon yellow">🛡</div><div class="stat-info"><div class="stat-value">${stats.porRol.Administrador}</div><div class="stat-label">Administradores</div></div></div>
                 <div class="stat-card"><div class="stat-icon green">✔</div><div class="stat-info"><div class="stat-value">${stats.incidenciasPorEstado.resuelta||0}</div><div class="stat-label">Resueltas</div></div></div>
             </div>
             <div class="insight-box"><strong>📊 Insight</strong>
@@ -572,7 +573,7 @@ async function renderReportes() {
             </div>
         </div></div>
     </div>`;
-    chartInstances['roles']=new Chart(document.getElementById('chart-roles').getContext('2d'),{type:'doughnut',data:{labels:['Atleta','Nutricionista','Administrador'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#f59e0b'],borderWidth:0,hoverOffset:6}]},options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}});
+    chartInstances['roles']=new Chart(document.getElementById('chart-roles').getContext('2d'),{type:'doughnut',data:{labels:['Atleta','Nutricionista','Médico','Administrador'],datasets:[{data:[stats.porRol.Futbolista,stats.porRol.Nutricionista,stats.porRol.Medico||0,stats.porRol.Administrador],backgroundColor:['#0ea5e9','#8b5cf6','#075985','#f59e0b'],borderWidth:0,hoverOffset:6}]},options:{cutout:'65%',plugins:{legend:{position:'bottom',labels:{padding:16,font:{family:'Outfit',size:13}}}},maintainAspectRatio:false}});
     const iEst=stats.incidenciasPorEstado;
     chartInstances['inc']=new Chart(document.getElementById('chart-incidencias').getContext('2d'),{type:'bar',data:{labels:['Abierta','En progreso','Resuelta'],datasets:[{label:'Incidencias',data:[iEst.abierta||0,iEst['en progreso']||0,iEst.resuelta||0],backgroundColor:['#fca5a5','#fcd34d','#86efac'],borderRadius:8,borderSkipped:false}]},options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{family:'Outfit'}}},y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Outfit'}},grid:{color:'#f1f5f9'}}},maintainAspectRatio:false}});
 }
