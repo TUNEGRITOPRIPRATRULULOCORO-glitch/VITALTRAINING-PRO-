@@ -4745,3 +4745,24 @@ body.dark .estado-resuelta    { background-color: rgba(34,197,94,0.15); color: #
 /* Moderación de fotos */
 .foto-moderar { width: 220px; height: 220px; margin: 0 auto 16px; border-radius: 16px; position: relative; overflow: hidden;
     display: grid; place-items: center; font-size: 48px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #16a34a, #0ea5e9); }
+
+/* Etiquetas de los tickets: mismo tamaño, punto de color en la prioridad y texto claro */
+.inc-meta { flex-wrap: wrap; gap: 8px; }
+.inc-meta .badge { font-size: 12px; padding: 5px 12px; line-height: 1.2; }
+.inc-meta .badge-cat::before, .inc-meta .badge-dest-soporte::before,
+.inc-meta .badge-dest-nutri::before, .inc-meta .badge-autor::before { display: none; }
+.badge-critica::before { background: #db2777; }
+.badge-alta::before    { background: #ef4444; }
+.badge-media::before   { background: #f59e0b; }
+.badge-baja::before    { background: #22c55e; }
+.badge-autor { background: transparent; color: var(--text-muted); border: 1px dashed var(--border); font-weight: 600; }
+body.dark .badge-autor { color: #cbd5e1; border-color: rgba(148,163,184,0.35); }
+body.dark .badge-critica { background: rgba(219,39,119,0.18); color: #f9a8d4; }
+body.dark .incidencia-card.inc-abierta     { border-left: 3px solid #ef4444; }
+body.dark .incidencia-card.inc-en-progreso { border-left: 3px solid #f59e0b; }
+body.dark .incidencia-card.inc-resuelta    { border-left: 3px solid #22c55e; }
+body.dark .filters-bar select {
+    padding-right: 32px; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; background-size: 14px;
+}

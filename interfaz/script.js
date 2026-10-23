@@ -1092,7 +1092,7 @@ function renderListaIncidencias(lista) {
         return `
         <div class="incidencia-card inc-${i.estado.replace(' ','-')}" onclick="verIncidencia(${i.id})">
             <div><div class="inc-titulo">${escapeHtml(i.titulo)}</div>
-                <div class="inc-meta">${prioridadBadge(i.prioridad)}${destBadge}<span class="badge badge-cat">${escapeHtml(i.categoria)}</span><span class="inc-usuario">👤 ${escapeHtml(i.usuario)}</span></div>
+                <div class="inc-meta"><span class="badge badge-${i.prioridad}">Prioridad ${INC_PRIORIDAD[i.prioridad]||i.prioridad}</span>${destBadge}<span class="badge badge-cat">🏷 ${escapeHtml(i.categoria)}</span><span class="badge badge-autor">👤 ${escapeHtml(i.usuario)}</span></div>
                 ${i.comentarios?.length?`<div class="inc-resumen">💬 ${i.comentarios.length} ${i.comentarios.length===1?'respuesta':'respuestas'}</div>`:'<div class="inc-resumen">Sin respuesta todavía · pulsa para responder</div>'}
             </div>
             <div class="inc-actions"><span class="inc-fecha">${i.fecha}</span>
@@ -1108,6 +1108,7 @@ async function filtrarIncidencias() {
     document.getElementById('lista-incidencias').innerHTML=renderListaIncidencias(data);
 }
 
+const INC_PRIORIDAD = { critica:'crítica', alta:'alta', media:'media', baja:'baja' };
 const INC_ESTADOS = { abierta:'🔴 Abierta', 'en progreso':'🟡 En progreso', resuelta:'🟢 Resuelta' };
 
 // Desplegable de estado con flecha y color según el estado
