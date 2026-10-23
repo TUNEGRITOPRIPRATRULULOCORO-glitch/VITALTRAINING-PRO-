@@ -63,11 +63,24 @@ async function crear(datos) {
   return rows[0];
 }
 
+const ROLES = ['Atleta', 'Futbolista', 'Nutricionista', 'Medico', 'Médico', 'Administrador'];
+const ESTADOS = ['Activo', 'Inactivo'];
+const errorDe = (mensaje, status = 400) => Object.assign(new Error(mensaje), { status });
+
 async function actualizar(id, datos) {
   const { password, ...cambios } = datos;
   const permitidos = ['nombre', 'email', 'rol', 'estado'];
   const campos = Object.keys(cambios).filter(k => permitidos.includes(k));
   if (!campos.length) return null;
+
+  if ('nombre' in cambios && !String(cambios.nombre || '').trim()) throw errorDe('El nombre es requerido.');
+  if ('email' in cambios && !EMAIL_RE.test(String(cambios.email || ''))) throw errorDe('El correo electrónico no tiene un formato válido.');
+  if ('rol' in cambios && !ROLES.includes(cambios.rol)) throw errorDe('Rol no válido.');
+  if ('estado' in cambios && !ESTADOS.includes(cambios.estado)) throw errorDe('Estado no válido.');
+  if ('email' in cambios) {
+    const { rows: otro } = await query('SELECT id FROM usuarios WHERE LOWER(email) = LOWER($1) AND id <> $2', [cambios.email, id]);
+    if (otro.length) throw errorDe('Ya existe otra cuenta con ese correo.', 409);
+  }
 
   const sets = campos.map((k, i) => `${k} = $${i + 2}`).join(', ');
   const { rows } = await query(

@@ -1,5 +1,8 @@
 const svc = require('./usuarios.service');
 const fotos = require('./fotos.service');
+const { olvidarCuenta } = require('../../compartido/middleware/auth');
+
+const esUnoMismo = req => Number(req.params.id) === Number(req.user?.id);
 
 async function getUsuarios(req, res) {
   try {
@@ -21,18 +24,24 @@ async function postUsuario(req, res) {
 
 async function putUsuario(req, res) {
   try {
+    // El administrador no puede dejarse fuera a sí mismo
+    if (esUnoMismo(req) && ((req.body.rol && req.body.rol !== 'Administrador') || req.body.estado === 'Inactivo'))
+      return res.status(400).json({ error: 'No puedes quitarte tu propio rol de administrador ni desactivar tu cuenta.' });
     const usuario = await svc.actualizar(req.params.id, req.body);
     if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado.' });
+    olvidarCuenta(req.params.id); // el nuevo rol o estado vale desde su próxima petición
     res.json(usuario);
   } catch (err) {
-    res.status(500).json({ error: 'Error actualizando usuario.' });
+    res.status(err.status || 500).json({ error: err.status ? err.message : 'Error actualizando usuario.' });
   }
 }
 
 async function deleteUsuario(req, res) {
   try {
+    if (esUnoMismo(req)) return res.status(400).json({ error: 'No puedes eliminar tu propia cuenta.' });
     const resultado = await svc.eliminar(req.params.id);
     if (!resultado) return res.status(404).json({ error: 'Usuario no encontrado.' });
+    olvidarCuenta(req.params.id);
     res.json({ mensaje: 'Eliminado correctamente.' });
   } catch (err) {
     res.status(500).json({ error: 'Error eliminando usuario.' });

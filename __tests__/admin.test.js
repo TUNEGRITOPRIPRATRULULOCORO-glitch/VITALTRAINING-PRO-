@@ -66,3 +66,24 @@ describe('moderación de fotos', () => {
     expect(res.statusCode).toBe(404);
   });
 });
+
+describe('el administrador no puede dejarse fuera', () => {
+  const pedir = (fn, params, body = {}) => { const res = respuesta(); return fn({ params, body, user: { id: ids.admin, rol: 'Administrador' } }, res).then(() => res); };
+
+  test('no puede quitarse el rol, desactivarse ni eliminarse', async () => {
+    const id = String(ids.admin);
+    expect((await pedir(ctrl.putUsuario, { id }, { rol: 'Atleta' })).statusCode).toBe(400);
+    expect((await pedir(ctrl.putUsuario, { id }, { estado: 'Inactivo' })).statusCode).toBe(400);
+    expect((await pedir(ctrl.deleteUsuario, { id })).statusCode).toBe(400);
+    const { rows } = await query('SELECT rol, estado FROM usuarios WHERE id = $1', [ids.admin]);
+    expect(rows[0]).toEqual({ rol: 'Administrador', estado: 'Activo' });
+  });
+
+  test('valida el rol, el estado y que el correo no esté repetido', async () => {
+    const id = String(ids.diego);
+    expect((await pedir(ctrl.putUsuario, { id }, { rol: 'Hacker' })).statusCode).toBe(400);
+    expect((await pedir(ctrl.putUsuario, { id }, { estado: 'Borrado' })).statusCode).toBe(400);
+    expect((await pedir(ctrl.putUsuario, { id }, { email: 'carlos@vital.com' })).statusCode).toBe(409);
+    expect((await pedir(ctrl.putUsuario, { id }, { nombre: 'Diego T.' })).cuerpo).toMatchObject({ nombre: 'Diego T.' });
+  });
+});

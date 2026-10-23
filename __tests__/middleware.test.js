@@ -1,5 +1,7 @@
 jest.mock('jsonwebtoken');
+jest.mock('../base-de-datos/db');
 const jwt = require('jsonwebtoken');
+const { query } = require('../base-de-datos/db');
 const authMiddleware = require('../servidor/compartido/middleware/auth');
 const { requireRol, requireOwnerOrRol } = require('../servidor/compartido/middleware/roles');
 
@@ -13,18 +15,63 @@ function makeRes() {
 beforeEach(() => jest.clearAllMocks());
 
 describe('authMiddleware', () => {
-  test('llama next() con token válido', () => {
+  test('llama next() con token válido y cuenta activa', async () => {
     const payload = { id: 1, rol: 'Futbolista' };
     jwt.verify.mockReturnValue(payload);
+    query.mockResolvedValueOnce({ rows: [{ rol: 'Futbolista', estado: 'Activo' }] });
     const req  = { path: '/panel/1', headers: { authorization: 'Bearer token-valido' } };
     const res  = makeRes();
     const next = jest.fn();
 
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
 
     expect(next).toHaveBeenCalledTimes(1);
     expect(req.user).toEqual(payload);
     expect(res.status).not.toHaveBeenCalled();
+  });
+
+  test('una cuenta desactivada no entra aunque su token siga vigente', async () => {
+    jwt.verify.mockReturnValue({ id: 2, rol: 'Atleta' });
+    query.mockResolvedValueOnce({ rows: [{ rol: 'Atleta', estado: 'Inactivo' }] });
+    const res = makeRes(), next = jest.fn();
+
+    await authMiddleware({ headers: { authorization: 'Bearer t' } }, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test('el rol se toma de la base: quitar el rol de admin surte efecto sin esperar a que caduque el token', async () => {
+    jwt.verify.mockReturnValue({ id: 3, rol: 'Administrador' });
+    query.mockResolvedValueOnce({ rows: [{ rol: 'Atleta', estado: 'Activo' }] });
+    const req = { headers: { authorization: 'Bearer t' } }, next = jest.fn();
+
+    await authMiddleware(req, makeRes(), next);
+
+    expect(req.user.rol).toBe('Atleta');
+    expect(next).toHaveBeenCalled();
+  });
+
+  test('recuerda la cuenta unos segundos y la olvida cuando el admin la cambia', async () => {
+    jwt.verify.mockReturnValue({ id: 4, rol: 'Atleta' });
+    query.mockResolvedValue({ rows: [{ rol: 'Atleta', estado: 'Activo' }] });
+    const pedir = () => authMiddleware({ headers: { authorization: 'Bearer t' } }, makeRes(), jest.fn());
+
+    await pedir(); await pedir();
+    expect(query).toHaveBeenCalledTimes(1);
+    authMiddleware.olvidarCuenta(4);
+    await pedir();
+    expect(query).toHaveBeenCalledTimes(2);
+  });
+
+  test('una cuenta eliminada no entra', async () => {
+    jwt.verify.mockReturnValue({ id: 99, rol: 'Atleta' });
+    query.mockResolvedValueOnce({ rows: [] });
+    const res = makeRes();
+
+    await authMiddleware({ headers: { authorization: 'Bearer t' } }, res, jest.fn());
+
+    expect(res.status).toHaveBeenCalledWith(401);
   });
 
   test('retorna 401 si no hay header de autorización', () => {

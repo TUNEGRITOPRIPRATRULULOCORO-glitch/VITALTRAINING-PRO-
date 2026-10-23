@@ -236,7 +236,7 @@ async function guardarEdicionUsuario(id) {
         if(Number(id)===Number(currentUser.id)) actualizarNombrePropio(nombre); // se editó a sí mismo
         await renderUsuarios();
     }
-    else showToast('Error al actualizar','error');
+    else { const d=await res.json().catch(()=>({})); showToast(d.error||'Error al actualizar','error'); }
 }
 
 // Moderación de fotos: el admin ve la foto en grande y puede retirarla (el usuario recibe un aviso)
@@ -261,7 +261,7 @@ async function eliminarUsuario(id,nombre) {
     if(!confirm(`¿Eliminar a ${nombre}?`)) return;
     const res=await apiFetch(`${API}/usuarios/${id}`,{method:'DELETE'});
     if(res.ok){showToast(`${nombre} eliminado`);await renderUsuarios();}
-    else showToast('Error al eliminar','error');
+    else { const d=await res.json().catch(()=>({})); showToast(d.error||'Error al eliminar','error'); }
 }
 
 // — REPORTES —
