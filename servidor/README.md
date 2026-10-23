@@ -23,6 +23,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `ia` | — (solo lectura) | — |
 | `rendimiento` | — (solo lectura) | — |
 | `mensajes` | `mensajes` | — |
+| `evaluaciones` | `evaluaciones` | — |
 
 ## Las 3 reglas
 

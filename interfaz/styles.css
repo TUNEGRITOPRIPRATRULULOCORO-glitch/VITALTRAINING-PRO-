@@ -4559,3 +4559,40 @@ body.dark .nut-porcion          { color: #7dd3fc; }
 @media (max-width: 700px) {
     .plan-day-header { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* ===========================
+   TESTS FÍSICOS
+=========================== */
+.ev-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.ev-tarjeta { padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+.ev-cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.ev-nombre { font-size: 15px; font-weight: 700; color: var(--text); }
+.ev-mide { font-size: 12px; color: var(--text-muted); }
+.ev-valor { font-family: var(--mono); font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.ev-detalle { font-size: 12px; color: var(--text-muted); }
+.ev-detalle strong { color: var(--text); }
+.ev-grafica { position: relative; height: 70px; }
+
+.ev-tendencia { flex: none; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.ev-mejora  { background: var(--primary-dim); color: #15803d; }
+.ev-empeora { background: var(--danger-dim);  color: #b91c1c; }
+.ev-estable { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.ev-vacio   { background: var(--bg); color: var(--text-muted); border: 1px dashed var(--border); }
+
+.ev-historial { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ev-historial li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; font-size: 12px; color: var(--text-muted); }
+.ev-historial strong { color: var(--text); font-family: var(--mono); }
+.ev-borrar { border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; }
+.ev-borrar:hover { color: var(--danger); background: var(--danger-dim); }
+
+.ev-aviso { padding: 12px 16px; border-radius: var(--radius); font-size: 13px; margin-bottom: 18px; border: 1px solid var(--border); color: var(--text); }
+.ev-aviso-alerta { background: var(--warning-dim); border-color: color-mix(in srgb, var(--warning) 45%, transparent); }
+.ev-aviso-info   { background: var(--accent-dim);  border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.ev-aviso-ok     { background: var(--primary-dim); border-color: color-mix(in srgb, var(--primary) 35%, transparent); }
+
+.ev-ayuda { font-size: 12px; line-height: 1.5; padding: 10px 12px; margin-bottom: 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: var(--text); }
+.ev-ayuda span { color: var(--text-muted); }
+.ev-nota { margin-top: 18px; font-size: 12px; color: var(--text-muted); }
+
+body.dark .ev-mejora  { color: #4ade80; }
+body.dark .ev-empeora { color: #fca5a5; }

@@ -67,6 +67,19 @@ async function cargarDatosDemo() {
         [userId, dia(n), fatiga, sueno, recuperacion]);
   }
 
+  // Tests físicos: Carlos con 3 evaluaciones; Diego con 2 y la última hace más de 6 semanas
+  const tests = {
+    'carlos@vital.com': { fechas: [80, 45, 10], valores: {
+      sprint10: [1.82, 1.79, 1.76], sprint30: [4.30, 4.27, 4.18], cmj: [38.5, 40.1, 42.8], agilidad5105: [4.72, 4.70, 4.69], yoyo1: [1600, 1760, 1720] } },
+    'diego@vital.com': { fechas: [75, 44], valores: {
+      sprint20: [3.10, 3.05], cmj: [52, 55.5], laneAgility: [11.4, 11.0], agilidad5105: [4.85, 4.90], yoyo1: [1480, 1600] } },
+  };
+  for (const [email, { fechas, valores }] of Object.entries(tests))
+    for (const [prueba, lista] of Object.entries(valores))
+      for (let k = 0; k < lista.length; k++)
+        await query('INSERT INTO evaluaciones (user_id, prueba, valor, fecha, registrado_por) VALUES ($1, $2, $3, $4, $5)',
+          [id(email), prueba, lista[k], dia(fechas[k]), 'Dr. Vital']);
+
   const [admin, maria, medico, carlos] = ['admin', 'maria', 'medico', 'carlos'].map(n => id(`${n}@vital.com`));
   const charla = [
     [carlos, maria, 'Hola María, ¿puedo cambiar la cena de hoy por pescado?', 300, true],

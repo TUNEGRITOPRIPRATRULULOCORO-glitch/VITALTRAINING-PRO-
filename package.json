@@ -43,6 +43,7 @@
     "collectCoverageFrom": [
       "servidor/api/**/*.service.js",
       "servidor/api/**/*.calculos.js",
+      "servidor/api/**/*.catalogo.js",
       "base-de-datos/db.js",
       "servidor/compartido/middleware/auth.js",
       "!servidor/api/ia/ia.service.js"

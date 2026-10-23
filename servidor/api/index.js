@@ -28,6 +28,7 @@ router.use('/ia',            require('./ia').router);
 router.use('/perfil-medico', require('./perfilMedico').router);
 router.use('/rendimiento',   require('./rendimiento').router);
 router.use('/mensajes',      require('./mensajes').router);
+router.use('/evaluaciones',  require('./evaluaciones').router);
 router.use('/cuenta',        require('./usuarios').cuentaRouter);
 router.use('/fotos',         require('./usuarios').fotosRouter);
 

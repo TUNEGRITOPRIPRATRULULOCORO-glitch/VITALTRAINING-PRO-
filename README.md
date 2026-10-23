@@ -51,6 +51,7 @@ vital-training/
 │       ├── ia/             # Asistente IA + contexto para n8n
 │       ├── rendimiento/    # Listo para entrenar · carga y riesgo de lesión · cumplimiento
 │       ├── mensajes/       # Chat atleta ↔ nutricionista/médico, equipo ↔ administración
+│       ├── evaluaciones/   # Tests físicos periódicos (salto, sprint, agilidad, Yo-Yo)
 │       ├── nutricionista/  # Panel nutricionista
 │       ├── incidencias/    # Soporte / tickets
 │       └── reportes/       # Estadísticas admin

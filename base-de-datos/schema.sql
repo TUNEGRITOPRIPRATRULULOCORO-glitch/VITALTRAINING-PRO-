@@ -136,6 +136,17 @@ CREATE TABLE IF NOT EXISTS fotos_perfil (
   actualizado TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS evaluaciones (
+  id             BIGSERIAL PRIMARY KEY,
+  user_id        BIGINT NOT NULL,
+  prueba         VARCHAR(40) NOT NULL,
+  valor          NUMERIC NOT NULL,
+  fecha          DATE NOT NULL,
+  notas          TEXT DEFAULT '',
+  registrado_por VARCHAR(255),
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS mensajes (
   id              BIGSERIAL PRIMARY KEY,
   remitente_id    BIGINT NOT NULL,
@@ -157,3 +168,4 @@ ALTER TABLE notas_nutricionista ADD CONSTRAINT notas_nutricionista_user_id_fkey 
 ALTER TABLE mensajes ADD CONSTRAINT mensajes_remitente_id_fkey FOREIGN KEY (remitente_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE mensajes ADD CONSTRAINT mensajes_destinatario_id_fkey FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE fotos_perfil ADD CONSTRAINT fotos_perfil_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE evaluaciones ADD CONSTRAINT evaluaciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
