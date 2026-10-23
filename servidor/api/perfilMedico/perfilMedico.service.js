@@ -1,6 +1,7 @@
 const { query } = require('../../../base-de-datos/db');
 const panel = require('../panel');
 const { generarRutina } = require('./rutinas');
+const nutricion = require('./nutricion');
 
 // ═══════════════════════════════════════════════════════════════
 // CATÁLOGOS
@@ -192,28 +193,59 @@ function filtrarComidas(pool, alergias, preferencia, condiciones) {
   return comidasCompatibles;
 }
 
-function pick(arr, idx) { return arr[idx % arr.length]; }
+const NOMBRES_ESTIMADOS = { peso: 'peso', altura: 'altura', edad: 'edad', sexo: 'sexo' };
 
-function generarPlanAlimenticio(perfilMedico, posicion) {
+/**
+ * Plan semanal de comidas con calorías y macros calculados para el atleta.
+ * @param perfilMedico  condiciones, alergias y preferencias
+ * @param opciones      { ficha, rutina } — ficha deportiva y rutina semanal (para saber qué día
+ *                      es de entreno, descanso o partido). Acepta una posición suelta por compatibilidad.
+ */
+function generarPlanAlimenticio(perfilMedico, opciones = {}) {
   const { condiciones = [], alergias = [], preferencias = 'Sin restricciones' } = perfilMedico;
+  const { ficha = null, rutina = null } = typeof opciones === 'string' ? { ficha: { posicion: opciones } } : opciones;
   const dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 
-  const bOk = filtrarComidas(DESAYUNOS, alergias, preferencias, condiciones);
-  const aOk = filtrarComidas(ALMUERZOS, alergias, preferencias, condiciones);
-  const cOk = filtrarComidas(CENAS,     alergias, preferencias, condiciones);
-  const mOk = filtrarComidas(MERIENDAS, alergias, preferencias, condiciones);
+  const base = nutricion.datosBase(ficha || {});
+  const tipos = rutina ? nutricion.tiposDeDia(rutina) : [];
+  const tipoDe = i => tipos[i] || (i === 6 ? 'descanso' : 'entreno');
 
+  const opcionesPorToma = {
+    desayuno:       filtrarComidas(DESAYUNOS, alergias, preferencias, condiciones),
+    meriendaMañana: filtrarComidas(MERIENDAS, alergias, preferencias, condiciones),
+    almuerzo:       filtrarComidas(ALMUERZOS, alergias, preferencias, condiciones),
+    meriendaTarde:  filtrarComidas(MERIENDAS, alergias, preferencias, condiciones),
+    cena:           filtrarComidas(CENAS,     alergias, preferencias, condiciones),
+  };
   const sinOpcionSegura = {
     nombre: 'Sin opción segura disponible en el catálogo',
     desc: 'Consulta con tu nutricionista para añadir una alternativa compatible con tus restricciones.',
-    kcal: 0, proteina: 0, carbs: 0, grasa: 0
+    kcal: 0, proteina: 0, carbs: 0, grasa: 0, porcion: 1
   };
-  const B = bOk.length ? bOk : [sinOpcionSegura];
-  const A = aOk.length ? aOk : [sinOpcionSegura];
-  const C = cOk.length ? cOk : [sinOpcionSegura];
-  const M = mOk.length ? mOk : [sinOpcionSegura];
+
+  // Estas preferencias ya ordenan el catálogo: hay que respetar ese orden al elegir
+  const respetarOrden = /mediterr|alto en prote/i.test(preferencias);
+
+  const semana = dias.map((dia, i) => {
+    const objetivo = nutricion.objetivosDelDia(base, tipoDe(i), preferencias);
+    const comidas = {};
+    for (const [toma, parte] of Object.entries(nutricion.REPARTO)) {
+      // Las dos meriendas usan el mismo catálogo: se desplaza el índice para que no se repitan
+      const indice = toma === 'meriendaTarde' ? i + 1 : i;
+      comidas[toma] = nutricion.elegirComida(opcionesPorToma[toma], objetivo.kcal * parte, indice, { respetarOrden }) || sinOpcionSegura;
+    }
+    const total = Object.values(comidas).reduce((t, c) => ({
+      kcal: t.kcal + c.kcal, proteina: t.proteina + c.proteina, carbs: t.carbs + c.carbs, grasa: t.grasa + c.grasa
+    }), { kcal: 0, proteina: 0, carbs: 0, grasa: 0 });
+    return { dia, tipoDia: objetivo.tipoDia, objetivo, total, ...comidas };
+  });
+
+  const entreno  = semana.find(d => d.tipoDia === 'entreno')?.objetivo || nutricion.objetivosDelDia(base, 'entreno', preferencias);
+  const descanso = semana.find(d => d.tipoDia === 'descanso')?.objetivo || nutricion.objetivosDelDia(base, 'descanso', preferencias);
 
   const notas = [];
+  if (base.estimados.length)
+    notas.push(`📝 Faltan datos (${base.estimados.map(c => NOMBRES_ESTIMADOS[c]).join(', ')}): se usaron valores de referencia. Complétalos en Mi Perfil para afinar el cálculo.`);
   if (condiciones.includes('Diabetes tipo 1') || condiciones.includes('Diabetes tipo 2'))
     notas.push('⚠️ Controla la glucosa antes y después de entrenar. Consulta tu médico para ajustes de dosis.');
   if (condiciones.includes('Hipertensión arterial'))
@@ -226,21 +258,20 @@ function generarPlanAlimenticio(perfilMedico, posicion) {
     notas.push('🍽 Come despacio, mastica bien y evita comidas copiosas antes de entrenar.');
   if (alergias.length)
     notas.push(`🚫 Alergias registradas: ${alergias.join(', ')}. Revisa siempre etiquetas de productos.`);
-  if (!bOk.length || !aOk.length || !cOk.length || !mOk.length)
+  if (Object.values(opcionesPorToma).some(o => !o.length))
     notas.push('⚠️ El catálogo no tiene opciones seguras para una o más comidas. Se dejaron sin asignar para evitar recomendar alimentos incompatibles; consulta a tu nutricionista.');
-  notas.push('💧 Bebe mínimo 2.5L de agua al día. Aumenta a 3L en días de entrenamiento intenso.');
+  if (semana.some(d => d.tipoDia === 'partido'))
+    notas.push('🏆 Día de partido: comida principal 3-4 h antes (rica en carbohidratos y baja en grasa) y algo de carbohidrato rápido en el descanso.');
+  const litros = l => String(l).replace('.', ',');
+  notas.push(`💧 Agua: unos ${litros(descanso.aguaLitros)} L en días de descanso y ${litros(entreno.aguaLitros)} L en días de entreno.`);
   notas.push('🕐 Respeta los horarios de comida. Evita saltarte comidas antes de entrenar.');
 
   return {
     descripcion: `Plan personalizado · ${condiciones.length ? condiciones.slice(0,2).join(', ') : 'Sin condiciones'} · ${alergias.length ? alergias.length+' alergia(s)' : 'Sin alergias'} · ${preferencias}`,
-    semana: dias.map((dia, i) => ({
-      dia,
-      desayuno:       pick(B, i),
-      meriendaMañana: pick(M, i),
-      almuerzo:       pick(A, i),
-      meriendaTarde:  pick(M, i+3),
-      cena:           pick(C, i)
-    })),
+    base: { peso: base.peso, altura: base.altura, edad: base.edad, sexo: base.sexo, deporte: base.deporte,
+            posicion: base.posicion, objetivo: base.objetivo, estimados: base.estimados },
+    objetivos: { entreno, descanso },
+    semana,
     notas
   };
 }
@@ -262,10 +293,41 @@ async function listarAtletas() {
 /** Ficha deportiva (deporte, posición, peso, altura...) para el expediente del médico. */
 async function obtenerFicha(userId) {
   const [{ rows: u }, { rows: p }] = await Promise.all([
-    query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia FROM usuarios WHERE id = $1', [userId]),
-    query('SELECT posicion, edad, peso, altura FROM perfiles WHERE user_id = $1', [userId])
+    query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia, objetivo FROM usuarios WHERE id = $1', [userId]),
+    query('SELECT posicion, edad, peso, altura, sexo FROM perfiles WHERE user_id = $1', [userId])
   ]);
   return u[0] ? panel.fichaDeportiva(u[0], p[0]) : null;
+}
+
+// Serialización con claves ordenadas: JSONB reordena las claves al guardar
+function estable(valor) {
+  if (Array.isArray(valor)) return `[${valor.map(estable).join(',')}]`;
+  if (valor && typeof valor === 'object')
+    return `{${Object.keys(valor).sort().map(k => JSON.stringify(k) + ':' + estable(valor[k])).join(',')}}`;
+  return JSON.stringify(valor);
+}
+
+/**
+ * Regenera rutina y plan de comidas con la ficha actual del atleta (peso, posición, deporte...)
+ * y los guarda si cambiaron. Así un cambio en Mi Perfil se refleja sin rehacer el perfil médico.
+ */
+async function refrescarPlanes(userId, perfil, ficha) {
+  if (!perfil || !ficha) return perfil;
+  const datos = {
+    condiciones:  perfil.condiciones  || [],
+    alergias:     perfil.alergias     || [],
+    preferencias: perfil.preferencias || 'Sin restricciones'
+  };
+  const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte);
+  const planAlimenticio = generarPlanAlimenticio(datos, { ficha, rutina: rutinaSemanal });
+  const cambio = estable(rutinaSemanal) !== estable(perfil.rutinaSemanal) || estable(planAlimenticio) !== estable(perfil.planAlimenticio);
+  if (cambio) {
+    await query(
+      'UPDATE perfiles_medicos SET rutina_semanal = $1, plan_alimenticio = $2 WHERE user_id = $3',
+      [JSON.stringify(rutinaSemanal), JSON.stringify(planAlimenticio), userId]
+    );
+  }
+  return { ...perfil, rutinaSemanal, planAlimenticio };
 }
 
 async function obtener(userId) {
@@ -287,15 +349,15 @@ async function obtener(userId) {
   };
 }
 
-async function guardar(userId, datos, posicion, deporte = 'Fútbol') {
+async function guardar(userId, datos, posicion, deporte = 'Fútbol', ficha = null) {
   const datosNorm = {
     condiciones:  datos.condiciones  || [],
     alergias:     datos.alergias     || [],
     preferencias: datos.preferencia  || datos.preferencias || 'Sin restricciones'
   };
 
-  const planAlimenticio = generarPlanAlimenticio(datosNorm, posicion);
   const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte);
+  const planAlimenticio = generarPlanAlimenticio(datosNorm, { ficha: { ...(ficha || {}), posicion, deporte }, rutina: rutinaSemanal });
 
   await query(
     `INSERT INTO perfiles_medicos (user_id, condiciones, alergias, preferencias, completado, plan_alimenticio, rutina_semanal)
@@ -329,4 +391,4 @@ async function guardar(userId, datos, posicion, deporte = 'Fútbol') {
   };
 }
 
-module.exports = { listarAtletas, obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS, obtenerFicha };
+module.exports = { listarAtletas, obtener, guardar, CONDICIONES, ALERGIAS, PREFERENCIAS, obtenerFicha, refrescarPlanes, generarPlanAlimenticio };

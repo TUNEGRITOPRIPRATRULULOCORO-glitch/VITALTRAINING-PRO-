@@ -1141,9 +1141,13 @@ function ntCardFutbolista(f) {
 
 async function ntVerDetalle(userId) {
     try {
-        const data=await apiFetch(`${API}/nutricionista/futbolistas/${userId}`).then(r=>r.json()).catch(()=>null);
+        const [data, medico]=await Promise.all([
+            apiFetch(`${API}/nutricionista/futbolistas/${userId}`).then(r=>r.json()).catch(()=>null),
+            apiFetch(`${API}/perfil-medico/${userId}`).then(r=>r.json()).catch(()=>null)
+        ]);
         if(!data?.ok) return showToast('No se pudo cargar el atleta. Intenta de nuevo.','error');
         const d=data.detalle;
+        const objetivos=medico?.perfil?.planAlimenticio?.objetivos;
         const [c1,c2]=avatarColor(d.nombre);
         const chartId=`chart-nt-sal-${userId}`;
 
@@ -1247,6 +1251,7 @@ async function ntVerDetalle(userId) {
                 <div class="paciente-hero-info">
                     <h3>${escapeHtml(d.nombre)}</h3>
                     ${fichaDeportivaHTML(d.ficha)}
+                    ${objetivos?`<div class="nut-hero-objetivos">🎯 Entreno <strong>${nutFormato(objetivos.entreno.kcal)} kcal</strong> · Descanso <strong>${nutFormato(objetivos.descanso.kcal)} kcal</strong> · Proteína <strong>${objetivos.entreno.proteina} g</strong> · Carbohidratos <strong>${objetivos.descanso.carbs}–${objetivos.entreno.carbs} g</strong></div>`:''}
                 </div>
             </div>
             <div class="detalle-tabs">
@@ -1766,7 +1771,10 @@ async function pfRenderPerfil() {
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Peso (kg)</label><input type="number" id="pf-f-peso" value="${p.peso||''}" placeholder="72"></div>
-                    <div class="form-group" style="display:flex;align-items:flex-end"><span style="color:var(--text-muted);font-size:12px;display:block;width:100%">Tu selección de deporte se sincroniza con el registro inicial.</span></div>
+                    <div class="form-group"><label>Sexo <span class="campo-ayuda">(para calcular tus calorías)</span></label><select id="pf-f-sexo">${['','Hombre','Mujer','Prefiero no decirlo'].map(s=>`<option value="${s}" ${(p.sexo||'')===s?'selected':''}>${s||'Selecciona…'}</option>`).join('')}</select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="grid-column:1/-1"><span style="color:var(--text-muted);font-size:12px;display:block;width:100%">Tu peso, altura, edad y sexo se usan para calcular tu plan de comidas. Tu selección de deporte se sincroniza con el registro inicial.</span></div>
                 </div>
                 <div class="form-actions"><button class="btn btn-primary" onclick="pfGuardarPerfil()">Guardar cambios</button></div>
             </div>
@@ -1782,7 +1790,8 @@ async function pfGuardarPerfil() {
         posicion: document.getElementById('pf-f-posicion').value,
         peso: Number(document.getElementById('pf-f-peso').value),
         altura: Number(document.getElementById('pf-f-altura').value),
-        deportePrincipal: document.getElementById('pf-f-deporte').value
+        deportePrincipal: document.getElementById('pf-f-deporte').value,
+        sexo: document.getElementById('pf-f-sexo').value
     };
     const res=await apiFetch(`${API}/panel/${userId}/perfil`,{method:'PUT',body:JSON.stringify(body)});
     if(res.ok){
@@ -2540,47 +2549,96 @@ async function pfRenderPlan() {
     </div>`;
 }
 
+// — PLAN ALIMENTICIO (ATLETA) —
+const NUT_TOMAS = [
+    { key:'desayuno',       label:'Desayuno' },
+    { key:'meriendaMañana', label:'Merienda mañana' },
+    { key:'almuerzo',       label:'Almuerzo' },
+    { key:'meriendaTarde',  label:'Merienda tarde' },
+    { key:'cena',           label:'Cena' }
+];
+const NUT_TIPO_DIA = {
+    entreno:        { icono:'🏃', clase:'nut-dia-entreno' },
+    recuperacion:   { icono:'🧘', clase:'nut-dia-recuperacion' },
+    precompetencia: { icono:'🔋', clase:'nut-dia-vispera' },
+    partido:        { icono:'🏆', clase:'nut-dia-partido' },
+    descanso:       { icono:'😴', clase:'nut-dia-descanso' }
+};
+const NUT_DATO = { peso:'peso', altura:'altura', edad:'edad', sexo:'sexo' };
+
+function nutFormato(n) { return Number(n || 0).toLocaleString('es-CO'); }
+
+// Barras de proteína, carbohidratos y grasa según su parte de las calorías
+function nutMacrosHTML(o) {
+    const kcal = Math.max(1, o.kcal);
+    const fila = (nombre, gramos, kcalPorGramo, clase) => {
+        const pct = Math.round(gramos * kcalPorGramo / kcal * 100);
+        return `<div class="nut-macro"><span>${nombre}</span><div class="nut-macro-barra"><div class="${clase}" style="width:${pct}%"></div></div><strong>${gramos} g</strong></div>`;
+    };
+    return fila('Proteína', o.proteina, 4, 'nut-p') + fila('Carbohidratos', o.carbs, 4, 'nut-c') + fila('Grasa', o.grasa, 9, 'nut-g');
+}
+
+function nutTarjetaObjetivo(titulo, o) {
+    if (!o) return '';
+    return `
+    <div class="nut-objetivo">
+        <div class="nut-objetivo-titulo">${titulo}</div>
+        <div class="nut-kcal">${nutFormato(o.kcal)} <small>kcal</small></div>
+        ${nutMacrosHTML(o)}
+        <div class="nut-agua">💧 ${String(o.aguaLitros).replace('.', ',')} L de agua</div>
+    </div>`;
+}
+
 async function pfRenderPlanAlimenticio() {
     const userId=currentUser.id;
     const main=document.getElementById('pf-content');
     main.innerHTML=showLoading();
     const data=await apiFetch(`${API}/perfil-medico/${userId}`).then(r=>r.json()).catch(()=>null);
     if(!data?.perfil){ main.innerHTML=showError('No tienes un perfil médico guardado.','pfRenderPlan()'); return; }
-    const{planAlimenticio={}}=data.perfil;
-    const semanaAlim = planAlimenticio?.semana || [];
-    const notasPlan  = planAlimenticio?.notas  || [];
+    const plan=data.perfil.planAlimenticio||{};
+    const semana=plan.semana||[];
+    const base=plan.base||{};
+    const notas=(plan.notas||[]).filter(n=>!n.startsWith('📝'));
 
-    const SLOTS=[
-        {key:'desayuno',      label:'Desayuno'},
-        {key:'meriendaMañana',label:'Merienda mañana'},
-        {key:'almuerzo',      label:'Almuerzo'},
-        {key:'meriendaTarde', label:'Merienda tarde'},
-        {key:'cena',          label:'Cena'}
-    ];
+    const aviso = base.estimados?.length ? `
+        <div class="nut-aviso">
+            <div>📝 <strong>Faltan datos para afinar tu plan:</strong> ${base.estimados.map(c=>NUT_DATO[c]||c).join(', ')}. Mientras tanto usamos valores de referencia.</div>
+            <button class="btn btn-primary btn-sm" onclick="pfRenderView('perfil')">Completar Mi Perfil</button>
+        </div>` : '';
 
-    const planHTML=semanaAlim.length?semanaAlim.map(dia=>{
-        const totalKcal=SLOTS.reduce((s,sl)=>s+(dia[sl.key]?.kcal||0),0);
-        const comidasHTML=SLOTS.map(sl=>{
-            const c=dia[sl.key]||{};
+    const datosUsados = [
+        base.peso && !base.estimados?.includes('peso') ? `${base.peso} kg` : null,
+        base.altura && !base.estimados?.includes('altura') ? `${base.altura} cm` : null,
+        base.edad && !base.estimados?.includes('edad') ? `${base.edad} años` : null,
+        base.sexo,
+        base.deporte ? `${getSportIcon(base.deporte)} ${base.deporte}` : null,
+        base.posicion,
+        base.objetivo ? `Objetivo: ${base.objetivo}` : null
+    ].filter(Boolean).map(escapeHtml).join(' · ');
+
+    const diasHTML = semana.length ? semana.map(dia=>{
+        const tipo = NUT_TIPO_DIA[dia.tipoDia] || NUT_TIPO_DIA.entreno;
+        const o = dia.objetivo;
+        const comidas = NUT_TOMAS.map(t=>{
+            const c = dia[t.key] || {};
+            const porcion = c.porcion && c.porcion !== 1 ? `<span class="nut-porcion" title="Cantidad respecto a la receta">×${String(c.porcion).replace('.', ',')}</span>` : '';
             return `
             <div class="plan-meal">
-                <div class="plan-meal-tipo">${sl.label}</div>
-                <div class="plan-meal-nombre">${c.nombre||'—'}</div>
-                <div class="plan-meal-kcal">${c.kcal||0} kcal</div>
-                ${c.proteina!=null?`<div class="plan-meal-macros">P:${c.proteina}g · C:${c.carbs}g · G:${c.grasa}g</div>`:''}
-            </div>`;}).join('');
+                <div class="plan-meal-tipo">${t.label}</div>
+                <div class="plan-meal-nombre">${escapeHtml(c.nombre||'—')}</div>
+                <div class="plan-meal-kcal">${nutFormato(c.kcal)} kcal ${porcion}</div>
+                ${c.proteina!=null?`<div class="plan-meal-macros">P ${c.proteina} g · C ${c.carbs} g · G ${c.grasa} g</div>`:''}
+            </div>`;
+        }).join('');
         return `
         <div class="plan-day-card">
             <div class="plan-day-header">
-                <div class="plan-day-name">${dia.dia||''}</div>
-                <div class="plan-day-kcal">~${totalKcal} kcal</div>
+                <div class="plan-day-name">${dia.dia||''} ${o?`<span class="nut-dia ${tipo.clase}">${tipo.icono} ${escapeHtml(o.etiqueta)}</span>`:''}</div>
+                <div class="plan-day-kcal">${o?`Objetivo ${nutFormato(o.kcal)} kcal · P ${o.proteina} · C ${o.carbs} · G ${o.grasa}`:`~${nutFormato(dia.total?.kcal)} kcal`}</div>
             </div>
-            <div class="plan-meals-grid">${comidasHTML}</div>
-        </div>`;}).join('')
-        :`<p style="color:var(--text-muted);padding:16px 0">Plan no disponible.</p>`;
-
-    const notasPlanHTML=notasPlan.length
-        ?`<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 16px;font-size:13px;color:#166534;margin-bottom:20px;line-height:1.8">${notasPlan.join('<br>')}</div>`:'';
+            <div class="plan-meals-grid">${comidas}</div>
+        </div>`;
+    }).join('') : `<p style="color:var(--text-muted);padding:16px 0">Plan no disponible.</p>`;
 
     main.innerHTML=`
     <div class="view-enter">
@@ -2588,11 +2646,33 @@ async function pfRenderPlanAlimenticio() {
             <div class="view-title">
                 <button class="btn btn-ghost btn-sm" onclick="pfRenderPlan()" style="margin-bottom:6px">← Volver al plan</button>
                 <h1>🍽 Plan Alimenticio</h1>
-                <p>Tu menú personalizado para los 7 días</p>
+                <p>Calculado para tu cuerpo, tu deporte y lo que entrenas cada día</p>
             </div>
         </div>
+        ${aviso}
+        ${plan.objetivos ? `
+        <div class="card nut-resumen">
+            <div class="card-header"><h2>🎯 Tus objetivos diarios</h2></div>
+            <div class="nut-resumen-cuerpo">
+                <div class="nut-objetivos">
+                    ${nutTarjetaObjetivo('Día de entreno', plan.objetivos.entreno)}
+                    ${nutTarjetaObjetivo('Día de descanso', plan.objetivos.descanso)}
+                </div>
+                ${datosUsados ? `<p class="nut-datos">Calculado con: ${datosUsados}</p>` : ''}
+                <details class="rd-explicacion">
+                    <summary>¿Cómo se calcula?</summary>
+                    Tu gasto en reposo sale de tu peso, altura, edad y sexo (fórmula Mifflin-St Jeor) y se multiplica según lo que entrenas ese día.
+                    Los carbohidratos se ajustan a la carga del día: menos en descanso y más en la víspera del partido para llenar tus reservas.
+                    La proteína se mantiene estable para recuperar músculo, y la grasa completa el resto. Las porciones (×1,5, ×0,75…) indican cuánto
+                    servirte de cada receta para llegar a tu objetivo. Es una guía: tu nutricionista puede ajustarla.
+                </details>
+            </div>
+        </div>` : ''}
         <div class="card">
-            <div style="padding:20px">${notasPlanHTML}${planHTML}</div>
+            <div style="padding:20px">
+                ${notas.length?`<div class="nut-notas">${notas.map(escapeHtml).join('<br>')}</div>`:''}
+                ${diasHTML}
+            </div>
         </div>
     </div>`;
 }

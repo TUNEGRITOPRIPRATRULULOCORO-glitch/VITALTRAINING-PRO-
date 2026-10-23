@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS perfiles (
   peso       NUMERIC,
   altura     NUMERIC,
   posicion   VARCHAR(100),
+  sexo       VARCHAR(20),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 

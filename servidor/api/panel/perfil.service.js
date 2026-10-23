@@ -11,6 +11,7 @@ async function obtenerPerfil(userId) {
             COALESCE(p.peso, u.peso) AS peso,
             COALESCE(p.altura, u.altura) AS altura,
             COALESCE(p.posicion, u.posicion) AS posicion,
+            p.sexo,
             u.fecha_nacimiento AS "fechaNacimiento",
             u.deporte_principal AS "deportePrincipal",
             p.updated_at AS "updatedAt"
@@ -27,17 +28,19 @@ async function obtenerPerfil(userId) {
 
 async function actualizarPerfil(userId, datos) {
   const { rows } = await query(
-    `INSERT INTO perfiles (user_id, nombre, edad, peso, altura, posicion)
-     VALUES ($1,$2,$3,$4,$5,$6)
+    `INSERT INTO perfiles (user_id, nombre, edad, peso, altura, posicion, sexo)
+     VALUES ($1,$2,$3,$4,$5,$6,$7)
      ON CONFLICT (user_id) DO UPDATE SET
        nombre   = COALESCE(EXCLUDED.nombre,   perfiles.nombre),
        edad     = COALESCE(EXCLUDED.edad,     perfiles.edad),
        peso     = COALESCE(EXCLUDED.peso,     perfiles.peso),
        altura   = COALESCE(EXCLUDED.altura,   perfiles.altura),
        posicion = COALESCE(EXCLUDED.posicion, perfiles.posicion),
+       sexo     = COALESCE(EXCLUDED.sexo,     perfiles.sexo),
        updated_at = NOW()
-     RETURNING id, user_id AS "userId", nombre, edad, peso, altura, posicion, updated_at AS "updatedAt"`,
-    [userId, datos.nombre || null, datos.edad || null, datos.peso || null, datos.altura || null, datos.posicion || null]
+     RETURNING id, user_id AS "userId", nombre, edad, peso, altura, posicion, sexo, updated_at AS "updatedAt"`,
+    [userId, datos.nombre || null, datos.edad || null, datos.peso || null, datos.altura || null, datos.posicion || null,
+     ['Hombre', 'Mujer', 'Prefiero no decirlo'].includes(datos.sexo) ? datos.sexo : null]
   );
 
   const perfil = rows[0];

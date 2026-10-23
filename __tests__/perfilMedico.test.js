@@ -168,3 +168,35 @@ describe('catálogos', () => {
     expect(vegano).toBeDefined();
   });
 });
+
+// ─── recálculo automático ─────────────────────────────────────────────────────
+describe('refrescarPlanes', () => {
+  const ficha = { peso: 74, altura: 181, edad: 23, sexo: 'Hombre', deporte: 'Fútbol', posicion: 'Delantero' };
+  const datos = { condiciones: [], alergias: [], preferencias: 'Sin restricciones' };
+
+  test('si cambian los datos del atleta, regenera rutina y comidas y las guarda', async () => {
+    const viejo = { ...datos, rutinaSemanal: { semana: [] }, planAlimenticio: { semana: [] } };
+    const nuevo = await svc.refrescarPlanes(5, viejo, ficha);
+    expect(nuevo.rutinaSemanal.posicion).toBe('Delantero');
+    expect(nuevo.planAlimenticio.base.peso).toBe(74);
+    expect(query).toHaveBeenCalledWith(expect.stringContaining('UPDATE perfiles_medicos'), expect.any(Array));
+  });
+
+  test('si nada cambió no escribe en la base (aunque el orden de las claves sea otro)', async () => {
+    const actual = await svc.refrescarPlanes(5, { ...datos, rutinaSemanal: null, planAlimenticio: null }, ficha);
+    query.mockClear();
+    // Simula lo que devuelve JSONB: mismas claves en otro orden
+    const reordenar = v => Array.isArray(v) ? v.map(reordenar)
+      : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).reverse().map(k => [k, reordenar(v[k])]))
+      : v;
+    const guardado = { ...datos, rutinaSemanal: reordenar(actual.rutinaSemanal), planAlimenticio: reordenar(actual.planAlimenticio) };
+    await svc.refrescarPlanes(5, guardado, ficha);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  test('sin perfil o sin ficha no hace nada', async () => {
+    expect(await svc.refrescarPlanes(5, null, ficha)).toBeNull();
+    expect(await svc.refrescarPlanes(5, datos, null)).toBe(datos);
+    expect(query).not.toHaveBeenCalled();
+  });
+});

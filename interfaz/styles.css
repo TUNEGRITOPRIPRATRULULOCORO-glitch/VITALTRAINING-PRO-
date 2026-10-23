@@ -4456,3 +4456,106 @@ body.dark .rd-aviso { border-color: rgba(239,68,68,0.4); }
     .auth-titulo .auth-linea > span { transform: none; animation: none !important; }
     .auth-container { transform: none !important; }
 }
+
+/* ===========================
+   PLAN ALIMENTICIO
+=========================== */
+.campo-ayuda { font-weight: 400; color: var(--text-muted); font-size: 11px; }
+
+.nut-aviso {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: var(--radius);
+    background: var(--warning-dim);
+    border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+    color: var(--text);
+    font-size: 13px;
+}
+
+.nut-resumen { margin-bottom: 24px; }
+.nut-resumen-cuerpo { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.nut-objetivos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.nut-objetivo {
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.nut-objetivo-titulo { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+.nut-kcal { font-family: var(--mono); font-size: 1.9rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.nut-kcal small { font-size: 0.95rem; color: var(--text-muted); }
+.nut-macro { display: grid; grid-template-columns: 96px 1fr 56px; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); }
+.nut-macro strong { text-align: right; color: var(--text); font-family: var(--mono); }
+.nut-macro-barra { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.nut-macro-barra > div { height: 100%; border-radius: 4px; }
+.nut-p { background: #0ea5e9; }
+.nut-c { background: #16a34a; }
+.nut-g { background: #f59e0b; }
+.nut-agua { font-size: 13px; color: var(--text); }
+.nut-datos { margin: 0; font-size: 13px; color: var(--text-muted); }
+
+.nut-notas {
+    background: var(--primary-dim);
+    border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 20px;
+    line-height: 1.8;
+}
+
+/* Tipo de día */
+.nut-dia {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+.nut-dia-entreno      { background: var(--primary-dim); color: #15803d; }
+.nut-dia-recuperacion { background: var(--accent-dim);  color: #0369a1; }
+.nut-dia-vispera      { background: var(--warning-dim); color: #b45309; }
+.nut-dia-partido      { background: var(--danger-dim);  color: #b91c1c; }
+.nut-dia-descanso     { background: var(--bg);          color: var(--text-muted); border: 1px solid var(--border); }
+
+.nut-porcion {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: var(--accent-dim);
+    color: #0369a1;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--mono);
+}
+
+body.dark .nut-dia-entreno      { color: #4ade80; }
+body.dark .nut-dia-recuperacion { color: #7dd3fc; }
+body.dark .nut-dia-vispera      { color: #fbbf24; }
+body.dark .nut-dia-partido      { color: #fca5a5; }
+body.dark .nut-porcion          { color: #7dd3fc; }
+
+@media (max-width: 700px) {
+    .nut-objetivos { grid-template-columns: 1fr; }
+    .nut-macro { grid-template-columns: 84px 1fr 52px; }
+}
+
+.nut-hero-objetivos { margin-top: 8px; font-size: 12px; color: inherit; opacity: 0.85; }
+.nut-hero-objetivos strong { color: inherit; font-weight: 700; }
+@media (max-width: 700px) {
+    .plan-day-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+}

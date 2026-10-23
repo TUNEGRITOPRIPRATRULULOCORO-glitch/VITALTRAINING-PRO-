@@ -11,7 +11,9 @@ async function getAtletas(req, res) {
 async function getObtener(req, res) {
   try {
     const userId = Number(req.params.userId);
-    const [perfil, ficha] = await Promise.all([svc.obtener(userId), svc.obtenerFicha(userId)]);
+    const [guardado, ficha] = await Promise.all([svc.obtener(userId), svc.obtenerFicha(userId)]);
+    // Rutina y comidas siempre al día con el peso, la posición y el deporte actuales
+    const perfil = await svc.refrescarPlanes(userId, guardado, ficha);
     res.json({ ok: true, perfil: perfil || null, ficha });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
@@ -25,7 +27,7 @@ async function postGuardar(req, res) {
     const ficha    = await svc.obtenerFicha(userId);
     const posicion = ficha?.posicion || req.body.posicion || null;
     const deporte  = ficha?.deporte || 'Fútbol';
-    const result   = await svc.guardar(userId, req.body, posicion, deporte);
+    const result   = await svc.guardar(userId, req.body, posicion, deporte, ficha);
     res.json({ ok: true, ...result });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });

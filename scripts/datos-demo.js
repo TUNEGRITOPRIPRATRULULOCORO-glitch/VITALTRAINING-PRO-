@@ -19,8 +19,8 @@ const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', '
 
 const ATLETAS = [
   // Carlos sube mucho la carga la última semana (para ver el aviso de riesgo)
-  { email: 'carlos@vital.com', deporte: 'Fútbol', posicion: 'Delantero', peso: 74, altura: 181, nacimiento: '2003-03-14', lado: 'Derecho', cargaAlta: true, salud: [6, 7, 5] },
-  { email: 'diego@vital.com', deporte: 'Baloncesto', posicion: 'Base', peso: 80, altura: 188, nacimiento: '2001-08-02', lado: 'Izquierda', cargaAlta: false, salud: [3, 8, 8] },
+  { email: 'carlos@vital.com', deporte: 'Fútbol', posicion: 'Delantero', peso: 74, altura: 181, nacimiento: '2003-03-14', lado: 'Derecho', sexo: 'Hombre', objetivo: 'Mejorar rendimiento deportivo', cargaAlta: true, salud: [6, 7, 5] },
+  { email: 'diego@vital.com', deporte: 'Baloncesto', posicion: 'Base', peso: 80, altura: 188, nacimiento: '2001-08-02', lado: 'Izquierda', sexo: null, objetivo: 'Ganar masa muscular', cargaAlta: false, salud: [3, 8, 8] },
 ];
 
 async function cargarDatosDemo() {
@@ -41,9 +41,11 @@ async function cargarDatosDemo() {
   for (const a of ATLETAS) {
     const userId = id(a.email);
     await query(
-      'UPDATE usuarios SET deporte_principal = $1, posicion = $2, peso = $3, altura = $4, fecha_nacimiento = $5, pie = $6 WHERE id = $7',
-      [a.deporte, a.posicion, a.peso, a.altura, a.nacimiento, a.lado, userId]
+      'UPDATE usuarios SET deporte_principal = $1, posicion = $2, peso = $3, altura = $4, fecha_nacimiento = $5, pie = $6, objetivo = $7 WHERE id = $8',
+      [a.deporte, a.posicion, a.peso, a.altura, a.nacimiento, a.lado, a.objetivo, userId]
     );
+    // Diego queda sin sexo para que se vea el aviso de "faltan datos" en su plan de comidas
+    if (a.sexo) await query('INSERT INTO perfiles (user_id, sexo) VALUES ($1, $2)', [userId, a.sexo]);
     const perfil = await perfilMedico.guardar(userId, { condiciones: [], alergias: [], preferencia: 'Sin restricciones' }, a.posicion, a.deporte);
     await query('UPDATE perfiles_medicos SET creado_en = $1 WHERE user_id = $2', [dia(27) + 'T10:00:00Z', userId]);
 
