@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VitalTraining por dentro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una sola columna de lectura (proyector o laptop), con el diagrama y las tablas a lo ancho */
+:root {
+  --bg: #f4f7f4;
+  --surface: #ffffff;
+  --ink: #12261a;
+  --muted: #5a6b60;
+  --line: #d8e2da;
+  --brand: #15803d;
+  --brand-soft: #e3f3e8;
+  --render: #4f46e5;
+  --neon: #0d9488;
+  --warn: #b45309;
+  --warn-soft: #fdf3e2;
+  --font-display: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1511; --surface: #142019; --ink: #e6f0e9; --muted: #9db0a3; --line: #263a2d;
+    --brand: #4ade80; --brand-soft: #173524; --render: #a5b4fc; --neon: #5eead4;
+    --warn: #fbbf24; --warn-soft: #2f2410; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1511; --surface: #142019; --ink: #e6f0e9; --muted: #9db0a3; --line: #263a2d;
+  --brand: #4ade80; --brand-soft: #173524; --render: #a5b4fc; --neon: #5eead4;
+  --warn: #fbbf24; --warn-soft: #2f2410; color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.6; }
+.pagina {
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px;
+  display: flex; flex-direction: column; gap: 48px;
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.12rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--brand); font-weight: 600; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--brand-soft); padding: 1px 6px; border-radius: 5px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.etiqueta { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); }
+.entrada { color: var(--muted); font-size: 1.1rem; }
+
+/* Cabecera */
+.cabecera { display: flex; flex-direction: column; gap: 14px; }
+.url-app { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.95rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; width: fit-content; max-width: 100%; }
+.punto-vivo { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); flex-shrink: 0; }
+
+/* Enlaces rápidos */
+.enlaces { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .enlaces { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.enlace { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; border-radius: 12px; background: var(--surface);
+  border: 1px solid var(--line); text-decoration: none; color: var(--ink); transition: border-color 0.15s, transform 0.15s; }
+.enlace:hover { border-color: var(--brand); transform: translateY(-2px); }
+.enlace strong { font-family: var(--font-display); font-size: 1.05rem; }
+.enlace span { font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+
+/* Diagrama */
+.diagrama { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+.mapa { display: grid; grid-template-columns: 1fr 70px 1.3fr 70px 1fr; align-items: center; min-width: 760px; gap: 0; }
+.nodo { border-radius: 12px; padding: 14px 16px; border: 2px solid var(--line); background: var(--bg); display: flex; flex-direction: column; gap: 4px; }
+.nodo strong { font-family: var(--font-display); font-size: 1.05rem; }
+.nodo small { color: var(--muted); font-size: 0.82rem; line-height: 1.35; }
+.nodo.render { border-color: var(--render); }
+.nodo.neon { border-color: var(--neon); }
+.flecha { text-align: center; color: var(--muted); font-size: 0.75rem; line-height: 1.2; }
+.flecha::before { content: "⟶"; display: block; font-size: 1.6rem; color: var(--ink); }
+.columna { display: flex; flex-direction: column; gap: 10px; }
+.debajo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; min-width: 760px; }
+.debajo .nodo { border-style: dashed; }
+.nota-diagrama { margin-top: 14px; font-size: 0.85rem; color: var(--muted); }
+
+/* Tarjetas de servicios */
+.servicios { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.servicio { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.servicio .rol { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+.servicio ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.servicio.destacado { border-width: 2px; }
+.servicio.destacado.render-c { border-color: var(--render); }
+.servicio.destacado.neon-c { border-color: var(--neon); }
+.estado { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); width: fit-content; }
+.estado.apagado { background: var(--warn-soft); color: var(--warn); }
+
+/* Tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.95rem; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+tr.principal td { background: var(--brand-soft); font-weight: 600; }
+
+/* Pasos (secuencias reales) */
+.pasos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: paso; }
+.pasos li { counter-increment: paso; display: grid; grid-template-columns: 38px 1fr; gap: 12px; align-items: start; }
+.pasos li::before { content: counter(paso); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brand); color: var(--bg); font-weight: 800; font-family: var(--font-display); }
+.pasos li > div { min-width: 0; }
+
+/* Lista de preparación */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.check input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--brand); flex-shrink: 0; }
+.check label { cursor: pointer; min-width: 0; }
+.check label small { display: block; color: var(--muted); font-size: 0.88rem; }
+.check:has(input:checked) { opacity: 0.6; }
+.check:has(input:checked) label strong { text-decoration: line-through; }
+.progreso { font-size: 0.9rem; color: var(--muted); }
+
+pre.comandos { margin: 0; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.7; }
+
+.cuidado { background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.cuidado h3 { color: var(--warn); }
+.cuidado ul { margin: 0; padding-left: 18px; }
+
+@media (max-width: 640px) { body { font-size: 16px; } .pagina { gap: 36px; padding-block: 24px 56px; } }
+@media (prefers-reduced-motion: reduce) { .enlace { transition: none; } .enlace:hover { transform: none; } }
+</style>
+<style>body{margin:0}*{box-sizing:border-box}</style>
+</head>
+<body>
+
+
+<div class="pagina">
+
+  <header class="cabecera">
+    <span class="etiqueta">Proyecto de clase · arquitectura</span>
+    <h1>VitalTraining por dentro</h1>
+    <p class="entrada">Dónde vive la app, dónde se guardan los datos y qué servicio hace cada cosa. Para explicarlo en clase y tener a mano los enlaces de cada panel.</p>
+    <a class="url-app" href="https://vitaltraining-pro.onrender.com" target="_blank" rel="noopener"><span class="punto-vivo" aria-hidden="true"></span>vitaltraining-pro.onrender.com</a>
+  </header>
+
+  <section aria-labelledby="t-enlaces">
+    <h2 id="t-enlaces">Paneles para abrir en clase</h2>
+    <div class="enlaces">
+      <a class="enlace" href="https://vitaltraining-pro.onrender.com" target="_blank" rel="noopener"><strong>La app</strong><span>Lo que ven los usuarios</span></a>
+      <a class="enlace" href="https://dashboard.render.com" target="_blank" rel="noopener"><strong>Render</strong><span>Servidor, deploys y logs</span></a>
+      <a class="enlace" href="https://console.neon.tech" target="_blank" rel="noopener"><strong>Neon</strong><span>Base de datos y tablas</span></a>
+      <a class="enlace" href="https://github.com/TUNEGRITOPRIPRATRULULOCORO-glitch/VITALTRAINING-PRO-" target="_blank" rel="noopener"><strong>GitHub</strong><span>Código, historial y CI</span></a>
+      <a class="enlace" href="https://sonarcloud.io/project/overview?id=TUNEGRITOPRIPRATRULULOCORO-glitch_VITALTRAINING-PRO" target="_blank" rel="noopener"><strong>SonarQube</strong><span>Calidad: Passed, todo en A</span></a>
+      <a class="enlace" href="https://app.brevo.com" target="_blank" rel="noopener"><strong>Brevo</strong><span>Correos enviados</span></a>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-mapa">
+    <h2 id="t-mapa">El mapa</h2>
+    <p>La persona abre la dirección de la app. Render le entrega las pantallas y ejecuta el servidor; cuando hay que guardar o leer datos, el servidor se los pide a Neon.</p>
+    <div class="diagrama" role="img" aria-label="Usuario se conecta a Render, que guarda y lee datos en Neon. Render usa Brevo para correos y Google para iniciar sesión. GitHub entrega el código a Render y SonarQube lo analiza.">
+      <div class="mapa">
+        <div class="nodo"><strong>Usuario</strong><small>Celular o computador, en el navegador</small></div>
+        <div class="flecha">entra a la web</div>
+        <div class="nodo render"><strong>Render</strong><small>Servidor Node.js + pantallas (HTML, CSS, JS). Construido con el Dockerfile.</small></div>
+        <div class="flecha">guarda y lee</div>
+        <div class="nodo neon"><strong>Neon</strong><small>Base de datos PostgreSQL. Aquí están todos los datos.</small></div>
+      </div>
+      <div class="debajo">
+        <div class="nodo"><strong>Brevo</strong><small>El servidor le pide enviar correos: bienvenida, contraseña, alertas.</small></div>
+        <div class="nodo"><strong>Google</strong><small>Verifica a quien pulsa “Entrar con Google”.</small></div>
+        <div class="nodo"><strong>GitHub → SonarQube</strong><small>GitHub guarda el código; Render lo toma al hacer deploy y SonarQube lo analiza.</small></div>
+      </div>
+      <p class="nota-diagrama">Arriba: lo que pasa cada vez que alguien usa la app. Abajo: servicios de apoyo.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-servicios">
+    <h2 id="t-servicios">Qué hace cada servicio</h2>
+    <div class="servicios">
+      <article class="servicio destacado render-c">
+        <h3>Render</h3>
+        <span class="rol">Donde vive la app</span>
+        <ul>
+          <li>Ejecuta el servidor y entrega las pantallas.</li>
+          <li>Construye la app con el <code>Dockerfile</code> desde GitHub, rama <code>main</code>.</li>
+          <li>Tras subir cambios: <strong>Manual Deploy → Deploy latest commit</strong>.</li>
+          <li>No guarda archivos de forma permanente: por eso los datos van en Neon.</li>
+        </ul>
+      </article>
+      <article class="servicio destacado neon-c">
+        <h3>Neon</h3>
+        <span class="rol">La base de datos (PostgreSQL)</span>
+        <ul>
+          <li>La única base de la app publicada: usuarios, perfiles, salud, comidas, rutinas, mensajes, tickets, fotos.</li>
+          <li>Está aparte de Render: los datos sobreviven a reinicios y deploys.</li>
+          <li>Las contraseñas se guardan cifradas (bcrypt), nunca en texto.</li>
+          <li>En <strong>Tables</strong> se ve cada tabla con sus filas.</li>
+        </ul>
+      </article>
+      <article class="servicio">
+        <h3>GitHub</h3>
+        <span class="rol">El código y su historial</span>
+        <ul>
+          <li>Cada cambio queda guardado con su explicación.</li>
+          <li>El CI pasa los 329 tests y construye la imagen de Docker en cada subida.</li>
+        </ul>
+      </article>
+      <article class="servicio">
+        <h3>SonarQube Cloud</h3>
+        <span class="rol">Calidad del código</span>
+        <span class="estado">Passed · todo en A</span>
+        <ul>
+          <li>Analiza solo cada cambio: fallos probables, seguridad y mantenibilidad.</li>
+          <li>0 bugs, 0 vulnerabilidades, 0 code smells.</li>
+        </ul>
+      </article>
+      <article class="servicio">
+        <h3>Brevo</h3>
+        <span class="rol">Envío de correos</span>
+        <ul>
+          <li>Bienvenida, recuperar contraseña y alertas de salud y carga.</li>
+          <li>Plan gratis: 300 correos al día.</li>
+        </ul>
+      </article>
+      <article class="servicio">
+        <h3>Google Cloud</h3>
+        <span class="rol">Entrar con Google</span>
+        <ul>
+          <li>Solo pide nombre y correo; no accede a nada más de la cuenta.</li>
+          <li>Requiere la página de privacidad publicada en la app.</li>
+        </ul>
+      </article>
+      <article class="servicio">
+        <h3>Claude</h3>
+        <span class="rol">Asistente IA “Vita”</span>
+        <span class="estado apagado">Sin activar · modo básico gratis</span>
+        <ul>
+          <li>Con una clave de pago conversaría usando los datos del atleta.</li>
+          <li>Sin clave responde con los análisis propios de la app.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-bases">
+    <h2 id="t-bases">¿Cuántas bases de datos hay?</h2>
+    <p>Una sola de verdad: Neon. Las otras existen para probar sin tocar los datos reales; por eso en la laptop o el PC se ven usuarios distintos a los de la web.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Dónde corre la app</th><th>Base de datos</th><th>Para qué</th></tr></thead>
+        <tbody>
+          <tr class="principal"><td>La web (Render)</td><td>Neon</td><td>La app real, con usuarios reales</td></tr>
+          <tr><td>Tu computador (<span class="mono">localhost:4000</span>)</td><td>PGlite, en <span class="mono">base-de-datos/datos-locales/</span></td><td>Probar cambios sin riesgo</td></tr>
+          <tr><td>Los tests</td><td>pg-mem, en memoria</td><td>Se crea y se borra en cada prueba</td></tr>
+          <tr><td>Docker (opcional)</td><td>PostgreSQL en un contenedor</td><td>Probar igual que en producción</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-variables">
+    <h2 id="t-variables">La configuración secreta</h2>
+    <p>Vive en Render, en el grupo de variables <strong>Pro</strong>. El código nunca lleva estos valores; solo sus nombres.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Variable</th><th>Qué guarda</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">DATABASE_URL</td><td>Dirección y contraseña de la base de Neon</td></tr>
+          <tr><td class="mono">JWT_SECRET</td><td>Clave con la que se firman las sesiones</td></tr>
+          <tr><td class="mono">ADMIN_PASSWORD</td><td>Contraseña del admin al crear la base por primera vez</td></tr>
+          <tr><td class="mono">DATOS_DEMO</td><td><span class="mono">false</span>: no crear cuentas de prueba</td></tr>
+          <tr><td class="mono">BREVO_API_KEY · CORREO_REMITENTE</td><td>Enviar correos con Brevo</td></tr>
+          <tr><td class="mono">GOOGLE_CLIENT_ID</td><td>Botón “Entrar con Google” (este no es secreto)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-cambio">
+    <h2 id="t-cambio">Cómo llega un cambio a la web</h2>
+    <ol class="pasos">
+      <li><div><strong>Se cambia el código</strong> y se prueba en el computador, con la base local.</div></li>
+      <li><div><strong>Se sube a GitHub</strong> (rama <code>main</code>). El CI pasa los tests y SonarQube analiza.</div></li>
+      <li><div><strong>Manual Deploy en Render.</strong> Render construye la imagen con Docker y publica la nueva versión.</div></li>
+      <li><div><strong>Neon no se toca.</strong> Los usuarios y sus datos siguen ahí.</div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="t-limites">
+    <h2 id="t-limites">Límites del plan gratis</h2>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Servicio</th><th>Límite</th><th>Qué significa en la práctica</th></tr></thead>
+        <tbody>
+          <tr><td>Render</td><td>Se duerme a los 15 min sin visitas</td><td>La primera visita tarda cerca de 1 minuto. Ábrela antes de clase.</td></tr>
+          <tr><td>Neon</td><td>0,5 GB de espacio</td><td>Sobra para un club: una foto de perfil ocupa unos 50 KB.</td></tr>
+          <tr><td>Neon</td><td>Se apaga cuando no se usa</td><td>Despierta en menos de un segundo.</td></tr>
+          <tr><td>Brevo</td><td>300 correos al día</td><td>Suficiente para registros y alertas.</td></tr>
+          <tr><td>SonarQube Cloud</td><td>Gratis en repositorios públicos</td><td>El análisis automático no muestra la cobertura de tests.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="t-laptop">
+    <h2 id="t-laptop">Preparar la laptop</h2>
+    <p>Todo está en internet: en la laptop solo hace falta iniciar sesión en cada panel. Marca lo que ya tengas listo; se recuerda en ese navegador.</p>
+    <div class="checklist" id="checklist">
+      <div class="check"><input type="checkbox" id="c-render"><label for="c-render"><strong>Entrar en Render</strong><small>dashboard.render.com, con la misma cuenta que usas en el PC.</small></label></div>
+      <div class="check"><input type="checkbox" id="c-neon"><label for="c-neon"><strong>Entrar en Neon</strong><small>console.neon.tech, con la misma cuenta (si entraste con Google o GitHub, usa ese botón).</small></label></div>
+      <div class="check"><input type="checkbox" id="c-github"><label for="c-github"><strong>Entrar en GitHub</strong><small>Para mostrar el código, los cambios y el CI en verde.</small></label></div>
+      <div class="check"><input type="checkbox" id="c-sonar"><label for="c-sonar"><strong>Entrar en SonarQube Cloud</strong><small>sonarcloud.io → Log in → With GitHub.</small></label></div>
+      <div class="check"><input type="checkbox" id="c-app"><label for="c-app"><strong>Probar la app</strong><small>Inicia sesión con tu admin de la web (no es admin123: esa es la del PC).</small></label></div>
+      <div class="check"><input type="checkbox" id="c-despertar"><label for="c-despertar"><strong>Abrir la app 2 minutos antes de presentar</strong><small>Para que Render ya esté despierto.</small></label></div>
+    </div>
+    <p class="progreso" id="progreso" aria-live="polite">0 de 6 listos</p>
+    <h3>Opcional: el código en la laptop</h3>
+    <p>Solo si quieres mostrar la app corriendo en local. Necesitas Git y Node.js 20 o más nuevo.</p>
+    <pre class="comandos">git clone https://github.com/TUNEGRITOPRIPRATRULULOCORO-glitch/VITALTRAINING-PRO-.git
+cd VITALTRAINING-PRO-
+npm install
+npm start
+# Abre http://localhost:4000 · admin@vital.com / admin123 (base local nueva, con datos de prueba)</pre>
+  </section>
+
+  <section aria-labelledby="t-demo">
+    <h2 id="t-demo">Guion para la demo</h2>
+    <ol class="pasos">
+      <li><div><strong>La app.</strong> Portada, registro y un atleta: plan, salud y asistente.</div></li>
+      <li><div><strong>Render.</strong> El servicio en línea, el historial de deploys y los Logs (“Base de datos lista · postgresql”).</div></li>
+      <li><div><strong>Neon.</strong> Tables → <span class="mono">usuarios</span> o <span class="mono">salud</span>: los datos que se acaban de ver en la app. Las contraseñas aparecen cifradas.</div></li>
+      <li><div><strong>GitHub.</strong> El historial de cambios y Actions con el CI en verde.</div></li>
+      <li><div><strong>SonarQube.</strong> Quality Gate Passed y las notas en A.</div></li>
+    </ol>
+  </section>
+
+  <aside class="cuidado" aria-labelledby="t-cuidado">
+    <h3 id="t-cuidado">Cuidado al proyectar</h3>
+    <ul>
+      <li>No muestres la <strong>connection string</strong> de Neon ni las variables de Render con su valor visible: dan acceso a todos los datos.</li>
+      <li>En Neon, enseña las tablas sin abrir datos personales de usuarios reales, o muéstralos rápido.</li>
+      <li>No dejes la sesión de Render o Neon abierta en un computador de la universidad.</li>
+    </ul>
+  </aside>
+
+</div>
+
+<script>
+(function () {
+  const caja = document.getElementById('checklist');
+  const progreso = document.getElementById('progreso');
+  const casillas = Array.from(caja.querySelectorAll('input[type="checkbox"]'));
+  const leer = id => { try { return localStorage.getItem('vtpd_' + id) === '1'; } catch { return false; } };
+  const guardar = (id, v) => { try { localStorage.setItem('vtpd_' + id, v ? '1' : '0'); } catch { /* sin almacenamiento */ } };
+  const pintar = () => { progreso.textContent = casillas.filter(c => c.checked).length + ' de ' + casillas.length + ' listos'; };
+  casillas.forEach(c => { c.checked = leer(c.id); c.addEventListener('change', () => { guardar(c.id, c.checked); pintar(); }); });
+  pintar();
+})();
+</script>
+
+</body>
+</html>

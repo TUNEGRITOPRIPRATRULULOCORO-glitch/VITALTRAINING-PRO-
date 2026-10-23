@@ -129,6 +129,8 @@ Para empezar de cero en local, borra la carpeta `base-de-datos/datos-locales/`. 
 
 Guía paso a paso para tenerla en un enlace público gratis (Neon + Render): **[docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)**.
 
+Cómo está montado todo (Render, Neon, GitHub, SonarQube...) y guion para presentarlo: **[docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**.
+
 ### Con Docker
 
 Antes, copia `.env.example` como `.env` y rellena `POSTGRES_PASSWORD` y `JWT_SECRET` (las contraseñas no van en `docker-compose.yml`).
