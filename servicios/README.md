@@ -6,7 +6,6 @@ Aquí van las **integraciones con servicios externos**, separadas del servidor p
 |---|---|---|
 | Correo (bienvenida, recuperar contraseña, alertas de salud y de carga) | ✅ Listo (Brevo) | [`correo/`](correo/) |
 | Pagos / suscripciones | Pendiente | `pagos/` |
-| IA / automatizaciones (n8n) | Endpoint de contexto en `servidor/api/ia/` | `ia/` |
 
 Regla: cada servicio expone funciones simples (p. ej. `enviarCorreo({ para, asunto, html, texto })`) y lee sus claves de `.env`. Los módulos de `servidor/api/` solo llaman a esas funciones (en el caso del correo, a través del módulo `servidor/api/avisos`).
 

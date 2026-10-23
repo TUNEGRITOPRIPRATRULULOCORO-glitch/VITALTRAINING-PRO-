@@ -63,15 +63,15 @@ describe('authMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  test('deja pasar sin token la ruta de contexto para n8n', () => {
+  test('ninguna ruta se salta la sesión (la antigua de n8n tampoco)', () => {
     const req  = { path: '/ia/n8n-contexto/5', headers: {} };
     const res  = makeRes();
     const next = jest.fn();
 
     authMiddleware(req, res, next);
 
-    expect(next).toHaveBeenCalledTimes(1);
-    expect(res.status).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
   });
 });
 

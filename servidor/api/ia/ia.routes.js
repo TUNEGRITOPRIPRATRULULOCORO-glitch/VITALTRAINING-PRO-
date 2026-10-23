@@ -8,7 +8,6 @@ const router    = require('express').Router();
 const rateLimit = require('express-rate-limit');
 const ctrl      = require('./ia.controller');
 const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
-const n8nContextController = require('./n8nContext.controller');
 
 router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
 router.get('/:userId/consulta', ctrl.getConsulta);
@@ -25,8 +24,5 @@ const limiteChat = rateLimit({
 router.get('/:userId/chat', ctrl.getChat);
 router.post('/:userId/chat', limiteChat, ctrl.postChat);
 router.delete('/:userId/chat', ctrl.deleteChat);
-
-// Ruta pública para n8n — usa "uid" en vez de "userId" para no disparar el router.param de arriba
-router.get('/n8n-contexto/:uid', n8nContextController.getContextoUsuario);
 
 module.exports = router;

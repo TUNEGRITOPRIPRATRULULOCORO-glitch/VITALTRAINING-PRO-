@@ -27,7 +27,7 @@ El proyecto está dividido en 4 bloques:
 |---|---|---|
 | 🖥️ **Interfaz** | [`interfaz/`](interfaz/) | Lo que ve el usuario: pantallas HTML, estilos y JS del navegador |
 | 🗄️ **Servidor** | [`servidor/`](servidor/) | API REST con Express, organizada como monolito modular ([reglas](servidor/README.md)) |
-| ✉️ **Servicios** | [`servicios/`](servicios/) | Integraciones externas: correo, pagos, IA (n8n) |
+| ✉️ **Servicios** | [`servicios/`](servicios/) | Integraciones externas: correo (y en el futuro, pagos) |
 | 💾 **Base de datos** | [`base-de-datos/`](base-de-datos/) | Conexión a PostgreSQL, tablas (`schema.sql`) y datos iniciales |
 
 ```
@@ -49,7 +49,7 @@ vital-training/
 │       ├── panel/          # Dashboard · Historial · Perfil
 │       ├── salud/          # Registros diarios de salud
 │       ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
-│       ├── ia/             # Asistente IA + contexto para n8n
+│       ├── ia/             # Asistente IA (chat con Vita)
 │       ├── rendimiento/    # Listo para entrenar · carga y riesgo de lesión · cumplimiento
 │       ├── mensajes/       # Chat atleta ↔ nutricionista/médico, equipo ↔ administración
 │       ├── evaluaciones/   # Tests físicos periódicos (salto, sprint, agilidad, Yo-Yo)
