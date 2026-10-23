@@ -5,6 +5,7 @@ async function getIncidencias(req, res) {
     const filtros = { ...req.query };
     if (req.user.rol === 'Atleta' || req.user.rol === 'Futbolista') filtros.userId = req.user.id;
     else if (req.user.rol === 'Nutricionista') filtros.destinatario = 'Nutricionista';
+    else if (req.user.rol !== 'Administrador') return res.json([]); // el médico no gestiona tickets
     // Administrador ve todo
     res.json(await svc.listar(filtros));
   } catch (err) {

@@ -24,11 +24,13 @@ const loginLimiter = limite(10, 'Demasiados intentos de inicio de sesión. Inten
 // Cada petición puede enviar un correo: límite bajo para que no se use para hacer spam
 const olvideLimiter = limite(5, 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.');
 const restablecerLimiter = limite(10, 'Demasiados intentos. Intenta de nuevo en 15 minutos.');
+// Cada cuenta nueva envía un correo de bienvenida: sin límite se podría usar para enviar spam
+const registroLimiter = limite(10, 'Demasiados registros desde esta conexión. Intenta de nuevo en 15 minutos.');
 
 router.get('/config',                           ctrl.getConfig);
 router.post('/login',       loginLimiter,       ctrl.postLogin);
 router.post('/google',      loginLimiter,       ctrl.postGoogle);
-router.post('/registro',                        ctrl.postRegistro);
+router.post('/registro',    registroLimiter,    ctrl.postRegistro);
 router.post('/olvide',      olvideLimiter,      ctrl.postOlvide);
 router.post('/restablecer', restablecerLimiter, ctrl.postRestablecer);
 
