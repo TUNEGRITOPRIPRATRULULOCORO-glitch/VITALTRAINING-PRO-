@@ -20,7 +20,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `nutricionista` | `notas_nutricionista` | — |
 | `incidencias` | `incidencias` | — |
 | `reportes` | — (solo lectura) | — |
-| `ia` | — (solo lectura) | — |
+| `ia` | `ia_mensajes` (chat con el asistente) | — |
 | `rendimiento` | — (solo lectura) | — |
 | `mensajes` | `mensajes` | — |
 | `evaluaciones` | `evaluaciones` | — |

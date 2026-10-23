@@ -538,84 +538,114 @@ function verVideoEjercicio(nombre) {
 }
 
 // — ASISTENTE IA (ATLETA) —
-function pfRenderIA() {
-    const main = document.getElementById('pf-content');
-    const categorias = [
-        {
-            titulo: '🏋️ Entrenamiento individual',
-            preguntas: [
-                { tipo: 'entrenamiento_personalizado', label: 'Crear mi rutina personalizada' },
-                { tipo: 'entrenar_hoy', label: '¿Puedo entrenar hoy?' },
-                { tipo: 'fatiga', label: '¿Qué tan cargado estoy?' }
-            ]
-        },
-        {
-            titulo: '🍽 Nutrición individual',
-            preguntas: [
-                { tipo: 'alimentacion_personalizada', label: 'Crear mi plan nutricional' },
-                { tipo: 'nutricion', label: '¿Cómo va mi alimentación?' },
-                { tipo: 'calorias', label: '¿Cuántas calorías consumo?' }
-            ]
-        },
-        {
-            titulo: '📋 Mi plan real',
-            preguntas: [
-                { tipo: 'personalizado', label: 'Generar mi plan completo' },
-                { tipo: 'resumen', label: 'Resumen de mi semana' },
-                { tipo: 'mejorar', label: 'Qué necesito mejorar' }
-            ]
-        }
-    ];
+// Chat con Vita: el atleta escribe como a una persona. Con Claude configurado en el servidor
+// conversa de verdad; si no, responde el modo básico con los análisis de la app.
+let _iaEnviando = false;
 
-    main.innerHTML=`
+async function pfRenderIA() {
+    const main = document.getElementById('pf-content');
+    main.innerHTML = `
     <div class="view-enter">
         <div class="view-header">
-            <div class="view-title"><h1>Asistente IA</h1><p>Plan personalizado según tu perfil, tu deporte y tu objetivo</p></div>
+            <div class="view-title"><h1>Asistente IA</h1><p>Habla con Vita sobre tu entrenamiento, tus comidas, tu descanso o tu próximo partido</p></div>
         </div>
-        <div class="ia-layout">
-            <div class="ia-col-preguntas">
-                ${categorias.map(cat=>`
-                <div class="ia-categoria">
-                    <div class="ia-cat-titulo">${cat.titulo}</div>
-                    <div class="ia-preguntas">
-                        ${cat.preguntas.map(p=>`
-                        <button class="ia-btn" onclick="pfConsultarIA('${p.tipo}',this)">${p.label}</button>`).join('')}
-                    </div>
-                </div>`).join('')}
+        <div class="ia-chat">
+            <div class="ia-chat-cabecera">
+                <div class="ia-avatar" aria-hidden="true">🌿</div>
+                <div class="ia-chat-quien"><strong>Vita</strong><span class="ia-estado" id="ia-estado">Conectando…</span></div>
+                <button type="button" class="ia-nueva" onclick="iaNuevaConversacion()" title="Borrar la conversación y empezar de cero">↺ <span>Nueva conversación</span></button>
             </div>
-            <div class="ia-col-respuesta">
-                <div id="ia-respuesta" class="ia-respuesta ia-placeholder">
-                    <div class="ia-placeholder-inner">
-                        <span class="ia-placeholder-icon">🤖</span>
-                        <p>Selecciona una opción y la IA te generará un plan adaptado a ti.</p>
-                    </div>
-                </div>
-            </div>
+            <div class="ia-mensajes" id="ia-mensajes" aria-live="polite"></div>
+            <form class="ia-escribir" onsubmit="event.preventDefault(); iaEnviar()">
+                <textarea id="ia-texto" rows="1" maxlength="2000" placeholder="Escribe tu mensaje…" aria-label="Mensaje para Vita"
+                    oninput="iaAjustarAltura(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();iaEnviar();}"></textarea>
+                <button type="submit" class="ia-enviar" id="ia-enviar" aria-label="Enviar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+                </button>
+            </form>
+            <div class="ia-aviso">Vita orienta, pero no sustituye a tu médico ni a tu nutricionista.</div>
         </div>
     </div>`;
+
+    const data = await apiFetch(`${API}/ia/${currentUser.id}/chat`).then(r => r.json()).catch(() => null);
+    const estado = document.getElementById('ia-estado');
+    if (!estado) return; // cambió de pantalla mientras cargaba
+    const basico = data?.modo !== 'claude';
+    estado.textContent = basico ? 'Modo básico' : 'En línea';
+    estado.classList.toggle('ia-basico', basico);
+    estado.title = basico ? 'Responde con los análisis de la app. Para conversar libremente, el administrador debe activar Claude.' : '';
+
+    const mensajes = data?.mensajes || [];
+    if (mensajes.length) mensajes.forEach(m => iaPintarMensaje(m.rol, m.texto, m.fecha));
+    else iaPintarMensaje('asistente', iaSaludo());
+    document.getElementById('ia-texto')?.focus();
 }
 
-async function pfConsultarIA(tipo, btn) {
-    document.querySelectorAll('.ia-btn').forEach(b=>b.classList.remove('ia-btn-active'));
-    btn.classList.add('ia-btn-active');
-    const box = document.getElementById('ia-respuesta');
-    box.className = 'ia-respuesta ia-loading';
-    box.innerHTML = '<div class="ia-spinner"></div> Analizando tus datos...';
+function iaSaludo() {
+    const nombre = currentUser.nombre.split(' ')[0]; // iaPintarMensaje ya lo escapa
+    return `¡Hola, ${nombre}! 👋 Soy Vita. Puedes preguntarme lo que quieras: si hoy te conviene entrenar fuerte, qué comer antes del partido, cómo mejorar tu descanso o cómo ajustar tu rutina. ¿En qué te ayudo?`;
+}
 
-    const data = await apiFetch(`${API}/ia/${currentUser.id}/consulta?tipo=${tipo}`).then(r=>r.json()).catch(()=>null);
+// Texto seguro con **negritas** y saltos de línea
+function iaFormato(texto) {
+    return escapeHtml(texto).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
 
-    if (!data?.ok) {
-        box.className = 'ia-respuesta ia-tipo-danger';
-        box.innerHTML = '❌ Error al obtener el análisis. Intenta de nuevo.';
-        return;
+function iaPintarMensaje(rol, texto, fecha = null, { seguro = false } = {}) {
+    const lista = document.getElementById('ia-mensajes');
+    if (!lista) return;
+    const esAtleta = rol === 'atleta';
+    const hora = fecha ? new Date(fecha) : new Date();
+    const fila = document.createElement('div');
+    fila.className = `ia-fila ia-fila-${esAtleta ? 'atleta' : 'asistente'}`;
+    fila.innerHTML = `
+        ${esAtleta ? '' : '<div class="ia-avatar" aria-hidden="true">🌿</div>'}
+        <div>
+            <div class="ia-burbuja">${seguro ? texto : iaFormato(texto)}</div>
+            <div class="ia-hora">${hora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>`;
+    lista.appendChild(fila);
+    lista.scrollTop = lista.scrollHeight;
+    return fila;
+}
+
+function iaAjustarAltura(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+async function iaEnviar() {
+    const campo = document.getElementById('ia-texto');
+    const texto = campo?.value.trim();
+    if (!texto || _iaEnviando) return;
+    _iaEnviando = true;
+    document.getElementById('ia-enviar').disabled = true;
+    campo.value = ''; iaAjustarAltura(campo);
+
+    iaPintarMensaje('atleta', texto);
+    const escribiendo = iaPintarMensaje('asistente', '<span class="ia-escribiendo"><span></span><span></span><span></span></span>', null, { seguro: true });
+    escribiendo?.querySelector('.ia-burbuja').setAttribute('aria-label', 'Vita está escribiendo');
+
+    try {
+        const res = await apiFetch(`${API}/ia/${currentUser.id}/chat`, { method: 'POST', body: JSON.stringify({ mensaje: texto }) });
+        const data = await res.json().catch(() => ({}));
+        escribiendo?.remove();
+        iaPintarMensaje('asistente', res.ok ? data.respuesta : (data.error || 'No pude responder. Inténtalo de nuevo.'));
+    } catch {
+        escribiendo?.remove();
+        iaPintarMensaje('asistente', 'No me pude conectar. Revisa tu conexión e inténtalo de nuevo.');
+    } finally {
+        _iaEnviando = false;
+        const boton = document.getElementById('ia-enviar');
+        if (boton) boton.disabled = false;
+        document.getElementById('ia-texto')?.focus();
     }
+}
 
-    const colores = { success:'ia-tipo-success', warning:'ia-tipo-warning', danger:'ia-tipo-danger', info:'ia-tipo-info' };
-    box.className = `ia-respuesta ${colores[data.tipo]||'ia-tipo-info'}`;
-    box.innerHTML = `
-        <div class="ia-resp-header">
-            <span class="ia-resp-icono">${data.icono||'🤖'}</span>
-            <span class="ia-resp-tipo">${btn.textContent}</span>
-        </div>
-        <div class="ia-resp-texto">${(data.respuesta||'').replace(/\n/g,'<br>')}</div>`;
+async function iaNuevaConversacion() {
+    if (!confirm('¿Borrar la conversación con Vita y empezar de nuevo?')) return;
+    const res = await apiFetch(`${API}/ia/${currentUser.id}/chat`, { method: 'DELETE' });
+    if (!res.ok) return showToast('No se pudo borrar la conversación', 'error');
+    document.getElementById('ia-mensajes').innerHTML = '';
+    iaPintarMensaje('asistente', iaSaludo());
 }

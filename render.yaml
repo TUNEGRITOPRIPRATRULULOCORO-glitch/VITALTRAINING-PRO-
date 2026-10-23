@@ -34,6 +34,9 @@ services:
         sync: false
       - key: CORREO_REMITENTE
         sync: false
+      # Asistente IA con Claude (opcional, se escribe a mano en Render)
+      - key: ANTHROPIC_API_KEY
+        sync: false
       # Entrar con Google (opcional, se escribe a mano en Render)
       - key: GOOGLE_CLIENT_ID
         sync: false

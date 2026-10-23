@@ -157,6 +157,15 @@ CREATE TABLE IF NOT EXISTS restablecimientos (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS ia_mensajes (  -- conversación del atleta con el asistente
+  id         BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT NOT NULL,
+  rol        VARCHAR(10) NOT NULL,      -- 'atleta' o 'asistente'
+  texto      TEXT NOT NULL,
+  modo       VARCHAR(10),               -- 'claude' o 'basico'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS mensajes (
   id              BIGSERIAL PRIMARY KEY,
   remitente_id    BIGINT NOT NULL,
@@ -180,3 +189,4 @@ ALTER TABLE mensajes ADD CONSTRAINT mensajes_destinatario_id_fkey FOREIGN KEY (d
 ALTER TABLE fotos_perfil ADD CONSTRAINT fotos_perfil_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE evaluaciones ADD CONSTRAINT evaluaciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE restablecimientos ADD CONSTRAINT restablecimientos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE ia_mensajes ADD CONSTRAINT ia_mensajes_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

@@ -2404,67 +2404,64 @@ input[type="range"].range-green  { accent-color: var(--primary); }
 }
 
 /* ===========================
-   ASISTENTE IA
+   ASISTENTE IA — chat con Vita
 =========================== */
-.ia-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 28px;
-    align-items: start;
+.ia-chat {
+    display: flex; flex-direction: column;
+    height: calc(100vh - 210px); min-height: 460px; max-width: 900px;
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+    box-shadow: var(--shadow);
 }
-.ia-col-preguntas { display: flex; flex-direction: column; gap: 0; }
-.ia-col-respuesta { position: sticky; top: 20px; }
-
-.ia-placeholder {
-    background: var(--bg-2);
-    border: 2px dashed var(--border);
-    border-radius: 14px;
-    min-height: 260px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.ia-chat-cabecera { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.ia-avatar {
+    width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+    font-size: 20px; background: linear-gradient(135deg, #22c55e, #0ea5e9); box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
 }
-.ia-placeholder-inner {
-    text-align: center;
-    color: var(--text-muted);
+.ia-chat-quien { flex: 1; min-width: 0; }
+.ia-chat-quien strong { display: block; font-size: 15px; color: var(--text); }
+.ia-estado { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.ia-estado::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+.ia-estado.ia-basico::before { background: #f59e0b; }
+.ia-nueva { background: none; border: 1px solid var(--border); color: var(--text-muted); border-radius: 10px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.ia-nueva:hover { color: var(--primary); border-color: var(--primary); }
+
+.ia-mensajes { flex: 1; overflow-y: auto; padding: 20px 18px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+.ia-fila { display: flex; gap: 10px; align-items: flex-end; max-width: 82%; animation: fadeIn 0.2s ease; }
+.ia-fila .ia-avatar { width: 30px; height: 30px; font-size: 15px; box-shadow: none; }
+.ia-fila-atleta { align-self: flex-end; flex-direction: row-reverse; }
+.ia-burbuja { padding: 11px 15px; border-radius: 18px; font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.ia-fila-asistente .ia-burbuja { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 6px; }
+.ia-fila-atleta .ia-burbuja { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; border-bottom-right-radius: 6px; }
+.ia-hora { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.ia-fila-atleta .ia-hora { text-align: right; }
+
+.ia-escribiendo { display: inline-flex; gap: 4px; padding: 14px 16px; }
+.ia-escribiendo span { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); animation: ia-punto 1.2s infinite ease-in-out; }
+.ia-escribiendo span:nth-child(2) { animation-delay: 0.15s; }
+.ia-escribiendo span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes ia-punto { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-4px); opacity: 1; } }
+
+.ia-escribir { display: flex; align-items: flex-end; gap: 10px; padding: 12px 14px; border-top: 1px solid var(--border); background: var(--bg-2); }
+.ia-escribir textarea {
+    flex: 1; resize: none; max-height: 140px; min-height: 44px; padding: 11px 14px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 14.5px; line-height: 1.45; outline: none;
 }
-.ia-placeholder-icon { font-size: 2.5rem; display: block; margin-bottom: 12px; }
-.ia-placeholder-inner p { font-size: 14px; line-height: 1.6; }
+.ia-escribir textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(22,163,74,0.12); }
+.ia-enviar { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center;
+    background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; transition: transform 0.15s, opacity 0.15s; }
+.ia-enviar:hover { transform: scale(1.06); }
+.ia-enviar:disabled { opacity: 0.45; cursor: default; transform: none; }
+.ia-enviar svg { width: 20px; height: 20px; }
+.ia-aviso { padding: 0 18px 10px; font-size: 11.5px; color: var(--text-muted); text-align: center; background: var(--bg-2); }
 
-.ia-intro {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: linear-gradient(135deg, #1e3a2f, #2d5a3f);
-    border-radius: 16px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-    color: white;
+body.dark .ia-fila-asistente .ia-burbuja { background: #252d3d; border-color: rgba(148,163,184,0.18); color: #e2e8f0; }
+body.dark .ia-escribir textarea { background: #252d3d; color: #f1f5f9; }
+
+@media (max-width: 640px) {
+    .ia-chat { height: calc(100vh - 150px); border-radius: 14px; }
+    .ia-fila { max-width: 92%; }
+    .ia-nueva span { display: none; }
 }
-.ia-intro-icon    { font-size: 2.5rem; line-height: 1; }
-.ia-intro-titulo  { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-.ia-intro-sub     { font-size: 13px; opacity: 0.8; }
-
-.ia-categoria     { margin-bottom: 18px; }
-.ia-cat-titulo    { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-
-.ia-preguntas     { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.ia-btn {
-    background: var(--bg-2);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: var(--font);
-}
-.ia-btn:hover      { border-color: var(--primary); color: var(--primary); background: rgba(22,163,74,0.06); }
-.ia-btn-active     { border-color: var(--primary); background: var(--primary); color: white; }
-.ia-btn-active:hover { background: var(--primary-dark); color: white; }
 
 /* ===========================
    MENSAJES — bandeja de chat entre roles
@@ -2686,39 +2683,6 @@ body.dark .msg-aviso-ticket { background: rgba(59,130,246,0.12); color: #93c5fd;
     .msg-box.msg-con-chat .msg-chat { display: flex; }
     .msg-volver { display: block; }
     .msg-burbuja { max-width: 88%; }
-}
-
-.ia-respuesta {
-    margin-top: 24px;
-    border-radius: 14px;
-    padding: 20px 24px;
-    animation: fadeIn 0.2s ease;
-    border-left: 4px solid transparent;
-}
-.ia-respuesta.hidden  { display: none; }
-.ia-loading           { background: var(--bg-2); border-left-color: var(--border); color: var(--text-muted); display: flex; align-items: center; gap: 12px; font-size: 14px; }
-.ia-tipo-success      { background: #dcfce7; border-left-color: #16a34a; }
-.ia-tipo-warning      { background: #fef9c3; border-left-color: #ca8a04; }
-.ia-tipo-danger       { background: #fee2e2; border-left-color: #ef4444; }
-.ia-tipo-info         { background: #e0f2fe; border-left-color: #0ea5e9; }
-
-.ia-resp-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-.ia-resp-icono  { font-size: 1.4rem; line-height: 1; }
-.ia-resp-tipo   { font-size: 14px; font-weight: 700; color: var(--text); }
-.ia-resp-texto  { font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-line; }
-
-.ia-spinner {
-    width: 18px; height: 18px;
-    border: 2.5px solid var(--border);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    flex-shrink: 0;
 }
 
 /* ===========================
@@ -3879,7 +3843,6 @@ body.dark .plan-day-card,
 body.dark .plan-rutina-dia,
 body.dark .salud-form-card,
 body.dark .onb-group,
-body.dark .ia-placeholder,
 body.dark .comment-item,
 body.dark .paciente-card {
     background: var(--bg-2);
@@ -3975,8 +3938,6 @@ body.dark .comment-form textarea { background: #252d3d; border-color: var(--bord
 body.dark .plan-day-header { background: linear-gradient(135deg, #1e2638, #252d3d); border-color: var(--border); }
 body.dark .plan-meal { background: #1e2638; }
 body.dark .plan-meals-grid { background: var(--border); }
-body.dark .ia-btn { background: var(--bg-2); border-color: var(--border); color: var(--text); }
-body.dark .ia-intro { background: linear-gradient(135deg, #0d1f12, #1a2e20); }
 body.dark .salud-chart-legend .scl-zone { background: rgba(239,68,68,0.15); }
 body.dark .today-badge { background: rgba(22,163,74,0.15); color: #4ade80; }
 

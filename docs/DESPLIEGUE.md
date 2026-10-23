@@ -150,3 +150,35 @@ Sin configurarlo, el botón "Continuar con Google" simplemente no aparece. Para 
 5. En Render → **Environment Groups → Pro**, añade `GOOGLE_CLIENT_ID` con ese valor y haz **Manual Deploy → Deploy latest commit**.
 
 Cómo funciona: si el correo de Google ya tiene cuenta, entra directamente. Si no, la persona completa el registro (deporte, posición...) sin inventar contraseña; si algún día la quiere, usa "¿Olvidaste tu contraseña?".
+
+
+---
+
+## Asistente IA con Claude (opcional)
+
+Sin configurar nada, el asistente "Vita" funciona en **modo básico**: entiende de qué le hablan y responde con los análisis de la app, pero no conversa libremente. Con una clave de Claude conversa como una persona y conoce los datos del atleta (perfil, salud de la semana, plan, día de partido, carga).
+
+1. Entra en [platform.claude.com](https://platform.claude.com) y crea una cuenta.
+2. **Billing**: carga saldo (prepago). Para empezar, 5-10 USD alcanzan para muchas conversaciones de prueba.
+3. **Limits**: pon un límite de gasto mensual para no llevarte sorpresas.
+4. **API Keys → Create Key**. Cópiala (empieza por `sk-ant-`). Es secreta: no la compartas ni la subas a GitHub.
+5. En Render → **Environment Groups → Pro**, añade `ANTHROPIC_API_KEY` con esa clave y haz **Manual Deploy**.
+6. En el asistente, debajo de "Vita" debe decir **En línea** (en vez de "Modo básico").
+
+**Costo aproximado:** usa el modelo Claude Opus 5.5. Cada mensaje cuesta unos 2 centavos de dólar (lleva los datos del atleta en cada pregunta). Cada persona puede enviar como máximo 30 mensajes cada 10 minutos. Si Claude falla o se acaba el saldo, el asistente pasa solo al modo básico.
+
+---
+
+## Análisis de código con SonarQube (opcional)
+
+SonarQube revisa el código en cada subida a GitHub: errores probables, fallos de seguridad, código duplicado y cobertura de tests. El repositorio es público, así que **SonarQube Cloud es gratis**.
+
+1. Entra en [sonarcloud.io](https://sonarcloud.io) → **Log in → With GitHub** y autoriza.
+2. **+ → Analyze new project → Import an organization**: elige tu cuenta de GitHub e instala la app solo para el repositorio `VITALTRAINING-PRO-`. Plan **Free**.
+3. Selecciona el repositorio → **Set up**. Para "new code" elige **Previous version**.
+4. En **Analysis Method** elige **With GitHub Actions** (no "Automatic Analysis": esa no lee la cobertura de los tests). SonarQube te muestra un **SONAR_TOKEN**: cópialo.
+5. En GitHub → el repositorio → **Settings → Secrets and variables → Actions → New repository secret**: nombre `SONAR_TOKEN`, valor el token.
+6. Comprueba en SonarQube Cloud la **Organization Key** y la **Project Key**. Si no coinciden con las de `sonar-project.properties`, cámbialas ahí.
+7. Sube cualquier cambio a `main` (o en GitHub → **Actions → CI → Run workflow**). Al terminar, el informe aparece en SonarQube Cloud.
+
+El análisis va en `.github/workflows/ci.yml`, después de los tests. Mientras no exista el secreto `SONAR_TOKEN`, ese paso se salta sin dar error.
