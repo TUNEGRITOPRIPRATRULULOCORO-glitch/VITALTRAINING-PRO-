@@ -4916,3 +4916,11 @@ button.sidebar-overlay { border: 0; padding: 0; margin: 0; width: 100%; cursor: 
 @media (prefers-reduced-motion: reduce) {
     .musica-boton.musica-sonando { animation: none; }
 }
+
+/* Etiqueta del rol Médico: igual que las demás (punto de color y borde), también en modo oscuro */
+.badge-medico { border: 1px solid #7dd3fc; }
+.badge-medico::before { background: #0284c7; }
+body.dark .badge-medico { background: rgba(2,132,199,0.18); color: #7dd3fc; border-color: rgba(2,132,199,0.4); }
+
+/* Espacio al final de cada panel para que el reproductor de música no tape la última fila */
+.main-content { padding-bottom: 96px; }
