@@ -786,7 +786,8 @@
   }
 
   .faq-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
-  .faq-pregunta { padding: 18px 20px; font-weight: 700; font-size: 17px; cursor: pointer; display:flex; justify-content:space-between; align-items:center; gap: 12px; }
+  .faq-pregunta { width: 100%; background: none; border: 0; color: inherit; font-family: inherit; text-align: left; padding: 18px 20px; font-weight: 700; font-size: 17px; cursor: pointer; display:flex; justify-content:space-between; align-items:center; gap: 12px; }
+  .solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .faq-pregunta .flecha { transition: transform .2s ease; color: var(--green); font-size: 20px; }
   .faq-item.abierta .faq-pregunta .flecha { transform: rotate(180deg); }
   .faq-respuesta { max-height: 0; overflow: hidden; transition: max-height .25s ease; padding: 0 20px; }
@@ -825,7 +826,8 @@
   <div class="search-wrap">
     <div class="search-box">
       <span style="font-size:20px">🔍</span>
-      <input type="text" id="buscador" placeholder="Escribe lo que quieres saber... ej: comida">
+      <label for="buscador" class="solo-lector">Buscar en la ayuda</label>
+    <input type="text" id="buscador" placeholder="Escribe lo que quieres saber... ej: comida">
     </div>
   </div>
 
@@ -1257,27 +1259,27 @@
       <div class="seccion-header"><div class="num">?</div><h2>Preguntas que la gente hace mucho</h2></div>
 
       <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>Se me olvidó mi contraseña, ¿qué hago?</span><span class="flecha">▾</span></div>
+        <button type="button" class="faq-pregunta" onclick="toggleFaq(this)"><span>Se me olvidó mi contraseña, ¿qué hago?</span><span class="flecha">▾</span></button>
         <div class="faq-respuesta"><p>Pídele a un administrador de tu equipo que te ayude a recuperarla, o pídele que te cree una nueva contraseña. Ellos pueden hacerlo desde su panel.</p></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>Escribí algo mal, ¿puedo corregirlo?</span><span class="flecha">▾</span></div>
+        <button type="button" class="faq-pregunta" onclick="toggleFaq(this)"><span>Escribí algo mal, ¿puedo corregirlo?</span><span class="flecha">▾</span></button>
         <div class="faq-respuesta"><p>Sí. Ve a la sección que quieras corregir (por ejemplo tu perfil), borra lo que está mal, escribe lo correcto y toca <strong>Guardar</strong>.</p></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Por qué no veo mis comidas de hoy?</span><span class="flecha">▾</span></div>
+        <button type="button" class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Por qué no veo mis comidas de hoy?</span><span class="flecha">▾</span></button>
         <div class="faq-respuesta"><p>Puede ser que tu nutricionista todavía no haya armado tu plan de esta semana. Espera un poco, o pregúntale directamente a él o ella.</p></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>La pantalla se ve rara o no carga</span><span class="flecha">▾</span></div>
+        <button type="button" class="faq-pregunta" onclick="toggleFaq(this)"><span>La pantalla se ve rara o no carga</span><span class="flecha">▾</span></button>
         <div class="faq-respuesta"><p>Intenta cerrar la aplicación y volver a abrirla. Si sigue igual, pídele a alguien que revise que tengas internet conectado.</p></div>
       </div>
 
       <div class="faq-item">
-        <div class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Cómo salgo de mi cuenta?</span><span class="flecha">▾</span></div>
+        <button type="button" class="faq-pregunta" onclick="toggleFaq(this)"><span>¿Cómo salgo de mi cuenta?</span><span class="flecha">▾</span></button>
         <div class="faq-respuesta"><p>Busca tu nombre o tu foto, generalmente abajo del todo en el menú de la izquierda. Ahí vas a encontrar un botón para salir de tu cuenta con seguridad.</p></div>
       </div>
     </section>

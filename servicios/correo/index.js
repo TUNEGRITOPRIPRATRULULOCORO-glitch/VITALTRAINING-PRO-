@@ -20,7 +20,9 @@ function configurado() {
 /** Dirección pública de la app, para los enlaces de los correos. */
 function urlApp() {
   const url = process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 4000}`;
-  return url.replace(/\/+$/, '');
+  let limpia = url;
+  while (limpia.endsWith('/')) limpia = limpia.slice(0, -1);
+  return limpia;
 }
 
 /**
@@ -56,12 +58,12 @@ async function enviarCorreo({ para, nombre, asunto, html, texto }) {
       signal: AbortSignal.timeout(10000),
     });
     if (!respuesta.ok) {
-      console.error(`❌ Correo no enviado a ${para} (${respuesta.status}):`, (await respuesta.text()).slice(0, 200));
+      console.error(`❌ Correo no enviado (Brevo respondió ${respuesta.status}):`, (await respuesta.text()).slice(0, 200));
       return { ok: false, motivo: 'proveedor' };
     }
     return { ok: true, modo: 'brevo' };
   } catch (err) {
-    console.error(`❌ Correo no enviado a ${para}:`, err.message);
+    console.error('❌ Correo no enviado (sin conexión con Brevo):', err.message);
     return { ok: false, motivo: 'red' };
   }
 }

@@ -20,7 +20,7 @@ function clamp(val, def) {
 function validarFecha(fecha) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) throw Object.assign(new Error('Formato de fecha inválido. Usa YYYY-MM-DD.'), { status: 400 });
   const d = new Date(fecha);
-  if (isNaN(d.getTime())) throw Object.assign(new Error('Fecha inválida.'), { status: 400 });
+  if (Number.isNaN(d.getTime())) throw Object.assign(new Error('Fecha inválida.'), { status: 400 });
   const hoy = new Date().toISOString().slice(0, 10);
   if (fecha > hoy) throw Object.assign(new Error('No puedes registrar salud en una fecha futura.'), { status: 400 });
 }

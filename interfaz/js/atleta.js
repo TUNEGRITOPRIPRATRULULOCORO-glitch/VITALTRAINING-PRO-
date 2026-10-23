@@ -2,6 +2,7 @@
    VitalTraining — atleta.js
    Panel del atleta: inicio, perfil, salud, historial y soporte.
 ============================================= */
+/* global currentUser:writable, chartInstances:writable -- declaradas en comun.js; aquí se les asigna valor */
 
 // ────────────────────────────────────────────────
 // PANEL ATLETA
@@ -18,7 +19,7 @@ async function showPanelAtleta(user) {
     // Server-side check — cannot be bypassed client-side
     const check=await apiFetch(`${API}/perfil-medico/${user.id}`).then(r=>r.json()).catch(()=>null);
     if (!check?.perfil) {
-        pfRenderOnboarding();
+        enSegundoPlano(pfRenderOnboarding());
     } else {
         pfRenderView('dashboard');
     }
@@ -34,14 +35,14 @@ function pfRenderView(view) {
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
     document.getElementById('pf-content').innerHTML=showLoading();
     Object.values(chartInstances).forEach(c=>c.destroy()); chartInstances={};
-    if(view==='dashboard')  pfRenderDashboard();
-    else if(view==='perfil')    pfRenderPerfil();
-    else if(view==='salud')     pfRenderSalud();
-    else if(view==='historial') pfRenderHistorial();
-    else if(view==='ia')        pfRenderIA();
-    else if(view==='plan')      pfRenderPlan();
-    else if(view==='tests')     pfRenderTests();
-    else if(view==='soporte')   pfRenderSoporte();
+    if(view==='dashboard')  enSegundoPlano(pfRenderDashboard());
+    else if(view==='perfil')    enSegundoPlano(pfRenderPerfil());
+    else if(view==='salud')     enSegundoPlano(pfRenderSalud());
+    else if(view==='historial') enSegundoPlano(pfRenderHistorial());
+    else if(view==='ia')        enSegundoPlano(pfRenderIA());
+    else if(view==='plan')      enSegundoPlano(pfRenderPlan());
+    else if(view==='tests')     enSegundoPlano(pfRenderTests());
+    else if(view==='soporte')   enSegundoPlano(pfRenderSoporte());
 }
 
 // — DASHBOARD —
@@ -492,7 +493,7 @@ async function pfGuardarSalud() {
     const userId=currentUser.id;
     const body={fatiga:document.getElementById('s-fatiga').value,sueno:document.getElementById('s-sueno').value,recuperacion:document.getElementById('s-rec').value,notas:document.getElementById('s-notas').value.trim(),fecha:new Date().toISOString().slice(0,10)};
     const res=await apiFetch(`${API}/salud/${userId}`,{method:'POST',body:JSON.stringify(body)});
-    if(res.ok){showToast('Registro de salud guardado');pfRenderSalud();}
+    if(res.ok){showToast('Registro de salud guardado');enSegundoPlano(pfRenderSalud());}
     else {
         const data=await res.json().catch(()=>({}));
         showToast(data.error||'Error al guardar','error');
@@ -508,7 +509,7 @@ async function pfLeerAlerta(alertaId, btn) {
 async function pfLeerTodas() {
     const userId=currentUser.id;
     const res=await apiFetch(`${API}/panel/${userId}/alertas/leer-todas`,{method:'PUT'});
-    if(res.ok) pfRenderDashboard();
+    if(res.ok) enSegundoPlano(pfRenderDashboard());
 }
 
 // — HISTORIAL —
@@ -767,13 +768,13 @@ async function pfRegistrarComida(userId) {
     const res=await apiFetch(`${API}/panel/${userId}/comidas`,{method:'POST',body:JSON.stringify({nombre,tipo,calorias,proteina,notas,fecha})}).then(r=>r.json()).catch(()=>null);
     if(!res?.ok){errEl.textContent=res?.error||'Error al registrar.';errEl.classList.remove('hidden');return;}
     showToast('Comida registrada ✓');
-    pfRenderHistorialComidas();
+    enSegundoPlano(pfRenderHistorialComidas());
 }
 
 async function pfEliminarComida(userId, comidaId) {
     if(!confirm('¿Eliminar esta comida del registro?'))return;
     const res=await apiFetch(`${API}/panel/${userId}/comidas/${comidaId}`,{method:'DELETE'}).then(r=>r.json()).catch(()=>null);
-    if(res?.ok){showToast('Comida eliminada');pfRenderHistorialComidas();}
+    if(res?.ok){showToast('Comida eliminada');enSegundoPlano(pfRenderHistorialComidas());}
     else showToast('Error al eliminar','error');
 }
 
@@ -790,13 +791,13 @@ async function pfRegistrarRutina(userId) {
     const res=await apiFetch(`${API}/panel/${userId}/rutinas`,{method:'POST',body:JSON.stringify({nombre,tipo,duracionMinutos,intensidad,descripcion,fecha})}).then(r=>r.json()).catch(()=>null);
     if(!res?.ok){errEl.textContent=res?.error||'Error al registrar.';errEl.classList.remove('hidden');return;}
     showToast('Entrenamiento registrado ✓');
-    pfRenderHistorialRutinas();
+    enSegundoPlano(pfRenderHistorialRutinas());
 }
 
 async function pfEliminarRutina(userId, rutinaId) {
     if(!confirm('¿Eliminar esta sesión del registro?'))return;
     const res=await apiFetch(`${API}/panel/${userId}/rutinas/${rutinaId}`,{method:'DELETE'}).then(r=>r.json()).catch(()=>null);
-    if(res?.ok){showToast('Sesión eliminada');pfRenderHistorialRutinas();}
+    if(res?.ok){showToast('Sesión eliminada');enSegundoPlano(pfRenderHistorialRutinas());}
     else showToast('Error al eliminar','error');
 }
 
@@ -859,7 +860,7 @@ async function pfCrearIncidencia() {
     const categoria=document.getElementById('inc-categoria').value;
     const body={titulo,categoria,prioridad:document.getElementById('inc-prioridad').value,descripcion:document.getElementById('inc-desc').value.trim()};
     const res=await apiFetch(`${API}/incidencias`,{method:'POST',body:JSON.stringify(body)});
-    if(res.ok){closeModal();showToast('Ticket enviado correctamente');pfRenderSoporte();}
+    if(res.ok){closeModal();showToast('Ticket enviado correctamente');enSegundoPlano(pfRenderSoporte());}
     else showToast('Error al enviar el ticket','error');
 }
 

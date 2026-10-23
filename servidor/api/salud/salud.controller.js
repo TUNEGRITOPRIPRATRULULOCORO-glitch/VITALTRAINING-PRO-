@@ -14,7 +14,8 @@ async function postSalud(req, res) {
     const registro = await svc.crear(Number(req.params.userId), req.body);
     res.status(201).json({ ok: true, registro });
     // Después de responder: aviso por correo al equipo médico si hay valores preocupantes
-    avisos.alertaSalud(Number(req.params.userId), svc.problemasDe(registro).map(p => p.resumen));
+    avisos.alertaSalud(Number(req.params.userId), svc.problemasDe(registro).map(p => p.resumen))
+      .catch(err => console.error('❌ Alerta de salud por correo:', err.message));
   } catch (err) {
     const status = err.status || 500;
     res.status(status).json({ error: err.message || 'Error guardando datos de salud.' });

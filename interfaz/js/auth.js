@@ -3,6 +3,7 @@
    Portada pública, inicio de sesión, registro (también con Google),
    recuperar contraseña y animaciones de la pantalla de entrada.
 ============================================= */
+/* global currentUser:writable, chartInstances:writable -- declaradas en comun.js; aquí se les asigna valor */
 
 // ── Portada pública ────────────────────────────────────────────
 function mostrarInicio() {
@@ -147,8 +148,8 @@ function ponerOjosPassword() {
 
 document.addEventListener('DOMContentLoaded', ()=>{
     ponerOjosPassword();
-    iniciarGoogle();
-    ['login-email','login-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); }); });
+    enSegundoPlano(iniciarGoogle());
+    ['login-email','login-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') enSegundoPlano(doLogin()); }); });
 });
 
 function goToStep2() {
@@ -214,7 +215,7 @@ function abrirOlvide() {
 
 async function pedirEnlace() {
     const email = document.getElementById('olvide-email').value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return mostrarErrorAuth('olvide-error', 'Escribe un correo válido.');
+    if (!/^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)+$/.test(email)) return mostrarErrorAuth('olvide-error', 'Escribe un correo válido.');
     mostrarErrorAuth('olvide-error', '');
     const btn = document.getElementById('olvide-btn');
     btn.disabled = true;
@@ -303,9 +304,10 @@ document.addEventListener('pointermove', e => {
     const ctx = canvas.getContext('2d');
     let ancho = 0, alto = 0, particulas = [];
     const nueva = () => ({
-        x: Math.random() * ancho, y: alto + Math.random() * alto * 0.3,
-        r: Math.random() * 1.8 + 0.4, v: Math.random() * 0.6 + 0.25,
-        deriva: (Math.random() - 0.5) * 0.3, tono: Math.random() < 0.7 ? '74,222,128' : '34,211,238'
+        // NOSONAR: posiciones de una animación decorativa, no se usa para nada de seguridad
+        x: Math.random() * ancho, y: alto + Math.random() * alto * 0.3, // NOSONAR
+        r: Math.random() * 1.8 + 0.4, v: Math.random() * 0.6 + 0.25, // NOSONAR
+        deriva: (Math.random() - 0.5) * 0.3, tono: Math.random() < 0.7 ? '74,222,128' : '34,211,238' // NOSONAR
     });
     function medir() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -313,7 +315,7 @@ document.addEventListener('pointermove', e => {
         canvas.width = ancho * dpr; canvas.height = alto * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const cantidad = Math.round(Math.min(90, ancho / 16));
-        particulas = Array.from({ length: cantidad }, () => ({ ...nueva(), y: Math.random() * alto }));
+        particulas = Array.from({ length: cantidad }, () => ({ ...nueva(), y: Math.random() * alto })); // NOSONAR (animación)
     }
     function cuadro() {
         requestAnimationFrame(cuadro);

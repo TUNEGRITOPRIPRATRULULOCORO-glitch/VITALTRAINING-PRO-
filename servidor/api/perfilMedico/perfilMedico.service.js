@@ -303,7 +303,7 @@ async function obtenerFicha(userId) {
 function estable(valor) {
   if (Array.isArray(valor)) return `[${valor.map(estable).join(',')}]`;
   if (valor && typeof valor === 'object')
-    return `{${Object.keys(valor).sort().map(k => JSON.stringify(k) + ':' + estable(valor[k])).join(',')}}`;
+    return `{${Object.keys(valor).sort((a, b) => (a < b ? -1 : Number(a > b))).map(k => JSON.stringify(k) + ':' + estable(valor[k])).join(',')}}`;
   return JSON.stringify(valor);
 }
 

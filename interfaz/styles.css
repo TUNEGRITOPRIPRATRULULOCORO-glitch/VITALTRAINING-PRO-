@@ -2087,7 +2087,7 @@ td {
 }
 
 @keyframes progressIn {
-    from { width: 0 !important; }
+    from { width: 0; }
 }
 
 .meter-fill.green  { background: linear-gradient(90deg, #4ade80, #16a34a); }
@@ -4861,3 +4861,6 @@ body.dark .filters-bar select {
 /* Cinco perfiles en la portada: se reparten solos según el ancho */
 .ip-roles { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 @media (max-width: 600px) { .ip-roles { grid-template-columns: 1fr; } }
+
+/* El fondo oscuro del menú móvil es un botón (para cerrar el menú): sin aspecto de botón */
+button.sidebar-overlay { border: 0; padding: 0; margin: 0; width: 100%; cursor: default; }

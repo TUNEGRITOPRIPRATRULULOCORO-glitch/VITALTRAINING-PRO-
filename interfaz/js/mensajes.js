@@ -140,7 +140,7 @@ async function msgAbrir(id) {
     msgPintarContactos();
     await msgCargarConversacion(true);
     document.getElementById('msg-texto')?.focus();
-    msgActualizarBadges();
+    enSegundoPlano(msgActualizarBadges());
 }
 
 function msgCerrarChat() {
@@ -200,7 +200,7 @@ async function msgEnviar(event) {
 async function msgRefrescar() {
     if (!document.getElementById('msg-box')) return stopPolling(); // el usuario se fue a otra vista
     await Promise.all([msgCargarContactos(), msgCargarConversacion()]);
-    msgActualizarBadges();
+    enSegundoPlano(msgActualizarBadges());
 }
 
 async function msgActualizarBadges() {
@@ -219,7 +219,7 @@ async function msgActualizarBadges() {
 
 function startBadgePolling() {
     stopBadgePolling();
-    msgActualizarBadges();
+    enSegundoPlano(msgActualizarBadges());
     badgeInterval = setInterval(msgActualizarBadges, 30000);
 }
 

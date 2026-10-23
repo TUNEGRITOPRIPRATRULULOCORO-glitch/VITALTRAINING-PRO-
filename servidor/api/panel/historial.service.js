@@ -10,7 +10,7 @@ async function historialComidas(userId, { page = 1, limit = 10 } = {}) {
       [userId, Number(limit), offset]
     )
   ]);
-  return paginar(dataR.rows, parseInt(countR.rows[0].total), page, limit);
+  return paginar(dataR.rows, Number.parseInt(countR.rows[0].total, 10), page, limit);
 }
 
 async function historialRutinas(userId, { page = 1, limit = 10 } = {}) {
@@ -23,7 +23,7 @@ async function historialRutinas(userId, { page = 1, limit = 10 } = {}) {
       [userId, Number(limit), offset]
     )
   ]);
-  return paginar(dataR.rows, parseInt(countR.rows[0].total), page, limit);
+  return paginar(dataR.rows, Number.parseInt(countR.rows[0].total, 10), page, limit);
 }
 
 async function historialAlertas(userId, { page = 1, limit = 10 } = {}) {
@@ -36,7 +36,7 @@ async function historialAlertas(userId, { page = 1, limit = 10 } = {}) {
       [userId, Number(limit), offset]
     )
   ]);
-  return paginar(dataR.rows, parseInt(countR.rows[0].total), page, limit);
+  return paginar(dataR.rows, Number.parseInt(countR.rows[0].total, 10), page, limit);
 }
 
 function paginar(datos, total, page, limit) {

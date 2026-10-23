@@ -7,8 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/svg+xml" href="img/logo.svg">
 </head>
@@ -204,14 +203,14 @@
             <div id="login-error" class="auth-error hidden"></div>
             <div class="auth-form">
                 <div class="auth-input-group">
-                    <label>Correo electrónico</label>
+                    <label for="login-email">Correo electrónico</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                         <input type="email" id="login-email" placeholder="correo@vitaltraining.com" autocomplete="email">
                     </div>
                 </div>
                 <div class="auth-input-group">
-                    <label>Contraseña</label>
+                    <label for="login-password">Contraseña</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
@@ -281,21 +280,21 @@
                     <a href="#" onclick="event.preventDefault(); cancelarRegistroGoogle()">Usar correo y contraseña</a>
                 </div>
                 <div class="auth-input-group">
-                    <label>Nombre completo *</label>
+                    <label for="reg-nombre">Nombre completo *</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez">
                     </div>
                 </div>
                 <div class="auth-input-group">
-                    <label>Correo electrónico *</label>
+                    <label for="reg-email">Correo electrónico *</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                         <input type="email" id="reg-email" placeholder="juan@ejemplo.com">
                     </div>
                 </div>
                 <div class="auth-input-group" id="reg-password-grupo">
-                    <label>Contraseña *</label>
+                    <label for="reg-password">Contraseña *</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
@@ -303,16 +302,16 @@
                 </div>
                 <div class="auth-input-row">
                     <div class="auth-input-group">
-                        <label>Peso (kg) *</label>
+                        <label for="reg-peso">Peso (kg) *</label>
                         <input type="number" id="reg-peso" placeholder="70">
                     </div>
                     <div class="auth-input-group">
-                        <label>Altura (cm) *</label>
+                        <label for="reg-altura">Altura (cm) *</label>
                         <input type="number" id="reg-altura" placeholder="175">
                     </div>
                 </div>
                 <div class="auth-input-group">
-                    <label>Fecha de nacimiento *</label>
+                    <label for="reg-fecha">Fecha de nacimiento *</label>
                     <input type="date" id="reg-fecha">
                 </div>
                 <div id="reg1-error" class="auth-error hidden"></div>
@@ -366,7 +365,7 @@
             </div>
             <div class="auth-form">
                 <div class="auth-input-group">
-                    <label>Deporte principal *</label>
+                    <label for="reg-deporte">Deporte principal *</label>
                     <select id="reg-deporte" onchange="updateSportSpecificFields()">
                         <option value="">Selecciona tu deporte</option>
                         <option value="Fútbol">⚽ Fútbol</option>
@@ -382,7 +381,7 @@
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label id="reg-posicion-label">Posición *</label>
+                    <label for="reg-posicion" id="reg-posicion-label">Posición *</label>
                     <select id="reg-posicion">
                         <option value="">Selecciona tu posición</option>
                         <option value="Portero">Portero</option>
@@ -401,7 +400,7 @@
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label id="reg-frecuencia-label">Frecuencia de juego *</label>
+                    <label for="reg-frecuencia" id="reg-frecuencia-label">Frecuencia de juego *</label>
                     <select id="reg-frecuencia">
                         <option value="">¿Cuántas veces juegas por semana?</option>
                         <option>1-2 veces por semana</option><option>3-4 veces por semana</option>
@@ -409,7 +408,7 @@
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label id="reg-pie-label">Pie dominante *</label>
+                    <label for="reg-pie" id="reg-pie-label">Pie dominante *</label>
                     <select id="reg-pie">
                         <option value="">Selecciona tu dominante</option>
                         <option>Derecho</option>
@@ -418,7 +417,7 @@
                     </select>
                 </div>
                 <div class="auth-input-group">
-                    <label>Objetivo principal *</label>
+                    <label for="reg-objetivo">Objetivo principal *</label>
                     <select id="reg-objetivo">
                         <option value="">¿Cuál es tu objetivo?</option>
                         <option>Mejorar rendimiento deportivo</option>
@@ -508,7 +507,7 @@
             <div id="olvide-ok" class="auth-aviso-ok hidden"></div>
             <div class="auth-form" id="olvide-form">
                 <div class="auth-input-group">
-                    <label>Correo electrónico</label>
+                    <label for="olvide-email">Correo electrónico</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                         <input type="email" id="olvide-email" placeholder="correo@vitaltraining.com" autocomplete="email" onkeydown="if(event.key==='Enter') pedirEnlace()">
@@ -544,14 +543,14 @@
             <div id="restablecer-error" class="auth-error hidden"></div>
             <div class="auth-form">
                 <div class="auth-input-group">
-                    <label>Nueva contraseña</label>
+                    <label for="restablecer-pass">Nueva contraseña</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <input type="password" id="restablecer-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
                     </div>
                 </div>
                 <div class="auth-input-group">
-                    <label>Repite la contraseña</label>
+                    <label for="restablecer-pass2">Repite la contraseña</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                         <input type="password" id="restablecer-pass2" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter') guardarNuevaPassword()">
@@ -619,7 +618,7 @@
             </button>
         </div>
     </aside>
-    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button type="button" class="sidebar-overlay" aria-label="Cerrar menú" onclick="closeSidebar()"></button>
     <main id="content" class="main-content"></main>
 </div>
 
@@ -669,7 +668,7 @@
             </button>
         </div>
     </aside>
-    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button type="button" class="sidebar-overlay" aria-label="Cerrar menú" onclick="closeSidebar()"></button>
     <main id="nt-content" class="main-content"></main>
 </div>
 
@@ -715,7 +714,7 @@
             </button>
         </div>
     </aside>
-    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button type="button" class="sidebar-overlay" aria-label="Cerrar menú" onclick="closeSidebar()"></button>
     <main id="md-content" class="main-content"></main>
 </div>
 
@@ -780,20 +779,20 @@
                 <span class="admin-name" id="pf-nombre">Atleta</span>
                 <span class="admin-role">Atleta</span>
             </div>
-            <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-3"></button>
+            <button class="dark-toggle-btn" onclick="toggleDarkMode()" title="Modo oscuro" id="dark-btn-4"></button>
             <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
         </div>
     </aside>
-    <div class="sidebar-overlay" onclick="closeSidebar()"></div>
+    <button type="button" class="sidebar-overlay" aria-label="Cerrar menú" onclick="closeSidebar()"></button>
     <main id="pf-content" class="main-content"></main>
 </div>
 
 
 <!-- MODAL GLOBAL -->
-<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
-    <div class="modal" onclick="event.stopPropagation()">
+<div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-header">
             <h3 id="modal-title">Detalle</h3>
             <button class="modal-close" onclick="closeModal()">✕</button>

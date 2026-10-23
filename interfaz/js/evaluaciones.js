@@ -133,7 +133,7 @@ async function evGuardar(userId) {
     if (!res?.ok) return showToast(res?.error || 'No se pudo guardar', 'error');
     closeModal();
     showToast('Resultado guardado');
-    evRender(_evDatos.contenedorId, userId, { propio: _evDatos.propio });
+    enSegundoPlano(evRender(_evDatos.contenedorId, userId, { propio: _evDatos.propio }));
 }
 
 async function evBorrar(userId, id) {
@@ -141,7 +141,7 @@ async function evBorrar(userId, id) {
     const res = await apiFetch(`${API}/evaluaciones/${userId}/${id}`, { method:'DELETE' }).then(r => r.json()).catch(() => null);
     if (!res?.ok) return showToast('No se pudo borrar', 'error');
     showToast('Resultado borrado');
-    evRender(_evDatos.contenedorId, userId, { propio: _evDatos.propio });
+    enSegundoPlano(evRender(_evDatos.contenedorId, userId, { propio: _evDatos.propio }));
 }
 
 async function pfRenderTests() {

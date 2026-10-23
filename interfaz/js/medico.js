@@ -2,6 +2,7 @@
    VitalTraining — medico.js
    Panel del médico: expedientes médicos y mensajes.
 ============================================= */
+/* global currentUser:writable -- declaradas en comun.js; aquí se les asigna valor */
 
 // ────────────────────────────────────────────────
 // PANEL MEDICO
@@ -24,8 +25,8 @@ function medicoRenderView(view) {
     stopPolling();
     setTitle(view === 'mensajes' ? 'Mensajes' : 'Expedientes médicos');
     document.querySelectorAll('#panel-medico .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mdView === view));
-    if (view === 'mensajes') medicoRenderMensajes();
-    else medicoRenderAtletas();
+    if (view === 'mensajes') enSegundoPlano(medicoRenderMensajes());
+    else enSegundoPlano(medicoRenderAtletas());
 }
 
 async function medicoRenderMensajes() {
@@ -130,7 +131,7 @@ async function medicoVerPerfil(userId) {
                 <div class="card"><div class="card-header"><h2>Preferencias alimentarias</h2></div><div class="card-body"><p>${escapeHtml(perfil.preferencias || 'Sin restricciones')}</p></div></div>
             </div>` : '<div class="card"><div class="card-body"><p>Este atleta aún no ha completado su perfil médico.</p></div></div>'}
         </div>`;
-        evRender('md-tests', userId, { propio: false });
+        enSegundoPlano(evRender('md-tests', userId, { propio: false }));
     } catch (error) {
         main.innerHTML = showError(escapeHtml(error.message), `medicoVerPerfil(${Number(userId)})`);
     }

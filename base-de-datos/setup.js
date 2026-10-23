@@ -71,7 +71,7 @@ function yaExiste(err) {
  */
 async function seedUsuarios() {
   const { rows } = await query('SELECT COUNT(*) AS cnt FROM usuarios');
-  if (parseInt(rows[0].cnt) > 0) return;
+  if (Number.parseInt(rows[0].cnt, 10) > 0) return;
 
   const produccion = process.env.NODE_ENV === 'production';
   if (produccion && !process.env.ADMIN_PASSWORD) {
@@ -84,9 +84,9 @@ async function seedUsuarios() {
     ...(conDemo ? [
       { nombre: 'Maria Gomez',   email: 'maria@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Baloncesto' },
       { nombre: 'Pedro Lopez',   email: 'pedro@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Tenis' },
-      { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' },
-      { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' },
-      { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' },
+      { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
+      { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
+      { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
     ] : []),
   ];
 

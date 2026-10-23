@@ -98,7 +98,7 @@ async function postCumplimiento(req, res) {
     const registro = await svc.registrarCumplimiento(Number(req.params.userId), req.body);
     res.status(201).json({ ok: true, registro });
     // Después de responder: avisar si esta sesión dispara el riesgo por carga
-    svc.revisarCargaAlta(Number(req.params.userId));
+    svc.revisarCargaAlta(Number(req.params.userId)).catch(err => console.error('❌ Revisar carga:', err.message));
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }

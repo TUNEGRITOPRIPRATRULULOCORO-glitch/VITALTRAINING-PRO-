@@ -1,0 +1,11 @@
+# Lo que nunca debe entrar en la imagen de Docker
+.git
+.github
+.env
+.env.*
+node_modules
+coverage
+__tests__
+base-de-datos/datos-locales
+docs
+*.md

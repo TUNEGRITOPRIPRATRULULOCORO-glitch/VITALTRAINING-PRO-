@@ -54,7 +54,7 @@ async function loginGoogle(credencial) {
   return sesion(usuario);
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE = /^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)+$/; // lineal: cada parte excluye el punto
 
 /**
  * Crea una cuenta de atleta. Con datos.googleCredencial la cuenta se crea con el correo que

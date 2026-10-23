@@ -131,6 +131,8 @@ Guía paso a paso para tenerla en un enlace público gratis (Neon + Render): **[
 
 ### Con Docker
 
+Antes, copia `.env.example` como `.env` y rellena `POSTGRES_PASSWORD` y `JWT_SECRET` (las contraseñas no van en `docker-compose.yml`).
+
 ```bash
 # Construir y levantar
 docker-compose up --build

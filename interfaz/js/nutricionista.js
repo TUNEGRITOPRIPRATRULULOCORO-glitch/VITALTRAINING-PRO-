@@ -2,6 +2,7 @@
    VitalTraining — nutricionista.js
    Panel del nutricionista: atletas, expedientes y soporte.
 ============================================= */
+/* global currentUser:writable -- declaradas en comun.js; aquí se les asigna valor */
 
 // ────────────────────────────────────────────────
 // PANEL NUTRICIONISTA
@@ -26,9 +27,9 @@ function ntRenderView(view, filtro = '') {
     stopPolling();
     document.querySelectorAll('#panel-nutricionista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.ntView===view));
     document.getElementById('nt-content').innerHTML=showLoading();
-    if(view==='dashboard') { ntRenderDashboard(); startPolling(ntRenderDashboard, 30); }
-    else if(view==='pacientes') ntRenderPacientes(filtro);
-    else if(view==='soporte')   ntRenderSoporte();
+    if(view==='dashboard') { enSegundoPlano(ntRenderDashboard()); startPolling(ntRenderDashboard, 30); }
+    else if(view==='pacientes') enSegundoPlano(ntRenderPacientes(filtro));
+    else if(view==='soporte')   enSegundoPlano(ntRenderSoporte());
 }
 
 function ntActualizarBadgeSoporte() {
@@ -349,7 +350,7 @@ async function ntGuardarNota(userId) {
     const texto=document.getElementById('nt-nueva-nota').value.trim();
     if(!texto) return showToast('Escribe una nota antes de guardar','error');
     const res=await apiFetch(`${API}/nutricionista/futbolistas/${userId}/notas`,{method:'POST',body:JSON.stringify({texto})});
-    if(res.ok){showToast('Nota guardada');ntVerDetalle(userId);}
+    if(res.ok){showToast('Nota guardada');enSegundoPlano(ntVerDetalle(userId));}
     else showToast('Error al guardar la nota','error');
 }
 
@@ -358,7 +359,7 @@ async function ntRegistrarComida(userId) {
     if(!nombre) return showToast('El nombre es obligatorio','error');
     const body={nombre,tipo:document.getElementById('nt-c-tipo').value,calorias:document.getElementById('nt-c-cals').value,fecha:document.getElementById('nt-c-fecha').value};
     const res=await apiFetch(`${API}/nutricionista/futbolistas/${userId}/comidas`,{method:'POST',body:JSON.stringify(body)});
-    if(res.ok){showToast('Comida registrada');ntVerDetalle(userId);}
+    if(res.ok){showToast('Comida registrada');enSegundoPlano(ntVerDetalle(userId));}
     else showToast('Error al registrar','error');
 }
 
@@ -367,7 +368,7 @@ async function ntRegistrarRutina(userId) {
     if(!nombre) return showToast('El nombre es obligatorio','error');
     const body={nombre,tipo:document.getElementById('nt-r-tipo').value,duracionMinutos:document.getElementById('nt-r-dur').value,intensidad:document.getElementById('nt-r-int').value,descripcion:document.getElementById('nt-r-desc').value.trim()};
     const res=await apiFetch(`${API}/nutricionista/futbolistas/${userId}/rutinas`,{method:'POST',body:JSON.stringify(body)});
-    if(res.ok){showToast('Rutina registrada');ntVerDetalle(userId);}
+    if(res.ok){showToast('Rutina registrada');enSegundoPlano(ntVerDetalle(userId));}
     else showToast('Error al registrar','error');
 }
 
@@ -473,7 +474,7 @@ async function ntVerIncidencia(id) {
 
 async function ntCambiarEstado(id, estado) {
     const res = await apiFetch(`${API}/incidencias/${id}/estado`, {method:'PUT', body:JSON.stringify({estado})});
-    if (res.ok) { showToast('Estado actualizado'); closeModal(); ntRenderSoporte(); }
+    if (res.ok) { showToast('Estado actualizado'); closeModal(); enSegundoPlano(ntRenderSoporte()); }
     else showToast('Error al actualizar estado','error');
 }
 
@@ -481,6 +482,6 @@ async function ntEnviarRespuesta(id) {
     const texto = document.getElementById('nt-comment-input').value.trim();
     if (!texto) return showToast('Escribe un mensaje primero','error');
     const res = await apiFetch(`${API}/incidencias/${id}/comentarios`, {method:'POST', body:JSON.stringify({texto})});
-    if (res.ok) { showToast('Respuesta enviada'); ntVerIncidencia(id); ntActualizarBadgeSoporte(); }
+    if (res.ok) { showToast('Respuesta enviada'); enSegundoPlano(ntVerIncidencia(id)); enSegundoPlano(ntActualizarBadgeSoporte()); }
     else showToast('Error al enviar respuesta','error');
 }

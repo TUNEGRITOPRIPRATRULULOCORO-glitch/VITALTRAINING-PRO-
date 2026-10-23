@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const { query } = require('../../../base-de-datos/db');
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE = /^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)+$/; // lineal: cada parte excluye el punto
 
 // Roles con dos nombres en la base (los registros antiguos usan "Futbolista" y "Medico")
 const ALIAS_ROL = {

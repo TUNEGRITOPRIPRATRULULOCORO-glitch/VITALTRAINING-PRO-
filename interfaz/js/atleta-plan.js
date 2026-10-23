@@ -285,7 +285,7 @@ async function pfCambiarDiaPartido(dia) {
     const res = await apiFetch(`${API}/panel/${currentUser.id}/perfil`, { method:'PUT', body: JSON.stringify({ diaPartido: dia }) });
     if (!res.ok) { showToast('No se pudo guardar el día', 'error'); return; }
     showToast(dia === 'Ninguno' ? 'Listo: semana sin partido fijo' : `Listo: tu semana se organiza para el ${dia.toLowerCase()}`);
-    pfRenderPlan();
+    enSegundoPlano(pfRenderPlan());
 }
 
 // — PLAN ALIMENTICIO (ATLETA) —
@@ -518,7 +518,7 @@ async function pfMarcarCumplimiento(diaSemana, tipo) {
     const rpe=Number(document.getElementById('cumpl-rpe')?.value)||null;
     const res=await apiFetch(`${API}/panel/${userId}/cumplimiento`,{method:'POST',body:JSON.stringify({diaSemana,tipo,fecha,estado,duracionMinutos,rpe})}).then(r=>r.json()).catch(()=>null);
     closeModal();
-    if(res?.ok){showToast(estado==='parcial'?`${diaSemana} registrado como parcial`:`¡${diaSemana} completado! 💪`);pfRenderPlanRutina();}
+    if(res?.ok){showToast(estado==='parcial'?`${diaSemana} registrado como parcial`:`¡${diaSemana} completado! 💪`);enSegundoPlano(pfRenderPlanRutina());}
     else showToast('Error al registrar cumplimiento','error');
 }
 

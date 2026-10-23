@@ -28,9 +28,34 @@ if (PRODUCCION && !process.env.JWT_SECRET) {
 // compartirían la IP del proxy y el límite de intentos de login sería común para todos.
 if (PRODUCCION || process.env.TRUST_PROXY) app.set('trust proxy', 1);
 
+// Política de contenido: el navegador solo carga código, estilos e imágenes de estos sitios.
+// - jsdelivr: gráficas (Chart.js) · fonts.googleapis/gstatic: tipografías · accounts.google.com: "Entrar con Google"
+// - 'unsafe-inline' en scripts y atributos: la interfaz usa onclick="..." en el HTML (y ayuda.html un <script> propio)
+// - blob: y data: en imágenes: fotos de perfil (se descargan con el token y se muestran como blob)
+const GOOGLE_GSI = 'https://accounts.google.com/gsi/';
+const politicaContenido = {
+  useDefaults: true,
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', `${GOOGLE_GSI}client`],
+    scriptSrcAttr: ["'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', `${GOOGLE_GSI}style`],
+    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    imgSrc: ["'self'", 'data:', 'blob:'],
+    connectSrc: ["'self'", GOOGLE_GSI],
+    frameSrc: [GOOGLE_GSI],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    frameAncestors: ["'self'"],
+    // En local la app va por http: forzar https rompería la carga
+    upgradeInsecureRequests: PRODUCCION ? [] : null,
+  },
+};
+
 // La ventana de "Entrar con Google" necesita comunicarse con la página (popups) y saber de qué web viene
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: politicaContenido,
   crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
 }));

@@ -24,10 +24,10 @@ function escapeHtml(str) {
 function animateCounters(root) {
     root.querySelectorAll('.stat-value, .soporte-stat-val, .paciente-stat-val, .sk-val').forEach(el => {
         const raw = el.textContent.trim();
-        const match = raw.match(/^(\d+(\.\d+)?)(.*)?$/);
-        if (!match || Number(match[1]) === 0) return;
-        const target = parseFloat(match[1]);
-        const suffix = match[3] || '';
+        const numero = /^\d+(?:\.\d+)?/.exec(raw)?.[0];
+        if (!numero || Number(numero) === 0) return;
+        const target = Number.parseFloat(numero);
+        const suffix = raw.slice(numero.length);
         const duration = 700;
         const startTime = performance.now();
         const step = (now) => {
@@ -95,8 +95,8 @@ function routeUser(user, token) {
     setSession(user, token);
     currentUser = user;
     hideAllPanels();
-    refrescarMiCuenta();
-    if      (isAtletaRole(user.rol))       showPanelFutbolista(user);
+    enSegundoPlano(refrescarMiCuenta());
+    if      (isAtletaRole(user.rol))       enSegundoPlano(showPanelFutbolista(user));
     else if (user.rol === 'Nutricionista') showPanelNutricionista(user);
     else if (['Medico', 'Médico'].includes(user.rol)) showPanelMedico(user);
     else if (user.rol === 'Administrador') showPanel(user);
@@ -560,6 +560,17 @@ function estadoBadge(e)     { const m={'Activo':'badge-activo','Inactivo':'badge
 function prioridadBadge(p)  { const m={'alta':'badge-alta','media':'badge-media','baja':'badge-baja','critica':'badge-critica'}; return `<span class="badge ${m[p]||''}">${p}</span>`; }
 function incEstadoBadge(e)  { const m={'abierta':'badge-abierta','en progreso':'badge-en-progreso','resuelta':'badge-resuelta'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
 
+/**
+ * Lanza una tarea asíncrona (cargar una pantalla, refrescar contadores...) sin esperarla.
+ * Si falla, avisa con un mensaje en vez de dejar la pantalla a medias sin explicación.
+ */
+function enSegundoPlano(promesa) {
+    Promise.resolve(promesa).catch(err => {
+        console.error(err);
+        showToast('Algo no se pudo cargar. Revisa tu conexión e inténtalo de nuevo.', 'error');
+    });
+}
+
 function showToast(msg, type='success', ms=2700) {
     document.querySelectorAll('.toast').forEach(t=>t.remove());
     const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg;
@@ -616,5 +627,7 @@ function closeSidebar() {
 }
 
 function openModal(title,body) { const ov=document.getElementById('modal-overlay'); document.getElementById('modal-title').textContent=title; document.getElementById('modal-body').innerHTML=body; ov.querySelector('.modal')?.classList.remove('modal-wide'); ov.classList.remove('hidden'); }
+// Pulsar fuera de la ventana (sobre el fondo) la cierra
+document.getElementById('modal-overlay')?.addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
 function closeModal()          { const ov=document.getElementById('modal-overlay'); ov.classList.add('hidden'); ov.querySelector('.modal').classList.remove('modal-wide'); }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });

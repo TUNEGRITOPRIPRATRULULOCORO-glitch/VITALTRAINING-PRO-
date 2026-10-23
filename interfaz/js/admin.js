@@ -2,6 +2,7 @@
    VitalTraining — admin.js
    Panel del administrador: dashboard, usuarios, reportes y soporte.
 ============================================= */
+/* global currentUser:writable, chartInstances:writable -- declaradas en comun.js; aquí se les asigna valor */
 
 // ────────────────────────────────────────────────
 // PANEL ADMIN
@@ -16,7 +17,7 @@ function showPanel(user) {
     document.getElementById('sidebar-name').textContent=user.nombre.split(' ').slice(0,2).join(' ');
     document.getElementById('sidebar-role').textContent=user.rol;
     startBadgePolling();
-    renderView('dashboard');
+    enSegundoPlano(renderView('dashboard'));
 }
 
 // filtros: { rol, estado, prioridad } para abrir la vista ya filtrada (desde una tarjeta)
@@ -333,7 +334,7 @@ async function renderSoporte(filtros = {}) {
             <div style="padding:16px 20px" id="lista-incidencias">${renderListaIncidencias(inc)}</div>
         </div>
     </div>`;
-    msgActualizarBadges();
+    enSegundoPlano(msgActualizarBadges());
     if(estF||prioF){
         if(estF) document.getElementById('filter-inc-estado').value=estF;
         if(prioF) document.getElementById('filter-inc-prioridad').value=prioF;

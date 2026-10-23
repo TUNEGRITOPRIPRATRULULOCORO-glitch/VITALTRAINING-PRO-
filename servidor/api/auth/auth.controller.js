@@ -28,7 +28,8 @@ async function postRegistro(req, res) {
     if (resultado.error) return res.status(resultado.status).json({ error: resultado.error });
 
     res.status(201).json({ ok: true, user: resultado.usuario, ...(resultado.token ? { token: resultado.token } : {}) });
-    avisos.bienvenida(resultado.usuario); // después de responder; un fallo no afecta al registro
+    // Después de responder: un fallo del correo no afecta al registro
+    avisos.bienvenida(resultado.usuario).catch(err => console.error('❌ Correo de bienvenida:', err.message));
   } catch (err) {
     console.error('❌ Registro:', err.message);
     res.status(500).json({ error: 'Error interno del servidor.' });
