@@ -58,7 +58,10 @@ async function enviarCorreo({ para, nombre, asunto, html, texto }) {
       signal: AbortSignal.timeout(10000),
     });
     if (!respuesta.ok) {
-      console.error(`❌ Correo no enviado (Brevo respondió ${respuesta.status}):`, (await respuesta.text()).slice(0, 200));
+      // Solo el código: el texto de la respuesta puede repetir datos que escribió el usuario
+      const codigo = Number(respuesta.status);
+      const pista = codigo === 401 ? ' Revisa BREVO_API_KEY.' : codigo === 400 ? ' Revisa que CORREO_REMITENTE esté verificado en Brevo.' : '';
+      console.error(`❌ Correo no enviado: Brevo respondió ${codigo}.${pista}`);
       return { ok: false, motivo: 'proveedor' };
     }
     return { ok: true, modo: 'brevo' };
