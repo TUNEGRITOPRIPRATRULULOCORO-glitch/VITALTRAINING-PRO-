@@ -1,4 +1,4 @@
-# Configuración para publicar Vital Sports en Render (plan gratuito).
+# Configuración para publicar VitalTraining en Render (plan gratuito).
 # Guía paso a paso: docs/DESPLIEGUE.md
 services:
   - type: web
@@ -33,4 +33,7 @@ services:
       - key: BREVO_API_KEY
         sync: false
       - key: CORREO_REMITENTE
+        sync: false
+      # Entrar con Google (opcional, se escribe a mano en Render)
+      - key: GOOGLE_CLIENT_ID
         sync: false

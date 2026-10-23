@@ -7,9 +7,13 @@ const svc = require('../servidor/api/evaluaciones/evaluaciones.service');
 const HOY = '2026-10-22';
 
 describe('catálogo de pruebas', () => {
-  test('cada deporte tiene 5 pruebas y todas existen', () => {
+  test('cada deporte de la app tiene entre 3 y 5 pruebas y todas existen', () => {
+    const { DEPORTES } = require('../servidor/compartido/deportes');
+    expect(Object.keys(cat.BATERIAS).sort()).toEqual([...DEPORTES].sort());
     for (const [deporte, ids] of Object.entries(cat.BATERIAS)) {
-      expect(ids).toHaveLength(5);
+      expect(ids.length).toBeGreaterThanOrEqual(3);
+      expect(ids.length).toBeLessThanOrEqual(5);
+      expect(ids.every(id => id in cat.PRUEBAS)).toBe(true);
       expect(cat.pruebasDe(deporte).every(p => p.nombre && p.unidad && p.instrucciones)).toBe(true);
     }
   });

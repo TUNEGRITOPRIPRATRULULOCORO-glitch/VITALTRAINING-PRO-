@@ -28,7 +28,7 @@ describe('servicio de correo', () => {
     expect(url).toBe('https://api.brevo.com/v3/smtp/email');
     expect(opciones.headers['api-key']).toBe('clave-de-prueba');
     expect(JSON.parse(opciones.body)).toMatchObject({
-      sender: { email: 'equipo@vital.com', name: 'Vital Sports' },
+      sender: { email: 'equipo@vital.com', name: 'VitalTraining' },
       to: [{ email: 'atleta@vital.com', name: 'Carlos' }],
       subject: 'Prueba',
     });
@@ -55,8 +55,8 @@ describe('servicio de correo', () => {
     expect(correo.urlApp()).toBe('http://localhost:4000');
     process.env.RENDER_EXTERNAL_URL = 'https://vital.onrender.com/';
     expect(correo.urlApp()).toBe('https://vital.onrender.com');
-    process.env.APP_URL = 'https://vitalsports.app';
-    expect(correo.urlApp()).toBe('https://vitalsports.app');
+    process.env.APP_URL = 'https://vitaltraining.app';
+    expect(correo.urlApp()).toBe('https://vitaltraining.app');
   });
 });
 
@@ -120,6 +120,13 @@ describe('recuperar contraseña y avisos (integración)', () => {
     expect(await auth.login('carlos@vital.com', 'nuevaClave123')).toHaveProperty('token');
     expect((await auth.login('carlos@vital.com', 'futbol123')).status).toBe(401);
     expect(await auth.restablecerPassword(token, 'otraClave123')).toMatchObject({ status: 400 }); // ya usado
+  });
+
+  test('la nueva contraseña no puede ser igual a la anterior (y el enlace sigue sirviendo)', async () => {
+    await auth.solicitarRestablecimiento('maria@vital.com');
+    const token = tokenDe(correo.enviados[0]);
+    expect(await auth.restablecerPassword(token, 'nutri123')).toMatchObject({ status: 400, error: expect.stringMatching(/distinta/) });
+    expect(await auth.restablecerPassword(token, 'otraClaveMaria1')).toEqual({ ok: true });
   });
 
   test('pedir un enlace nuevo anula el anterior', async () => {

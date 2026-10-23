@@ -626,7 +626,7 @@ function planEntrenamientoPersonalizado({ user, pm, salud, rutinas, deporte }) {
   const recuperacion = snapshot.actual.recuperacion ?? 5;
   const objetivo = snapshot.objetivo;
   const posicion = snapshot.posicion;
-  const deporteKey = (deporte || snapshot.deporte || 'Fútbol').toLowerCase();
+  const deporteKey = (deporte || snapshot.deporte || 'Fútbol').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   if (pm?.rutinaSemanal?.semana?.length) {
@@ -691,6 +691,11 @@ function planEntrenamientoPersonalizado({ user, pm, salud, rutinas, deporte }) {
     baloncesto: 'Si juegas baloncesto, prioriza saltos, explosividad, desplazamientos laterales y trabajo de corte y rebote.',
     tenis: 'Si juegas tenis, prioriza fuerza de piernas, velocidad, coordinación y resistencia de intervalos cortos.',
     natacion: 'Si nadas, prioriza fuerza de espalda y tronco, resistencia aeróbica y trabajo de técnica en el agua.',
+    atletismo: 'En atletismo, entrena según tu prueba: técnica de carrera y velocidad, saltos o lanzamientos, con fuerza de base.',
+    beisbol: 'Si juegas béisbol, prioriza potencia rotacional, sprints cortos y el cuidado del hombro y el codo del brazo de lanzar.',
+    boxeo: 'Si boxeas, entrena por asaltos (3 min de trabajo, 1 de pausa), potencia de piernas y tronco, y técnica con sombra y saco.',
+    running: 'Si corres, la mayor parte de los kilómetros deben ser suaves, con 1-2 sesiones de calidad y 2 días de fuerza a la semana.',
+    'estar en forma': 'Para ponerte en forma: 150-300 min de actividad moderada a la semana y fuerza de todo el cuerpo al menos 2 días.',
     default: 'El plan prioriza fuerza, velocidad, técnica y recuperación según tu nivel actual.'
   };
 

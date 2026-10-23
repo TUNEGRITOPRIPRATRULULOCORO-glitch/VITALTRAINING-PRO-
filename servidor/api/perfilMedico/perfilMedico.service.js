@@ -294,7 +294,7 @@ async function listarAtletas() {
 async function obtenerFicha(userId) {
   const [{ rows: u }, { rows: p }] = await Promise.all([
     query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia, objetivo FROM usuarios WHERE id = $1', [userId]),
-    query('SELECT posicion, edad, peso, altura, sexo FROM perfiles WHERE user_id = $1', [userId])
+    query('SELECT posicion, edad, peso, altura, sexo, dia_partido FROM perfiles WHERE user_id = $1', [userId])
   ]);
   return u[0] ? panel.fichaDeportiva(u[0], p[0]) : null;
 }
@@ -318,7 +318,7 @@ async function refrescarPlanes(userId, perfil, ficha) {
     alergias:     perfil.alergias     || [],
     preferencias: perfil.preferencias || 'Sin restricciones'
   };
-  const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte);
+  const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte, ficha.diaPartido);
   const planAlimenticio = generarPlanAlimenticio(datos, { ficha, rutina: rutinaSemanal });
   const cambio = estable(rutinaSemanal) !== estable(perfil.rutinaSemanal) || estable(planAlimenticio) !== estable(perfil.planAlimenticio);
   if (cambio) {
@@ -356,7 +356,7 @@ async function guardar(userId, datos, posicion, deporte = 'Fútbol', ficha = nul
     preferencias: datos.preferencia  || datos.preferencias || 'Sin restricciones'
   };
 
-  const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte);
+  const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte, ficha?.diaPartido);
   const planAlimenticio = generarPlanAlimenticio(datosNorm, { ficha: { ...(ficha || {}), posicion, deporte }, rutina: rutinaSemanal });
 
   await query(

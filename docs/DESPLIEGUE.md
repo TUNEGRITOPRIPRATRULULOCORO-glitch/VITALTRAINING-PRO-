@@ -1,4 +1,4 @@
-# Publicar Vital Sports en internet (gratis)
+# Publicar VitalTraining en internet (gratis)
 
 Al terminar tendrás un enlace como `https://vital-sports.onrender.com` que se abre desde cualquier computador o celular, sin instalar nada.
 
@@ -115,7 +115,7 @@ La app envía correos de **bienvenida**, de **recuperar contraseña** y de **ale
 Se usa **Brevo** (gratis: 300 correos al día).
 
 1. Crea una cuenta en [brevo.com](https://www.brevo.com) (plan **Free**).
-2. **Remitente:** menú de tu cuenta → **Senders, Domains & Dedicated IPs → Senders → Add a sender**. Pon el nombre (`Vital Sports`) y el correo desde el que saldrán los mensajes. Brevo te manda un código a ese correo para verificarlo.
+2. **Remitente:** menú de tu cuenta → **Senders, Domains & Dedicated IPs → Senders → Add a sender**. Pon el nombre (`VitalTraining`) y el correo desde el que saldrán los mensajes. Brevo te manda un código a ese correo para verificarlo.
 3. **Clave:** menú de tu cuenta → **SMTP & API → API Keys → Generate a new API key**. Cópiala (empieza por `xkeysib-`). Es secreta: no la subas a GitHub ni la compartas.
 4. En Render → **Environment Groups → Pro**, añade:
 
@@ -123,7 +123,7 @@ Se usa **Brevo** (gratis: 300 correos al día).
    |---|---|
    | `BREVO_API_KEY` | la clave del paso 3 |
    | `CORREO_REMITENTE` | el correo verificado del paso 2 |
-   | `CORREO_NOMBRE` | `Vital Sports` (opcional) |
+   | `CORREO_NOMBRE` | `VitalTraining` (opcional) |
 
 5. **Manual Deploy → Deploy latest commit**.
 6. Prueba: en la página de inicio pulsa **¿Olvidaste tu contraseña?** con un correo registrado que sea tuyo. Si no llega, mira la carpeta de spam y los **Logs** de Render (si Brevo rechaza el envío aparece `❌ Correo no enviado`).
@@ -131,3 +131,22 @@ Se usa **Brevo** (gratis: 300 correos al día).
 > **Spam:** si el remitente es un Gmail/Hotmail, algunos correos pueden caer en spam porque salen desde los servidores de Brevo y no de Google. Para evitarlo del todo hace falta un dominio propio verificado en Brevo (Senders, Domains → Domains). Para empezar, un Gmail basta.
 
 Los enlaces de los correos apuntan a la dirección de Render automáticamente. Si algún día usas un dominio propio, añade `APP_URL=https://tu-dominio.com`.
+
+---
+
+## Entrar con Google (opcional)
+
+Sin configurarlo, el botón "Continuar con Google" simplemente no aparece. Para activarlo:
+
+1. Entra en [console.cloud.google.com](https://console.cloud.google.com) con tu cuenta de Google y crea un proyecto (por ejemplo `VitalTraining`).
+2. Menú → **APIs y servicios → Pantalla de consentimiento de OAuth** (en la versión nueva: **Google Auth Platform → Branding**):
+   - Nombre de la app: `VitalTraining`; correo de asistencia: el tuyo.
+   - Público: **Externo**. Luego, en **Audience / Público**, pulsa **Publicar app** para que pueda entrar cualquier persona (solo se piden nombre y correo, así que Google no exige revisión).
+3. **Clientes → Crear cliente** (o *Credenciales → Crear credenciales → ID de cliente de OAuth*):
+   - Tipo: **Aplicación web**.
+   - **Orígenes autorizados de JavaScript**: `https://vitaltraining-pro.onrender.com` y `http://localhost:4000`.
+   - No hace falta poner URI de redirección.
+4. Copia el **ID de cliente** (termina en `.apps.googleusercontent.com`). No es secreto: es el que ve el navegador.
+5. En Render → **Environment Groups → Pro**, añade `GOOGLE_CLIENT_ID` con ese valor y haz **Manual Deploy → Deploy latest commit**.
+
+Cómo funciona: si el correo de Google ya tiene cuenta, entra directamente. Si no, la persona completa el registro (deporte, posición...) sin inventar contraseña; si algún día la quiere, usa "¿Olvidaste tu contraseña?".

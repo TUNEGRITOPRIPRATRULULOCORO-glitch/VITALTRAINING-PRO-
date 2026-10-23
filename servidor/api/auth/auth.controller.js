@@ -1,4 +1,5 @@
 const svc = require('./auth.service');
+const google = require('./google');
 const avisos = require('../avisos');
 
 async function postLogin(req, res) {
@@ -19,19 +20,36 @@ async function postLogin(req, res) {
 
 async function postRegistro(req, res) {
   try {
-    const { nombre, email, password } = req.body;
-    if (!nombre || !email || !password)
+    const { nombre, email, password, googleCredencial } = req.body;
+    if (!nombre || (!googleCredencial && (!email || !password)))
       return res.status(400).json({ error: 'Nombre, correo y contraseña son requeridos.' });
 
     const resultado = await svc.registro(req.body);
     if (resultado.error) return res.status(resultado.status).json({ error: resultado.error });
 
-    res.status(201).json({ ok: true, user: resultado.usuario });
+    res.status(201).json({ ok: true, user: resultado.usuario, ...(resultado.token ? { token: resultado.token } : {}) });
     avisos.bienvenida(resultado.usuario); // después de responder; un fallo no afecta al registro
   } catch (err) {
     console.error('❌ Registro:', err.message);
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
+}
+
+async function postGoogle(req, res) {
+  try {
+    const resultado = await svc.loginGoogle(req.body?.credencial);
+    if (resultado.error) return res.status(resultado.status).json({ error: resultado.error });
+    if (resultado.nuevo) return res.json({ ok: true, nuevo: true, nombre: resultado.nombre, email: resultado.email });
+    res.json({ ok: true, user: resultado.usuario, token: resultado.token });
+  } catch (err) {
+    console.error('❌ Login con Google:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+/** Datos públicos que necesita la pantalla de inicio (sin secretos). */
+function getConfig(req, res) {
+  res.json({ googleClientId: google.clientId() });
 }
 
 // Respuesta idéntica exista o no el correo, para no revelar quién tiene cuenta
@@ -58,4 +76,4 @@ async function postRestablecer(req, res) {
   }
 }
 
-module.exports = { postLogin, postRegistro, postOlvide, postRestablecer };
+module.exports = { postLogin, postRegistro, postGoogle, getConfig, postOlvide, postRestablecer };

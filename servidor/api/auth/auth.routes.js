@@ -1,6 +1,8 @@
 /**
+ * GET  /api/auth/config      → Configuración pública (id de cliente de Google, si lo hay)
  * POST /api/auth/login       → Iniciar sesión
- * POST /api/auth/registro    → Crear cuenta de atleta (envía correo de bienvenida)
+ * POST /api/auth/google      → Entrar con Google { credencial }
+ * POST /api/auth/registro    → Crear cuenta de atleta (envía correo de bienvenida; con Google, sin contraseña)
  * POST /api/auth/olvide      → Pedir enlace para cambiar la contraseña { email }
  * POST /api/auth/restablecer → Cambiar la contraseña con el enlace { token, password }
  */
@@ -23,7 +25,9 @@ const loginLimiter = limite(10, 'Demasiados intentos de inicio de sesión. Inten
 const olvideLimiter = limite(5, 'Demasiadas solicitudes. Intenta de nuevo en 15 minutos.');
 const restablecerLimiter = limite(10, 'Demasiados intentos. Intenta de nuevo en 15 minutos.');
 
+router.get('/config',                           ctrl.getConfig);
 router.post('/login',       loginLimiter,       ctrl.postLogin);
+router.post('/google',      loginLimiter,       ctrl.postGoogle);
 router.post('/registro',                        ctrl.postRegistro);
 router.post('/olvide',      olvideLimiter,      ctrl.postOlvide);
 router.post('/restablecer', restablecerLimiter, ctrl.postRestablecer);

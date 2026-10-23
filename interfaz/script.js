@@ -167,6 +167,54 @@ function getSportFieldConfig(deporte) {
             frecuenciaOptions: ['1-2 días por semana','3-4 días por semana','5+ días por semana','Diario'],
             pieLabel: 'Mano dominante *',
             pieOptions: ['Derecha','Izquierda','Ambas']
+        },
+        'Béisbol': {
+            posicionLabel: 'Posición *',
+            posicionOptions: ['Lanzador','Receptor','Cuadro interior','Jardinero'],
+            frecuenciaLabel: 'Sesiones por semana *',
+            frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana','Diario'],
+            pieLabel: 'Mano de lanzar *',
+            pieOptions: ['Derecha','Izquierda']
+        },
+        'Atletismo': {
+            posicionLabel: 'Especialidad *',
+            posicionOptions: ['Velocidad','Medio fondo','Saltos','Lanzamientos'],
+            frecuenciaLabel: 'Sesiones por semana *',
+            frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana','Diario'],
+            pieLabel: 'Pierna dominante *',
+            pieOptions: ['Derecha','Izquierda','Ambas']
+        },
+        'Running': {
+            posicionLabel: 'Distancia objetivo *',
+            posicionOptions: ['5K - 10K','Media maratón','Maratón'],
+            frecuenciaLabel: 'Días de carrera por semana *',
+            frecuenciaOptions: ['2-3 días por semana','4-5 días por semana','6+ días por semana'],
+            pieLabel: 'Pie dominante *',
+            pieOptions: ['Derecho','Izquierdo','Ambos']
+        },
+        'Natación': {
+            posicionLabel: 'Especialidad *',
+            posicionOptions: ['Velocista','Fondista'],
+            frecuenciaLabel: 'Sesiones por semana *',
+            frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana','Diario'],
+            pieLabel: 'Lado de respiración *',
+            pieOptions: ['Derecho','Izquierdo','Ambos']
+        },
+        'Boxeo': {
+            posicionLabel: 'Modalidad *',
+            posicionOptions: ['Competición','Recreativo'],
+            frecuenciaLabel: 'Sesiones por semana *',
+            frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana'],
+            pieLabel: 'Guardia *',
+            pieOptions: ['Diestra (ortodoxa)','Zurda','Ambas']
+        },
+        'Estar en forma': {
+            posicionLabel: 'Nivel *',
+            posicionOptions: ['Principiante','Intermedio','Avanzado'],
+            frecuenciaLabel: 'Días de actividad por semana *',
+            frecuenciaOptions: ['1-2 días por semana','3-4 días por semana','5+ días por semana'],
+            pieLabel: 'Lado dominante *',
+            pieOptions: ['Derecho','Izquierdo','Ambos']
         }
     };
     return config[deporte] || config['Fútbol'];
@@ -473,9 +521,14 @@ function normalizeDisplayRole(rol) {
     if (['Futbolista', 'Atleta'].includes(rol)) return 'Atleta';
     return ['Medico', 'Médico'].includes(rol) ? 'Médico' : rol;
 }
-function getSportIcon(sport) { const map = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾' }; return map[sport] || '🏅'; }
+// Mismos deportes que el servidor (servidor/compartido/deportes.js)
+const DEPORTES_APP = ['Fútbol','Baloncesto','Tenis','Béisbol','Atletismo','Running','Natación','Boxeo','Estar en forma'];
+const ICONOS_DEPORTE = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾', 'Béisbol':'⚾', 'Atletismo':'🏃', 'Running':'👟', 'Natación':'🏊', 'Boxeo':'🥊', 'Estar en forma':'💪' };
+const SIN_COMPETICION = ['Estar en forma'];
+const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+function getSportIcon(sport) { return ICONOS_DEPORTE[sport] || '🏅'; }
 function getSportLabel(sport) { return sport || 'Deporte'; }
-function getSportBadge(sport) { const map = { 'Fútbol':'⚽ Fútbol', 'Baloncesto':'🏀 Baloncesto', 'Tenis':'🎾 Tenis' }; return map[sport] || `🏅 ${sport || 'Deporte'}`; }
+function getSportBadge(sport) { return `${getSportIcon(sport)} ${sport || 'Deporte'}`; }
 function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador','Medico':'badge-medico','Médico':'badge-medico'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
 function getSportBadgeNeutral(sport) { return getSportBadge(sport || 'Fútbol'); }
 function estadoBadge(e)     { const m={'Activo':'badge-activo','Inactivo':'badge-inactivo'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
@@ -523,7 +576,7 @@ function showError(msg, retryFn='') {
 }
 
 function setTitle(seccion) {
-    document.title = seccion ? `${seccion} — Vital Sports` : 'Vital Sports';
+    document.title = seccion ? `${seccion} — VitalTraining` : 'VitalTraining';
 }
 
 function toggleSidebar(panelId) {
@@ -564,7 +617,89 @@ async function doLogin() {
     finally  { btn.innerHTML='<span>Iniciar sesión</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'; btn.disabled=false; }
 }
 
+// ── Entrar con Google ──────────────────────────────────────────
+// Solo aparece si el servidor tiene GOOGLE_CLIENT_ID. Google devuelve una credencial firmada
+// que el servidor comprueba; si el correo no tiene cuenta, se completa el registro sin contraseña.
+let _googleCredencial = null;
+
+async function iniciarGoogle() {
+    const cfg = await fetch(`${API}/auth/config`).then(r => r.json()).catch(() => ({}));
+    if (!cfg.googleClientId) return;
+    await new Promise((ok, falla) => {
+        const s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        s.async = true; s.onload = ok; s.onerror = falla;
+        document.head.appendChild(s);
+    }).catch(() => null);
+    if (!window.google?.accounts?.id) return;
+    google.accounts.id.initialize({ client_id: cfg.googleClientId, callback: respuestaGoogle, ux_mode: 'popup' });
+    document.querySelectorAll('.google-btn').forEach(el => {
+        google.accounts.id.renderButton(el, { theme: 'filled_black', size: 'large', shape: 'pill', width: 320, text: el.dataset.texto || 'continue_with', locale: 'es' });
+        el.closest('.google-bloque')?.classList.remove('hidden');
+    });
+}
+
+async function respuestaGoogle({ credential }) {
+    const errorEl = document.getElementById('login-error');
+    try {
+        const res = await fetch(`${API}/auth/google`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ credencial: credential }) });
+        const data = await res.json();
+        if (!res.ok) { mostrarErrorGoogle(data.error || 'No se pudo entrar con Google.'); return; }
+        if (!data.nuevo) { routeUser(data.user, data.token); return; }
+        // Correo sin cuenta: completa el registro con su nombre y correo de Google
+        _googleCredencial = credential;
+        document.getElementById('reg-nombre').value = data.nombre || '';
+        const email = document.getElementById('reg-email');
+        email.value = data.email; email.readOnly = true;
+        document.getElementById('reg-password-grupo').classList.add('hidden');
+        document.getElementById('reg-google-aviso').classList.remove('hidden');
+        errorEl?.classList.add('hidden');
+        showAuthScreen('screen-register-1');
+    } catch { mostrarErrorGoogle('No se pudo conectar al servidor.'); }
+}
+
+function mostrarErrorGoogle(msg) {
+    const visible = document.querySelector('#auth-screen .auth-container:not(.hidden) .auth-error');
+    const el = visible || document.getElementById('login-error');
+    el.textContent = msg; el.classList.remove('hidden');
+}
+
+// Volver al registro normal (con contraseña)
+function cancelarRegistroGoogle() {
+    _googleCredencial = null;
+    const email = document.getElementById('reg-email');
+    email.readOnly = false; email.value = '';
+    document.getElementById('reg-password-grupo').classList.remove('hidden');
+    document.getElementById('reg-google-aviso').classList.add('hidden');
+}
+
+// ── Ver u ocultar contraseña ───────────────────────────────────
+const OJO_ABIERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const OJO_CERRADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>';
+
+function ponerOjosPassword() {
+    document.querySelectorAll('.auth-input-wrap input[type="password"]').forEach(input => {
+        if (input.dataset.ojo) return;
+        input.dataset.ojo = '1';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'auth-ojo';
+        btn.setAttribute('aria-label', 'Mostrar contraseña');
+        btn.innerHTML = OJO_ABIERTO;
+        btn.addEventListener('click', () => {
+            const ver = input.type === 'password';
+            input.type = ver ? 'text' : 'password';
+            btn.innerHTML = ver ? OJO_CERRADO : OJO_ABIERTO;
+            btn.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            input.focus();
+        });
+        input.after(btn);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
+    ponerOjosPassword();
+    iniciarGoogle();
     ['login-email','login-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); }); });
 });
 
@@ -573,8 +708,8 @@ function goToStep2() {
           password=document.getElementById('reg-password').value, peso=document.getElementById('reg-peso').value,
           altura=document.getElementById('reg-altura').value, fecha=document.getElementById('reg-fecha').value,
           errorEl=document.getElementById('reg1-error');
-    if(!nombre||!email||!password||!peso||!altura||!fecha){errorEl.textContent='Completa todos los campos obligatorios.';errorEl.classList.remove('hidden');return;}
-    if(password.length<8){errorEl.textContent='La contraseña debe tener al menos 8 caracteres.';errorEl.classList.remove('hidden');return;}
+    if(!nombre||!email||(!_googleCredencial&&!password)||!peso||!altura||!fecha){errorEl.textContent='Completa todos los campos obligatorios.';errorEl.classList.remove('hidden');return;}
+    if(!_googleCredencial&&password.length<8){errorEl.textContent='La contraseña debe tener al menos 8 caracteres.';errorEl.classList.remove('hidden');return;}
     errorEl.classList.add('hidden'); showAuthScreen('screen-register-2');
 }
 
@@ -588,10 +723,13 @@ async function doRegistro() {
     if(!deporte||!posicion||!frecuencia||!pie||!objetivo){errorEl.textContent='Completa todos los campos del perfil deportivo.';errorEl.classList.remove('hidden');return;}
     errorEl.classList.add('hidden'); document.getElementById('reg-loading').classList.remove('hidden');
     try {
-        const res=await fetch(`${API}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre,email,password,peso,altura,fechaNacimiento,deporte,posicion,frecuencia,pie,objetivo})});
+        const datos={nombre,email,peso,altura,fechaNacimiento,deporte,posicion,frecuencia,pie,objetivo,
+            ...(_googleCredencial?{googleCredencial:_googleCredencial}:{password})};
+        const res=await fetch(`${API}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)});
         const data=await res.json();
         document.getElementById('reg-loading').classList.add('hidden');
         if(!res.ok){errorEl.textContent=data.error||'Error al crear la cuenta';errorEl.classList.remove('hidden');}
+        else if(data.token){_googleCredencial=null;routeUser(data.user,data.token);} // con Google entra directamente
         else showAuthScreen('screen-success');
     } catch{document.getElementById('reg-loading').classList.add('hidden');errorEl.textContent='No se pudo conectar al servidor.';errorEl.classList.remove('hidden');}
 }
@@ -1530,21 +1668,22 @@ async function pfRenderDashboard() {
         ${ultimaSalud?`
         <div class="card" style="margin-bottom:24px">
             <div class="card-header"><h2>📊 Mi estado físico hoy</h2><span class="inc-fecha">${formatFecha(ultimaSalud.fecha)}</span></div>
-            <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-                ${saludMeterBig('Fatiga',ultimaSalud.fatiga,'danger')}
-                ${saludMeterBig('Sueño',ultimaSalud.sueno,'blue')}
-                ${saludMeterBig('Recuperación',ultimaSalud.recuperacion,'green')}
+            <p class="salud-regla">Fatiga: cuanto más baja, mejor. Sueño y recuperación: cuanto más altos, mejor.</p>
+            <div class="salud-big-grid">
+                ${saludMeterBig('Fatiga',ultimaSalud.fatiga,'danger','fatiga')}
+                ${saludMeterBig('Sueño',ultimaSalud.sueno,'blue','sueno')}
+                ${saludMeterBig('Recuperación',ultimaSalud.recuperacion,'green','recuperacion')}
             </div>
             ${ultimaSalud.notas?`<div style="padding:0 20px 20px;font-size:13px;color:var(--text-muted)">📝 ${escapeHtml(ultimaSalud.notas)}</div>`:''}
         </div>`:''}
         <div class="charts-grid">
             <div class="card"><div class="card-header"><h2>🍽 Últimas comidas</h2></div><div style="padding:16px">
                 ${ultimasComidas.length?ultimasComidas.map(c=>`<div class="mini-item"><strong>${escapeHtml(c.nombre)}</strong><span>${escapeHtml(c.tipo)} · ${c.calorias} kcal</span></div>`).join(''):`<p style="color:var(--text-muted);font-size:13px;padding:8px 0">Sin comidas registradas.</p>`}
-                <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="pfGoToHistorial('comidas')">Ver comidas →</button>
+                <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="pfGoToHistorial('comidas', true)">＋ Registrar comida</button>
             </div></div>
             <div class="card"><div class="card-header"><h2>🏃 Últimas rutinas</h2></div><div style="padding:16px">
                 ${ultimasRutinas.length?ultimasRutinas.map(r=>`<div class="mini-item"><strong>${escapeHtml(r.nombre)}</strong><span>${escapeHtml(r.tipo)} · ${r.duracionMinutos}min · ${escapeHtml(r.intensidad)}</span></div>`).join(''):`<p style="color:var(--text-muted);font-size:13px;padding:8px 0">Sin rutinas registradas.</p>`}
-                <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="pfGoToHistorial('rutinas')">Ver rutinas →</button>
+                <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="pfGoToHistorial('rutinas', true)">＋ Registrar entrenamiento</button>
             </div></div>
         </div>
         ${alertasRecientes.length?`
@@ -1607,10 +1746,83 @@ function pfTarjetasResumen(hoy = {}, saludHoy) {
     </div>`;
 }
 
-function saludMeterBig(label, val, color) {
+function saludMeterBig(label, val, color, campo) {
     const pct=Math.round(val/10*100);
     const colors={danger:'#ef4444',blue:'#0ea5e9',green:'#16a34a'};
-    return `<div style="text-align:center"><div style="font-size:2rem;font-weight:700;color:${colors[color]};font-family:var(--mono)">${val}<span style="font-size:1rem;color:var(--text-muted)">/10</span></div><div class="meter-bar" style="margin:8px auto;max-width:100px"><div class="meter-fill" style="width:${pct}%;background:${colors[color]}"></div></div><div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.6px">${label}</div></div>`;
+    return `<div style="text-align:center"><div style="font-size:2rem;font-weight:700;color:${colors[color]};font-family:var(--mono)">${val}<span style="font-size:1rem;color:var(--text-muted)">/10</span></div><div class="meter-bar" style="margin:8px auto;max-width:100px"><div class="meter-fill" style="width:${pct}%;background:${colors[color]}"></div></div><div style="font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.6px">${label}</div>${campo?saludLecturaHTML(campo,val):''}</div>`;
+}
+
+/**
+ * Qué significa cada valor del 1 al 10. En fatiga, cuanto más bajo mejor; en sueño y
+ * recuperación, cuanto más alto mejor. Los tramos "mal" coinciden con las alertas que
+ * genera el servidor (salud.service.js: fatiga ≥ 8, sueño ≤ 4, recuperación ≤ 3).
+ */
+const SALUD_ESCALA = {
+    fatiga: { nombre:'Fatiga', regla:'cuanto más baja, mejor', tramos:[
+        [3,'bien','Descansado'], [5,'bien','Normal, puedes entrenar'], [7,'ojo','Cansado: baja la intensidad'], [10,'mal','Agotado: mejor descansar hoy'] ] },
+    sueno: { nombre:'Sueño', regla:'cuanto más alto, mejor', tramos:[
+        [4,'mal','Dormiste muy mal: más riesgo de lesión'], [6,'ojo','Sueño justo: acuéstate antes hoy'], [10,'bien','Dormiste bien'] ] },
+    recuperacion: { nombre:'Recuperación', regla:'cuanto más alta, mejor', tramos:[
+        [3,'mal','Sin recuperar: descanso o sesión muy suave'], [6,'ojo','A medias: entrena sin forzar'], [10,'bien','Recuperado: listo para entrenar'] ] }
+};
+const SALUD_ICONO = { bien:'✅', ojo:'⚠️', mal:'🔴' };
+
+function saludLectura(campo, valor) {
+    const t = SALUD_ESCALA[campo].tramos.find(([max]) => Number(valor) <= max) || SALUD_ESCALA[campo].tramos.at(-1);
+    return { nivel: t[1], texto: t[2] };
+}
+function saludLecturaHTML(campo, valor) {
+    const l = saludLectura(campo, valor);
+    return `<div class="salud-lectura salud-${l.nivel}">${SALUD_ICONO[l.nivel]} ${l.texto}</div>`;
+}
+// Bienestar de 0 a 100 a partir de los tres valores (fatiga invertida)
+function bienestarDe(r) {
+    return Math.round(((10-Number(r.fatiga)) + (Number(r.sueno)-1) + (Number(r.recuperacion)-1)) / 27 * 100);
+}
+// Mientras mueve el control, explica qué significa el valor elegido
+function saludActualizarControl(campo, valor) {
+    document.getElementById(`val-${campo}`).textContent = valor;
+    document.getElementById(`lect-${campo}`).innerHTML = saludLecturaHTML(campo, valor);
+}
+
+/**
+ * Resumen en palabras: media de los últimos 7 días frente a los 7 anteriores.
+ * Solo se habla de cambio si la media se mueve al menos medio punto.
+ */
+function saludResumenTendencia(registros) {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const diasAtras = r => Math.round((hoy - new Date(`${String(r.fecha).slice(0,10)}T00:00:00`)) / 86400000);
+    const recientes = registros.filter(r => diasAtras(r) <= 6);
+    const anteriores = registros.filter(r => diasAtras(r) >= 7 && diasAtras(r) <= 13);
+    if (!recientes.length) return '<p class="tendencia-nada">Sin registros en los últimos 7 días. Registra hoy para ver cómo vas.</p>';
+    const media = (lista, campo) => lista.reduce((s, r) => s + Number(r[campo]), 0) / lista.length;
+    const fmt = n => n.toFixed(1).replace('.', ',');
+
+    const filas = Object.entries(SALUD_ESCALA).map(([campo, cfg]) => {
+        const ahora = media(recientes, campo);
+        const lectura = saludLectura(campo, Math.round(ahora));
+        let cambio = '';
+        if (anteriores.length) {
+            const antes = media(anteriores, campo);
+            const dif = campo === 'fatiga' ? antes - ahora : ahora - antes; // positivo = mejor
+            cambio = Math.abs(dif) < 0.5 ? '<span class="tend-igual">→ igual que la semana anterior</span>'
+                : dif > 0 ? `<span class="tend-mejor">↑ mejor que la semana anterior (${fmt(antes)})</span>`
+                : `<span class="tend-peor">↓ peor que la semana anterior (${fmt(antes)})</span>`;
+        }
+        return `<div class="tendencia-fila">
+            <div class="tendencia-nombre">${cfg.nombre} <small>${cfg.regla}</small></div>
+            <div class="tendencia-valor salud-${lectura.nivel}">${fmt(ahora)}<small>/10</small></div>
+            <div class="tendencia-texto">${SALUD_ICONO[lectura.nivel]} ${lectura.texto}<br>${cambio}</div>
+        </div>`;
+    }).join('');
+
+    const bAhora = Math.round(recientes.reduce((s, r) => s + bienestarDe(r), 0) / recientes.length);
+    let titular = `Tu bienestar medio esta semana es ${bAhora}/100.`;
+    if (anteriores.length) {
+        const bAntes = Math.round(anteriores.reduce((s, r) => s + bienestarDe(r), 0) / anteriores.length);
+        titular += bAhora - bAntes >= 5 ? ' 👍 Vas mejor que la semana pasada.' : bAntes - bAhora >= 5 ? ' 👀 Vas peor que la semana pasada: revisa sueño y descanso.' : ' Estás igual que la semana pasada.';
+    }
+    return `<p class="tendencia-titular">${titular}</p>${filas}`;
 }
 
 // — RENDIMIENTO (listo para entrenar · carga · cumplimiento) —
@@ -1751,7 +1963,7 @@ async function pfRenderPerfil() {
     const data=await apiFetch(`${API}/panel/${userId}/perfil`).then(r=>r.json()).catch(()=>null);
     const main=document.getElementById('pf-content');
     const p=data?.perfil||{};
-    const sportOptions=['Fútbol','Baloncesto','Tenis'];
+    const sportOptions=DEPORTES_APP;
     const deporteActual = p.deportePrincipal || currentUser.deporte_principal || 'Fútbol';
     const sportConfig = getSportFieldConfig(deporteActual);
     const posicionActual = p.posicion || sportConfig.posicionOptions[0];
@@ -1768,8 +1980,8 @@ async function pfRenderPerfil() {
                 </div>
                 <div class="form-group"><label>Nombre completo</label><input type="text" id="pf-f-nombre" value="${escapeHtml(p.nombre||currentUser.nombre||'')}"></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Deporte principal</label><select id="pf-f-deporte" onchange="pfRenderPerfil()">${sportOptions.map(s=>`<option value="${s}" ${deporteActual===s?'selected':''}>${s}</option>`).join('')}</select></div>
-                    <div class="form-group"><label>${sportConfig.posicionLabel.replace('*','')}</label><select id="pf-f-posicion">${sportConfig.posicionOptions.map(pos=>`<option value="${pos}" ${posicionActual===pos?'selected':''}>${pos}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Deporte principal</label><select id="pf-f-deporte" onchange="pfCambiarDeporte()">${sportOptions.map(s=>`<option value="${s}" ${deporteActual===s?'selected':''}>${getSportIcon(s)} ${s}</option>`).join('')}</select></div>
+                    <div class="form-group"><label id="pf-f-posicion-label">${sportConfig.posicionLabel.replace('*','')}</label><select id="pf-f-posicion">${sportConfig.posicionOptions.map(pos=>`<option value="${pos}" ${posicionActual===pos?'selected':''}>${pos}</option>`).join('')}</select></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label>Edad</label><input type="number" id="pf-f-edad" value="${p.edad||''}" placeholder="22"></div>
@@ -1778,6 +1990,11 @@ async function pfRenderPerfil() {
                 <div class="form-row">
                     <div class="form-group"><label>Peso (kg)</label><input type="number" id="pf-f-peso" value="${p.peso||''}" placeholder="72"></div>
                     <div class="form-group"><label>Sexo <span class="campo-ayuda">(para calcular tus calorías)</span></label><select id="pf-f-sexo">${['','Hombre','Mujer','Prefiero no decirlo'].map(s=>`<option value="${s}" ${(p.sexo||'')===s?'selected':''}>${s||'Selecciona…'}</option>`).join('')}</select></div>
+                </div>
+                <div class="form-group ${SIN_COMPETICION.includes(deporteActual)?'hidden':''}" id="pf-f-partido-grupo">
+                    <label>📅 ¿Qué día tienes partido o competición?</label>
+                    <select id="pf-f-partido">${diasPartidoOpciones(p.diaPartido)}</select>
+                    <span class="campo-ayuda">Tu rutina, tus comidas y los consejos de sueño se organizan alrededor de ese día: la víspera es suave y con más carbohidratos, y el día siguiente es de recuperación.</span>
                 </div>
                 <div class="form-row">
                     <div class="form-group" style="grid-column:1/-1"><span style="color:var(--text-muted);font-size:12px;display:block;width:100%">Tu peso, altura, edad y sexo se usan para calcular tu plan de comidas. Tu selección de deporte se sincroniza con el registro inicial.</span></div>
@@ -1788,9 +2005,24 @@ async function pfRenderPerfil() {
     </div>`;
 }
 
+function diasPartidoOpciones(actual) {
+    const opciones = [['', 'Selecciona…'], ...DIAS_SEMANA.map(d => [d, d]), ['Ninguno', 'No tengo partidos / día variable']];
+    return opciones.map(([v, t]) => `<option value="${v}" ${(actual||'')===v?'selected':''}>${t}</option>`).join('');
+}
+
+// Cambiar de deporte cambia las posiciones disponibles sin perder lo que ya escribió
+function pfCambiarDeporte() {
+    const deporte = document.getElementById('pf-f-deporte').value;
+    const cfg = getSportFieldConfig(deporte);
+    document.getElementById('pf-f-posicion-label').textContent = cfg.posicionLabel.replace('*','');
+    document.getElementById('pf-f-posicion').innerHTML = cfg.posicionOptions.map(p => `<option value="${p}">${p}</option>`).join('');
+    document.getElementById('pf-f-partido-grupo').classList.toggle('hidden', SIN_COMPETICION.includes(deporte));
+}
+
 async function pfGuardarPerfil() {
     const userId=currentUser.id;
     const body={
+        diaPartido: document.getElementById('pf-f-partido').value || undefined,
         nombre: document.getElementById('pf-f-nombre').value.trim(),
         edad: Number(document.getElementById('pf-f-edad').value),
         posicion: document.getElementById('pf-f-posicion').value,
@@ -1801,7 +2033,7 @@ async function pfGuardarPerfil() {
     };
     const res=await apiFetch(`${API}/panel/${userId}/perfil`,{method:'PUT',body:JSON.stringify(body)});
     if(res.ok){
-        showToast('Perfil actualizado');
+        showToast(body.diaPartido && body.diaPartido!=='Ninguno' ? `Perfil actualizado · tu semana se organiza para el ${body.diaPartido.toLowerCase()}` : 'Perfil actualizado');
         currentUser.deporte_principal = body.deportePrincipal;
         setSession(currentUser, getToken());
         document.getElementById('pf-nombre').textContent = body.nombre.split(' ').slice(0,2).join(' ');
@@ -1816,7 +2048,7 @@ async function pfRenderSalud() {
     const main=document.getElementById('pf-content');
     const latest=registros[0], prev=registros[1];
 
-    const wellness=latest?Math.round(((10-Number(latest.fatiga))+Number(latest.sueno)+Number(latest.recuperacion))/29*100):null;
+    const wellness=latest?bienestarDe(latest):null;
     const wsClass=wellness>=70?'ws-good':wellness>=40?'ws-mid':'ws-bad';
 
     function trendArrow(field){
@@ -1855,7 +2087,8 @@ async function pfRenderSalud() {
                 <div class="sk-icon">😓</div>
                 <div class="sk-body">
                     <div class="sk-val">${latest.fatiga}<span>/10</span></div>
-                    <div class="sk-label">Fatiga hoy</div>
+                    <div class="sk-label">Fatiga hoy <small>(más baja = mejor)</small></div>
+                    ${saludLecturaHTML('fatiga', latest.fatiga)}
                     ${trendArrow('fatiga')}
                     <div class="sk-avg">Prom. 7d: ${avgOf('fatiga')}</div>
                 </div>
@@ -1864,7 +2097,8 @@ async function pfRenderSalud() {
                 <div class="sk-icon">😴</div>
                 <div class="sk-body">
                     <div class="sk-val">${latest.sueno}<span>/10</span></div>
-                    <div class="sk-label">Sueño hoy</div>
+                    <div class="sk-label">Sueño hoy <small>(más alto = mejor)</small></div>
+                    ${saludLecturaHTML('sueno', latest.sueno)}
                     ${trendArrow('sueno')}
                     <div class="sk-avg">Prom. 7d: ${avgOf('sueno')}</div>
                 </div>
@@ -1873,7 +2107,8 @@ async function pfRenderSalud() {
                 <div class="sk-icon">⚡</div>
                 <div class="sk-body">
                     <div class="sk-val">${latest.recuperacion}<span>/10</span></div>
-                    <div class="sk-label">Recuperación hoy</div>
+                    <div class="sk-label">Recuperación hoy <small>(más alta = mejor)</small></div>
+                    ${saludLecturaHTML('recuperacion', latest.recuperacion)}
                     ${trendArrow('recuperacion')}
                     <div class="sk-avg">Prom. 7d: ${avgOf('recuperacion')}</div>
                 </div>
@@ -1883,17 +2118,18 @@ async function pfRenderSalud() {
         ${registros.length>=2?`
         <div class="card" style="margin-bottom:24px">
             <div class="card-header">
-                <h2>📊 Tendencia de salud</h2>
-                <span style="font-size:12px;color:var(--text-muted)">Últimos ${Math.min(registros.length,14)} días</span>
+                <h2>📊 ¿Cómo vas?</h2>
+                <span style="font-size:12px;color:var(--text-muted)">Esta semana frente a la anterior</span>
             </div>
-            <div style="padding:20px 24px 16px">
+            <div class="tendencia-cuerpo">
+                ${saludResumenTendencia(registros)}
+                <div class="tendencia-grafica-titulo">Bienestar de cada día <small>(0-100: junta fatiga, sueño y recuperación)</small></div>
                 <div class="salud-chart-legend">
-                    <span class="scl-item scl-fatiga">● Fatiga</span>
-                    <span class="scl-item scl-sueno">● Sueño</span>
-                    <span class="scl-item scl-rec">● Recuperación</span>
-                    <span class="scl-zone">Zona alerta fatiga ≥ 8</span>
+                    <span class="scl-item" style="color:#16a34a">● 70 o más: bien</span>
+                    <span class="scl-item" style="color:#d97706">● 40-69: regular</span>
+                    <span class="scl-item" style="color:#ef4444">● menos de 40: necesitas descansar</span>
                 </div>
-                <div class="chart-wrap" style="height:240px"><canvas id="chart-salud-trend"></canvas></div>
+                <div class="chart-wrap" style="height:200px"><canvas id="chart-salud-trend"></canvas></div>
             </div>
         </div>`:''}
 
@@ -1901,19 +2137,22 @@ async function pfRenderSalud() {
             <div class="card-header"><h2>📝 Registrar hoy</h2></div>
             <div style="padding:24px;display:flex;flex-direction:column;gap:20px">
                 <div>
-                    <label class="range-label">Fatiga <span id="val-fatiga">5</span>/10</label>
-                    <input type="range" id="s-fatiga" min="1" max="10" value="5" oninput="document.getElementById('val-fatiga').textContent=this.value" class="range-input range-danger">
-                    <div class="range-hints"><span>Sin fatiga</span><span>Muy cansado</span></div>
+                    <label class="range-label">¿Qué tan cansado estás? <span id="val-fatiga">5</span>/10</label>
+                    <input type="range" id="s-fatiga" min="1" max="10" value="5" oninput="saludActualizarControl('fatiga',this.value)" class="range-input range-danger">
+                    <div class="range-hints"><span>1 = nada cansado</span><span>10 = agotado</span></div>
+                    <div id="lect-fatiga">${saludLecturaHTML('fatiga',5)}</div>
                 </div>
                 <div>
-                    <label class="range-label">Horas de sueño <span id="val-sueno">7</span>/10</label>
-                    <input type="range" id="s-sueno" min="1" max="10" value="7" oninput="document.getElementById('val-sueno').textContent=this.value" class="range-input range-blue">
-                    <div class="range-hints"><span>Muy poco</span><span>Excelente</span></div>
+                    <label class="range-label">¿Qué tan bien dormiste? <span id="val-sueno">7</span>/10</label>
+                    <input type="range" id="s-sueno" min="1" max="10" value="7" oninput="saludActualizarControl('sueno',this.value)" class="range-input range-blue">
+                    <div class="range-hints"><span>1 = casi nada / muy mal</span><span>10 = profundo, 8 h o más</span></div>
+                    <div id="lect-sueno">${saludLecturaHTML('sueno',7)}</div>
                 </div>
                 <div>
-                    <label class="range-label">Recuperación <span id="val-rec">5</span>/10</label>
-                    <input type="range" id="s-rec" min="1" max="10" value="5" oninput="document.getElementById('val-rec').textContent=this.value" class="range-input range-green">
-                    <div class="range-hints"><span>Sin recuperar</span><span>Totalmente recuperado</span></div>
+                    <label class="range-label">¿Cómo de recuperado te sientes? <span id="val-recuperacion">5</span>/10</label>
+                    <input type="range" id="s-rec" min="1" max="10" value="5" oninput="saludActualizarControl('recuperacion',this.value)" class="range-input range-green">
+                    <div class="range-hints"><span>1 = con dolor, sin recuperar</span><span>10 = como nuevo</span></div>
+                    <div id="lect-recuperacion">${saludLecturaHTML('recuperacion',5)}</div>
                 </div>
                 <div class="form-group" style="margin:0"><label>Notas (opcional)</label><textarea id="s-notas" placeholder="Ej: pierna derecha molesta, dormí bien..." style="height:70px"></textarea></div>
                 <button class="btn btn-primary" onclick="pfGuardarSalud()">Guardar registro de hoy</button>
@@ -1938,55 +2177,36 @@ async function pfRenderSalud() {
     </div>`;
 
     if(registros.length>=2){
+        // Una barra de bienestar por día, con el color de su zona
         const recientes=registros.slice(0,14).reverse();
-        const labels=recientes.map(s=>s.fecha.slice(5)); // MM-DD
-        const ctx=document.getElementById('chart-salud-trend').getContext('2d');
-
-        const gradFatiga=ctx.createLinearGradient(0,0,0,240);
-        gradFatiga.addColorStop(0,'rgba(239,68,68,0.18)');
-        gradFatiga.addColorStop(1,'rgba(239,68,68,0)');
-        const gradSueno=ctx.createLinearGradient(0,0,0,240);
-        gradSueno.addColorStop(0,'rgba(14,165,233,0.15)');
-        gradSueno.addColorStop(1,'rgba(14,165,233,0)');
-        const gradRec=ctx.createLinearGradient(0,0,0,240);
-        gradRec.addColorStop(0,'rgba(22,163,74,0.15)');
-        gradRec.addColorStop(1,'rgba(22,163,74,0)');
-
-        new Chart(ctx,{
-            type:'line',
-            data:{labels,datasets:[
-                {label:'Fatiga',data:recientes.map(s=>s.fatiga),borderColor:'#ef4444',backgroundColor:gradFatiga,tension:.45,fill:true,pointBackgroundColor:'#ef4444',pointRadius:4,pointHoverRadius:6,borderWidth:2.5},
-                {label:'Sueño',data:recientes.map(s=>s.sueno),borderColor:'#0ea5e9',backgroundColor:gradSueno,tension:.45,fill:true,pointBackgroundColor:'#0ea5e9',pointRadius:4,pointHoverRadius:6,borderWidth:2.5},
-                {label:'Recuperación',data:recientes.map(s=>s.recuperacion),borderColor:'#16a34a',backgroundColor:gradRec,tension:.45,fill:true,pointBackgroundColor:'#16a34a',pointRadius:4,pointHoverRadius:6,borderWidth:2.5}
-            ]},
+        const valores=recientes.map(bienestarDe);
+        const colorDe=v=>v>=70?'#16a34a':v>=40?'#d97706':'#ef4444';
+        new Chart(document.getElementById('chart-salud-trend').getContext('2d'),{
+            type:'bar',
+            data:{labels:recientes.map(s=>formatFecha(s.fecha)),datasets:[{label:'Bienestar',data:valores,backgroundColor:valores.map(colorDe),borderRadius:6,maxBarThickness:28}]},
             options:{
                 responsive:true,
                 maintainAspectRatio:false,
-                interaction:{mode:'index',intersect:false},
                 plugins:{
                     legend:{display:false},
                     tooltip:{
                         backgroundColor:'#0f172a',
-                        titleColor:'#94a3b8',
                         bodyColor:'#f1f5f9',
                         padding:12,
                         cornerRadius:10,
-                        titleFont:{family:'Outfit',size:11},
                         bodyFont:{family:'Outfit',size:13},
                         callbacks:{
-                            title:i=>`📅 ${recientes[i[0].dataIndex].fecha}`,
-                            afterBody:items=>{
-                                const r=recientes[items[0].dataIndex];
-                                const w=Math.round(((10-Number(r.fatiga))+Number(r.sueno)+Number(r.recuperacion))/30*100);
-                                return [`Bienestar: ${w}/100`];
+                            label:i=>`Bienestar: ${i.raw}/100`,
+                            afterLabel:i=>{
+                                const r=recientes[i.dataIndex];
+                                return Object.keys(SALUD_ESCALA).map(c=>`${SALUD_ESCALA[c].nombre}: ${r[c]}/10 · ${saludLectura(c,r[c]).texto}`);
                             }
                         }
-                    },
-                    ...(typeof window.chartjsPluginAnnotation !== 'undefined' || (Chart.registry && Chart.registry.plugins.get('annotation')) ? {annotation:{annotations:{alertZone:{type:'box',yMin:8,yMax:10,backgroundColor:'rgba(239,68,68,0.07)',borderColor:'rgba(239,68,68,0.25)',borderWidth:1,label:{display:true,content:'⚠ Zona alerta',color:'#ef4444',font:{size:10,family:'Outfit'}}}}}} : {})
+                    }
                 },
                 scales:{
                     x:{grid:{display:false},ticks:{font:{family:'Outfit',size:11},color:'#94a3b8'}},
-                    y:{min:0,max:10,ticks:{stepSize:2,font:{family:'Outfit',size:11},color:'#94a3b8'},grid:{color:'#f1f5f9'},border:{display:false}}
+                    y:{min:0,max:100,ticks:{stepSize:20,font:{family:'Outfit',size:11},color:'#94a3b8'},grid:{color:'rgba(148,163,184,0.15)'},border:{display:false}}
                 }
             }
         });
@@ -2017,12 +2237,14 @@ async function pfLeerTodas() {
 }
 
 // — HISTORIAL —
-function pfGoToHistorial(sub) {
+// registrar = true: deja el cursor en el formulario para anotar directamente
+async function pfGoToHistorial(sub, registrar = false) {
     document.querySelectorAll('[data-pf-view]').forEach(b=>b.classList.remove('active'));
     document.querySelector('[data-pf-view="historial"]')?.classList.add('active');
-    if(sub==='comidas') pfRenderHistorialComidas();
-    else if(sub==='rutinas') pfRenderHistorialRutinas();
-    else pfRenderHistorial();
+    if(sub==='comidas') await pfRenderHistorialComidas();
+    else if(sub==='rutinas') await pfRenderHistorialRutinas();
+    else return pfRenderHistorial();
+    if(registrar) document.getElementById(sub==='comidas'?'hst-nombre':'rut-nombre')?.focus();
 }
 
 async function pfRenderHistorial() {
@@ -2521,6 +2743,7 @@ async function pfRenderPlan() {
 
     const diasAlim   = semanaAlim.length;
     const diasRutina = semanaRutina.filter(d=>d.ejercicios&&d.ejercicios.length).length;
+    const deporte    = rutinaSemanal?.deporte || currentUser.deporte_principal || 'Fútbol';
 
     main.innerHTML=`
     <div class="view-enter">
@@ -2528,6 +2751,8 @@ async function pfRenderPlan() {
             <div class="view-title"><h1>Mi Plan Personalizado</h1><p>Diseñado para tu rendimiento y recuperación</p></div>
             <button class="btn btn-ghost" onclick="pfRenderOnboarding(true)">⚙️ Actualizar perfil</button>
         </div>
+
+        ${SIN_COMPETICION.includes(deporte) ? '' : planSemanaPartidoHTML(rutinaSemanal?.diaPartido)}
 
         <div class="card" style="margin-bottom:24px">
             <div class="card-header"><h2>🩺 Tu Perfil Médico</h2></div>
@@ -2555,6 +2780,36 @@ async function pfRenderPlan() {
     </div>`;
 }
 
+/** Día de partido: se elige aquí mismo y la semana (rutina, comidas, sueño) se reorganiza. */
+function planSemanaPartidoHTML(diaPartido) {
+    const i = DIAS_SEMANA.indexOf(diaPartido);
+    const detalle = i >= 0 ? `
+        <ul class="partido-semana">
+            <li><strong>${DIAS_SEMANA[(i+6)%7]}</strong> (víspera): sesión corta y suave, más carbohidratos en las comidas.</li>
+            <li><strong>Noches antes del partido</strong>: duerme 8-9 h.</li>
+            <li><strong>${diaPartido}</strong>: partido. Comida principal 3-4 h antes.</li>
+            <li><strong>${DIAS_SEMANA[(i+1)%7]}</strong>: recuperación (descanso o actividad muy suave).</li>
+        </ul>` : '<p class="msg-ayuda">Elige el día y organizamos tu semana: la víspera suave y con más carbohidratos, y el día siguiente de recuperación.</p>';
+    return `
+        <div class="card partido-card" style="margin-bottom:24px">
+            <div class="card-header"><h2>📅 Tu semana de partido</h2></div>
+            <div style="padding:16px 20px">
+                <label class="partido-label">¿Qué día tienes partido o competición?
+                    <select onchange="pfCambiarDiaPartido(this.value)">${diasPartidoOpciones(diaPartido || '')}</select>
+                </label>
+                ${detalle}
+            </div>
+        </div>`;
+}
+
+async function pfCambiarDiaPartido(dia) {
+    if (!dia) return;
+    const res = await apiFetch(`${API}/panel/${currentUser.id}/perfil`, { method:'PUT', body: JSON.stringify({ diaPartido: dia }) });
+    if (!res.ok) { showToast('No se pudo guardar el día', 'error'); return; }
+    showToast(dia === 'Ninguno' ? 'Listo: semana sin partido fijo' : `Listo: tu semana se organiza para el ${dia.toLowerCase()}`);
+    pfRenderPlan();
+}
+
 // — TESTS FÍSICOS (atleta y médico) —
 const EV_TENDENCIA = {
     mejora:      { clase:'ev-mejora',  texto: c => `▲ Mejora ${String(c).replace('.', ',')} %` },
@@ -2568,6 +2823,11 @@ let _evDatos = null; // última respuesta, para el formulario de registro
 function evValor(prueba, valor) {
     if (valor == null) return '—';
     const dec = prueba.decimales ?? 1;
+    // Tiempos largos (5 km, 400 m) se leen mejor en minutos: 1530 s → 25:30
+    if (prueba.unidad === 's' && Number(valor) >= 120) {
+        const s = Math.round(Number(valor));
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} min`;
+    }
     return `${Number(valor).toLocaleString('es-CO', { minimumFractionDigits: dec, maximumFractionDigits: dec })} ${prueba.unidad}`;
 }
 
@@ -2783,14 +3043,14 @@ async function pfRenderPlanAlimenticio() {
                 <div class="plan-meal-tipo">${t.label}</div>
                 <div class="plan-meal-nombre">${escapeHtml(c.nombre||'—')}</div>
                 <div class="plan-meal-kcal">${nutFormato(c.kcal)} kcal ${porcion}</div>
-                ${c.proteina!=null?`<div class="plan-meal-macros">P ${c.proteina} g · C ${c.carbs} g · G ${c.grasa} g</div>`:''}
+                ${c.proteina!=null?`<div class="plan-meal-macros">Proteína ${c.proteina} g · Carbohidratos ${c.carbs} g · Grasa ${c.grasa} g</div>`:''}
             </div>`;
         }).join('');
         return `
         <div class="plan-day-card">
             <div class="plan-day-header">
                 <div class="plan-day-name">${dia.dia||''} ${o?`<span class="nut-dia ${tipo.clase}">${tipo.icono} ${escapeHtml(o.etiqueta)}</span>`:''}</div>
-                <div class="plan-day-kcal">${o?`Objetivo ${nutFormato(o.kcal)} kcal · P ${o.proteina} · C ${o.carbs} · G ${o.grasa}`:`~${nutFormato(dia.total?.kcal)} kcal`}</div>
+                <div class="plan-day-kcal">${o?`🎯 Meta del día: <strong>${nutFormato(o.kcal)} kcal</strong> · Proteína ${o.proteina} g · Carbohidratos ${o.carbs} g · Grasa ${o.grasa} g`:`~${nutFormato(dia.total?.kcal)} kcal`}</div>
             </div>
             <div class="plan-meals-grid">${comidas}</div>
         </div>`;
@@ -2815,6 +3075,13 @@ async function pfRenderPlanAlimenticio() {
                     ${nutTarjetaObjetivo('Día de descanso', plan.objetivos.descanso)}
                 </div>
                 ${datosUsados ? `<p class="nut-datos">Calculado con: ${datosUsados}</p>` : ''}
+                <div class="nut-glosario">
+                    <div><strong>kcal (calorías)</strong> La energía total que necesitas ese día. Si comes menos, bajas de peso; si comes más, subes.</div>
+                    <div><strong>Proteína</strong> Repara y construye músculo. Está en carne, pollo, pescado, huevo, lácteos y legumbres.</div>
+                    <div><strong>Carbohidratos</strong> El combustible para entrenar y jugar. Arroz, pasta, papa, pan, avena y fruta.</div>
+                    <div><strong>Grasa</strong> Energía de reserva y hormonas. Aceite de oliva, aguacate, frutos secos y pescado azul.</div>
+                    <div><strong>g (gramos)</strong> Cantidad del nutriente, no del alimento: 100 g de pollo tienen unos 30 g de proteína.</div>
+                </div>
                 <details class="rd-explicacion">
                     <summary>¿Cómo se calcula?</summary>
                     Tu gasto en reposo sale de tu peso, altura, edad y sexo (fórmula Mifflin-St Jeor) y se multiplica según lo que entrenas ese día.
@@ -3511,7 +3778,7 @@ function portadaVisible() {
 
 // Palabra que va cambiando en el subtítulo
 (function rotarDeporte() {
-    const deportes = ['fútbol', 'baloncesto', 'tenis', 'tu equipo'];
+    const deportes = ['fútbol', 'baloncesto', 'tenis', 'béisbol', 'atletismo', 'running', 'natación', 'boxeo', 'estar en forma'];
     let i = 0;
     setInterval(() => {
         const el = document.getElementById('auth-deporte');

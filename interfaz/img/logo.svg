@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Vital Sports">
-  <!-- Logo de Vital Sports: una "V" cuyo trazo derecho se convierte en un pulso que sube como una flecha -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="VitalTraining">
+  <!-- Logo de VitalTraining: una "V" cuyo trazo derecho se convierte en un pulso que sube como una flecha -->
   <defs>
     <linearGradient id="vs-fondo" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#22c55e"/>

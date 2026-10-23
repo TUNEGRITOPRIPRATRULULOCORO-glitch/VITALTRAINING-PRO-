@@ -33,6 +33,7 @@ const MIGRACIONES = [
   'ALTER TABLE cumplimiento ADD COLUMN rpe INTEGER',
   'ALTER TABLE cumplimiento ADD COLUMN duracion_minutos INTEGER',
   'ALTER TABLE perfiles     ADD COLUMN sexo VARCHAR(20)',
+  'ALTER TABLE perfiles     ADD COLUMN dia_partido VARCHAR(12)',
 ];
 
 // PostgreSQL y PGlite permiten comprobar antes; pg-mem (tests) no, y ahí se usa el error "ya existe".

@@ -21,7 +21,7 @@ Variables de entorno:
 |---|---|
 | `BREVO_API_KEY` | Clave de API de Brevo (Brevo → SMTP & API → API Keys) |
 | `CORREO_REMITENTE` | Correo remitente **verificado** en Brevo (Senders) |
-| `CORREO_NOMBRE` | Nombre que ve quien recibe (por defecto "Vital Sports") |
+| `CORREO_NOMBRE` | Nombre que ve quien recibe (por defecto "VitalTraining") |
 | `APP_URL` | Dirección de la app para los enlaces. En Render no hace falta: se usa `RENDER_EXTERNAL_URL` |
 
 Guía para configurarlo: [docs/DESPLIEGUE.md](../docs/DESPLIEGUE.md#correos-opcional).

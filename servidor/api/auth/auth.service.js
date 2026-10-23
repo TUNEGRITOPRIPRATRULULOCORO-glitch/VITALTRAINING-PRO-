@@ -4,6 +4,8 @@ const jwt    = require('jsonwebtoken');
 const { query } = require('../../../base-de-datos/db');
 const usuarios = require('../usuarios');
 const avisos   = require('../avisos');
+const { DEPORTES } = require('../../compartido/deportes');
+const google   = require('./google');
 
 const JWT_SECRET  = process.env.JWT_SECRET || 'vt-super-secret-key-2026';
 const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '8h';
@@ -24,23 +26,52 @@ async function login(email, password) {
   const match = await bcrypt.compare(password, usuario.password);
   if (!match) return { error: 'Correo o contraseña incorrectos.', status: 401 };
 
+  return sesion(usuario);
+}
+
+function sesion(usuario) {
   const token = jwt.sign(
     { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES }
   );
-
   const { password: _, ...usuarioSeguro } = usuario;
   return { usuario: usuarioSeguro, token };
 }
 
+/**
+ * Entrar con Google. Si el correo ya tiene cuenta, inicia sesión. Si no, devuelve el nombre y
+ * el correo para que la persona complete el registro (deporte, posición...) sin contraseña.
+ */
+async function loginGoogle(credencial) {
+  const perfil = await google.verificar(credencial);
+  if (!perfil) return { error: 'No se pudo verificar tu cuenta de Google. Inténtalo de nuevo.', status: 401 };
+
+  const { rows } = await query('SELECT * FROM usuarios WHERE LOWER(email) = LOWER($1)', [perfil.email]);
+  const usuario = rows[0];
+  if (!usuario) return { nuevo: true, nombre: perfil.nombre, email: perfil.email };
+  if (usuario.estado === 'Inactivo') return { error: 'Cuenta inactiva. Contacta al administrador.', status: 403 };
+  return sesion(usuario);
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Crea una cuenta de atleta. Con datos.googleCredencial la cuenta se crea con el correo que
+ * Google verificó y una contraseña aleatoria (si algún día quiere una, usa "¿Olvidaste tu contraseña?").
+ */
 async function registro(datos) {
-  const { nombre, email, password } = datos;
-  const deportesValidos = ['Fútbol', 'Baloncesto', 'Tenis'];
-  const deportePrincipal = deportesValidos.includes(datos.deporte) ? datos.deporte : 'Fútbol';
+  const { nombre } = datos;
+  let { email, password } = datos;
+  const deportePrincipal = DEPORTES.includes(datos.deporte) ? datos.deporte : 'Fútbol';
   const rolUsuario = ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
+
+  if (datos.googleCredencial) {
+    const perfil = await google.verificar(datos.googleCredencial);
+    if (!perfil) return { error: 'No se pudo verificar tu cuenta de Google. Vuelve a pulsar "Continuar con Google".', status: 401 };
+    email = perfil.email;
+    password = crypto.randomBytes(32).toString('hex');
+  }
 
   if (!nombre || nombre.trim().length < 2)
     return { error: 'El nombre debe tener al menos 2 caracteres.', status: 400 };
@@ -56,6 +87,8 @@ async function registro(datos) {
     nombre, email, hashedPassword, rol: rolUsuario, deportePrincipal, datos
   });
 
+  // Con Google ya está verificado quién es: entra directamente
+  if (datos.googleCredencial) return sesion(nuevo);
   const { password: _, ...usuarioSeguro } = nuevo;
   return { usuario: usuarioSeguro };
 }
@@ -103,9 +136,14 @@ async function restablecerPassword(token, password) {
   const enlace = rows[0];
   if (!enlace || enlace.usado || new Date(enlace.expira) < new Date()) return invalido;
 
+  // El enlace sigue sirviendo: puede probar con otra contraseña
+  const { rows: actual } = await query('SELECT password FROM usuarios WHERE id = $1', [enlace.user_id]);
+  if (actual[0] && await bcrypt.compare(password, actual[0].password))
+    return { error: 'La nueva contraseña debe ser distinta de la anterior.', status: 400 };
+
   await usuarios.cambiarPassword(enlace.user_id, await bcrypt.hash(password, 10));
   await query('UPDATE restablecimientos SET usado = true WHERE user_id = $1', [enlace.user_id]);
   return { ok: true };
 }
 
-module.exports = { login, registro, solicitarRestablecimiento, restablecerPassword };
+module.exports = { login, loginGoogle, registro, solicitarRestablecimiento, restablecerPassword };

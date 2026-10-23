@@ -8,6 +8,11 @@
  * "margen": cambio en % por debajo del cual la diferencia entre dos mediciones puede deberse al
  * error normal de la prueba (los estudios dan errores típicos de ~2-6 %). Solo se habla de mejora
  * o empeoramiento cuando el cambio lo supera.
+ *
+ * Deportes de resistencia: test de Cooper (12 min) y tiempo en 5 km; natación: 50 y 400 m libre.
+ * "Estar en forma": pruebas sin material de la batería Senior Fitness Test (Rikli y Jones) y la
+ * caminata de 6 minutos, válidas para cualquier nivel. En los tiempos largos el resultado se
+ * escribe en segundos (5:30 = 330).
  */
 
 const PRUEBAS = {
@@ -51,12 +56,63 @@ const PRUEBAS = {
     mide: 'Potencia de tronco y brazos',
     instrucciones: 'De pie, de lado, lanza con giro de cadera como un golpe de derecha. 3 intentos por lado; anota el mejor.',
   },
+  saltoHorizontal: {
+    nombre: 'Salto de longitud sin impulso', corto: 'Salto horizontal', unidad: 'cm', mejor: 'mayor', margen: 3, min: 80, max: 380, decimales: 0,
+    mide: 'Potencia horizontal de piernas',
+    instrucciones: 'Pies detrás de la línea, balancea los brazos y salta lo más lejos posible. Mide hasta el talón más cercano. 3 intentos.',
+  },
+  cooper: {
+    nombre: 'Test de Cooper (12 minutos)', corto: 'Cooper 12 min', unidad: 'm', mejor: 'mayor', margen: 4, min: 800, max: 5000, decimales: 0,
+    mide: 'Resistencia aeróbica',
+    instrucciones: 'Corre (o camina si hace falta) la mayor distancia posible en 12 minutos, mejor en pista. Anota los metros.',
+  },
+  carrera5k: {
+    nombre: 'Carrera de 5 km', corto: '5 km', unidad: 's', mejor: 'menor', margen: 2, min: 780, max: 3600, decimales: 0,
+    mide: 'Rendimiento en carrera',
+    instrucciones: 'Corre 5 km a tu mejor ritmo en terreno llano. Escribe el tiempo en segundos (25:30 = 1530).',
+  },
+  nado50: {
+    nombre: '50 m libre', corto: '50 m libre', unidad: 's', mejor: 'menor', margen: 1.5, min: 20, max: 120, decimales: 2,
+    mide: 'Velocidad en el agua',
+    instrucciones: 'Salida desde el poyete o desde el agua (anota cuál y repite siempre igual). Un intento a máxima velocidad.',
+  },
+  nado400: {
+    nombre: '400 m libre', corto: '400 m libre', unidad: 's', mejor: 'menor', margen: 1.5, min: 230, max: 900, decimales: 0,
+    mide: 'Resistencia en el agua',
+    instrucciones: 'Nada 400 m a tu mejor ritmo. Escribe el tiempo en segundos (6:15 = 375).',
+  },
+  flexiones: {
+    nombre: 'Flexiones en 1 minuto', corto: 'Flexiones 1 min', unidad: 'rep', mejor: 'mayor', margen: 8, min: 1, max: 120, decimales: 0,
+    mide: 'Resistencia de brazos y pecho',
+    instrucciones: 'Cuerpo recto, baja hasta que el pecho quede a un puño del suelo. Cuenta las completas en 1 minuto (puedes apoyar rodillas, pero siempre igual).',
+  },
+  sentarse30: {
+    nombre: 'Sentarse y levantarse en 30 segundos', corto: 'Silla 30 s', unidad: 'rep', mejor: 'mayor', margen: 10, min: 1, max: 60, decimales: 0,
+    mide: 'Fuerza de piernas',
+    instrucciones: 'Silla sin ruedas contra la pared, brazos cruzados. Cuenta cuántas veces te levantas del todo en 30 segundos.',
+  },
+  plancha: {
+    nombre: 'Plancha frontal', corto: 'Plancha', unidad: 's', mejor: 'mayor', margen: 10, min: 5, max: 600, decimales: 0,
+    mide: 'Resistencia del tronco',
+    instrucciones: 'Apoyado en antebrazos y puntas de los pies, cuerpo recto. Para cuando la cadera se hunda o suba. Anota los segundos.',
+  },
+  caminata6: {
+    nombre: 'Caminata de 6 minutos', corto: 'Caminata 6 min', unidad: 'm', mejor: 'mayor', margen: 5, min: 150, max: 1100, decimales: 0,
+    mide: 'Resistencia para el día a día',
+    instrucciones: 'Camina lo más rápido que puedas (sin correr) durante 6 minutos en un recorrido medido. Anota los metros.',
+  },
 };
 
 const BATERIAS = {
   'Fútbol':     ['sprint10', 'sprint30', 'cmj', 'agilidad5105', 'yoyo1'],
   'Baloncesto': ['sprint20', 'cmj', 'laneAgility', 'agilidad5105', 'yoyo1'],
   'Tenis':      ['sprint10', 'agilidad5105', 'cmj', 'balonMedicinal', 'yoyo1'],
+  'Béisbol':    ['sprint30', 'agilidad5105', 'cmj', 'balonMedicinal'],
+  'Atletismo':  ['sprint30', 'cmj', 'saltoHorizontal', 'balonMedicinal', 'cooper'],
+  'Running':    ['cooper', 'carrera5k', 'cmj'],
+  'Natación':   ['nado50', 'nado400', 'cmj', 'flexiones'],
+  'Boxeo':      ['balonMedicinal', 'cmj', 'flexiones', 'cooper'],
+  'Estar en forma': ['sentarse30', 'flexiones', 'plancha', 'caminata6'],
 };
 
 const DIAS_RECOMENDADOS = { min: 28, max: 42 }; // repetir cada 4-6 semanas

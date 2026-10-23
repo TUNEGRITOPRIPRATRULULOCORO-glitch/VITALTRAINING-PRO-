@@ -5,14 +5,14 @@ Es **el cerebro de la app**: recibe las peticiones de la interfaz, valida permis
 Está organizado como un **monolito modular**: una sola aplicación, dividida en módulos independientes.
 
 - `server.js` — punto de entrada (`npm start`)
-- `compartido/` — lo que usan todos los módulos (middleware de JWT, roles, CORS)
+- `compartido/` — lo que usan todos los módulos (middleware de JWT, roles, CORS, lista de deportes)
 - `api/` — un módulo por funcionalidad; `api/index.js` los monta bajo `/api`
 
 ## Módulos y sus tablas
 
 | Módulo | Tablas propias (solo él escribe) | Expone a otros módulos |
 |---|---|---|
-| `auth` | `restablecimientos` | — |
+| `auth` | `restablecimientos` (también entrar con Google) | — |
 | `usuarios` | `usuarios`, `fotos_perfil` | `buscarIdPorEmail`, `registrarAtleta`, `actualizarDeporte` |
 | `panel` | `perfiles`, `comidas`, `rutinas`, `alertas`, `cumplimiento` | `crearAlerta`, `registrarComidaAsignada`, `registrarRutinaAsignada` |
 | `salud` | `salud` | — |

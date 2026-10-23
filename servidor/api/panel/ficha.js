@@ -34,6 +34,7 @@ function fichaDeportiva(usuario = {}, perfil = null) {
     lateralidad: usuario.pie || null,                    // pie o mano dominante según el deporte
     frecuencia:  usuario.frecuencia || null,
     sexo:        p.sexo || null,                         // para calcular calorías (opcional)
+    diaPartido:  p.dia_partido || null,                  // organiza la semana (rutina, comidas, sueño)
     objetivo:    usuario.objetivo || null
   };
 }

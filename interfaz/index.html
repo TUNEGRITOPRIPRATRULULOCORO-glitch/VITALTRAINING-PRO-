@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vital Sports</title>
+    <title>VitalTraining</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<!-- Logo de Vital Sports: "V" cuyo trazo derecho es un pulso que sube como flecha. Se usa con <use href="#logo-marca"> -->
+<!-- Logo de VitalTraining: "V" cuyo trazo derecho es un pulso que sube como flecha. Se usa con <use href="#logo-marca"> -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="logo-marca" viewBox="0 0 48 48">
         <path class="logo-trazo" d="M9 13 L19 35 L25 21 L29 28 L35 12" fill="none" stroke="currentColor" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -45,7 +45,7 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1 class="auth-titulo">
                     <span class="auth-linea"><span>Entrena.</span></span>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
+                <p>© 2026 VitalTraining · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -75,7 +75,7 @@
                     <label>Correo electrónico</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <input type="email" id="login-email" placeholder="correo@vitalsports.com" autocomplete="email">
+                        <input type="email" id="login-email" placeholder="correo@vitaltraining.com" autocomplete="email">
                     </div>
                 </div>
                 <div class="auth-input-group">
@@ -90,6 +90,10 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
                 <a href="#" class="auth-olvide" onclick="event.preventDefault(); abrirOlvide()">¿Olvidaste tu contraseña?</a>
+                <div class="google-bloque hidden">
+                    <div class="auth-separador"><span>o</span></div>
+                    <div class="google-btn" data-texto="signin_with"></div>
+                </div>
             </div>
             <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-1')">Regístrate aquí</a></p>
         </div>
@@ -101,7 +105,7 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1>Crea tu<br>perfil de<br><span>atleta.</span></h1>
                 <p class="auth-tagline">Únete a la plataforma de gestión deportiva profesional.</p>
@@ -109,10 +113,16 @@
                     <span class="brand-chip">⚽ Fútbol</span>
                     <span class="brand-chip">🏀 Baloncesto</span>
                     <span class="brand-chip">🎾 Tenis</span>
+                    <span class="brand-chip">⚾ Béisbol</span>
+                    <span class="brand-chip">🏃 Atletismo</span>
+                    <span class="brand-chip">👟 Running</span>
+                    <span class="brand-chip">🏊 Natación</span>
+                    <span class="brand-chip">🥊 Boxeo</span>
+                    <span class="brand-chip">💪 Estar en forma</span>
                 </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
+                <p>© 2026 VitalTraining · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -128,6 +138,14 @@
                 <p>Cuéntanos sobre ti para personalizar tu plan</p>
             </div>
             <div class="auth-form">
+                <div class="google-bloque hidden" id="reg-google-bloque">
+                    <div class="google-btn" data-texto="signup_with"></div>
+                    <div class="auth-separador"><span>o con tu correo</span></div>
+                </div>
+                <div id="reg-google-aviso" class="auth-aviso-ok hidden">
+                    ✅ Cuenta de Google conectada. Completa tus datos para terminar (no necesitas contraseña).
+                    <a href="#" onclick="event.preventDefault(); cancelarRegistroGoogle()">Usar correo y contraseña</a>
+                </div>
                 <div class="auth-input-group">
                     <label>Nombre completo *</label>
                     <div class="auth-input-wrap">
@@ -142,11 +160,11 @@
                         <input type="email" id="reg-email" placeholder="juan@ejemplo.com">
                     </div>
                 </div>
-                <div class="auth-input-group">
+                <div class="auth-input-group" id="reg-password-grupo">
                     <label>Contraseña *</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <input type="password" id="reg-password" placeholder="Mínimo 4 caracteres">
+                        <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
                     </div>
                 </div>
                 <div class="auth-input-row">
@@ -179,7 +197,7 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1>Perfil<br><span>deportivo.</span></h1>
                 <p class="auth-tagline">Último paso para personalizar tu experiencia.</p>
@@ -187,10 +205,16 @@
                     <span class="brand-chip">⚽ Fútbol</span>
                     <span class="brand-chip">🏀 Baloncesto</span>
                     <span class="brand-chip">🎾 Tenis</span>
+                    <span class="brand-chip">⚾ Béisbol</span>
+                    <span class="brand-chip">🏃 Atletismo</span>
+                    <span class="brand-chip">👟 Running</span>
+                    <span class="brand-chip">🏊 Natación</span>
+                    <span class="brand-chip">🥊 Boxeo</span>
+                    <span class="brand-chip">💪 Estar en forma</span>
                 </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
+                <p>© 2026 VitalTraining · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card">
@@ -210,9 +234,15 @@
                     <label>Deporte principal *</label>
                     <select id="reg-deporte" onchange="updateSportSpecificFields()">
                         <option value="">Selecciona tu deporte</option>
-                        <option value="Fútbol">Fútbol</option>
-                        <option value="Baloncesto">Baloncesto</option>
-                        <option value="Tenis">Tenis</option>
+                        <option value="Fútbol">⚽ Fútbol</option>
+                        <option value="Baloncesto">🏀 Baloncesto</option>
+                        <option value="Tenis">🎾 Tenis</option>
+                        <option value="Béisbol">⚾ Béisbol</option>
+                        <option value="Atletismo">🏃 Atletismo</option>
+                        <option value="Running">👟 Running</option>
+                        <option value="Natación">🏊 Natación</option>
+                        <option value="Boxeo">🥊 Boxeo</option>
+                        <option value="Estar en forma">💪 Estar en forma (no practico un deporte)</option>
                     </select>
                 </div>
                 <div class="auth-input-group">
@@ -288,7 +318,7 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1>Listo para<br><span>comenzar.</span></h1>
                 <p class="auth-tagline">Tu perfil ha sido creado exitosamente.</p>
@@ -296,10 +326,16 @@
                     <span class="brand-chip">⚽ Fútbol</span>
                     <span class="brand-chip">🏀 Baloncesto</span>
                     <span class="brand-chip">🎾 Tenis</span>
+                    <span class="brand-chip">⚾ Béisbol</span>
+                    <span class="brand-chip">🏃 Atletismo</span>
+                    <span class="brand-chip">👟 Running</span>
+                    <span class="brand-chip">🏊 Natación</span>
+                    <span class="brand-chip">🥊 Boxeo</span>
+                    <span class="brand-chip">💪 Estar en forma</span>
                 </div>
             </div>
             <div class="auth-brand-bottom">
-                <p>© 2026 Vital Sports · Todos los derechos reservados</p>
+                <p>© 2026 VitalTraining · Todos los derechos reservados</p>
             </div>
         </div>
         <div class="auth-card auth-success-card">
@@ -319,12 +355,12 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1>Recupera tu<br><span>acceso.</span></h1>
                 <p class="auth-tagline">Te enviaremos un enlace a tu correo para que elijas una contraseña nueva.</p>
             </div>
-            <div class="auth-brand-bottom"><p>© 2026 Vital Sports · Todos los derechos reservados</p></div>
+            <div class="auth-brand-bottom"><p>© 2026 VitalTraining · Todos los derechos reservados</p></div>
         </div>
         <div class="auth-card">
             <div class="auth-card-header">
@@ -338,7 +374,7 @@
                     <label>Correo electrónico</label>
                     <div class="auth-input-wrap">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        <input type="email" id="olvide-email" placeholder="correo@vitalsports.com" autocomplete="email" onkeydown="if(event.key==='Enter') pedirEnlace()">
+                        <input type="email" id="olvide-email" placeholder="correo@vitaltraining.com" autocomplete="email" onkeydown="if(event.key==='Enter') pedirEnlace()">
                     </div>
                 </div>
                 <button class="auth-btn" id="olvide-btn" onclick="pedirEnlace()">
@@ -356,12 +392,12 @@
             <div class="auth-brand-top">
                 <div class="auth-logo-wrap">
                     <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
-                    <span class="auth-logo-name">Vital Sports</span>
+                    <span class="auth-logo-name">VitalTraining</span>
                 </div>
                 <h1>Nueva<br><span>contraseña.</span></h1>
                 <p class="auth-tagline">Elige una contraseña de al menos 8 caracteres que no uses en otros sitios.</p>
             </div>
-            <div class="auth-brand-bottom"><p>© 2026 Vital Sports · Todos los derechos reservados</p></div>
+            <div class="auth-brand-bottom"><p>© 2026 VitalTraining · Todos los derechos reservados</p></div>
         </div>
         <div class="auth-card">
             <div class="auth-card-header">
@@ -404,13 +440,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('app')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Sports</span>
+        <span class="mobile-topbar-title">VitalTraining</span>
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Sports</span>
+                <span class="logo-main">VitalTraining</span>
                 <span class="logo-sub">Admin Panel</span>
             </div>
         </div>
@@ -459,13 +495,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('panel-nutricionista')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Sports</span>
+        <span class="mobile-topbar-title">VitalTraining</span>
     </div>
     <aside class="sidebar sidebar-nutri">
         <div class="sidebar-header">
             <div class="logo-icon logo-nutri"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Sports</span>
+                <span class="logo-main">VitalTraining</span>
                 <span class="logo-sub">Nutricionista</span>
             </div>
         </div>
@@ -509,13 +545,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('panel-medico')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Sports</span>
+        <span class="mobile-topbar-title">VitalTraining</span>
     </div>
     <aside class="sidebar sidebar-medico">
         <div class="sidebar-header">
             <div class="logo-icon logo-medico"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Sports</span>
+                <span class="logo-main">VitalTraining</span>
                 <span class="logo-sub">Área médica</span>
             </div>
         </div>
@@ -555,13 +591,13 @@
         <button class="hamburger-btn" onclick="toggleSidebar('panel-futbolista')">
             <span></span><span></span><span></span>
         </button>
-        <span class="mobile-topbar-title">Vital Sports</span>
+        <span class="mobile-topbar-title">VitalTraining</span>
     </div>
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
             <div class="logo-text">
-                <span class="logo-main">Vital Sports</span>
+                <span class="logo-main">VitalTraining</span>
                 <span class="logo-sub">Mi Panel</span>
             </div>
         </div>

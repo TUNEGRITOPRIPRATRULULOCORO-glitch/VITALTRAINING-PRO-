@@ -16,8 +16,8 @@ const sharp = require('sharp');
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
         <rect x="26" y="18" rx="16" width="260" height="58" fill="#22c55e"/>
-        <text x="52" y="58" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#ffffff">Vital Sports</text>
-        ${file === 'login.png' ? '<text x="504" y="398" font-size="25" font-family="Segoe UI, Arial, sans-serif" fill="#f4f7fb">correo@vitalsports.com</text>' : ''}
+        <text x="52" y="58" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#ffffff">VitalTraining</text>
+        ${file === 'login.png' ? '<text x="504" y="398" font-size="25" font-family="Segoe UI, Arial, sans-serif" fill="#f4f7fb">correo@vitaltraining.com</text>' : ''}
       </svg>
     `;
 

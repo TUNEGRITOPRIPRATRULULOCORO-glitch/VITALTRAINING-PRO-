@@ -47,7 +47,7 @@ async function enviarCorreo({ para, nombre, asunto, html, texto }) {
       method: 'POST',
       headers: { 'api-key': process.env.BREVO_API_KEY, 'Content-Type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({
-        sender: { email: process.env.CORREO_REMITENTE, name: process.env.CORREO_NOMBRE || 'Vital Sports' },
+        sender: { email: process.env.CORREO_REMITENTE, name: process.env.CORREO_NOMBRE || 'VitalTraining' },
         to: [{ email: para, ...(nombre ? { name: nombre } : {}) }],
         subject: asunto,
         htmlContent: html,

@@ -25,7 +25,8 @@ const ETIQUETA_DIA = {
 };
 
 // Posiciones que más distancia recorren: un poco más de carbohidrato los días de entreno
-const ALTO_VOLUMEN = ['Mediocampista', 'Lateral', 'Extremo', 'Base', 'Escolta', 'Alero', 'Individuales', 'Right-handed', 'Left-handed'];
+const ALTO_VOLUMEN = ['Mediocampista', 'Lateral', 'Extremo', 'Base', 'Escolta', 'Alero', 'Individuales', 'Right-handed', 'Left-handed',
+  'Medio fondo', '5K - 10K', 'Media maratón', 'Maratón', 'Fondista', 'Jardinero', 'Competición'];
 
 // Valores de referencia cuando faltan datos del atleta (se avisa en el plan)
 const POR_DEFECTO = { peso: 70, altura: 175, edad: 22 };
@@ -67,7 +68,7 @@ function tiposDeDia(rutinaSemanal) {
   const semana = rutinaSemanal?.semana || [];
   const tipos = semana.map(d => {
     const tipo = String(d.tipo || '');
-    if (/partido|competici|torneo|scrimmage/i.test(tipo)) return 'partido';
+    if (/partido|competici|torneo|scrimmage|combate/i.test(tipo)) return 'partido';
     if (d.descanso || !d.ejercicios?.length) return 'descanso';
     if (/recuperaci/i.test(tipo)) return 'recuperacion';
     return 'entreno';

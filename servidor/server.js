@@ -28,7 +28,12 @@ if (PRODUCCION && !process.env.JWT_SECRET) {
 // compartirían la IP del proxy y el límite de intentos de login sería común para todos.
 if (PRODUCCION || process.env.TRUST_PROXY) app.set('trust proxy', 1);
 
-app.use(helmet({ contentSecurityPolicy: false }));
+// La ventana de "Entrar con Google" necesita comunicarse con la página (popups) y saber de qué web viene
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+}));
 // Límite pequeño para todo; la subida de foto de perfil necesita más (máx. 300 KB de imagen en base64)
 const jsonNormal = express.json({ limit: '50kb' });
 const jsonFoto   = express.json({ limit: '450kb' });
@@ -56,7 +61,7 @@ setupDatabase()
   .then(() => {
     app.listen(PORT, () => {
       console.log('');
-      console.log('🚀 Vital Sports — Servidor iniciado');
+      console.log('🚀 VitalTraining — Servidor iniciado');
       console.log(PRODUCCION ? `📡 Escuchando en el puerto ${PORT}` : `📡 http://localhost:${PORT}`);
       console.log('');
     });
