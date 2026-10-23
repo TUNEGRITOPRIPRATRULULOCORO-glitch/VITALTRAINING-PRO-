@@ -43,6 +43,7 @@ app.use(require('./compartido/middleware/cors'));
 // así tras cada despliegue nadie se queda con la interfaz vieja.
 const SIEMPRE_REVISAR = /\.(html|js|css)$/;
 app.use(express.static(path.join(__dirname, '..', 'interfaz'), {
+  extensions: ['html'], // /privacidad sirve privacidad.html
   setHeaders: (res, ruta) => { if (SIEMPRE_REVISAR.test(ruta)) res.setHeader('Cache-Control', 'no-cache'); },
 }));
 

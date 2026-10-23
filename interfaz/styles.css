@@ -4687,3 +4687,6 @@ body.dark .ev-empeora { color: #fca5a5; }
 
 /* La regla móvil de .salud-kpis estaba antes que la general y quedaba anulada */
 @media (max-width: 640px) { .salud-kpis { grid-template-columns: 1fr; } }
+
+.auth-legal { color: inherit; text-decoration: underline; }
+.auth-legal:hover { color: #4ade80; }
