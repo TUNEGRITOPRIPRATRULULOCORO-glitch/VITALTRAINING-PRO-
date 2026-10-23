@@ -1,6 +1,6 @@
 /**
  * Módulo AUTH — login y registro público.
- * Tablas propias: ninguna (lee usuarios; las altas las hace el módulo usuarios).
+ * Tablas propias: restablecimientos (enlaces para cambiar la contraseña; las altas las hace usuarios).
  */
 module.exports = {
   router: require('./auth.routes'),

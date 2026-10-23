@@ -57,6 +57,7 @@ vital-training/
 │       └── reportes/       # Estadísticas admin
 │
 ├── servicios/              # ✉️ SERVICIOS — integraciones con terceros
+│   └── correo/             # Envío de correos (Brevo) y plantillas
 │
 ├── base-de-datos/          # 💾 BASE DE DATOS — PostgreSQL
 │   ├── db.js               # Conexión (PostgreSQL real o pg-mem en memoria)

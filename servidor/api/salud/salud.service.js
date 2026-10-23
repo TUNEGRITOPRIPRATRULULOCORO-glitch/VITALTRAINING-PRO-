@@ -47,17 +47,25 @@ async function crear(userId, datos) {
   const registro = rows[0];
 
   const fecha = new Date().toLocaleDateString('es-CO');
-  if (fatiga >= 8) {
-    await panel.crearAlerta(userId, 'fatiga', `Fatiga alta detectada (${fatiga}/10). Considera un día de recuperación.`, fecha);
-  }
-  if (recuperacion <= 3) {
-    await panel.crearAlerta(userId, 'recuperacion', `Recuperación baja (${recuperacion}/10). Revisa tu descanso y alimentación.`, fecha);
-  }
-  if (sueno <= 4) {
-    await panel.crearAlerta(userId, 'sueno', `Sueño insuficiente (${sueno}/10). El descanso es clave para el rendimiento.`, fecha);
-  }
+  for (const p of problemasDe({ fatiga, sueno, recuperacion }))
+    await panel.crearAlerta(userId, p.tipo, p.mensaje, fecha);
 
   return registro;
 }
 
-module.exports = { listar, crear };
+/**
+ * Valores de salud que merecen una alerta (en la app para el atleta y por correo al equipo médico).
+ * resumen: texto corto para el correo a los médicos.
+ */
+function problemasDe({ fatiga, sueno, recuperacion }) {
+  const problemas = [];
+  if (fatiga >= 8)
+    problemas.push({ tipo: 'fatiga', resumen: `Fatiga alta (${fatiga}/10)`, mensaje: `Fatiga alta detectada (${fatiga}/10). Considera un día de recuperación.` });
+  if (recuperacion <= 3)
+    problemas.push({ tipo: 'recuperacion', resumen: `Recuperación baja (${recuperacion}/10)`, mensaje: `Recuperación baja (${recuperacion}/10). Revisa tu descanso y alimentación.` });
+  if (sueno <= 4)
+    problemas.push({ tipo: 'sueno', resumen: `Sueño insuficiente (${sueno}/10)`, mensaje: `Sueño insuficiente (${sueno}/10). El descanso es clave para el rendimiento.` });
+  return problemas;
+}
+
+module.exports = { listar, crear, problemasDe };

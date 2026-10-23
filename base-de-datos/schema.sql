@@ -147,6 +147,15 @@ CREATE TABLE IF NOT EXISTS evaluaciones (
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS restablecimientos (
+  id         BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT NOT NULL,
+  token_hash VARCHAR(64) NOT NULL UNIQUE,
+  expira     TIMESTAMPTZ NOT NULL,
+  usado      BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS mensajes (
   id              BIGSERIAL PRIMARY KEY,
   remitente_id    BIGINT NOT NULL,
@@ -169,3 +178,4 @@ ALTER TABLE mensajes ADD CONSTRAINT mensajes_remitente_id_fkey FOREIGN KEY (remi
 ALTER TABLE mensajes ADD CONSTRAINT mensajes_destinatario_id_fkey FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE fotos_perfil ADD CONSTRAINT fotos_perfil_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE evaluaciones ADD CONSTRAINT evaluaciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE restablecimientos ADD CONSTRAINT restablecimientos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

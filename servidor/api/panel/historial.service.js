@@ -189,10 +189,42 @@ async function registrarRutinaAsignada(userId, registradoPor, datos) {
   return rows[0];
 }
 
+const DIAS_ENTRE_AVISOS_DE_CARGA = 7;
+
+/**
+ * Tras una sesión: si la carga entra en riesgo alto, crea una alerta en la app y avisa por
+ * correo al atleta y a los médicos. Como mucho una vez por semana para no saturar.
+ * Nunca lanza errores: se llama después de responder al atleta.
+ */
+async function revisarCargaAlta(userId) {
+  try {
+    // Se cargan aquí para evitar dependencias circulares al arrancar
+    const rendimiento = require('../rendimiento');
+    const avisos = require('../avisos');
+
+    const { carga } = await rendimiento.obtenerResumen(userId);
+    if (carga.riesgo !== 'alto') return false;
+
+    const desde = new Date(Date.now() - DIAS_ENTRE_AVISOS_DE_CARGA * 86400000).toISOString();
+    const { rows } = await query("SELECT 1 FROM alertas WHERE user_id = $1 AND tipo = 'carga' AND created_at > $2", [userId, desde]);
+    if (rows.length) return false;
+
+    const cambio = carga.cambioPorcentaje > 0 ? `+${carga.cambioPorcentaje}` : carga.cambioPorcentaje;
+    await crearAlerta(userId, 'carga',
+      `Tu carga de entrenamiento está muy alta (${cambio} % sobre tu semana normal). Baja la intensidad 2 o 3 días.`,
+      new Date().toLocaleDateString('es-CO'));
+    await avisos.alertaCarga(userId, carga);
+    return true;
+  } catch (err) {
+    console.error('Revisión de carga:', err.message);
+    return false;
+  }
+}
+
 module.exports = {
   historialComidas, historialRutinas, historialAlertas,
   marcarAlertaLeida, marcarTodasLeidas, crearAlerta,
   registrarComida, eliminarComida, registrarComidaAsignada,
   registrarRutina, eliminarRutina, registrarRutinaAsignada,
-  getCumplimiento, registrarCumplimiento
+  getCumplimiento, registrarCumplimiento, revisarCargaAlta
 };

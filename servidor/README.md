@@ -12,7 +12,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 
 | Módulo | Tablas propias (solo él escribe) | Expone a otros módulos |
 |---|---|---|
-| `auth` | — | — |
+| `auth` | `restablecimientos` | — |
 | `usuarios` | `usuarios`, `fotos_perfil` | `buscarIdPorEmail`, `registrarAtleta`, `actualizarDeporte` |
 | `panel` | `perfiles`, `comidas`, `rutinas`, `alertas`, `cumplimiento` | `crearAlerta`, `registrarComidaAsignada`, `registrarRutinaAsignada` |
 | `salud` | `salud` | — |
@@ -24,6 +24,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `rendimiento` | — (solo lectura) | — |
 | `mensajes` | `mensajes` | — |
 | `evaluaciones` | `evaluaciones` | — |
+| `avisos` | — (decide qué correo mandar y a quién) | `bienvenida`, `restablecerPassword`, `alertaSalud`, `alertaCarga` |
 
 ## Las 3 reglas
 

@@ -29,3 +29,8 @@ services:
       # Ponlo en false cuando la app la use gente real.
       - key: DATOS_DEMO
         value: "true"
+      # Correos con Brevo (opcional, se escriben a mano en Render)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: CORREO_REMITENTE
+        sync: false

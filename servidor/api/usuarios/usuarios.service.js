@@ -109,4 +109,30 @@ async function actualizarDeporte(id, deportePrincipal) {
   return rows[0]?.deportePrincipal ?? null;
 }
 
-module.exports = { listar, crear, actualizar, eliminar, buscarIdPorEmail, registrarAtleta, actualizarDeporte };
+/** Cambia la contraseña (ya hasheada) de un usuario. */
+async function cambiarPassword(id, hashedPassword) {
+  const { rows } = await query('UPDATE usuarios SET password = $1 WHERE id = $2 RETURNING id', [hashedPassword, id]);
+  return rows.length > 0;
+}
+
+/** Nombre y correo de un usuario activo, para enviarle avisos. */
+async function contacto(id) {
+  const { rows } = await query(
+    "SELECT id, nombre, email FROM usuarios WHERE id = $1 AND estado = 'Activo'",
+    [id]
+  );
+  return rows[0] || null;
+}
+
+/** Nombre y correo de los usuarios activos con alguno de esos roles. */
+async function contactosPorRol(roles) {
+  if (!roles.length) return [];
+  const marcadores = roles.map((_, i) => `$${i + 1}`).join(', ');
+  const { rows } = await query(
+    `SELECT id, nombre, email FROM usuarios WHERE estado = 'Activo' AND rol IN (${marcadores})`,
+    roles
+  );
+  return rows;
+}
+
+module.exports = { listar, crear, actualizar, eliminar, buscarIdPorEmail, registrarAtleta, actualizarDeporte, cambiarPassword, contacto, contactosPorRol };

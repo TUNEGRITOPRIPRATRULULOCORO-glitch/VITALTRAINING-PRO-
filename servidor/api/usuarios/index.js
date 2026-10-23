@@ -12,4 +12,7 @@ module.exports = {
   buscarIdPorEmail:  svc.buscarIdPorEmail,
   registrarAtleta:   svc.registrarAtleta,
   actualizarDeporte: svc.actualizarDeporte,
+  cambiarPassword:   svc.cambiarPassword,
+  contacto:          svc.contacto,
+  contactosPorRol:   svc.contactosPorRol,
 };

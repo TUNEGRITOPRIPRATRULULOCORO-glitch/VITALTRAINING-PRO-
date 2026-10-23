@@ -105,3 +105,29 @@ Si algo falla, en Render abre la pestaña **Logs**: ahí aparece el motivo (por 
   1. Cambia `DATOS_DEMO` a `false` en Render.
   2. Desactiva o elimina las cuentas de prueba desde **Usuarios** en el panel del administrador.
 - **Neon gratuito** da 0,5 GB de almacenamiento: de sobra para un club (las fotos de perfil ocupan unos 50 KB cada una).
+
+---
+
+## Correos (opcional)
+
+La app envía correos de **bienvenida**, de **recuperar contraseña** y de **alertas** (salud del atleta a los médicos; carga de entrenamiento muy alta al atleta y a los médicos, como mucho una vez por semana). Sin configurar nada la app funciona igual, pero esos correos no salen (solo se anotan en los Logs de Render) y **"¿Olvidaste tu contraseña?" no llegará a nadie**.
+
+Se usa **Brevo** (gratis: 300 correos al día).
+
+1. Crea una cuenta en [brevo.com](https://www.brevo.com) (plan **Free**).
+2. **Remitente:** menú de tu cuenta → **Senders, Domains & Dedicated IPs → Senders → Add a sender**. Pon el nombre (`Vital Sports`) y el correo desde el que saldrán los mensajes. Brevo te manda un código a ese correo para verificarlo.
+3. **Clave:** menú de tu cuenta → **SMTP & API → API Keys → Generate a new API key**. Cópiala (empieza por `xkeysib-`). Es secreta: no la subas a GitHub ni la compartas.
+4. En Render → **Environment Groups → Pro**, añade:
+
+   | Key | Value |
+   |---|---|
+   | `BREVO_API_KEY` | la clave del paso 3 |
+   | `CORREO_REMITENTE` | el correo verificado del paso 2 |
+   | `CORREO_NOMBRE` | `Vital Sports` (opcional) |
+
+5. **Manual Deploy → Deploy latest commit**.
+6. Prueba: en la página de inicio pulsa **¿Olvidaste tu contraseña?** con un correo registrado que sea tuyo. Si no llega, mira la carpeta de spam y los **Logs** de Render (si Brevo rechaza el envío aparece `❌ Correo no enviado`).
+
+> **Spam:** si el remitente es un Gmail/Hotmail, algunos correos pueden caer en spam porque salen desde los servidores de Brevo y no de Google. Para evitarlo del todo hace falta un dominio propio verificado en Brevo (Senders, Domains → Domains). Para empezar, un Gmail basta.
+
+Los enlaces de los correos apuntan a la dirección de Render automáticamente. Si algún día usas un dominio propio, añade `APP_URL=https://tu-dominio.com`.

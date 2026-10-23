@@ -3430,6 +3430,76 @@ async function pfVerIncidencia(id) {
 }
 
 // ────────────────────────────────────────────────
+// RECUPERAR CONTRASEÑA
+// ────────────────────────────────────────────────
+let _tokenRestablecer = null;
+
+function mostrarErrorAuth(id, texto) {
+    const el = document.getElementById(id);
+    el.textContent = texto;
+    el.classList.toggle('hidden', !texto);
+}
+
+function abrirOlvide() {
+    document.getElementById('olvide-email').value = document.getElementById('login-email').value.trim();
+    mostrarErrorAuth('olvide-error', '');
+    document.getElementById('olvide-ok').classList.add('hidden');
+    document.getElementById('olvide-form').classList.remove('hidden');
+    showAuthScreen('screen-olvide');
+    document.getElementById('olvide-email').focus();
+}
+
+async function pedirEnlace() {
+    const email = document.getElementById('olvide-email').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return mostrarErrorAuth('olvide-error', 'Escribe un correo válido.');
+    mostrarErrorAuth('olvide-error', '');
+    const btn = document.getElementById('olvide-btn');
+    btn.disabled = true;
+    const res = await fetch(`${API}/auth/olvide`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ email }) })
+        .then(async r => ({ status: r.status, datos: await r.json().catch(() => ({})) })).catch(() => null);
+    btn.disabled = false;
+    if (!res || res.status >= 400) return mostrarErrorAuth('olvide-error', res?.datos?.error || 'No se pudo enviar. Revisa tu conexión.');
+    const ok = document.getElementById('olvide-ok');
+    ok.innerHTML = `✉️ ${escapeHtml(res.datos.mensaje)}<br><small>Revisa también la carpeta de spam. El enlace caduca en 60 minutos.</small>`;
+    ok.classList.remove('hidden');
+    document.getElementById('olvide-form').classList.add('hidden');
+}
+
+/** Si la página se abre desde el enlace del correo (?restablecer=...), muestra el formulario. */
+function revisarEnlaceRestablecer() {
+    const token = new URLSearchParams(location.search).get('restablecer');
+    if (!token) return false;
+    _tokenRestablecer = token;
+    clearSession();
+    hideAllPanels();
+    document.getElementById('auth-screen').classList.remove('hidden');
+    showAuthScreen('screen-restablecer');
+    return true;
+}
+
+function salirDeRestablecer() {
+    _tokenRestablecer = null;
+    history.replaceState(null, '', location.pathname); // quita el enlace de la barra de direcciones
+    showAuthScreen('screen-login');
+}
+
+async function guardarNuevaPassword() {
+    const pass = document.getElementById('restablecer-pass').value;
+    const pass2 = document.getElementById('restablecer-pass2').value;
+    if (pass.length < 8) return mostrarErrorAuth('restablecer-error', 'La contraseña debe tener al menos 8 caracteres.');
+    if (pass !== pass2) return mostrarErrorAuth('restablecer-error', 'Las contraseñas no coinciden.');
+    mostrarErrorAuth('restablecer-error', '');
+    const btn = document.getElementById('restablecer-btn');
+    btn.disabled = true;
+    const res = await fetch(`${API}/auth/restablecer`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ token: _tokenRestablecer, password: pass }) })
+        .then(async r => ({ status: r.status, datos: await r.json().catch(() => ({})) })).catch(() => null);
+    btn.disabled = false;
+    if (!res || res.status >= 400) return mostrarErrorAuth('restablecer-error', res?.datos?.error || 'No se pudo guardar. Revisa tu conexión.');
+    salirDeRestablecer();
+    showToast('Contraseña cambiada. Ya puedes iniciar sesión.', 'success', 5000);
+}
+
+// ────────────────────────────────────────────────
 // PORTADA ANIMADA (login y registro)
 // ────────────────────────────────────────────────
 const MENOS_MOVIMIENTO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3507,6 +3577,7 @@ document.addEventListener('pointermove', e => {
 // INIT
 // ────────────────────────────────────────────────
 window.addEventListener('load', ()=>{
+    if (revisarEnlaceRestablecer()) return; // abierto desde el correo de "recuperar contraseña"
     const session=getSession(), token=getToken();
     if(session && token) routeUser(session, token);
 });

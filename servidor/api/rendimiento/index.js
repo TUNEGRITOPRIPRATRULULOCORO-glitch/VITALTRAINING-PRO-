@@ -4,4 +4,5 @@
  */
 module.exports = {
   router: require('./rendimiento.routes'),
+  obtenerResumen: require('./rendimiento.service').obtenerResumen,
 };
