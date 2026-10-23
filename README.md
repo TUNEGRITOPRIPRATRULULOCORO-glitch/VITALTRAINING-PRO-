@@ -122,6 +122,10 @@ Abrir en el navegador: **http://localhost:4000**
 
 Para empezar de cero en local, borra la carpeta `base-de-datos/datos-locales/`. Esa carpeta no se sube a GitHub.
 
+### Publicarla en internet
+
+Guía paso a paso para tenerla en un enlace público gratis (Neon + Render): **[docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)**.
+
 ### Con Docker
 
 ```bash

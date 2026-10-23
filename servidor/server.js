@@ -6,6 +6,16 @@ const { setupDatabase } = require('../base-de-datos/setup');
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
+const PRODUCCION = process.env.NODE_ENV === 'production';
+
+if (PRODUCCION && !process.env.JWT_SECRET) {
+  console.error('❌ Falta JWT_SECRET: en producción las sesiones no pueden firmarse con la clave de desarrollo.');
+  process.exit(1);
+}
+
+// En Render (y la mayoría de hostings) hay un proxy delante: sin esto, todos los usuarios
+// compartirían la IP del proxy y el límite de intentos de login sería común para todos.
+if (PRODUCCION || process.env.TRUST_PROXY) app.set('trust proxy', 1);
 
 app.use(helmet({ contentSecurityPolicy: false }));
 // Límite pequeño para todo; la subida de foto de perfil necesita más (máx. 300 KB de imagen en base64)
@@ -22,11 +32,15 @@ app.use((req, res) => {
 });
 
 setupDatabase()
+  .then(async () => {
+    // Sin consola en el hosting gratuito: los datos de ejemplo se cargan al arrancar (solo una vez)
+    if (process.env.DATOS_DEMO === 'true') await require('../scripts/datos-demo').cargarDatosDemo();
+  })
   .then(() => {
     app.listen(PORT, () => {
       console.log('');
       console.log('🚀 Vital Sports — Servidor iniciado');
-      console.log(`📡 http://localhost:${PORT}`);
+      console.log(PRODUCCION ? `📡 Escuchando en el puerto ${PORT}` : `📡 http://localhost:${PORT}`);
       console.log('');
     });
   })

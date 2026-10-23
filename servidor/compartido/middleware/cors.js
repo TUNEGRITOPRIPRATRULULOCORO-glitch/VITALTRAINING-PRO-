@@ -4,13 +4,13 @@
  * Permite que el frontend se comunique con el backend
  * aunque estén en dominios o puertos diferentes.
  *
- * CUANDO DESPLIEGUEN EN PRODUCCIÓN:
- *   Reemplazar '*' por el dominio real del frontend, por ejemplo:
- *     'https://vital-training.com'
- *   Nunca dejar '*' en producción si el sistema maneja datos de usuarios.
+ * En producción la interfaz se sirve desde el mismo servidor, así que por defecto no se
+ * permite ningún otro origen. Si algún día la interfaz vive en otro dominio, poner ese
+ * dominio en CORS_ORIGIN (por ejemplo https://vital-training.com).
+ * En desarrollo se permite cualquier origen para facilitar las pruebas.
  */
 
-const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || '*';
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? null : '*');
 
 function corsMiddleware(req, res, next) {
   const origin = req.headers.origin;

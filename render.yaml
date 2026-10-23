@@ -1,0 +1,31 @@
+# Configuración para publicar Vital Sports en Render (plan gratuito).
+# Guía paso a paso: docs/DESPLIEGUE.md
+services:
+  - type: web
+    name: vital-sports
+    runtime: node
+    plan: free
+    region: virginia
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/estado
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      # Clave para firmar las sesiones: Render la genera sola
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      # Cadena de conexión de Neon (se pega a mano en Render)
+      - key: DATABASE_URL
+        sync: false
+      # Contraseña del usuario admin@vital.com (se escribe a mano en Render)
+      - key: ADMIN_PASSWORD
+        sync: false
+      # true = crea las cuentas de prueba y los datos de ejemplo para una demo.
+      # Ponlo en false cuando la app la use gente real.
+      - key: DATOS_DEMO
+        value: "true"

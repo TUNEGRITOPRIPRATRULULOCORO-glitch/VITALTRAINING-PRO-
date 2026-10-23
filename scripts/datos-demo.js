@@ -2,9 +2,10 @@
  * Carga datos de ejemplo en la base local para ver la app con contenido:
  * fichas deportivas, planes, 4 semanas de sesiones, salud, mensajes y un ticket.
  *
- *   npm run demo
+ *   npm run demo                 (en local)
+ *   DATOS_DEMO=true al arrancar  (en el hosting, donde no hay consola)
  *
- * Solo se ejecuta si la base aún no tiene sesiones registradas (no duplica datos).
+ * Solo carga datos si la base aún no tiene sesiones registradas (no duplica datos).
  * Para empezar de cero: borra base-de-datos/datos-locales/ y vuelve a ejecutarlo.
  */
 require('dotenv').config();
@@ -22,8 +23,7 @@ const ATLETAS = [
   { email: 'diego@vital.com', deporte: 'Baloncesto', posicion: 'Base', peso: 80, altura: 188, nacimiento: '2001-08-02', lado: 'Izquierda', cargaAlta: false, salud: [3, 8, 8] },
 ];
 
-async function main() {
-  await setupDatabase();
+async function cargarDatosDemo() {
   const { rows: [{ total }] } = await query('SELECT COUNT(*) AS total FROM cumplimiento');
   if (Number(total) > 0) {
     console.log('ℹ️  La base ya tiene sesiones registradas: no se cargan datos de ejemplo.');
@@ -32,6 +32,11 @@ async function main() {
 
   const { rows: usuarios } = await query('SELECT id, email FROM usuarios');
   const id = email => Number(usuarios.find(u => u.email === email)?.id);
+  const faltan = ['admin', 'maria', 'medico', 'carlos', 'diego'].filter(n => !id(`${n}@vital.com`));
+  if (faltan.length) {
+    console.log(`ℹ️  No se cargan datos de ejemplo: faltan las cuentas de prueba (${faltan.join(', ')}).`);
+    return;
+  }
 
   for (const a of ATLETAS) {
     const userId = id(a.email);
@@ -83,4 +88,11 @@ async function main() {
   console.log('✅ Datos de ejemplo cargados.');
 }
 
-main().catch(err => { console.error('❌', err.message); process.exit(1); });
+module.exports = { cargarDatosDemo };
+
+// Ejecutado directamente con "npm run demo"
+if (require.main === module) {
+  setupDatabase()
+    .then(cargarDatosDemo)
+    .catch(err => { console.error('❌', err.message); process.exit(1); });
+}

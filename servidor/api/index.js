@@ -3,6 +3,16 @@ const auth   = require('../compartido/middleware/auth');
 const { requireRol } = require('../compartido/middleware/roles');
 
 // Rutas públicas (no requieren token)
+
+// Estado del servidor y de la base de datos (lo usa el hosting para saber si la app está viva)
+router.get('/estado', async (req, res) => {
+  try {
+    await require('../../base-de-datos/db').query('SELECT 1');
+    res.json({ ok: true, baseDeDatos: 'conectada' });
+  } catch {
+    res.status(503).json({ ok: false, baseDeDatos: 'sin conexión' });
+  }
+});
 router.use('/auth', require('./auth').router);
 
 // Todas las rutas siguientes requieren sesión iniciada

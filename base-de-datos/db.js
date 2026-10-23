@@ -15,14 +15,19 @@ let query;
 let motor;
 
 if (process.env.DATABASE_URL) {
-  const { Pool } = require('pg');
+  const { Pool, types } = require('pg');
 
-  // SSL solo si es una conexión remota (Railway), no en local con Docker
-  const esLocal = process.env.DATABASE_URL.includes('@db:');
+  // Los ids (BIGSERIAL) y COUNT(*) llegan como texto por defecto; como número, igual que en desarrollo
+  types.setTypeParser(20, valor => parseInt(valor, 10));
+
+  // SSL para bases en la nube (Neon, Railway...); sin SSL para Docker (@db:) o una base en este equipo
+  const esLocal = /@(db|localhost|127.0.0.1)[:/]/.test(process.env.DATABASE_URL) || /sslmode=disable/.test(process.env.DATABASE_URL);
 
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: !esLocal ? { rejectUnauthorized: false } : false
+    ssl: !esLocal ? { rejectUnauthorized: false } : false,
+    // Conexiones simultáneas (algunas bases gratuitas admiten pocas)
+    max: Number(process.env.PG_POOL_MAX) || 10
   });
 
   query = (text, params) => pool.query(text, params);

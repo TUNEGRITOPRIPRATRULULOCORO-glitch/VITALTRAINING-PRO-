@@ -11,6 +11,7 @@ async function setupDatabase() {
     .filter(stmt => stmt && !stmt.startsWith('--'));
 
   for (const statement of statements) {
+    if (await restriccionYaCreada(statement)) continue;
     try {
       await query(statement);
     } catch (err) {
@@ -33,8 +34,20 @@ const MIGRACIONES = [
   'ALTER TABLE cumplimiento ADD COLUMN duracion_minutos INTEGER',
 ];
 
+// PostgreSQL y PGlite permiten comprobar antes; pg-mem (tests) no, y ahí se usa el error "ya existe".
+// Evitar errores a propósito mantiene limpios los registros del servidor en producción.
+const COMPRUEBA_ANTES = require('./db').motor !== 'pg-mem';
+
+async function restriccionYaCreada(sql) {
+  const m = /ADD CONSTRAINT (\w+)/i.exec(sql);
+  if (!m || !COMPRUEBA_ANTES) return false;
+  const { rows } = await query('SELECT 1 FROM pg_constraint WHERE conname = $1', [m[1]]);
+  return rows.length > 0;
+}
+
 async function aplicarMigraciones() {
-  for (const sql of MIGRACIONES) {
+  for (const migracion of MIGRACIONES) {
+    const sql = COMPRUEBA_ANTES ? migracion.replace(/ADD COLUMN /i, 'ADD COLUMN IF NOT EXISTS ') : migracion;
     try {
       await query(sql);
     } catch (err) {
@@ -48,17 +61,31 @@ function yaExiste(err) {
   return ['42701', '42710'].includes(err.code) || /already exists|ya existe/i.test(err.message);
 }
 
+/**
+ * Usuarios iniciales, solo si la base está vacía.
+ * - En desarrollo: el admin y las cuentas de prueba con contraseñas conocidas.
+ * - En producción (NODE_ENV=production): el admin usa ADMIN_PASSWORD (obligatoria) y las
+ *   cuentas de prueba solo se crean si DATOS_DEMO=true (útil para una demo en clase).
+ */
 async function seedUsuarios() {
   const { rows } = await query('SELECT COUNT(*) AS cnt FROM usuarios');
   if (parseInt(rows[0].cnt) > 0) return;
 
+  const produccion = process.env.NODE_ENV === 'production';
+  if (produccion && !process.env.ADMIN_PASSWORD) {
+    throw new Error('Falta ADMIN_PASSWORD: en producción la contraseña del administrador no puede ser la de prueba.');
+  }
+  const conDemo = !produccion || process.env.DATOS_DEMO === 'true';
+
   const users = [
-    { nombre: 'Admin Sistema', email: 'admin@vital.com',  password: 'admin123',  rol: 'Administrador', deporte_principal: 'Fútbol' },
-    { nombre: 'Maria Gomez',   email: 'maria@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Baloncesto' },
-    { nombre: 'Pedro Lopez',   email: 'pedro@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Tenis' },
-    { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' },
-    { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' },
-    { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' },
+    { nombre: 'Admin Sistema', email: 'admin@vital.com',  password: process.env.ADMIN_PASSWORD || 'admin123', rol: 'Administrador', deporte_principal: 'Fútbol' },
+    ...(conDemo ? [
+      { nombre: 'Maria Gomez',   email: 'maria@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Baloncesto' },
+      { nombre: 'Pedro Lopez',   email: 'pedro@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Tenis' },
+      { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' },
+      { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' },
+      { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' },
+    ] : []),
   ];
 
   for (const u of users) {
