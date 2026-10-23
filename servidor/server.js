@@ -34,11 +34,17 @@ const jsonNormal = express.json({ limit: '50kb' });
 const jsonFoto   = express.json({ limit: '450kb' });
 app.use((req, res, next) => (req.path === '/api/cuenta/foto' ? jsonFoto : jsonNormal)(req, res, next));
 app.use(require('./compartido/middleware/cors'));
-app.use(express.static(path.join(__dirname, '..', 'interfaz')));
+// HTML, JS y CSS: el navegador pregunta siempre si hay versión nueva (responde 304 si no),
+// así tras cada despliegue nadie se queda con la interfaz vieja.
+const SIEMPRE_REVISAR = /\.(html|js|css)$/;
+app.use(express.static(path.join(__dirname, '..', 'interfaz'), {
+  setHeaders: (res, ruta) => { if (SIEMPRE_REVISAR.test(ruta)) res.setHeader('Cache-Control', 'no-cache'); },
+}));
 
 app.use('/api', require('./api'));
 
 app.use((req, res) => {
+  res.setHeader('Cache-Control', 'no-cache');
   res.sendFile(path.join(__dirname, '..', 'interfaz', 'index.html'));
 });
 
