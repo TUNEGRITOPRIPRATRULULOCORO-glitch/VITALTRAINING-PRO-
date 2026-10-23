@@ -1,4 +1,15 @@
 require('dotenv').config();
+
+// Render define RENDER=true: ahí siempre es producción, aunque falte NODE_ENV
+if (process.env.RENDER === 'true' && !process.env.NODE_ENV) process.env.NODE_ENV = 'production';
+
+// Sin DATABASE_URL en producción la app usaría la base local (PGlite), que en un hosting
+// gratuito se queda sin memoria. Mejor avisar claro antes de cargarla.
+if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+  console.error('❌ Falta DATABASE_URL: en producción hay que configurar la base de datos (por ejemplo la cadena de Neon).');
+  process.exit(1);
+}
+
 const express = require('express');
 const helmet  = require('helmet');
 const path    = require('path');
