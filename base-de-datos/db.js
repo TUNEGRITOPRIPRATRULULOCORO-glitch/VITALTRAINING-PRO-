@@ -23,9 +23,15 @@ if (process.env.DATABASE_URL) {
   // SSL para bases en la nube (Neon, Railway...); sin SSL para Docker (@db:) o una base en este equipo
   const esLocal = /@(db|localhost|127.0.0.1)[:/]/.test(process.env.DATABASE_URL) || /sslmode=disable/.test(process.env.DATABASE_URL);
 
+  // En la nube se verifica siempre el certificado del servidor (equivale a sslmode=verify-full).
+  // Se quita "sslmode" de la dirección: la librería le cambiará el significado en su próxima versión
+  // (avisa al arrancar) y su valor tendría prioridad sobre esta configuración.
+  const direccion = new URL(process.env.DATABASE_URL);
+  direccion.searchParams.delete('sslmode');
+
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: !esLocal ? { rejectUnauthorized: false } : false,
+    connectionString: direccion.toString(),
+    ssl: esLocal ? false : { rejectUnauthorized: true },
     // Conexiones simultáneas (algunas bases gratuitas admiten pocas)
     max: Number(process.env.PG_POOL_MAX) || 10
   });
