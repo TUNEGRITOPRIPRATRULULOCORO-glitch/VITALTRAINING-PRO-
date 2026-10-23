@@ -4864,3 +4864,55 @@ body.dark .filters-bar select {
 
 /* El fondo oscuro del menú móvil es un botón (para cerrar el menú): sin aspecto de botón */
 button.sidebar-overlay { border: 0; padding: 0; margin: 0; width: 100%; cursor: default; }
+
+/* ===========================
+   MÚSICA DE FONDO — reproductor flotante
+=========================== */
+.musica {
+    position: fixed; right: 20px; bottom: 20px; z-index: 900;
+    display: flex; align-items: center; gap: 6px; padding: 6px 8px 6px 6px;
+    border-radius: 999px; background: rgba(15, 17, 24, 0.88); border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: #fff; font-family: var(--font);
+    transition: padding 0.2s ease;
+}
+.musica :where(button) { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; display: grid; place-items: center; }
+.musica :where(button):focus-visible { outline: 2px solid #c084fc; outline-offset: 2px; }
+.musica-boton {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.45); transition: transform 0.15s;
+}
+.musica-boton:hover { transform: scale(1.06); }
+.musica-boton svg { width: 20px; height: 20px; }
+.musica-boton.musica-sonando { animation: musica-latido 2.4s ease-in-out infinite; }
+@keyframes musica-latido { 0%, 100% { box-shadow: 0 4px 14px rgba(139,92,246,0.45); } 50% { box-shadow: 0 4px 22px rgba(236,72,153,0.7); } }
+
+.musica-controles { display: flex; align-items: center; gap: 4px; overflow: hidden; max-width: 200px; transition: max-width 0.25s ease, opacity 0.2s ease; }
+.musica-paso { width: 30px; height: 30px; border-radius: 50%; font-size: 20px; line-height: 1; }
+.musica-paso:hover { background: rgba(255,255,255,0.1); }
+.musica-barras { display: flex; align-items: flex-end; gap: 3px; height: 18px; padding: 0 4px; }
+.musica-barras span { width: 4px; border-radius: 2px; background: rgba(255,255,255,0.25); transition: background 0.15s; }
+.musica-barras span:nth-child(1) { height: 5px; }
+.musica-barras span:nth-child(2) { height: 8px; }
+.musica-barras span:nth-child(3) { height: 11px; }
+.musica-barras span:nth-child(4) { height: 14px; }
+.musica-barras span:nth-child(5) { height: 18px; }
+.musica-barras span.activa { background: #fff; }
+.musica-plegar { width: 26px; height: 30px; border-radius: 8px; color: rgba(255,255,255,0.6); }
+.musica-plegar:hover { color: #fff; }
+.musica-plegar svg { width: 16px; height: 16px; transition: transform 0.2s; }
+
+/* Minimizado: solo el botón redondo y la flecha para volver a abrirlo */
+.musica-plegada { padding-right: 4px; gap: 2px; }
+.musica-plegada .musica-controles { max-width: 0; opacity: 0; pointer-events: none; }
+.musica-plegada .musica-plegar svg { transform: rotate(180deg); }
+
+/* En el celular va abajo a la izquierda, lejos del botón de enviar del chat */
+@media (max-width: 640px) {
+    .musica { right: auto; left: 12px; bottom: 12px; }
+    .musica-boton { width: 40px; height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .musica-boton.musica-sonando { animation: none; }
+}

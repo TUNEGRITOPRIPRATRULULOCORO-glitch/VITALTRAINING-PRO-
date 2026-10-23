@@ -801,8 +801,23 @@
     </div>
 </div>
 
+<!-- Música de fondo: reproductor flotante (js/musica.js) -->
+<div id="musica" class="musica" role="group" aria-label="Música de fondo">
+    <button type="button" class="musica-boton" id="musica-boton" aria-pressed="false" aria-label="Activar música" onclick="musicaAlternar()"></button>
+    <div class="musica-controles">
+        <button type="button" class="musica-paso" aria-label="Bajar volumen" onclick="musicaVolumen(-1)">−</button>
+        <div class="musica-barras" id="musica-barras" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+        <button type="button" class="musica-paso" aria-label="Subir volumen" onclick="musicaVolumen(1)">+</button>
+    </div>
+    <button type="button" class="musica-plegar" id="musica-plegar" aria-expanded="true" aria-label="Minimizar reproductor" onclick="musicaPlegar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+</div>
+<audio id="musica-audio" src="audio/musica.mp3" loop preload="none"></audio>
+
 <!-- El orden importa: comun.js primero (lo usan todos) e inicio.js al final (arranca la app) -->
 <script src="js/comun.js"></script>
+<script src="js/musica.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/mensajes.js"></script>
 <script src="js/rendimiento.js"></script>
