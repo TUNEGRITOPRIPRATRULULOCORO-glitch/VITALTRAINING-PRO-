@@ -25,10 +25,10 @@ services:
       # Contraseña del usuario admin@vital.com (se escribe a mano en Render)
       - key: ADMIN_PASSWORD
         sync: false
-      # true = crea las cuentas de prueba y los datos de ejemplo para una demo.
-      # Ponlo en false cuando la app la use gente real.
+      # true = crea las cuentas de prueba (contraseñas públicas) y datos de ejemplo, solo para una demo.
+      # La app ya la usa gente real: queda en false.
       - key: DATOS_DEMO
-        value: "true"
+        value: "false"
       # Correos con Brevo (opcional, se escriben a mano en Render)
       - key: BREVO_API_KEY
         sync: false
