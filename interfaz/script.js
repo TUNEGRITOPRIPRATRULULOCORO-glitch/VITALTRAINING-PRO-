@@ -101,7 +101,7 @@ function routeUser(user, token) {
 }
 
 function hideAllPanels() {
-    ['app','panel-nutricionista','panel-medico','panel-futbolista','auth-screen'].forEach(id => {
+    ['app','panel-nutricionista','panel-medico','panel-futbolista','auth-screen','inicio-publico'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
 }
@@ -112,6 +112,37 @@ function showAuthPanel() {
     hideAllPanels();
     document.getElementById('auth-screen').classList.remove('hidden');
     showAuthScreen('screen-login');
+}
+
+// ── Portada pública ────────────────────────────────────────────
+function mostrarInicio() {
+    setTitle('');
+    hideAllPanels();
+    document.getElementById('inicio-publico').classList.remove('hidden');
+    window.scrollTo(0, 0);
+    animarPortadaPublica();
+}
+
+// Desde la portada: abre el inicio de sesión o el registro
+function abrirAuth(pantalla) {
+    hideAllPanels();
+    document.getElementById('auth-screen').classList.remove('hidden');
+    showAuthScreen(pantalla);
+    window.scrollTo(0, 0);
+}
+
+// Las secciones aparecen suavemente al bajar (salvo si el sistema pide menos movimiento)
+let _portadaObservador = null;
+function animarPortadaPublica() {
+    const elementos = document.querySelectorAll('#inicio-publico .ip-aparece');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+        elementos.forEach(el => el.classList.add('ip-visible'));
+        return;
+    }
+    _portadaObservador ??= new IntersectionObserver(entradas => entradas.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('ip-visible'); _portadaObservador.unobserve(e.target); }
+    }), { threshold: 0.15 });
+    elementos.forEach(el => { if (!el.classList.contains('ip-visible')) _portadaObservador.observe(el); });
 }
 
 function showAuthScreen(id) {
@@ -1171,7 +1202,8 @@ function showPanelNutricionista(user) {
     startBadgePolling();
 }
 
-function ntRenderView(view) {
+// filtro: '' | 'con' | 'alta' | 'media' | 'sin' para abrir "Mis Atletas" ya filtrado
+function ntRenderView(view, filtro = '') {
     closeSidebar();
     const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', soporte:'Mensajes' };
     setTitle(titles[view] || view);
@@ -1179,7 +1211,7 @@ function ntRenderView(view) {
     document.querySelectorAll('#panel-nutricionista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.ntView===view));
     document.getElementById('nt-content').innerHTML=showLoading();
     if(view==='dashboard') { ntRenderDashboard(); startPolling(ntRenderDashboard, 30); }
-    else if(view==='pacientes') ntRenderPacientes();
+    else if(view==='pacientes') ntRenderPacientes(filtro);
     else if(view==='soporte')   ntRenderSoporte();
 }
 
@@ -1205,10 +1237,10 @@ async function ntRenderDashboard() {
             </div>
         </div>
         <div class="stats-grid" style="margin-bottom:24px">
-            <div class="stat-card"><div class="stat-icon purple">🏅</div><div class="stat-info"><div class="stat-value">${futbolistas.length}</div><div class="stat-label">Atletas activos</div></div></div>
-            <div class="stat-card"><div class="stat-icon green">✅</div><div class="stat-info"><div class="stat-value">${conSalud}</div><div class="stat-label">Con datos de salud</div></div></div>
-            <div class="stat-card"><div class="stat-icon red">🔥</div><div class="stat-info"><div class="stat-value">${fatigaAlta}</div><div class="stat-label">Fatiga alta (≥8)</div></div></div>
-            <div class="stat-card"><div class="stat-icon yellow">⚠️</div><div class="stat-info"><div class="stat-value">${sinDatos}</div><div class="stat-label">Sin registro</div></div></div>
+            ${statLink('🏅','purple',futbolistas.length,'Atletas activos',"ntRenderView('pacientes')")}
+            ${statLink('✅','green',conSalud,'Con datos de salud',"ntRenderView('pacientes','con')")}
+            ${statLink('🔥','red',fatigaAlta,'Fatiga alta (≥8)',"ntRenderView('pacientes','alta')")}
+            ${statLink('⚠️','yellow',sinDatos,'Sin registro',"ntRenderView('pacientes','sin')")}
         </div>
         ${fatigaAlta>0?`<div class="insight-box" style="margin-bottom:24px;border-left-color:#ef4444;background:#fee2e2;color:#991b1b">
             <strong>⚠️ Atención:</strong> ${fatigaAlta} atleta(s) con fatiga ≥ 8. Revisa su estado antes del entrenamiento.
@@ -1259,7 +1291,7 @@ async function ntRenderDashboard() {
 
 let _ntTodosPacientes = [];
 
-async function ntRenderPacientes() {
+async function ntRenderPacientes(filtro = '') {
     const [pacientes, rendimiento] = await Promise.all([
         apiFetch(`${API}/nutricionista/futbolistas`).then(r=>r.json()).catch(()=>[]),
         rdCargarEquipo()
@@ -1277,6 +1309,7 @@ async function ntRenderPacientes() {
                 </div>
                 <select id="nt-filter-fatiga" onchange="ntFiltrarPacientes()">
                     <option value="">Todos</option>
+                    <option value="con">Con datos de salud</option>
                     <option value="alta">Fatiga alta (≥8)</option>
                     <option value="media">Fatiga media (4-7)</option>
                     <option value="sin">Sin registro hoy</option>
@@ -1288,6 +1321,7 @@ async function ntRenderPacientes() {
             `<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>No hay atletas activos</p></div>`}
         </div>
     </div>`;
+    if (filtro) { document.getElementById('nt-filter-fatiga').value = filtro; ntFiltrarPacientes(); }
 }
 
 function ntFiltrarPacientes() {
@@ -1295,6 +1329,7 @@ function ntFiltrarPacientes() {
     const filtro = document.getElementById('nt-filter-fatiga')?.value || '';
     let lista    = _ntTodosPacientes;
     if (q) lista = lista.filter(f => f.nombre.toLowerCase().includes(q));
+    if (filtro === 'con')   lista = lista.filter(f => f.ultimaSalud);
     if (filtro === 'alta')  lista = lista.filter(f => f.ultimaSalud?.fatiga >= 8);
     if (filtro === 'media') lista = lista.filter(f => f.ultimaSalud?.fatiga >= 4 && f.ultimaSalud?.fatiga < 8);
     if (filtro === 'sin')   lista = lista.filter(f => !f.ultimaSalud);
@@ -1570,6 +1605,10 @@ async function medicoRenderMensajes() {
     await msgMontar('md-mensajes');
 }
 
+function medicoEnlaceAtleta(a) {
+    return `<button type="button" class="enlace-atleta" onclick="medicoVerPerfil(${Number(a.id)})">${escapeHtml(a.nombre)}</button>`;
+}
+
 async function medicoRenderAtletas() {
     closeSidebar();
     const main = document.getElementById('md-content');
@@ -1590,8 +1629,8 @@ async function medicoRenderAtletas() {
             </div>
             ${enRiesgo.length || noListos.length ? `
             <div class="rd-aviso">
-                ${enRiesgo.length ? `<div>⚠️ <strong>${enRiesgo.length} ${enRiesgo.length === 1 ? 'atleta' : 'atletas'} con riesgo alto de lesión por carga:</strong> ${enRiesgo.map(a => escapeHtml(a.nombre)).join(', ')}</div>` : ''}
-                ${noListos.length ? `<div>🛑 <strong>${noListos.length} ${noListos.length === 1 ? 'atleta necesita' : 'atletas necesitan'} descanso hoy:</strong> ${noListos.map(a => escapeHtml(a.nombre)).join(', ')}</div>` : ''}
+                ${enRiesgo.length ? `<div>⚠️ <strong>${enRiesgo.length} ${enRiesgo.length === 1 ? 'atleta' : 'atletas'} con riesgo alto de lesión por carga:</strong> ${enRiesgo.map(medicoEnlaceAtleta).join(', ')}</div>` : ''}
+                ${noListos.length ? `<div>🛑 <strong>${noListos.length} ${noListos.length === 1 ? 'atleta necesita' : 'atletas necesitan'} descanso hoy:</strong> ${noListos.map(medicoEnlaceAtleta).join(', ')}</div>` : ''}
             </div>` : ''}
             <div class="card">
                 <div class="card-header"><h2>Atletas</h2></div>
@@ -1599,13 +1638,13 @@ async function medicoRenderAtletas() {
                     ${_medicoAtletas.length ? _medicoAtletas.map(atleta => {
                         const rd = rendimiento[atleta.id];
                         return `
-                        <tr>
+                        <tr class="fila-link" onclick="medicoVerPerfil(${Number(atleta.id)})" title="Ver expediente">
                             <td><div class="user-name">${escapeHtml(atleta.nombre)}</div><div class="user-email">${escapeHtml(atleta.email)}</div></td>
                             <td>${rd ? rdBadgeListo(rd.listo) : '—'}</td>
                             <td>${rd ? rdBadgeRiesgo(rd.carga) : '—'}</td>
                             <td>${rd?.cumplimiento.porcentaje != null ? rd.cumplimiento.porcentaje + '%' : '—'}</td>
                             <td>${atleta.completado ? '<span class="badge badge-activo">Completa</span>' : '<span class="badge badge-inactivo">Pendiente</span>'}</td>
-                            <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="medicoVerPerfil(${Number(atleta.id)})">Ver expediente</button></td>
+                            <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();medicoVerPerfil(${Number(atleta.id)})">Ver expediente →</button></td>
                         </tr>`;
                     }).join('') : '<tr><td colspan="6"><div class="empty-state"><p>No hay atletas activos.</p></div></td></tr>'}
                 </tbody></table></div>
@@ -1733,7 +1772,7 @@ async function pfRenderDashboard() {
         ${pfTarjetasResumen(data.resumen.hoy, saludHoy)}
         ${ultimaSalud?`
         <div class="card" style="margin-bottom:24px">
-            <div class="card-header"><h2>📊 Mi estado físico hoy</h2><span class="inc-fecha">${formatFecha(ultimaSalud.fecha)}</span></div>
+            <div class="card-header"><h2>📊 Mi estado físico hoy</h2><div style="display:flex;align-items:center;gap:10px"><span class="inc-fecha">${formatFecha(ultimaSalud.fecha)}</span><button class="btn btn-ghost btn-sm" onclick="pfRenderView('salud')">Ver mi salud →</button></div></div>
             <p class="salud-regla">Fatiga: cuanto más baja, mejor. Sueño y recuperación: cuanto más altos, mejor.</p>
             <div class="salud-big-grid">
                 ${saludMeterBig('Fatiga',ultimaSalud.fatiga,'danger','fatiga')}
@@ -3913,4 +3952,5 @@ window.addEventListener('load', ()=>{
     if (revisarEnlaceRestablecer()) return; // abierto desde el correo de "recuperar contraseña"
     const session=getSession(), token=getToken();
     if(session && token) routeUser(session, token);
+    else mostrarInicio();
 });

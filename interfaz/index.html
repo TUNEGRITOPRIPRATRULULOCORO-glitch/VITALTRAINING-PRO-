@@ -23,9 +23,140 @@
 </svg>
 
 <!-- ========================= -->
+<!-- PORTADA PÚBLICA           -->
+<!-- ========================= -->
+<!-- Lo primero que ve quien entra sin sesión: qué es la app y para quién. También es la
+     "página principal" que revisa Google para el inicio de sesión con Google. -->
+<div id="inicio-publico" class="hidden">
+    <div class="ip-fondo" aria-hidden="true">
+        <div class="auth-aurora auth-aurora-1"></div>
+        <div class="auth-aurora auth-aurora-2"></div>
+        <div class="auth-rejilla"></div>
+    </div>
+
+    <header class="ip-barra">
+        <a href="/" class="ip-marca" onclick="event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'})">
+            <span class="ip-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></span>
+            VitalTraining
+        </a>
+        <nav class="ip-nav" aria-label="Secciones">
+            <a href="#ip-funciones">Qué hace</a>
+            <a href="#ip-para-quien">Para quién</a>
+            <a href="#ip-pasos">Cómo funciona</a>
+        </nav>
+        <div class="ip-barra-botones">
+            <button class="ip-btn ip-btn-texto" onclick="abrirAuth('screen-login')">Iniciar sesión</button>
+            <button class="ip-btn ip-btn-principal ip-btn-chico" onclick="abrirAuth('screen-register-1')">Crear cuenta</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="ip-hero">
+            <div class="ip-hero-texto ip-aparece">
+                <p class="ip-etiqueta">Para atletas, clubes y quien quiere ponerse en forma</p>
+                <h1>Entrena con un plan <span>hecho para ti.</span></h1>
+                <p class="ip-sub">VitalTraining junta tu rutina, tu alimentación y tu salud en un solo lugar, y conecta a tu nutricionista y a tu médico para que todos sigan el mismo plan.</p>
+                <div class="ip-cta">
+                    <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-1')">Crear cuenta gratis →</button>
+                    <button class="ip-btn ip-btn-secundario" onclick="abrirAuth('screen-login')">Ya tengo cuenta</button>
+                </div>
+                <div class="google-bloque hidden ip-google">
+                    <div class="google-btn" data-texto="continue_with"></div>
+                </div>
+                <p class="ip-nota">Gratis · En español · Funciona en el móvil y en el computador</p>
+            </div>
+
+            <div class="ip-hero-visual ip-aparece" aria-hidden="true">
+                <div class="ip-tarjeta ip-tarjeta-listo">
+                    <div class="ip-anillo"><span>82</span></div>
+                    <div><strong>Listo para entrenar</strong><small>Dormiste bien y estás recuperado</small></div>
+                </div>
+                <div class="ip-tarjeta ip-tarjeta-rutina">
+                    <small>Hoy · Lateral</small>
+                    <strong>Sprint + Prevención</strong>
+                    <ul><li>Sprints repetidos 6 × 30 m</li><li>Nórdico de isquiotibiales</li><li>Copenhague de aductores</li></ul>
+                </div>
+                <div class="ip-tarjeta ip-tarjeta-comida">
+                    <small>Meta de hoy</small>
+                    <strong>2.860 kcal</strong>
+                    <div class="ip-barras"><span style="width:45%"></span><span style="width:70%"></span><span style="width:35%"></span></div>
+                    <small>Proteína · Carbohidratos · Grasa</small>
+                </div>
+                <div class="ip-tarjeta ip-tarjeta-partido">📅 Partido el sábado · el viernes, sesión suave</div>
+            </div>
+        </section>
+
+        <section class="ip-seccion" id="ip-funciones">
+            <h2 class="ip-aparece">Todo lo que necesitas para rendir más</h2>
+            <div class="ip-funciones">
+                <article class="ip-funcion ip-aparece">
+                    <div class="ip-icono">🏋️</div>
+                    <h3>Rutina por deporte y posición</h3>
+                    <p>Ejercicios basados en estudios para lo que exige tu posición, sin los que no te convienen por una lesión, y organizados alrededor de tu día de partido.</p>
+                </article>
+                <article class="ip-funcion ip-aparece">
+                    <div class="ip-icono">🍽</div>
+                    <h3>Plan de comidas calculado</h3>
+                    <p>Calorías, proteína y carbohidratos según tu peso, tu objetivo y lo que entrenas cada día. La víspera del partido, más energía.</p>
+                </article>
+                <article class="ip-funcion ip-aparece">
+                    <div class="ip-icono">❤️</div>
+                    <h3>Salud y fatiga bajo control</h3>
+                    <p>Registra cómo te sientes en 10 segundos y sabrás si hoy toca apretar o descansar. Si algo va mal, tu médico recibe un aviso.</p>
+                </article>
+                <article class="ip-funcion ip-aparece">
+                    <div class="ip-icono">📈</div>
+                    <h3>Tests físicos y progreso</h3>
+                    <p>Mide salto, velocidad y resistencia cada 4-6 semanas y comprueba si de verdad estás mejorando.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="ip-seccion" id="ip-para-quien">
+            <h2 class="ip-aparece">Un equipo conectado</h2>
+            <div class="ip-roles">
+                <div class="ip-rol ip-aparece"><span>🏅</span><h3>Atleta</h3><p>Tu plan del día, tu progreso y un chat con tu nutricionista y tu médico.</p></div>
+                <div class="ip-rol ip-aparece"><span>🥗</span><h3>Nutricionista</h3><p>Ve cómo come y cómo se siente cada atleta y ajusta su plan.</p></div>
+                <div class="ip-rol ip-aparece"><span>🩺</span><h3>Médico</h3><p>Expedientes, alertas de fatiga y riesgo de lesión por exceso de carga.</p></div>
+                <div class="ip-rol ip-aparece"><span>🛡</span><h3>Club</h3><p>Usuarios, reportes y soporte de toda la plataforma en un panel.</p></div>
+            </div>
+        </section>
+
+        <section class="ip-seccion ip-deportes-seccion">
+            <h2 class="ip-aparece">9 deportes, y también si solo quieres estar en forma</h2>
+            <div class="ip-deportes ip-aparece">
+                <span>⚽ Fútbol</span><span>🏀 Baloncesto</span><span>🎾 Tenis</span><span>⚾ Béisbol</span><span>🏃 Atletismo</span>
+                <span>👟 Running</span><span>🏊 Natación</span><span>🥊 Boxeo</span><span>💪 Estar en forma</span>
+            </div>
+        </section>
+
+        <section class="ip-seccion" id="ip-pasos">
+            <h2 class="ip-aparece">Empieza en 3 pasos</h2>
+            <ol class="ip-pasos">
+                <li class="ip-aparece"><b>1</b><h3>Crea tu cuenta</h3><p>Con tu correo o con Google, en menos de un minuto.</p></li>
+                <li class="ip-aparece"><b>2</b><h3>Cuéntanos de ti</h3><p>Deporte, posición, peso, objetivo y si tienes alguna lesión o alergia.</p></li>
+                <li class="ip-aparece"><b>3</b><h3>Recibe tu plan</h3><p>Rutina semanal y comidas listas, que se ajustan solas cuando cambias tus datos.</p></li>
+            </ol>
+        </section>
+
+        <section class="ip-final ip-aparece">
+            <h2>¿Listo para entrenar mejor?</h2>
+            <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-1')">Crear cuenta gratis →</button>
+        </section>
+    </main>
+
+    <footer class="ip-pie">
+        <span>© 2026 VitalTraining</span>
+        <a href="/privacidad">Privacidad</a>
+        <a href="/ayuda.html">Ayuda</a>
+        <a href="#" onclick="event.preventDefault(); abrirAuth('screen-login')">Iniciar sesión</a>
+    </footer>
+</div>
+
+<!-- ========================= -->
 <!-- PANTALLA AUTH             -->
 <!-- ========================= -->
-<div id="auth-screen">
+<div id="auth-screen" class="hidden">
 
     <!-- Fondo animado: aurora, cuadrícula de estadio, pulso cardíaco y chispas -->
     <div class="auth-fondo" aria-hidden="true">
@@ -96,6 +227,7 @@
                 </div>
             </div>
             <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-1')">Regístrate aquí</a></p>
+            <p class="auth-switch"><a href="#" onclick="event.preventDefault(); mostrarInicio()">← Conoce VitalTraining</a></p>
         </div>
     </div>
 
