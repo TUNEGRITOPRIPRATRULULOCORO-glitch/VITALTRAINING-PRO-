@@ -695,6 +695,7 @@ function planEntrenamientoPersonalizado({ user, pm, salud, rutinas, deporte }) {
     beisbol: 'Si juegas béisbol, prioriza potencia rotacional, sprints cortos y el cuidado del hombro y el codo del brazo de lanzar.',
     boxeo: 'Si boxeas, entrena por asaltos (3 min de trabajo, 1 de pausa), potencia de piernas y tronco, y técnica con sombra y saco.',
     running: 'Si corres, la mayor parte de los kilómetros deben ser suaves, con 1-2 sesiones de calidad y 2 días de fuerza a la semana.',
+    gimnasio: 'En el gimnasio, entrena cada músculo 2 veces por semana, acércate al fallo con buena técnica y sube la carga poco a poco.',
     'estar en forma': 'Para ponerte en forma: 150-300 min de actividad moderada a la semana y fuerza de todo el cuerpo al menos 2 días.',
     default: 'El plan prioriza fuerza, velocidad, técnica y recuperación según tu nivel actual.'
   };

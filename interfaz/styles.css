@@ -4896,3 +4896,7 @@ body.dark .filters-bar select {
     .ip-hero-visual { min-height: 0; display: grid; gap: 12px; }
     .ip-tarjeta, .ip-tarjeta-rutina, .ip-tarjeta-comida { position: static; width: auto; animation: none; }
 }
+
+/* Cinco perfiles en la portada: se reparten solos según el ancho */
+.ip-roles { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+@media (max-width: 600px) { .ip-roles { grid-template-columns: 1fr; } }

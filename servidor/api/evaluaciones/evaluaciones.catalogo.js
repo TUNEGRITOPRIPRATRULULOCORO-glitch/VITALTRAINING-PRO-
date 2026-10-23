@@ -112,6 +112,7 @@ const BATERIAS = {
   'Running':    ['cooper', 'carrera5k', 'cmj'],
   'Natación':   ['nado50', 'nado400', 'cmj', 'flexiones'],
   'Boxeo':      ['balonMedicinal', 'cmj', 'flexiones', 'cooper'],
+  'Gimnasio':   ['flexiones', 'plancha', 'cmj', 'saltoHorizontal'],
   'Estar en forma': ['sentarse30', 'flexiones', 'plancha', 'caminata6'],
 };
 

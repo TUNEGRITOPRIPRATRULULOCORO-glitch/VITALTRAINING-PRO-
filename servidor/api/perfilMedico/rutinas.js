@@ -51,6 +51,12 @@
  *   estructura. La potencia del golpe nace de piernas y tronco (trabajo rotacional), y el cuello
  *   fuerte ayuda a absorber impactos. Recreativo: misma base, sin sparring.
  *
+ * GIMNASIO — para ganar músculo: entrenar cada grupo muscular 2 veces por semana (Schoenfeld et al.,
+ *   Sports Medicine 2016) con unas 10 series semanales o más por músculo (Schoenfeld et al., J Sports
+ *   Sci 2017), cerca del fallo y con cualquier rango de 6 a 30 repeticiones. Definir: la misma fuerza
+ *   para conservar el músculo más cardio; la grasa se pierde sobre todo con la dieta. Fuerza: pocas
+ *   repeticiones (3-5) con más carga en los ejercicios básicos.
+ *
  * ESTAR EN FORMA — guías de la OMS (2020): 150-300 min de actividad aeróbica moderada a la
  *   semana y fuerza de los grandes grupos musculares al menos 2 días. El principiante empieza
  *   con ejercicios de bajo impacto.
@@ -360,6 +366,41 @@ const EJERCICIOS = {
   boxSparring: [
     { nombre: 'Sparring técnico controlado', impacto: 'alto', evitar: [...CORAZON, 'Migraña crónica'], series: 4, tiempo: '3 min' },
     { nombre: 'Trabajo de distancia con compañero (sin golpes a la cabeza)', impacto: 'medio', evitar: [], series: 3, tiempo: '3 min' },
+  ],
+
+  // ── Gimnasio ───────────────────────────────────────────────────────────────
+  gymEmpuje: [
+    { nombre: 'Press de banca con mancuernas', impacto: 'medio', evitar: [], series: 4, repeticiones: 10 },
+    { nombre: 'Press inclinado con mancuernas', impacto: 'medio', evitar: [], series: 3, repeticiones: 12 },
+    { nombre: 'Press militar sentado', impacto: 'medio', evitar: ['Hernia discal'], series: 3, repeticiones: 10 },
+    { nombre: 'Elevaciones laterales', impacto: 'bajo', evitar: [], series: 3, repeticiones: 15 },
+    { nombre: 'Extensión de tríceps en polea', impacto: 'bajo', evitar: ['Epicondilitis (codo de tenista)'], series: 3, repeticiones: 12 },
+  ],
+  gymTiron: [
+    { nombre: 'Jalón al pecho o dominadas', impacto: 'medio', evitar: [], series: 4, repeticiones: 10 },
+    { nombre: 'Remo con mancuerna a una mano', impacto: 'medio', evitar: ['Hernia discal'], series: 3, repeticiones: 10 },
+    { nombre: 'Remo en polea sentado', impacto: 'medio', evitar: [], series: 3, repeticiones: 12 },
+    { nombre: 'Face pull con cuerda', impacto: 'bajo', evitar: [], series: 3, repeticiones: 15 },
+    { nombre: 'Curl de bíceps con mancuernas', impacto: 'bajo', evitar: ['Epicondilitis (codo de tenista)'], series: 3, repeticiones: 12 },
+  ],
+  gymPierna: [
+    { nombre: 'Sentadilla (barra o goblet)', impacto: 'alto', evitar: [...RODILLA, 'Hernia discal'], series: 4, repeticiones: 8 },
+    { nombre: 'Prensa de piernas', impacto: 'medio', evitar: RODILLA, series: 3, repeticiones: 12 },
+    { nombre: 'Peso muerto rumano', impacto: 'alto', evitar: ESPALDA, series: 3, repeticiones: 10 },
+    { nombre: 'Curl femoral', impacto: 'bajo', evitar: [], series: 3, repeticiones: 12 },
+    { nombre: 'Hip thrust', impacto: 'medio', evitar: [], series: 3, repeticiones: 12 },
+    { nombre: 'Elevaciones de talón de pie', impacto: 'bajo', evitar: ['Tendinitis de Aquiles'], series: 3, repeticiones: 15 },
+  ],
+  gymFuerza: [
+    { nombre: 'Sentadilla con barra 5 × 5', impacto: 'alto', evitar: [...RODILLA, ...ESPALDA], series: 5, repeticiones: 5 },
+    { nombre: 'Press de banca con barra 5 × 5', impacto: 'alto', evitar: [], series: 5, repeticiones: 5 },
+    { nombre: 'Peso muerto 3 × 5', impacto: 'alto', evitar: ESPALDA, series: 3, repeticiones: 5 },
+    { nombre: 'Press militar de pie 5 × 5', impacto: 'alto', evitar: ['Hernia discal'], series: 5, repeticiones: 5 },
+  ],
+  gymCardio: [
+    { nombre: 'Cinta inclinada caminando rápido', impacto: 'bajo', evitar: [], series: 1, tiempo: '25 min' },
+    { nombre: 'Bicicleta en intervalos 30 seg fuerte / 90 seg suave', impacto: 'medio', evitar: CORAZON, series: 8, tiempo: '2 min' },
+    { nombre: 'Elíptica a ritmo constante', impacto: 'bajo', evitar: [], series: 1, tiempo: '25 min' },
   ],
 
   // ── Estar en forma ─────────────────────────────────────────────────────────
@@ -680,6 +721,41 @@ const RUTINAS = {
       )
     },
   },
+  'Gimnasio': {
+    'Ganar músculo': {
+      enfoque: 'Hipertrofia: cada músculo se entrena 2 veces por semana, series de 8-15 repeticiones dejando 1-2 en reserva, y sube el peso cuando llegues al tope de repeticiones.',
+      semana: semana(
+        ['Torso: empuje y tirón', ['gymEmpuje', 'gymTiron']],
+        ['Pierna', ['gymPierna', 'fuerzaTronco']],
+        ['Torso: tirón y empuje', ['gymTiron', 'gymEmpuje']],
+        ['Pierna y glúteo', ['gymPierna', 'fuerzaTronco']],
+        ['Cardio suave o actividad libre', ['gymCardio']],
+        'Movilidad y estiramientos'
+      )
+    },
+    Definir: {
+      enfoque: 'Perder grasa sin perder músculo: mantén las pesas pesadas, suma cardio y deja que la dieta haga el resto (déficit moderado y proteína alta).',
+      semana: semana(
+        ['Torso', ['gymEmpuje', 'gymTiron']],
+        ['Pierna + Cardio', ['gymPierna', 'gymCardio']],
+        ['Torso', ['gymTiron', 'gymEmpuje']],
+        ['Pierna + Cardio', ['gymPierna', 'gymCardio']],
+        ['Cardio largo o actividad libre', ['gymCardio', 'fitLibre']],
+        'Movilidad y estiramientos'
+      )
+    },
+    Fuerza: {
+      enfoque: 'Más fuerte: pocas repeticiones con más carga en los ejercicios básicos, descansando 2-3 min entre series.',
+      semana: semana(
+        ['Fuerza: sentadilla y banca', ['gymFuerza']],
+        ['Accesorios de tirón', ['gymTiron', 'fuerzaTronco']],
+        ['Fuerza: peso muerto y press', ['gymFuerza']],
+        ['Accesorios de pierna', ['gymPierna']],
+        ['Cardio suave o actividad libre', ['gymCardio']],
+        'Movilidad y estiramientos'
+      )
+    },
+  },
   'Estar en forma': {
     Principiante: {
       enfoque: 'Empezar sin lesionarse: ejercicios de bajo impacto y caminar o pedalear casi todos los días.',
@@ -724,7 +800,7 @@ RUTINAS['Tenis']['Left-handed']  = RUTINAS['Tenis'].Individuales;
 const POR_DEFECTO = {
   'Fútbol': 'Mediocampista', 'Baloncesto': 'Alero', 'Tenis': 'Individuales', 'Béisbol': 'Cuadro interior',
   'Atletismo': 'Velocidad', 'Running': '5K - 10K', 'Natación': 'Fondista', 'Boxeo': 'Recreativo',
-  'Estar en forma': 'Principiante',
+  'Gimnasio': 'Ganar músculo', 'Estar en forma': 'Principiante',
 };
 
 const NOTAS_DEPORTE = {
@@ -736,6 +812,7 @@ const NOTAS_DEPORTE = {
   'Running':    '👟 Corre suave la mayoría de días (debes poder hablar). Sube el volumen poco a poco, no más de un 10 % por semana como guía.',
   'Natación':   '🏊 El trabajo de hombro fuera del agua no es opcional: protege del "hombro del nadador".',
   'Boxeo':      '🥊 Usa siempre vendas y guantes adecuados. Ante dolor de cabeza o mareo tras un golpe, para y consulta al médico.',
+  'Gimnasio':   '🏋️ La clave es la constancia y subir poco a poco el peso o las repeticiones. Calienta 5-10 min y prioriza la técnica antes que la carga.',
   'Estar en forma': '💪 La meta de la OMS: 150-300 min de actividad moderada a la semana y fuerza al menos 2 días. Lo importante es la constancia.',
 };
 

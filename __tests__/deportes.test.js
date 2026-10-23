@@ -28,6 +28,16 @@ describe('deportes de la app', () => {
     expect(nombres(generarRutina(SIN_CONDICIONES, 'Recreativo', 'Boxeo'))).not.toContain('Sparring técnico controlado');
   });
 
+  test('gimnasio: ganar músculo entrena cada grupo 2 veces por semana y no tiene partido', () => {
+    const r = generarRutina(SIN_CONDICIONES, 'Ganar músculo', 'Gimnasio', 'Sábado');
+    expect(r.diaPartido).toBeNull();
+    const dias = grupo => r.semana.filter(d => d.ejercicios.some(e => e.nombre === grupo)).length;
+    expect(dias('Press de banca con mancuernas')).toBe(2);
+    expect(dias('Prensa de piernas')).toBe(2);
+    expect(nombres(generarRutina(SIN_CONDICIONES, 'Fuerza', 'Gimnasio'))).toContain('Peso muerto 3 × 5');
+    expect(nombres(generarRutina(SIN_CONDICIONES, 'Definir', 'Gimnasio'))).toContain('Cinta inclinada caminando rápido');
+  });
+
   test('"Estar en forma" no tiene partido y el principiante empieza con bajo impacto', () => {
     const r = generarRutina(SIN_CONDICIONES, 'Principiante', 'Estar en forma', 'Jueves');
     expect(r.diaPartido).toBeNull();

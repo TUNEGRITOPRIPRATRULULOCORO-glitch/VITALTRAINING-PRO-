@@ -124,6 +124,16 @@ async function cambiarPassword(id, hashedPassword) {
   return rows.length > 0;
 }
 
+/** Lo que la interfaz guarda de la sesión (sin contraseña). El nombre de Mi Perfil gana, como en el resto de la app. */
+async function datosPropios(id) {
+  const { rows } = await query(
+    `SELECT u.id, COALESCE(p.nombre, u.nombre) AS nombre, u.email, u.rol, u.estado, u.deporte_principal
+       FROM usuarios u LEFT JOIN perfiles p ON p.user_id = u.id WHERE u.id = $1`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
 /** Nombre y correo de un usuario activo, para enviarle avisos. */
 async function contacto(id) {
   const { rows } = await query(
@@ -144,4 +154,4 @@ async function contactosPorRol(roles) {
   return rows;
 }
 
-module.exports = { listar, crear, actualizar, eliminar, buscarIdPorEmail, registrarAtleta, actualizarDeporte, cambiarPassword, contacto, contactosPorRol };
+module.exports = { listar, crear, actualizar, eliminar, buscarIdPorEmail, registrarAtleta, actualizarDeporte, cambiarPassword, contacto, contactosPorRol, datosPropios };

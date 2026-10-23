@@ -93,11 +93,32 @@ function routeUser(user, token) {
     setSession(user, token);
     currentUser = user;
     hideAllPanels();
+    refrescarMiCuenta();
     if      (isAtletaRole(user.rol))       showPanelFutbolista(user);
     else if (user.rol === 'Nutricionista') showPanelNutricionista(user);
     else if (['Medico', 'Médico'].includes(user.rol)) showPanelMedico(user);
     else if (user.rol === 'Administrador') showPanel(user);
     else { clearSession(); showAuthPanel(); }
+}
+
+// Trae el nombre y el deporte actuales: si alguien los cambió, la sesión guardada quedó vieja
+async function refrescarMiCuenta() {
+    const yo = await apiFetch(`${API}/cuenta/yo`).then(r => r.ok ? r.json() : null).catch(() => null);
+    if (!yo || !currentUser || Number(yo.id) !== Number(currentUser.id)) return;
+    if (yo.deporte_principal) currentUser.deporte_principal = yo.deporte_principal;
+    if (yo.nombre !== currentUser.nombre) actualizarNombrePropio(yo.nombre);
+    else setSession(currentUser, getToken());
+}
+
+function actualizarNombrePropio(nombre) {
+    currentUser.nombre = nombre;
+    setSession(currentUser, getToken());
+    const corto = nombre.split(' ').slice(0, 2).join(' ');
+    ['sidebar-name', 'nt-nombre', 'md-nombre', 'pf-nombre'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = corto;
+    });
+    pintarAvatarPropio();
 }
 
 function hideAllPanels() {
@@ -238,6 +259,14 @@ function getSportFieldConfig(deporte) {
             frecuenciaOptions: ['2-3 veces por semana','4-5 veces por semana','6+ veces por semana'],
             pieLabel: 'Guardia *',
             pieOptions: ['Diestra (ortodoxa)','Zurda','Ambas']
+        },
+        'Gimnasio': {
+            posicionLabel: 'Tu meta *',
+            posicionOptions: ['Ganar músculo','Definir','Fuerza'],
+            frecuenciaLabel: 'Días de gimnasio por semana *',
+            frecuenciaOptions: ['2-3 días por semana','4-5 días por semana','6+ días por semana'],
+            pieLabel: 'Lado dominante *',
+            pieOptions: ['Derecho','Izquierdo','Ambos']
         },
         'Estar en forma': {
             posicionLabel: 'Nivel *',
@@ -553,9 +582,9 @@ function normalizeDisplayRole(rol) {
     return ['Medico', 'Médico'].includes(rol) ? 'Médico' : rol;
 }
 // Mismos deportes que el servidor (servidor/compartido/deportes.js)
-const DEPORTES_APP = ['Fútbol','Baloncesto','Tenis','Béisbol','Atletismo','Running','Natación','Boxeo','Estar en forma'];
-const ICONOS_DEPORTE = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾', 'Béisbol':'⚾', 'Atletismo':'🏃', 'Running':'👟', 'Natación':'🏊', 'Boxeo':'🥊', 'Estar en forma':'💪' };
-const SIN_COMPETICION = ['Estar en forma'];
+const DEPORTES_APP = ['Fútbol','Baloncesto','Tenis','Béisbol','Atletismo','Running','Natación','Boxeo','Gimnasio','Estar en forma'];
+const ICONOS_DEPORTE = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾', 'Béisbol':'⚾', 'Atletismo':'🏃', 'Running':'👟', 'Natación':'🏊', 'Boxeo':'🥊', 'Gimnasio':'🏋️', 'Estar en forma':'💪' };
+const SIN_COMPETICION = ['Gimnasio','Estar en forma'];
 const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 function getSportIcon(sport) { return ICONOS_DEPORTE[sport] || '🏅'; }
 function getSportLabel(sport) { return sport || 'Deporte'; }
@@ -1002,7 +1031,11 @@ async function guardarEdicionUsuario(id) {
           rol=document.getElementById('f-rol').value, estado=document.getElementById('f-estado').value;
     if(!nombre||!email) return showToast('Completa todos los campos','error');
     const res=await apiFetch(`${API}/usuarios/${id}`,{method:'PUT',body:JSON.stringify({nombre,email,rol,estado})});
-    if(res.ok){closeModal();showToast('Usuario actualizado');await renderUsuarios();}
+    if(res.ok){
+        closeModal(); showToast('Usuario actualizado');
+        if(Number(id)===Number(currentUser.id)) actualizarNombrePropio(nombre); // se editó a sí mismo
+        await renderUsuarios();
+    }
     else showToast('Error al actualizar','error');
 }
 
@@ -2141,7 +2174,7 @@ async function pfGuardarPerfil() {
         showToast(body.diaPartido && body.diaPartido!=='Ninguno' ? `Perfil actualizado · tu semana se organiza para el ${body.diaPartido.toLowerCase()}` : 'Perfil actualizado');
         currentUser.deporte_principal = body.deportePrincipal;
         setSession(currentUser, getToken());
-        document.getElementById('pf-nombre').textContent = body.nombre.split(' ').slice(0,2).join(' ');
+        if (body.nombre) actualizarNombrePropio(body.nombre);
     }
     else showToast('Error al guardar','error');
 }
@@ -3883,7 +3916,7 @@ function portadaVisible() {
 
 // Palabra que va cambiando en el subtítulo
 (function rotarDeporte() {
-    const deportes = ['fútbol', 'baloncesto', 'tenis', 'béisbol', 'atletismo', 'running', 'natación', 'boxeo', 'estar en forma'];
+    const deportes = ['fútbol', 'baloncesto', 'tenis', 'béisbol', 'atletismo', 'running', 'natación', 'boxeo', 'el gimnasio', 'estar en forma'];
     let i = 0;
     setInterval(() => {
         const el = document.getElementById('auth-deporte');

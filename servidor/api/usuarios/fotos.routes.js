@@ -1,5 +1,6 @@
 /**
  * Fotos de perfil (cualquier usuario con sesión gestiona la suya):
+ * GET    /api/cuenta/yo     → Mis datos actuales (nombre, correo, rol, deporte) para refrescar la sesión
  * PUT    /api/cuenta/foto   → Subir o cambiar mi foto { foto: "data:image/jpeg;base64,..." }
  * DELETE /api/cuenta/foto   → Quitar mi foto
  * GET    /api/fotos/:userId → La imagen, o 404 si no tiene foto (solo con sesión iniciada;
@@ -9,6 +10,17 @@ const express = require('express');
 const svc     = require('./fotos.service');
 
 const cuenta = express.Router();
+
+// El nombre guardado en la sesión puede quedarse viejo si un admin lo cambia; la interfaz lo refresca con esto
+cuenta.get('/yo', async (req, res) => {
+  try {
+    const yo = await require('./usuarios.service').datosPropios(req.user.id);
+    if (!yo) return res.status(404).json({ error: 'Usuario no encontrado.' });
+    res.json(yo);
+  } catch (err) {
+    res.status(500).json({ error: 'Error leyendo tu cuenta.' });
+  }
+});
 
 cuenta.put('/foto', async (req, res) => {
   try {
