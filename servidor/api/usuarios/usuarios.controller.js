@@ -1,4 +1,5 @@
 const svc = require('./usuarios.service');
+const fotos = require('./fotos.service');
 
 async function getUsuarios(req, res) {
   try {
@@ -38,4 +39,20 @@ async function deleteUsuario(req, res) {
   }
 }
 
-module.exports = { getUsuarios, postUsuario, putUsuario, deleteUsuario };
+/** Moderación: el administrador retira una foto inapropiada. El usuario recibe un aviso en la app. */
+async function deleteFotoUsuario(req, res) {
+  try {
+    const id = Number(req.params.id);
+    if (!(await fotos.obtener(id))) return res.status(404).json({ error: 'Ese usuario no tiene foto.' });
+    await fotos.borrar(id);
+    res.json({ ok: true });
+    // Después de responder: el aviso no debe impedir la moderación
+    require('../panel').crearAlerta(id, 'cuenta',
+      'Un administrador retiró tu foto de perfil porque no cumple las normas de la app. Puedes subir otra desde Mi Perfil.',
+      new Date().toISOString().slice(0, 10)).catch(() => {});
+  } catch (err) {
+    res.status(500).json({ error: 'Error retirando la foto.' });
+  }
+}
+
+module.exports = { getUsuarios, postUsuario, putUsuario, deleteUsuario, deleteFotoUsuario };

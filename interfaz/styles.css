@@ -4690,3 +4690,58 @@ body.dark .ev-empeora { color: #fca5a5; }
 
 .auth-legal { color: inherit; text-decoration: underline; }
 .auth-legal:hover { color: #4ade80; }
+
+/* ── Admin: tarjetas de cifras que llevan a otra pantalla ── */
+.stat-link {
+    position: relative; width: 100%; text-align: left; font: inherit; color: inherit;
+    border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.stat-link:hover, .stat-link:focus-visible { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-light); outline: none; }
+.stat-link-ir { position: absolute; top: 12px; right: 14px; font-size: 16px; color: var(--text-muted); opacity: 0; transition: opacity 0.15s, transform 0.15s; }
+.stat-link:hover .stat-link-ir, .stat-link:focus-visible .stat-link-ir { opacity: 1; transform: translateX(2px); color: var(--primary); }
+.stat-link-activa { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(34,197,94,0.25); }
+.meter-link { cursor: pointer; border-radius: var(--radius-sm); padding: 4px 6px; margin: -4px -6px; transition: background 0.15s; }
+.meter-link:hover, .meter-link:focus-visible { background: rgba(34,197,94,0.08); outline: none; }
+
+/* ── Admin: incidencias más legibles ── */
+.badge-cat           { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+.badge-dest-soporte  { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-dest-nutri    { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+body.dark .badge-cat          { background: rgba(148,163,184,0.15); color: #e2e8f0; border-color: rgba(148,163,184,0.3); }
+body.dark .badge-dest-soporte { background: rgba(59,130,246,0.18); color: #93c5fd; border-color: rgba(59,130,246,0.35); }
+body.dark .badge-dest-nutri   { background: rgba(34,197,94,0.15); color: #86efac; border-color: rgba(34,197,94,0.3); }
+body.dark .badge-media        { color: #fcd34d; }
+body.dark .badge-abierta, body.dark .badge-alta { color: #fca5a5; }
+
+.incidencia-card.inc-abierta     { border-left-color: #ef4444; }
+.incidencia-card.inc-en-progreso { border-left-color: #f59e0b; }
+.incidencia-card.inc-resuelta    { border-left-color: #22c55e; opacity: 0.85; }
+.inc-resumen { margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+.inc-titulo { font-size: 16px; }
+
+/* Desplegable de estado: flecha visible y color según el estado */
+.estado-select-wrap { display: inline-block; }
+.estado-select, body.dark .estado-select {
+    padding: 7px 34px 7px 12px; font-size: 13px; font-weight: 700; border-radius: 999px; min-width: 150px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+}
+.estado-select:hover { filter: brightness(1.05); }
+.estado-abierta     { background-color: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.estado-en-progreso { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.estado-resuelta    { background-color: #dcfce7; color: #166534; border-color: #86efac; }
+body.dark .estado-abierta     { background-color: rgba(239,68,68,0.18); color: #fca5a5; border-color: rgba(239,68,68,0.45); }
+body.dark .estado-en-progreso { background-color: rgba(245,158,11,0.18); color: #fcd34d; border-color: rgba(245,158,11,0.45); }
+body.dark .estado-resuelta    { background-color: rgba(34,197,94,0.15); color: #86efac; border-color: rgba(34,197,94,0.4); }
+
+/* Detalle de una incidencia */
+.inc-detalle-cabecera { display: flex; flex-wrap: wrap; gap: 14px 22px; margin-bottom: 14px; }
+.inc-detalle-dato { display: flex; flex-direction: column; gap: 6px; }
+.inc-detalle-dato > span:first-child { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+.inc-detalle-autor { font-size: 14px; color: var(--text-muted); }
+.detail-desc em { color: var(--text-muted); }
+
+/* Moderación de fotos */
+.foto-moderar { width: 220px; height: 220px; margin: 0 auto 16px; border-radius: 16px; position: relative; overflow: hidden;
+    display: grid; place-items: center; font-size: 48px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #16a34a, #0ea5e9); }

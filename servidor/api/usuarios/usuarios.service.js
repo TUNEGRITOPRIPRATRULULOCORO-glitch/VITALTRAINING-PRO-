@@ -3,23 +3,32 @@ const { query } = require('../../../base-de-datos/db');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Roles con dos nombres en la base (los registros antiguos usan "Futbolista" y "Medico")
+const ALIAS_ROL = {
+  Atleta: ['Atleta', 'Futbolista'], Futbolista: ['Atleta', 'Futbolista'],
+  Medico: ['Medico', 'Médico'], 'Médico': ['Medico', 'Médico'],
+};
+
 async function listar({ q, rol, estado } = {}) {
-  let sql = 'SELECT id, nombre, email, rol, estado FROM usuarios WHERE 1=1';
+  let sql = `SELECT u.id, u.nombre, u.email, u.rol, u.estado, (f.user_id IS NOT NULL) AS "tieneFoto"
+               FROM usuarios u LEFT JOIN fotos_perfil f ON f.user_id = u.id WHERE 1=1`;
   const params = [];
 
   if (q) {
     params.push(`%${q.toLowerCase()}%`);
     const n = params.length;
-    sql += ` AND (LOWER(nombre) LIKE $${n} OR LOWER(email) LIKE $${n})`;
+    sql += ` AND (LOWER(u.nombre) LIKE $${n} OR LOWER(u.email) LIKE $${n})`;
   }
   if (rol && rol !== 'Todos los roles') {
-    params.push(rol);
-    sql += ` AND rol = $${params.length}`;
+    const roles = ALIAS_ROL[rol] || [rol];
+    const marcadores = roles.map(r => { params.push(r); return `$${params.length}`; });
+    sql += ` AND u.rol IN (${marcadores.join(', ')})`;
   }
   if (estado && estado !== 'Todos los estados') {
     params.push(estado);
-    sql += ` AND estado = $${params.length}`;
+    sql += ` AND u.estado = $${params.length}`;
   }
+  sql += ' ORDER BY u.nombre';
 
   const { rows } = await query(sql, params);
   return rows;
