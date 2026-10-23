@@ -5,7 +5,29 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 - `index.html` — la aplicación completa (SPA)
 - `ayuda.html` — guía de uso
 - `styles.css` — estilos
-- `script.js` — lógica del navegador; llama al servidor con `fetch('/api/...')` y un token JWT
+- `privacidad.html` — política de privacidad (pública, en `/privacidad`)
+- `js/` — lógica del navegador, un archivo por rol; llama al servidor con `fetch('/api/...')` y un token JWT
+
+## Archivos de `js/` (en el orden en que se cargan)
+
+| Archivo | Qué tiene |
+|---|---|
+| `comun.js` | Sesión, `apiFetch`, enrutador por rol, fotos de perfil, deportes, avisos, ventanas. Lo usan todos |
+| `auth.js` | Portada pública, entrar, registro (también con Google), recuperar contraseña |
+| `mensajes.js` | Chat entre roles y contadores de no leídos |
+| `rendimiento.js` | Listo para entrenar, carga y cumplimiento (atleta, nutricionista y médico) |
+| `evaluaciones.js` | Tests físicos (atleta y médico) |
+| `admin.js` | Panel del administrador |
+| `nutricionista.js` | Panel del nutricionista |
+| `medico.js` | Panel del médico |
+| `atleta.js` | Atleta: inicio, perfil, salud, historial, soporte |
+| `atleta-plan.js` | Atleta: perfil médico, rutina, plan de comidas, asistente IA |
+| `inicio.js` | Arranque: decide qué pantalla mostrar. Va el último |
+
+Son scripts normales (sin módulos ni build): comparten las funciones globales, que es lo que usan los
+`onclick="..."` del HTML. Por eso el orden importa: un archivo solo puede **ejecutar al cargarse** código
+de los que van antes (llamar funciones de otros desde dentro de una función no tiene problema).
+Una pantalla de un rol va en el archivo de ese rol; si la usan varios roles, en uno compartido.
 - `img/` — capturas e imágenes
 
 El servidor publica esta carpeta tal cual (sin build). No guardes aquí claves ni lógica sensible: todo lo que está aquí lo puede leer cualquiera.

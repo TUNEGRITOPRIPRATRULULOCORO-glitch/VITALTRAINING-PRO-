@@ -35,8 +35,9 @@ vital-training/
 ├── interfaz/               # 🖥️ INTERFAZ — SPA en HTML, CSS y JS
 │   ├── index.html
 │   ├── ayuda.html
+│   ├── privacidad.html
 │   ├── styles.css
-│   ├── script.js
+│   ├── js/                 # lógica del navegador, un archivo por rol (ver interfaz/README.md)
 │   └── img/
 │
 ├── servidor/               # 🗄️ SERVIDOR — Node.js + Express

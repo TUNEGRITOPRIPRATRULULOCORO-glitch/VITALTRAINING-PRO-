@@ -268,7 +268,9 @@ El nutricionista solo ve tickets de las 4 categorías que le corresponden. El ad
 ```
 interfaz/
   index.html    ← Contiene todos los paneles (admin, nutricionista, futbolista) ocultos con CSS
-  script.js     ← Toda la lógica: auth, routing de vistas, llamadas API, renderizado
+  js/           ← La lógica, un archivo por rol: comun.js (sesión, enrutador, utilidades), auth.js,
+                  admin.js, nutricionista.js, medico.js, atleta.js, atleta-plan.js y los compartidos
+                  mensajes.js, rendimiento.js y evaluaciones.js. inicio.js arranca la app.
   styles.css    ← Estilos: variables CSS, dark mode, componentes reutilizables
 ```
 
