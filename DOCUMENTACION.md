@@ -254,7 +254,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **473 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **477 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.
@@ -265,6 +265,8 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 ## 9. Despliegue
 
 Render construye la imagen con el `Dockerfile` desde la rama `main` (**Manual Deploy**) y la conecta a Neon con `DATABASE_URL`. Paso a paso en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md); mapa y guion para presentar en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md). Las variables de entorno están en el [README](README.md#variables-de-entorno).
+
+**Club de demostración** (`scripts/club-demo.js`): un equipo de fútbol con entrenador, nutricionista, médico y 5 atletas con 4 semanas de historia (racha, récords verificados, sesiones del reloj, comidas escaneadas, un lesionado, uno con carga alta y una que volvió de lesión). En local: `npm run club-demo` (y `-- --borrar` para quitarlo). En Render se crea al arrancar si existe `CLUB_DEMO_PASSWORD`, y se vuelve a crear si sus datos tienen más de un día, para que la racha y "Hoy te toca" se vean al día. Sus correos usan el dominio reservado `.example`: la app nunca les envía correos.
 
 ---
 

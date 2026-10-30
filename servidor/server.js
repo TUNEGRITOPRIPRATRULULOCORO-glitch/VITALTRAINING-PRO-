@@ -90,6 +90,10 @@ setupDatabase()
       console.log('🚀 VitalTraining — Servidor iniciado');
       console.log(PRODUCCION ? `📡 Escuchando en el puerto ${PORT}` : `📡 http://localhost:${PORT}`);
       console.log('');
+      // Club de demostración (solo si se definió su contraseña): se crea después de arrancar, sin bloquear
+      if (process.env.CLUB_DEMO_PASSWORD) {
+        require('../scripts/club-demo').crearClubDemo().catch(err => console.error('❌ Club demo:', err.message));
+      }
     });
   })
   .catch(err => {

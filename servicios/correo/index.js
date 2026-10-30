@@ -31,6 +31,8 @@ function urlApp() {
  */
 async function enviarCorreo({ para, nombre, asunto, html, texto }) {
   if (!para) return { ok: false, motivo: 'sin-destinatario' };
+  // Dominios reservados (.example): cuentas del club de demostración, nunca reciben correos
+  if (/\.example$/i.test(String(para).trim())) return { ok: false, motivo: 'dominio-de-prueba' };
 
   if (!configurado()) {
     enviados.push({ para, nombre, asunto, html, texto, fecha: new Date().toISOString() });

@@ -32,7 +32,7 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 | Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
 | IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |
 | Servicios | Brevo (correos) · Google (entrar con Google) |
-| Calidad | Jest (473 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
+| Calidad | Jest (477 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
 | Publicación | Docker · Render |
 
 ---
@@ -90,6 +90,7 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 | `JWT_SECRET` · `JWT_EXPIRES_IN` | Firmar las sesiones (obligatoria en producción) · duración (8 h) |
 | `ADMIN_PASSWORD` | Contraseña del admin al crear la base en producción |
 | `DATOS_DEMO` | `true` crea las cuentas de prueba (en la web está en `false`) |
+| `CLUB_DEMO_PASSWORD` | Opcional: crea el **club de demostración** (8 cuentas `@club-demo.example` con esta contraseña, mínimo 10 caracteres) y lo renueva si sus datos tienen más de un día. Sin la variable no se crea |
 | `BREVO_API_KEY` · `CORREO_REMITENTE` · `CORREO_NOMBRE` · `APP_URL` | Correos (bienvenida, contraseña, alertas) |
 | `GOOGLE_CLIENT_ID` | Botón "Entrar con Google" |
 | `ANTHROPIC_API_KEY` | Opcional: Vita conversa con Claude. Sin ella usa el modelo propio, gratis |
@@ -102,7 +103,7 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 ## Pruebas
 
 ```bash
-npm test                 # 473 pruebas
+npm test                 # 477 pruebas
 npm run test:coverage    # con informe de cobertura en coverage/lcov-report/index.html
 ```
 

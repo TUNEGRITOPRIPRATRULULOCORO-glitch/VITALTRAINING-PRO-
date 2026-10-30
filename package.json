@@ -7,6 +7,7 @@
     "start": "node servidor/server.js",
     "dev": "node servidor/server.js",
     "demo": "node scripts/datos-demo.js",
+    "club-demo": "node scripts/club-demo.js",
     "test": "jest --forceExit",
     "test:coverage": "jest --coverage --forceExit",
     "test:watch": "jest --watch"
