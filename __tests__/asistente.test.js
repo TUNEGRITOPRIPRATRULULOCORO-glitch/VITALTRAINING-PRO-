@@ -49,6 +49,17 @@ describe('modo básico (sin clave de Claude)', () => {
     expect(mockCrear).not.toHaveBeenCalled();
   });
 
+  test('el modelo de machine learning entiende agradecimientos, temas ajenos y lesiones', async () => {
+    expect((await asistente.conversar(carlos, 'mil gracias vita')).respuesta).toMatch(/Con gusto/);
+    expect((await asistente.conversar(carlos, 'cuéntame un chiste')).respuesta).toMatch(/De eso no sé/);
+    expect((await asistente.conversar(carlos, 'me torcí el tobillo')).respuesta).toMatch(/médico/);
+  });
+
+  test('si no entiende, pregunta entre las dos opciones más probables en vez de adivinar', async () => {
+    const r = await asistente.conversar(carlos, 'zzz qqq');
+    expect(r.respuesta).toMatch(/No estoy segura de haberte entendido\. ¿Me preguntas por .+ o por .+\?/);
+  });
+
   test('guarda la conversación en orden', async () => {
     await asistente.conversar(carlos, 'hola');
     await asistente.conversar(carlos, 'cuántas calorías llevo');

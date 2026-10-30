@@ -3,13 +3,15 @@
  *
  * Con ANTHROPIC_API_KEY conversa con Claude, que recibe en cada mensaje un resumen de los datos
  * del atleta (ficha, salud reciente, plan, carga...). Sin clave, o si Claude falla, responde el
- * modo básico: detecta de qué se habla y usa los análisis de ia.service.
+ * modo básico: un modelo de machine learning propio (ml/, ver clasificador.js) detecta de qué se
+ * habla y responde con los análisis de ia.service.
  *
  * La conversación se guarda en la tabla ia_mensajes (este módulo es su dueño).
  */
 const Anthropic = require('@anthropic-ai/sdk');
 const { query } = require('../../../base-de-datos/db');
 const { consulta } = require('./ia.service');
+const { clasificar } = require('./clasificador');
 
 const MODELO = 'claude-opus-5-5';
 const MAX_HISTORIAL = 20;          // mensajes anteriores que se envían a Claude
@@ -170,15 +172,39 @@ function detectarTema(texto) {
   return TEMAS.find(tema => tema.claves.some(c => t.includes(c)))?.tipo || null;
 }
 
+// Cómo nombrar cada intención cuando Vita pregunta "¿te refieres a…?"
+const TEMA_EN_PALABRAS = {
+  entrenar_hoy: 'si puedes entrenar hoy', fatiga: 'tu cansancio', sueno: 'tu sueño', recuperacion: 'tu recuperación',
+  riesgo: 'una posible lesión', sobrecarga: 'tu carga de entrenamiento', calorias: 'tus calorías',
+  nutricion: 'tu alimentación', alimentacion_personalizada: 'qué comer', partido: 'tu próximo partido',
+  entrenamiento_personalizado: 'tu rutina', mejorar: 'consejos para mejorar', resumen: 'el resumen de tu semana',
+  alertas: 'tus alertas',
+};
+const AVISO_LESION = '⚠️ Si es un dolor fuerte, hay hinchazón o no puedes apoyar, para y consúltalo con tu médico (puedes escribirle desde Mensajes).\n\n';
+
+/**
+ * Modo básico: el modelo de machine learning (clasificador.js, entrenado en ml/) decide de qué
+ * se habla. Si duda, se prueba con palabras clave; si tampoco, Vita pregunta entre las dos
+ * intenciones más probables en vez de adivinar.
+ */
 async function responderLocal(userId, texto) {
-  const tipo = detectarTema(texto);
-  if (!tipo) {
-    if (SALUDOS.test(texto.trim()))
-      return '¡Hola! 👋 Soy Vita. Pregúntame si puedes entrenar hoy, cómo vas esta semana, qué comer, cómo dormiste o cómo prepararte para tu partido.';
-    return 'Ahora mismo funciono en modo básico y no entendí bien la pregunta. Puedo ayudarte con: si puedes entrenar hoy, tu fatiga y sueño, tu carga de entrenamiento, qué comer y cuántas calorías, tu rutina o cómo prepararte para el partido.';
+  const prediccion = clasificar(texto);
+  const intencion = prediccion.segura ? prediccion.intencion : detectarTema(texto);
+
+  if (intencion === 'saludo' || (!intencion && SALUDOS.test(texto.trim())))
+    return '¡Hola! 👋 Soy Vita. Pregúntame si puedes entrenar hoy, cómo vas esta semana, qué comer, cómo dormiste o cómo prepararte para tu partido.';
+  if (intencion === 'gracias')
+    return '¡Con gusto! 💪 Aquí estoy cuando quieras seguir hablando de tu entrenamiento o tus comidas.';
+  if (intencion === 'fuera_tema')
+    return 'De eso no sé mucho 😅. Lo mío es tu entrenamiento, tu alimentación, tu descanso y tus partidos. ¿Te ayudo con algo de eso?';
+  if (!intencion) {
+    const opciones = prediccion.ranking.map(r => TEMA_EN_PALABRAS[r.intencion]).filter(Boolean).slice(0, 2);
+    return `No estoy segura de haberte entendido. ¿Me preguntas por ${opciones.join(' o por ')}? Puedes decírmelo con otras palabras.`;
   }
-  const r = await consulta(userId, tipo);
-  return r.respuesta || 'No tengo datos suficientes todavía. Registra tu salud y tus comidas para que pueda ayudarte mejor.';
+
+  const r = await consulta(userId, intencion);
+  const respuesta = r.respuesta || 'No tengo datos suficientes todavía. Registra tu salud y tus comidas para que pueda ayudarte mejor.';
+  return intencion === 'riesgo' ? AVISO_LESION + respuesta : respuesta;
 }
 
 // ── Conversación ──────────────────────────────────────────────────────────────

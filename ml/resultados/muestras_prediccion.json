@@ -1,0 +1,77 @@
+[
+  {
+    "texto": "hola vita",
+    "intencion": "saludo",
+    "confianza": 0.99388
+  },
+  {
+    "texto": "puedo entrenar hoy?",
+    "intencion": "entrenar_hoy",
+    "confianza": 0.995171
+  },
+  {
+    "texto": "dormí fatal anoche",
+    "intencion": "sueno",
+    "confianza": 0.946823
+  },
+  {
+    "texto": "me duele mucho la rodilla",
+    "intencion": "riesgo",
+    "confianza": 0.930635
+  },
+  {
+    "texto": "qué como antes del partido",
+    "intencion": "partido",
+    "confianza": 0.974893
+  },
+  {
+    "texto": "dame una rutina de gimnasio",
+    "intencion": "entrenamiento_personalizado",
+    "confianza": 0.910884
+  },
+  {
+    "texto": "cuántas calorías necesito",
+    "intencion": "calorias",
+    "confianza": 0.992177
+  },
+  {
+    "texto": "estoy reventado",
+    "intencion": "fatiga",
+    "confianza": 0.890576
+  },
+  {
+    "texto": "cómo voy esta semana",
+    "intencion": "resumen",
+    "confianza": 0.989724
+  },
+  {
+    "texto": "cuéntame un chiste",
+    "intencion": "fuera_tema",
+    "confianza": 0.819055
+  },
+  {
+    "texto": "dormi pesimo",
+    "intencion": "sueno",
+    "confianza": 0.940834
+  },
+  {
+    "texto": "Tengo PARTIDO el sábado!!",
+    "intencion": "partido",
+    "confianza": 0.885397
+  },
+  {
+    "texto": "que desayuno sin huevo",
+    "intencion": "alimentacion_personalizada",
+    "confianza": 0.892223
+  },
+  {
+    "texto": "estoy sobreentrenado?",
+    "intencion": "sobrecarga",
+    "confianza": 0.84179
+  },
+  {
+    "texto": "gracias crack",
+    "intencion": "gracias",
+    "confianza": 0.950601
+  }
+]

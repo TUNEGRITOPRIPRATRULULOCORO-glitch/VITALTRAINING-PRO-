@@ -1,0 +1,224 @@
+{
+  "precision": 0.8089171974522293,
+  "f1_macro": 0.8070430616551543,
+  "top2": 0.910828025477707,
+  "umbral": 0.35,
+  "umbrales": [
+    {
+      "umbral": 0.15,
+      "cobertura": 0.9872611464968153,
+      "precision": 0.8193548387096774
+    },
+    {
+      "umbral": 0.2,
+      "cobertura": 0.9363057324840764,
+      "precision": 0.8639455782312925
+    },
+    {
+      "umbral": 0.25,
+      "cobertura": 0.8853503184713376,
+      "precision": 0.8705035971223022
+    },
+    {
+      "umbral": 0.3,
+      "cobertura": 0.8343949044585988,
+      "precision": 0.8854961832061069
+    },
+    {
+      "umbral": 0.35,
+      "cobertura": 0.7834394904458599,
+      "precision": 0.9186991869918699
+    },
+    {
+      "umbral": 0.4,
+      "cobertura": 0.7388535031847133,
+      "precision": 0.9396551724137931
+    },
+    {
+      "umbral": 0.45,
+      "cobertura": 0.6878980891719745,
+      "precision": 0.9444444444444444
+    },
+    {
+      "umbral": 0.5,
+      "cobertura": 0.5923566878980892,
+      "precision": 0.956989247311828
+    },
+    {
+      "umbral": 0.55,
+      "cobertura": 0.535031847133758,
+      "precision": 0.9761904761904762
+    },
+    {
+      "umbral": 0.6,
+      "cobertura": 0.4968152866242038,
+      "precision": 0.9743589743589743
+    }
+  ],
+  "validacion_cruzada": {
+    "Naive Bayes multinomial": {
+      "media": 0.7595868038543198,
+      "desviacion": 0.016481439823384472
+    },
+    "Regresión logística": {
+      "media": 0.7979585170667972,
+      "desviacion": 0.023690008330672255
+    },
+    "SVM lineal": {
+      "media": 0.7953535848440307,
+      "desviacion": 0.022133537656773398
+    }
+  },
+  "errores": [
+    {
+      "texto": "me toca entrenar o recuperar",
+      "real": "entrenar_hoy",
+      "predicho": "recuperacion"
+    },
+    {
+      "texto": "quiero dar un salto de nivel",
+      "real": "mejorar",
+      "predicho": "entrenamiento_personalizado"
+    },
+    {
+      "texto": "eso es todo por hoy",
+      "real": "gracias",
+      "predicho": "entrenar_hoy"
+    },
+    {
+      "texto": "cuánto descanso entre entrenamientos",
+      "real": "recuperacion",
+      "predicho": "sobrecarga"
+    },
+    {
+      "texto": "me salto el desayuno, es malo?",
+      "real": "nutricion",
+      "predicho": "alimentacion_personalizada"
+    },
+    {
+      "texto": "en qué estoy fallando",
+      "real": "mejorar",
+      "predicho": "fatiga"
+    },
+    {
+      "texto": "qué tal mi nutrición esta semana",
+      "real": "nutricion",
+      "predicho": "resumen"
+    },
+    {
+      "texto": "quiero un plan nutricional",
+      "real": "alimentacion_personalizada",
+      "predicho": "entrenamiento_personalizado"
+    },
+    {
+      "texto": "qué comer para tener más proteína",
+      "real": "alimentacion_personalizada",
+      "predicho": "nutricion"
+    },
+    {
+      "texto": "cómo arreglo mi celular",
+      "real": "fuera_tema",
+      "predicho": "sueno"
+    },
+    {
+      "texto": "qué llevo de comida al partido",
+      "real": "partido",
+      "predicho": "alimentacion_personalizada"
+    },
+    {
+      "texto": "me mareo cuando corro",
+      "real": "riesgo",
+      "predicho": "fuera_tema"
+    },
+    {
+      "texto": "hazme la tarea de matemáticas",
+      "real": "fuera_tema",
+      "predicho": "nutricion"
+    },
+    {
+      "texto": "hello",
+      "real": "saludo",
+      "predicho": "riesgo"
+    },
+    {
+      "texto": "panorama general",
+      "real": "resumen",
+      "predicho": "fuera_tema"
+    },
+    {
+      "texto": "qué piensas de la vida",
+      "real": "fuera_tema",
+      "predicho": "alimentacion_personalizada"
+    },
+    {
+      "texto": "qué hago en el gimnasio hoy",
+      "real": "entrenamiento_personalizado",
+      "predicho": "recuperacion"
+    },
+    {
+      "texto": "me lastimé jugando",
+      "real": "riesgo",
+      "predicho": "fatiga"
+    },
+    {
+      "texto": "aumenté los kilómetros de golpe",
+      "real": "sobrecarga",
+      "predicho": "nutricion"
+    },
+    {
+      "texto": "cómo se hace una página web",
+      "real": "fuera_tema",
+      "predicho": "entrenamiento_personalizado"
+    },
+    {
+      "texto": "qué día es hoy",
+      "real": "fuera_tema",
+      "predicho": "entrenar_hoy"
+    },
+    {
+      "texto": "mis comidas son saludables?",
+      "real": "nutricion",
+      "predicho": "alimentacion_personalizada"
+    },
+    {
+      "texto": "me cuesta progresar",
+      "real": "mejorar",
+      "predicho": "fuera_tema"
+    },
+    {
+      "texto": "comida vegana para deportistas",
+      "real": "alimentacion_personalizada",
+      "predicho": "nutricion"
+    },
+    {
+      "texto": "que mas pues",
+      "real": "saludo",
+      "predicho": "mejorar"
+    },
+    {
+      "texto": "electrolitos para entrenar",
+      "real": "nutricion",
+      "predicho": "entrenar_hoy"
+    },
+    {
+      "texto": "plan para correr mi primer 5k",
+      "real": "entrenamiento_personalizado",
+      "predicho": "alimentacion_personalizada"
+    },
+    {
+      "texto": "como dosifico el entrenamiento",
+      "real": "sobrecarga",
+      "predicho": "entrenamiento_personalizado"
+    },
+    {
+      "texto": "hazme una dieta",
+      "real": "alimentacion_personalizada",
+      "predicho": "fuera_tema"
+    },
+    {
+      "texto": "cómo saco más provecho al entreno",
+      "real": "mejorar",
+      "predicho": "nutricion"
+    }
+  ]
+}

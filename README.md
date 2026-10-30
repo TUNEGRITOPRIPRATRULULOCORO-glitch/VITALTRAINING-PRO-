@@ -65,6 +65,7 @@ vital-training/
 │   ├── schema.sql          # Definición de tablas
 │   └── setup.js            # Crea tablas y usuarios de prueba al arrancar
 │
+├── ml/                     # 🧠 Modelo de machine learning de Vita (Python + scikit-learn) — ver ml/README.md
 ├── __tests__/              # Pruebas unitarias Jest
 ├── scripts/                # Utilidades sueltas (no forman parte de la app)
 ├── Dockerfile

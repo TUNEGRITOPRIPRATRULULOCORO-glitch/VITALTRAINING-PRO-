@@ -60,7 +60,7 @@ flowchart LR
 - Solo pide nombre y correo. Requiere la página de privacidad publicada en la app.
 
 ### Claude: asistente "Vita" (sin activar)
-- Con una clave de pago conversaría usando los datos del atleta. Sin clave responde con los análisis propios de la app (modo básico, gratis).
+- Con una clave de pago conversaría usando los datos del atleta. Sin clave usa un **modelo de machine learning propio** (Python + scikit-learn, ver [ml/README.md](../ml/README.md)) que entiende la intención de cada mensaje con un 81 % de precisión, y responde con los análisis de la app. Gratis.
 
 ## ¿Cuántas bases de datos hay?
 

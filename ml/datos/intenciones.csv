@@ -1,0 +1,783 @@
+texto,intencion
+"hola",saludo
+"hola vita",saludo
+"buenas",saludo
+"buenos días",saludo
+"buenos dias vita",saludo
+"buenas tardes",saludo
+"buenas noches",saludo
+"hey",saludo
+"qué tal",saludo
+"que mas pues",saludo
+"hola como estas",saludo
+"holaa",saludo
+"ola",saludo
+"saludos",saludo
+"hey vita que tal",saludo
+"buenas buenas",saludo
+"hola, soy nuevo aquí",saludo
+"hola que haces",saludo
+"quiubo",saludo
+"hola de nuevo",saludo
+"hola vita, ¿estás ahí?",saludo
+"epa",saludo
+"hola que tal todo",saludo
+"buen día",saludo
+"holi",saludo
+"hello",saludo
+"hola, ¿me ayudas?",saludo
+"hola buenas, una pregunta",saludo
+"saludos vita",saludo
+"hola entrenadora",saludo
+"qué hubo",saludo
+"buenas, cómo vas",saludo
+"hola otra vez",saludo
+"hola hola",saludo
+"buenas noches vita",saludo
+"buenos días, ¿qué tal?",saludo
+"gracias",gracias
+"muchas gracias",gracias
+"mil gracias vita",gracias
+"gracias por la ayuda",gracias
+"listo gracias",gracias
+"vale gracias",gracias
+"perfecto, gracias",gracias
+"chao",gracias
+"adiós",gracias
+"nos vemos",gracias
+"hasta mañana",gracias
+"hasta luego vita",gracias
+"ok, entendido",gracias
+"genial, gracias",gracias
+"super, muchas gracias",gracias
+"te agradezco",gracias
+"bueno chao",gracias
+"me sirvió mucho, gracias",gracias
+"listo, eso era todo",gracias
+"eso es todo por hoy",gracias
+"gracias, me voy a entrenar",gracias
+"bacano, gracias",gracias
+"dale gracias",gracias
+"buenísimo, gracias",gracias
+"ok gracias",gracias
+"gracias crack",gracias
+"vale, nos vemos mañana",gracias
+"hasta pronto",gracias
+"chao chao",gracias
+"gracias por todo",gracias
+"entendido, gracias vita",gracias
+"perfecto entonces, chao",gracias
+"me quedó claro, gracias",gracias
+"listo, hablamos luego",gracias
+"puedo entrenar hoy?",entrenar_hoy
+"¿puedo entrenar hoy?",entrenar_hoy
+"hoy entreno o descanso?",entrenar_hoy
+"me conviene entrenar hoy",entrenar_hoy
+"estoy listo para entrenar?",entrenar_hoy
+"debería entrenar fuerte hoy",entrenar_hoy
+"hoy puedo darle duro al entreno?",entrenar_hoy
+"entreno hoy o mejor no",entrenar_hoy
+"qué tan listo estoy para entrenar",entrenar_hoy
+"hoy toca entrenar?",entrenar_hoy
+"puedo ir al gimnasio hoy",entrenar_hoy
+"voy a entrenar hoy, está bien?",entrenar_hoy
+"es buena idea entrenar hoy",entrenar_hoy
+"hoy hago el entrenamiento completo o suave",entrenar_hoy
+"debo descansar hoy o entrenar",entrenar_hoy
+"me siento bien para entrenar hoy?",entrenar_hoy
+"puedo jugar hoy",entrenar_hoy
+"puedo hacer pesas hoy",entrenar_hoy
+"hoy salgo a correr o no",entrenar_hoy
+"estoy apto para entrenar",entrenar_hoy
+"qué tan fuerte entreno hoy",entrenar_hoy
+"hoy me toca descanso?",entrenar_hoy
+"entreno o no entreno",entrenar_hoy
+"puedo hacer intervalos hoy",entrenar_hoy
+"listo para entrenar hoy?",entrenar_hoy
+"debería entrenar o recuperarme hoy",entrenar_hoy
+"hoy le meto intensidad?",entrenar_hoy
+"puedo entrenar aunque esté un poco cansado",entrenar_hoy
+"cómo debería entrenar hoy",entrenar_hoy
+"intensidad recomendada para hoy",entrenar_hoy
+"hoy entreno a tope?",entrenar_hoy
+"vale la pena entrenar hoy",entrenar_hoy
+"puedo hacer doble sesión hoy",entrenar_hoy
+"me recomiendas entrenar hoy",entrenar_hoy
+"entrenar hoy si o no",entrenar_hoy
+"hoy voy a la práctica o descanso",entrenar_hoy
+"estoy muy cansado",fatiga
+"me siento agotado",fatiga
+"tengo mucha fatiga",fatiga
+"estoy reventado",fatiga
+"qué tan cansado estoy",fatiga
+"cómo está mi fatiga",fatiga
+"me siento sin energía",fatiga
+"ando muy cansado esta semana",fatiga
+"estoy fundido",fatiga
+"no tengo fuerzas",fatiga
+"me siento pesado y cansado",fatiga
+"por qué estoy tan cansado",fatiga
+"tengo las piernas muertas",fatiga
+"me canso muy rápido",fatiga
+"estoy exhausto",fatiga
+"siento cansancio todo el día",fatiga
+"mi nivel de fatiga es alto?",fatiga
+"me siento débil",fatiga
+"ando sin pilas",fatiga
+"estoy molido después del entreno",fatiga
+"cansancio acumulado",fatiga
+"me siento agotada",fatiga
+"estoy muerto de cansancio",fatiga
+"tengo fatiga muscular",fatiga
+"siento que no rindo, estoy cansado",fatiga
+"qué hago con tanta fatiga",fatiga
+"estoy cansadisimo",fatiga
+"me siento drenado",fatiga
+"mi cuerpo está agotado",fatiga
+"no me dan las piernas",fatiga
+"siempre estoy cansado",fatiga
+"tengo la energía por el piso",fatiga
+"me siento muy cargado",fatiga
+"estoy flojo hoy",fatiga
+"dormí fatal",sueno
+"dormí muy mal anoche",sueno
+"no pude dormir",sueno
+"tengo insomnio",sueno
+"cuántas horas debo dormir",sueno
+"cómo está mi sueño",sueno
+"duermo poco",sueno
+"me cuesta dormirme",sueno
+"me despierto mucho en la noche",sueno
+"solo dormí 4 horas",sueno
+"cómo duermo mejor",sueno
+"consejos para dormir",sueno
+"no descanso bien en la noche",sueno
+"me acuesto muy tarde",sueno
+"dormir ayuda a rendir?",sueno
+"qué tal ha sido mi descanso nocturno",sueno
+"me levanto cansado aunque duermo",sueno
+"no he dormido bien esta semana",sueno
+"es malo dormir 5 horas",sueno
+"me desvelé",sueno
+"trasnoché",sueno
+"no consigo conciliar el sueño",sueno
+"cuánto debería dormir antes de un partido",sueno
+"siesta antes de entrenar sirve?",sueno
+"duermo mal por los nervios",sueno
+"tengo sueño todo el día",sueno
+"anoche casi no dormi",sueno
+"mi calidad de sueño",sueno
+"cómo mejoro mi sueño",sueno
+"me despierto a las 3 am",sueno
+"el celular me quita el sueño",sueno
+"dormir mas me ayuda a recuperarme?",sueno
+"dormi pesimo",sueno
+"llevo días durmiendo mal",sueno
+"tengo agujetas",recuperacion
+"me duelen los músculos después de entrenar",recuperacion
+"cómo me recupero más rápido",recuperacion
+"estoy adolorido del entreno de ayer",recuperacion
+"qué hago para recuperarme",recuperacion
+"cómo va mi recuperación",recuperacion
+"tengo dolor muscular",recuperacion
+"me duelen las piernas del partido",recuperacion
+"estiramientos para recuperarme",recuperacion
+"sirve el foam roller",recuperacion
+"baño de hielo para recuperar",recuperacion
+"recuperación después del partido",recuperacion
+"qué hago el día después del partido",recuperacion
+"cuánto tarda la recuperación",recuperacion
+"me siento entumecido",recuperacion
+"tengo las piernas cargadas del gimnasio",recuperacion
+"descanso activo qué hago",recuperacion
+"cómo recupero las piernas",recuperacion
+"me duele todo del entreno",recuperacion
+"recuperarme entre sesiones",recuperacion
+"masaje para recuperar",recuperacion
+"todavía no me recupero",recuperacion
+"estoy recuperado?",recuperacion
+"qué comer para recuperarme",recuperacion
+"tengo los músculos tensos",recuperacion
+"movilidad para recuperarme",recuperacion
+"me duelen los gemelos después de correr",recuperacion
+"dolor de piernas al día siguiente",recuperacion
+"cómo acelerar la recuperación muscular",recuperacion
+"estoy entumido desde ayer",recuperacion
+"agujetas en los cuadriceps",recuperacion
+"día de recuperación activa",recuperacion
+"me lesioné",riesgo
+"creo que tengo una lesión",riesgo
+"me duele mucho la rodilla",riesgo
+"tengo riesgo de lesionarme?",riesgo
+"me torcí el tobillo",riesgo
+"siento un pinchazo en el isquiotibial",riesgo
+"me duele el hombro al lanzar",riesgo
+"dolor fuerte en la espalda",riesgo
+"me dio un tirón",riesgo
+"cómo evito lesionarme",riesgo
+"estoy en riesgo de lesión",riesgo
+"me duele el tendón de aquiles",riesgo
+"me sonó la rodilla y duele",riesgo
+"tengo un esguince",riesgo
+"dolor en el pecho al entrenar",riesgo
+"me mareo cuando corro",riesgo
+"tengo una contractura",riesgo
+"me hice daño en el entreno",riesgo
+"dolor agudo en el muslo",riesgo
+"prevenir lesiones",riesgo
+"me duele la ingle",riesgo
+"me duele el codo",riesgo
+"siento dolor punzante en el pie",riesgo
+"me caí y me duele la muñeca",riesgo
+"tengo una molestia que no se va",riesgo
+"me desgarré",riesgo
+"me duele la espalda baja al hacer peso muerto",riesgo
+"me duele la cabeza después del golpe",riesgo
+"me falta el aire y me duele el pecho",riesgo
+"tengo hinchada la rodilla",riesgo
+"qué tan alto es mi riesgo de lesión",riesgo
+"estoy entrenando demasiado?",sobrecarga
+"entreno mucho?",sobrecarga
+"estoy sobreentrenado",sobrecarga
+"cómo está mi carga de entrenamiento",sobrecarga
+"mi carga está muy alta?",sobrecarga
+"subí mucho el volumen esta semana",sobrecarga
+"es mucho entrenar todos los días",sobrecarga
+"cuántos días debo descansar a la semana",sobrecarga
+"estoy haciendo demasiado ejercicio",sobrecarga
+"entreno dos veces al día, es mucho?",sobrecarga
+"sobreentrenamiento síntomas",sobrecarga
+"aumenté los kilómetros de golpe",sobrecarga
+"hago demasiadas sesiones",sobrecarga
+"cuánto entrenamiento es demasiado",sobrecarga
+"mi volumen de entreno está bien?",sobrecarga
+"estoy sobrecargado",sobrecarga
+"debería bajar la carga",sobrecarga
+"llevo muchas semanas sin descanso",sobrecarga
+"subo o bajo el volumen",sobrecarga
+"entrené 3 horas hoy, está bien?",sobrecarga
+"mi carga aguda es muy alta",sobrecarga
+"es normal entrenar 7 días seguidos",sobrecarga
+"tengo demasiada carga de partidos",sobrecarga
+"como dosifico el entrenamiento",sobrecarga
+"me estoy pasando con el entreno?",sobrecarga
+"ratio de carga",sobrecarga
+"necesito una semana de descarga?",sobrecarga
+"cuántas calorías comí hoy",calorias
+"cuántas calorías llevo",calorias
+"cuántas calorías necesito",calorias
+"cuántas kcal debo comer",calorias
+"cuánto debo comer al día",calorias
+"estoy comiendo suficientes calorías",calorias
+"calorías de hoy",calorias
+"mi meta de calorías",calorias
+"cuántas calorías quemo entrenando",calorias
+"estoy en déficit calórico?",calorias
+"cuánta energía necesito para entrenar",calorias
+"cuantas calorias para ganar masa",calorias
+"cuantas calorias para bajar de peso",calorias
+"cuántas calorías comí esta semana",calorias
+"me faltan calorías?",calorias
+"estoy comiendo de más",calorias
+"cuántas kilocalorías tiene mi plan",calorias
+"calorías día de partido",calorias
+"cuánto como el día de descanso",calorias
+"mi gasto calórico",calorias
+"cuántas calorías tiene mi almuerzo",calorias
+"necesito comer más?",calorias
+"estoy comiendo poco?",calorias
+"cuántas calorías llevo esta semana",calorias
+"superávit calórico",calorias
+"calculame las calorias",calorias
+"cómo va mi alimentación",nutricion
+"estoy comiendo bien?",nutricion
+"cuánta proteína necesito",nutricion
+"estoy comiendo suficiente proteína",nutricion
+"cuántos carbohidratos debo comer",nutricion
+"mi dieta está bien balanceada?",nutricion
+"qué me falta en la alimentación",nutricion
+"tomo suficiente agua?",nutricion
+"cuánta agua debo tomar",nutricion
+"necesito suplementos?",nutricion
+"la creatina sirve",nutricion
+"es bueno tomar proteína en polvo",nutricion
+"qué alimentos tienen hierro",nutricion
+"cómo me hidrato",nutricion
+"grasas buenas para deportistas",nutricion
+"mis macros están bien?",nutricion
+"qué son los macronutrientes",nutricion
+"como mucho azúcar",nutricion
+"es malo comer pan",nutricion
+"necesito vitamina b12 siendo vegano",nutricion
+"cuántas comidas al día debo hacer",nutricion
+"me salto el desayuno, es malo?",nutricion
+"electrolitos para entrenar",nutricion
+"cómo como más proteína siendo vegetariano",nutricion
+"qué tal mi nutrición esta semana",nutricion
+"estoy tomando poca agua",nutricion
+"bebidas energéticas son malas",nutricion
+"alimentos para tener más energía",nutricion
+"el café antes de entrenar",nutricion
+"qué como hoy",alimentacion_personalizada
+"dame un plan de comidas",alimentacion_personalizada
+"hazme una dieta",alimentacion_personalizada
+"qué desayuno",alimentacion_personalizada
+"qué almuerzo hoy",alimentacion_personalizada
+"qué ceno",alimentacion_personalizada
+"ideas de comida para hoy",alimentacion_personalizada
+"menú para la semana",alimentacion_personalizada
+"quiero un plan nutricional",alimentacion_personalizada
+"qué meriendo",alimentacion_personalizada
+"recetas saludables",alimentacion_personalizada
+"dieta para ganar músculo",alimentacion_personalizada
+"dieta para bajar de peso",alimentacion_personalizada
+"qué como antes de entrenar",alimentacion_personalizada
+"qué como después de entrenar",alimentacion_personalizada
+"comida vegana para deportistas",alimentacion_personalizada
+"plan de alimentación vegetariano",alimentacion_personalizada
+"no como huevo ni lácteos, qué como",alimentacion_personalizada
+"snack saludable",alimentacion_personalizada
+"qué puedo cenar ligero",alimentacion_personalizada
+"crea mi plan de comidas",alimentacion_personalizada
+"opciones de desayuno con proteína",alimentacion_personalizada
+"qué como si soy celíaco",alimentacion_personalizada
+"almuerzo rápido y sano",alimentacion_personalizada
+"dame comidas para esta semana",alimentacion_personalizada
+"que comer para definir",alimentacion_personalizada
+"merienda antes del gimnasio",alimentacion_personalizada
+"no sé qué cocinar",alimentacion_personalizada
+"tengo partido el sábado, cómo me preparo",partido
+"qué hago antes del partido",partido
+"qué como antes del partido",partido
+"cómo me preparo para la competencia",partido
+"mañana tengo partido",partido
+"el domingo juego",partido
+"tengo carrera el fin de semana",partido
+"día de partido qué desayuno",partido
+"nervios antes del partido",partido
+"calentamiento antes de jugar",partido
+"cómo llego bien al partido",partido
+"víspera del partido qué hago",partido
+"tengo torneo esta semana",partido
+"cómo me preparo para la maratón",partido
+"hoy es el partido",partido
+"qué comer el día de la competencia",partido
+"cuánto antes del partido como",partido
+"preparación para el combate",partido
+"tengo competencia de natación",partido
+"juego la final mañana",partido
+"rutina el día antes de competir",partido
+"cómo rindo mejor en el partido",partido
+"debo entrenar el día antes del partido",partido
+"partido importante el viernes",partido
+"tengo un juego de béisbol mañana",partido
+"me toca competir el domingo",partido
+"qué hago después del partido para recuperarme mañana",partido
+"dame una rutina",entrenamiento_personalizado
+"hazme una rutina de gimnasio",entrenamiento_personalizado
+"qué ejercicios hago hoy",entrenamiento_personalizado
+"rutina para ganar músculo",entrenamiento_personalizado
+"rutina para definir",entrenamiento_personalizado
+"ejercicios para piernas",entrenamiento_personalizado
+"ejercicios para ser más rápido",entrenamiento_personalizado
+"cómo mejoro mi salto",entrenamiento_personalizado
+"rutina de fuerza",entrenamiento_personalizado
+"ejercicios de core",entrenamiento_personalizado
+"quiero mejorar mi resistencia",entrenamiento_personalizado
+"plan de entrenamiento para esta semana",entrenamiento_personalizado
+"ejercicios para mi posición",entrenamiento_personalizado
+"rutina para portero",entrenamiento_personalizado
+"ejercicios para el hombro",entrenamiento_personalizado
+"cómo hago sentadillas",entrenamiento_personalizado
+"cuántas series y repeticiones",entrenamiento_personalizado
+"ejercicios en casa sin material",entrenamiento_personalizado
+"rutina de cardio",entrenamiento_personalizado
+"quiero ponerme en forma, por dónde empiezo",entrenamiento_personalizado
+"ejercicios para correr más rápido",entrenamiento_personalizado
+"rutina para nadar mejor",entrenamiento_personalizado
+"entrenamiento para boxeo",entrenamiento_personalizado
+"crea mi rutina",entrenamiento_personalizado
+"ejercicios de pliometría",entrenamiento_personalizado
+"qué entreno el lunes",entrenamiento_personalizado
+"ejercicios para glúteos",entrenamiento_personalizado
+"rutina de pecho y espalda",entrenamiento_personalizado
+"qué tengo que mejorar",mejorar
+"dame consejos",mejorar
+"en qué estoy fallando",mejorar
+"cómo puedo rendir más",mejorar
+"qué debería cambiar",mejorar
+"tips para mejorar",mejorar
+"cómo subo mi nivel",mejorar
+"qué hago para mejorar mi rendimiento",mejorar
+"mis puntos débiles",mejorar
+"qué me recomiendas",mejorar
+"consejos para esta semana",mejorar
+"cómo mejoro en general",mejorar
+"qué hábitos debería cambiar",mejorar
+"no avanzo, qué hago",mejorar
+"estoy estancado",mejorar
+"quiero ser mejor atleta",mejorar
+"recomendaciones para mí",mejorar
+"cómo saco más provecho al entreno",mejorar
+"qué estoy haciendo mal",mejorar
+"ayúdame a mejorar",mejorar
+"siento que no progreso",mejorar
+"qué priorizo",mejorar
+"dame un consejo para hoy",mejorar
+"cómo mejoro mis resultados",mejorar
+"qué puedo hacer mejor",mejorar
+"cómo voy esta semana",resumen
+"resumen de mi semana",resumen
+"cómo estoy",resumen
+"cómo voy",resumen
+"dame un resumen",resumen
+"cómo ha ido mi semana",resumen
+"mi progreso",resumen
+"cómo me ha ido",resumen
+"estado general",resumen
+"balance de la semana",resumen
+"qué tal voy con todo",resumen
+"resumen de mis datos",resumen
+"cómo están mis números",resumen
+"cómo he estado últimamente",resumen
+"cómo me ves",resumen
+"mi semana en resumen",resumen
+"qué tal voy",resumen
+"análisis de mi semana",resumen
+"cómo voy con el plan",resumen
+"evaluación de esta semana",resumen
+"cómo estuvo mi semana",resumen
+"quiero ver cómo voy",resumen
+"informe de mi semana",resumen
+"en general cómo estoy",resumen
+"tengo alertas?",alertas
+"qué alertas tengo",alertas
+"mis avisos",alertas
+"hay algo pendiente",alertas
+"tengo notificaciones",alertas
+"me llegó una alerta",alertas
+"qué significa la alerta",alertas
+"alertas sin leer",alertas
+"por qué me salió una alerta",alertas
+"tengo algún aviso del médico",alertas
+"revisa mis alertas",alertas
+"hay advertencias para mí",alertas
+"qué avisos tengo pendientes",alertas
+"me apareció un aviso de carga",alertas
+"tengo mensajes de alerta",alertas
+"algo urgente?",alertas
+"alertas de salud",alertas
+"mis notificaciones pendientes",alertas
+"qué me avisaron",alertas
+"hay alguna alerta nueva",alertas
+"qué día es hoy",fuera_tema
+"cuéntame un chiste",fuera_tema
+"cómo va a estar el clima",fuera_tema
+"quién ganó el partido de anoche",fuera_tema
+"hazme la tarea de matemáticas",fuera_tema
+"cuál es la capital de francia",fuera_tema
+"recomiéndame una película",fuera_tema
+"qué música me recomiendas",fuera_tema
+"cómo se hace una página web",fuera_tema
+"cuánto cuesta el dólar",fuera_tema
+"quién eres",fuera_tema
+"eres una persona",fuera_tema
+"me puedes prestar plata",fuera_tema
+"cuál es tu color favorito",fuera_tema
+"escribe un poema",fuera_tema
+"cómo arreglo mi celular",fuera_tema
+"qué hora es",fuera_tema
+"traduce esto al inglés",fuera_tema
+"tengo un examen mañana",fuera_tema
+"me gusta una chica",fuera_tema
+"dónde queda el estadio",fuera_tema
+"cuándo es el mundial",fuera_tema
+"qué opinas de política",fuera_tema
+"cómo cocino arroz con leche",fuera_tema
+"recomiéndame una serie",fuera_tema
+"cuál es el mejor equipo del mundo",fuera_tema
+"cómo se juega ajedrez",fuera_tema
+"me aburro",fuera_tema
+"hola, ¿cómo vas?",saludo
+"buenas vita, ¿todo bien?",saludo
+"hola, buen día",saludo
+"qué más, todo bien?",saludo
+"hola!! ¿estás?",saludo
+"buenas, aquí de nuevo",saludo
+"hola, regresé",saludo
+"hola coach",saludo
+"hey hola",saludo
+"buenas tardes vita",saludo
+"hola, ¿qué tal tu día?",saludo
+"saludos cordiales",saludo
+"buenos días a todos",saludo
+"hola, qué más pues",saludo
+"ey vita",saludo
+"hola cómo amaneciste",saludo
+"buenas, ¿puedo preguntarte algo?",saludo
+"hola, tengo una duda",saludo
+"gracias por responder",gracias
+"bueno, gracias vita",gracias
+"muchas gracias, eres la mejor",gracias
+"gracias de verdad",gracias
+"todo claro, gracias",gracias
+"perfecto, hasta luego",gracias
+"chao vita",gracias
+"me despido",gracias
+"gracias, buenas noches",gracias
+"listo, gracias por el consejo",gracias
+"ok perfecto",gracias
+"vale, entendido",gracias
+"muy amable",gracias
+"gracias totales",gracias
+"genial, nos hablamos",gracias
+"de acuerdo, gracias",gracias
+"hoy me conviene descansar?",entrenar_hoy
+"puedo entrenar con este cansancio?",entrenar_hoy
+"hoy hago pesas o descanso",entrenar_hoy
+"estoy en condiciones de entrenar",entrenar_hoy
+"me dejas entrenar hoy",entrenar_hoy
+"qué tan duro le doy hoy",entrenar_hoy
+"hoy voy a entrenar, qué intensidad uso",entrenar_hoy
+"según mis datos puedo entrenar",entrenar_hoy
+"estoy para entrenar fuerte",entrenar_hoy
+"es seguro entrenar hoy",entrenar_hoy
+"hoy salgo a la cancha?",entrenar_hoy
+"hago la sesión de hoy o la cambio",entrenar_hoy
+"mi cuerpo está listo para entrenar?",entrenar_hoy
+"recomiendas entrenar suave hoy",entrenar_hoy
+"puedo hacer cardio hoy",entrenar_hoy
+"me toca entrenar o recuperar",entrenar_hoy
+"cómo me noto hoy para entrenar",entrenar_hoy
+"debo saltarme el entreno de hoy",entrenar_hoy
+"me falta energía para todo",fatiga
+"ando agotado de la semana",fatiga
+"me siento sin ganas de nada",fatiga
+"mi fatiga sigue alta",fatiga
+"estoy hecho polvo",fatiga
+"me pesan las piernas",fatiga
+"estoy muy cansado últimamente",fatiga
+"siento fatiga general",fatiga
+"me agoto en el calentamiento",fatiga
+"estoy reventada",fatiga
+"no aguanto el entreno, me canso",fatiga
+"cansancio que no se me quita",fatiga
+"me siento lento y cansado",fatiga
+"tengo poca energía",fatiga
+"estoy fatigado",fatiga
+"me siento desgastado",fatiga
+"cómo bajo mi fatiga",fatiga
+"me acuesto a la 1 de la mañana",sueno
+"me cuesta dormir antes de los partidos",sueno
+"cuántas horas he dormido",sueno
+"tengo pesadillas y no descanso",sueno
+"duermo 6 horas, es suficiente?",sueno
+"me quedo pegado al celular de noche",sueno
+"rutina para dormir mejor",sueno
+"es malo trasnochar antes de entrenar",sueno
+"me despierto muy temprano y no vuelvo a dormir",sueno
+"la cafeína me quita el sueño",sueno
+"cómo afecta el sueño al rendimiento",sueno
+"dormir poco me cansa?",sueno
+"sueño ligero",sueno
+"no duermo nada",sueno
+"me dormí tardísimo",sueno
+"la siesta es buena",sueno
+"cómo me recupero después de un partido",recuperacion
+"qué hago con las agujetas",recuperacion
+"duelen los músculos, es normal?",recuperacion
+"crioterapia o calor para recuperar",recuperacion
+"cuánto descanso entre entrenamientos",recuperacion
+"tengo los isquiotibiales cargados del entreno",recuperacion
+"me siento rígido después de entrenar",recuperacion
+"recuperación muscular rápida",recuperacion
+"qué estirar después del partido",recuperacion
+"dolor leve en las piernas del gimnasio",recuperacion
+"me recupero lento",recuperacion
+"compresión para recuperar sirve?",recuperacion
+"tengo los brazos adoloridos de la rutina",recuperacion
+"mi recuperación es buena?",recuperacion
+"proteína para recuperar el músculo",recuperacion
+"me duele un poco la espalda del gimnasio pero no es lesión",recuperacion
+"siento un dolor raro en la rodilla",riesgo
+"me duele la planta del pie al correr",riesgo
+"crujió algo en el hombro",riesgo
+"tengo un golpe en la pierna",riesgo
+"me lastimé jugando",riesgo
+"me duele la pantorrilla, creo que es un desgarro",riesgo
+"tengo tendinitis",riesgo
+"dolor en la cadera al correr",riesgo
+"me duele el pecho",riesgo
+"me desmayé entrenando",riesgo
+"tengo un moretón grande y duele",riesgo
+"me duele el tobillo desde el partido",riesgo
+"tengo calambres muy fuertes",riesgo
+"lesión en el isquio",riesgo
+"cómo prevengo una lesión de rodilla",riesgo
+"me duele la espinilla al correr",riesgo
+"siento que me voy a lesionar",riesgo
+"me pegaron una patada y no puedo apoyar",riesgo
+"he entrenado mucho estos días",sobrecarga
+"carga de esta semana",sobrecarga
+"hago muchas sesiones seguidas",sobrecarga
+"mi entrenamiento es excesivo?",sobrecarga
+"subí la intensidad de golpe",sobrecarga
+"demasiados partidos seguidos",sobrecarga
+"cuánto debo entrenar por semana",sobrecarga
+"estoy acumulando mucha carga",sobrecarga
+"no he descansado ningún día",sobrecarga
+"es mucho volumen para mí",sobrecarga
+"debo bajar el ritmo de entrenamiento",sobrecarga
+"llevo 10 días sin parar",sobrecarga
+"cómo está mi carga respecto a la semana normal",sobrecarga
+"mi carga de entrenamiento subió?",sobrecarga
+"hago mucho deporte?",sobrecarga
+"esta semana entrené el doble",sobrecarga
+"kcal que llevo hoy",calorias
+"cuánta energía comí",calorias
+"total de calorías de la semana",calorias
+"cuántas calorías tiene lo que comí",calorias
+"cuántas calorías debo comer para definir",calorias
+"cuántas calorías gasto al día",calorias
+"estoy comiendo muy pocas calorías",calorias
+"necesito más calorías para el partido?",calorias
+"objetivo calórico del día",calorias
+"llevo mis calorías bien?",calorias
+"calorías que me faltan hoy",calorias
+"cuántas calorías gasto entrenando fútbol",calorias
+"cuánto comer para subir de peso",calorias
+"mi metabolismo basal",calorias
+"cuántas calorías quemé hoy",calorias
+"me paso de calorías",calorias
+"qué tal mi alimentación esta semana",nutricion
+"tomo suficientes carbohidratos?",nutricion
+"cuántos gramos de proteína al día",nutricion
+"me falta hierro?",nutricion
+"qué tomar para hidratarme",nutricion
+"el alcohol afecta el rendimiento",nutricion
+"comer frutas antes de entrenar es bueno",nutricion
+"es malo comer de noche",nutricion
+"qué vitaminas necesito",nutricion
+"la comida chatarra me afecta",nutricion
+"mis comidas son saludables?",nutricion
+"cómo leo mis macros",nutricion
+"omega 3 para deportistas",nutricion
+"bebo poca agua al día",nutricion
+"necesito más fibra",nutricion
+"azúcar y rendimiento",nutricion
+"cuánto sodio pierdo sudando",nutricion
+"cafeína antes del partido",nutricion
+"recomiéndame un desayuno",alimentacion_personalizada
+"qué como en la cena hoy",alimentacion_personalizada
+"comida para después del gimnasio",alimentacion_personalizada
+"dame ideas de almuerzo",alimentacion_personalizada
+"soy vegano, qué como",alimentacion_personalizada
+"menú sin gluten",alimentacion_personalizada
+"comidas sin lactosa",alimentacion_personalizada
+"plan de comidas para ganar peso",alimentacion_personalizada
+"qué comer para tener más proteína",alimentacion_personalizada
+"desayuno rápido para el colegio",alimentacion_personalizada
+"cena alta en proteína",alimentacion_personalizada
+"lista de mercado saludable",alimentacion_personalizada
+"comida para llevar a la universidad",alimentacion_personalizada
+"no puedo comer huevo, qué desayuno",alimentacion_personalizada
+"qué meriendas son buenas",alimentacion_personalizada
+"plan de comidas vegetariano para la semana",alimentacion_personalizada
+"qué como hoy si entreno por la tarde",alimentacion_personalizada
+"juego el sábado, cómo organizo la semana",partido
+"qué hago la noche antes del partido",partido
+"antes de competir qué como",partido
+"tengo final del torneo",partido
+"cómo me preparo para la carrera de 10k",partido
+"qué desayuno el día del partido",partido
+"el partido es a las 3, a qué hora almuerzo",partido
+"cómo controlo los nervios antes de competir",partido
+"tengo pelea el viernes",partido
+"cómo me hidrato el día del partido",partido
+"qué hago en el entretiempo",partido
+"preparación para la competencia de atletismo",partido
+"cómo me caliento antes del juego",partido
+"qué llevo de comida al partido",partido
+"semana de competencia",partido
+"partido de visitante mañana",partido
+"ejercicios para mejorar la velocidad",entrenamiento_personalizado
+"rutina para aumentar fuerza en piernas",entrenamiento_personalizado
+"cómo entreno el core",entrenamiento_personalizado
+"ejercicios para abdomen",entrenamiento_personalizado
+"rutina de 30 minutos",entrenamiento_personalizado
+"ejercicios para delantero",entrenamiento_personalizado
+"qué hago en el gimnasio hoy",entrenamiento_personalizado
+"rutina full body",entrenamiento_personalizado
+"ejercicios para prevenir lesiones de rodilla",entrenamiento_personalizado
+"entrenamiento de resistencia para fútbol",entrenamiento_personalizado
+"rutina para principiantes",entrenamiento_personalizado
+"ejercicios con mancuernas",entrenamiento_personalizado
+"cómo hago peso muerto bien",entrenamiento_personalizado
+"plan para correr mi primer 5k",entrenamiento_personalizado
+"ejercicios de agilidad",entrenamiento_personalizado
+"rutina de brazos",entrenamiento_personalizado
+"ejercicios de movilidad",entrenamiento_personalizado
+"qué aspecto debo trabajar más",mejorar
+"cómo soy más constante",mejorar
+"dame tres consejos",mejorar
+"qué cambio para rendir mejor",mejorar
+"cómo mejoro mi disciplina",mejorar
+"me cuesta progresar",mejorar
+"quiero dar un salto de nivel",mejorar
+"cómo optimizo mi semana",mejorar
+"qué me falta para mejorar",mejorar
+"recomiéndame qué cambiar",mejorar
+"qué consejo me das",mejorar
+"necesito mejorar, ayúdame",mejorar
+"cómo puedo ser mejor jugador",mejorar
+"mis debilidades",mejorar
+"qué debo corregir",mejorar
+"cómo me motivo",mejorar
+"cómo voy en general",resumen
+"resúmeme la semana",resumen
+"dame el resumen de hoy",resumen
+"cómo están mis datos",resumen
+"qué tal la semana",resumen
+"muéstrame mi situación",resumen
+"cómo me fue esta semana",resumen
+"panorama general",resumen
+"cómo estoy en todo",resumen
+"un resumen rápido",resumen
+"mi estado esta semana",resumen
+"repaso de la semana",resumen
+"cómo voy con mis registros",resumen
+"cómo vengo",resumen
+"datos de mi semana",resumen
+"cómo cerré la semana",resumen
+"cuántas alertas tengo",alertas
+"leer mis alertas",alertas
+"tengo avisos nuevos",alertas
+"alerta de fatiga",alertas
+"me salió un aviso rojo",alertas
+"qué dice la notificación",alertas
+"avisos del sistema",alertas
+"hay alertas de mi médico",alertas
+"tengo algo por revisar",alertas
+"por qué tengo una alerta de carga",alertas
+"notificaciones nuevas",alertas
+"qué aviso me mandaron",alertas
+"alertas recientes",alertas
+"tengo avisos sin leer",alertas
+"cuéntame algo divertido",fuera_tema
+"cuál es tu nombre real",fuera_tema
+"sabes programar",fuera_tema
+"qué piensas de la vida",fuera_tema
+"ayúdame con mi ensayo",fuera_tema
+"dónde compro zapatos baratos",fuera_tema
+"cuánto mide la torre eiffel",fuera_tema
+"juguemos a algo",fuera_tema
+"cuál es la mejor marca de carro",fuera_tema
+"cómo hago una tortilla de papa paso a paso",fuera_tema
+"quién inventó internet",fuera_tema
+"dime el horóscopo",fuera_tema
+"necesito un abogado",fuera_tema
+"me puedes llamar",fuera_tema
+"cómo saco la licencia de conducir",fuera_tema
+"qué juego de videojuegos me recomiendas",fuera_tema
+"cuál es la mejor universidad",fuera_tema
+"hablemos de otra cosa",fuera_tema

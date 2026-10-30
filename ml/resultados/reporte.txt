@@ -1,0 +1,46 @@
+Precisión: 0.8089
+F1 macro: 0.8070
+
+                             precision    recall  f1-score   support
+
+                    alertas       1.00      1.00      1.00         7
+ alimentacion_personalizada       0.50      0.56      0.53         9
+                   calorias       1.00      1.00      1.00         8
+entrenamiento_personalizado       0.64      0.78      0.70         9
+               entrenar_hoy       0.77      0.91      0.83        11
+                     fatiga       0.83      1.00      0.91        10
+                 fuera_tema       0.50      0.44      0.47         9
+                    gracias       1.00      0.90      0.95        10
+                    mejorar       0.80      0.50      0.62         8
+                  nutricion       0.50      0.56      0.53         9
+                    partido       1.00      0.89      0.94         9
+               recuperacion       0.82      0.90      0.86        10
+                    resumen       0.88      0.88      0.88         8
+                     riesgo       0.89      0.80      0.84        10
+                     saludo       1.00      0.82      0.90        11
+                 sobrecarga       0.88      0.78      0.82         9
+                      sueno       0.91      1.00      0.95        10
+
+                   accuracy                           0.81       157
+                  macro avg       0.82      0.81      0.81       157
+               weighted avg       0.82      0.81      0.81       157
+
+Matriz de confusión (filas: real, columnas: predicho)
+                                alertas alimentaci   calorias entrenamie entrenar_h     fatiga fuera_tema    gracias    mejorar  nutricion    partido recuperaci    resumen     riesgo     saludo sobrecarga      sueno
+alertas                               7          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0
+alimentacion_personalizada            0          5          0          1          0          0          1          0          0          2          0          0          0          0          0          0          0
+calorias                              0          0          8          0          0          0          0          0          0          0          0          0          0          0          0          0          0
+entrenamiento_personalizado           0          1          0          7          0          0          0          0          0          0          0          1          0          0          0          0          0
+entrenar_hoy                          0          0          0          0         10          0          0          0          0          0          0          1          0          0          0          0          0
+fatiga                                0          0          0          0          0         10          0          0          0          0          0          0          0          0          0          0          0
+fuera_tema                            0          1          0          1          1          0          4          0          0          1          0          0          0          0          0          0          1
+gracias                               0          0          0          0          1          0          0          9          0          0          0          0          0          0          0          0          0
+mejorar                               0          0          0          1          0          1          1          0          4          1          0          0          0          0          0          0          0
+nutricion                             0          2          0          0          1          0          0          0          0          5          0          0          1          0          0          0          0
+partido                               0          1          0          0          0          0          0          0          0          0          8          0          0          0          0          0          0
+recuperacion                          0          0          0          0          0          0          0          0          0          0          0          9          0          0          0          1          0
+resumen                               0          0          0          0          0          0          1          0          0          0          0          0          7          0          0          0          0
+riesgo                                0          0          0          0          0          1          1          0          0          0          0          0          0          8          0          0          0
+saludo                                0          0          0          0          0          0          0          0          1          0          0          0          0          1          9          0          0
+sobrecarga                            0          0          0          1          0          0          0          0          0          1          0          0          0          0          0          7          0
+sueno                                 0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0         10
