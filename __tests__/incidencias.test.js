@@ -1,4 +1,10 @@
 jest.mock('../base-de-datos/db');
+// Los equipos se prueban en equipos.test.js; aquí, sin equipos creados (cada profesional ve a todos)
+jest.mock('../servidor/api/equipos', () => ({
+  filtrarAtletas: async (usuario, lista) => lista,
+  nombresDeEquipos: async () => ({}),
+  accesoAtleta: () => (req, res, next) => next(),
+}));
 const { query } = require('../base-de-datos/db');
 const incSvc  = require('../servidor/api/incidencias/incidencias.service');
 const nutrSvc = require('../servidor/api/nutricionista/nutricionista.service');

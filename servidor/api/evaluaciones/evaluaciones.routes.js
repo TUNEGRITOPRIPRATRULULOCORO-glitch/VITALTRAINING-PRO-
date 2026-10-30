@@ -8,10 +8,11 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./evaluaciones.controller');
-const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
+const { accesoAtleta } = require('../equipos');
 
-const puedeVer      = requireOwnerOrRol('Medico', 'Nutricionista', 'Administrador');
-const puedeRegistrar = requireOwnerOrRol('Medico', 'Administrador');
+// Además del rol, el profesional tiene que compartir equipo con el atleta (módulo equipos)
+const puedeVer       = accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador');
+const puedeRegistrar = accesoAtleta('Medico', 'Médico', 'Administrador');
 
 router.get('/:userId',        puedeVer,       ctrl.getEvaluaciones);
 router.post('/:userId',       puedeRegistrar, ctrl.postEvaluacion);

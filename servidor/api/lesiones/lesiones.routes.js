@@ -13,13 +13,15 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./lesiones.controller');
-const { requireRol, requireOwnerOrRol } = require('../../compartido/middleware/roles');
+const { requireRol } = require('../../compartido/middleware/roles');
+const { accesoAtleta } = require('../equipos');
 
-const puedeVer = requireOwnerOrRol('Medico', 'Médico', 'Nutricionista', 'Administrador');
-const medico   = requireRol('Medico', 'Médico');
+const medico = requireRol('Medico', 'Médico');
 
 router.get('/catalogos',                 ctrl.getCatalogos);
-router.get('/:userId',                   puedeVer, ctrl.getExpediente);
+// Para cualquier ruta con :userId, el profesional tiene que compartir equipo con el atleta
+router.param('userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador'));
+router.get('/:userId',                   ctrl.getExpediente);
 router.post('/:userId',                  medico,   ctrl.postLesion);
 router.post('/:userId/notas',            medico,   ctrl.postNota);
 router.delete('/:userId/notas/:id',      medico,   ctrl.deleteNota);

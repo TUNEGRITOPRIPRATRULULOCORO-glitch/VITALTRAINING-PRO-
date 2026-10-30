@@ -1,5 +1,6 @@
 const { query } = require('../../../base-de-datos/db');
 const permisos = require('./mensajes.permisos');
+const equipos = require('../equipos');
 
 const MAX_TEXTO = 1000;
 
@@ -18,6 +19,8 @@ async function validarContacto(yo, otroId) {
   const otro = await buscarUsuario(otroId);
   if (!otro || otro.estado !== 'Activo') throw error('Usuario no encontrado.', 404);
   if (!permisos.puedeEscribir(yo.rol, otro.rol)) throw error('No puedes enviar mensajes a este usuario.', 403);
+  // Con equipos creados, atleta y profesional solo hablan si comparten equipo
+  if (!(await equipos.puedenHablar(yo, otro))) throw error('Esta persona no está en tu equipo.', 403);
   return otro;
 }
 
@@ -30,7 +33,7 @@ async function listarContactos(yo) {
   if (!roles.length) return [];
 
   const marcadores = roles.map((_, i) => `$${i + 2}`).join(', ');
-  const [{ rows: usuarios }, { rows: mensajes }] = await Promise.all([
+  const [{ rows: todos }, { rows: mensajes }] = await Promise.all([
     query(
       `SELECT id, nombre, rol FROM usuarios
        WHERE estado = 'Activo' AND id <> $1 AND rol IN (${marcadores})`,
@@ -44,6 +47,7 @@ async function listarContactos(yo) {
     )
   ]);
 
+  const usuarios = await equipos.filtrarContactos(yo, todos);
   const resumen = {};
   for (const m of mensajes) {
     const mio = Number(m.remitente_id) === Number(yo.id);

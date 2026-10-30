@@ -11,7 +11,7 @@ async function getResumen(req, res) {
 
 async function getEquipo(req, res) {
   try {
-    const atletas = await svc.obtenerEquipo();
+    const atletas = await svc.obtenerEquipo(req.user);
     res.json({ ok: true, atletas });
   } catch (err) {
     res.status(500).json({ error: 'Error calculando el rendimiento del equipo.' });

@@ -47,7 +47,7 @@ test('obtenerResumen de un atleta sin datos no falla', async () => {
 });
 
 test('obtenerEquipo devuelve solo atletas activos, cada uno con sus propios datos', async () => {
-  const equipo = await svc.obtenerEquipo();
+  const equipo = await svc.obtenerEquipo({ id: 1, rol: 'Administrador' });
   const nombres = equipo.map(a => a.nombre);
   expect(nombres).toEqual(expect.arrayContaining(['Carlos Ruiz', 'Diego Torres']));
   expect(nombres).not.toContain('Admin Sistema');

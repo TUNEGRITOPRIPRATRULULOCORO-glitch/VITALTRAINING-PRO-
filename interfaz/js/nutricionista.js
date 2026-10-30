@@ -176,6 +176,7 @@ function ntCardFutbolista(f) {
             <div class="paciente-info">
                 <div class="paciente-nombre">${escapeHtml(f.nombre)}</div>
                 <div class="paciente-pos">${ntResumenFicha(f.ficha)}</div>
+                ${f.equipos?.length ? `<div>${eqChips(f.equipos)}</div>` : ''}
                 ${f.rendimiento?.estadoMedico && f.rendimiento.estadoMedico.estado !== 'apto' ? `<div style="margin-top:4px">${lsBadgeEstado(f.rendimiento.estadoMedico)}</div>` : ''}
             </div>
         </div>

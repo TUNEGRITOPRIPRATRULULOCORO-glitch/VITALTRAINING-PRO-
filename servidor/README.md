@@ -24,6 +24,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `rendimiento` | — (solo lectura) | — |
 | `mensajes` | `mensajes` | — |
 | `evaluaciones` | `evaluaciones` | — |
+| `equipos` | `equipos`, `equipo_miembros` | `accesoAtleta` (middleware), `filtrarAtletas`, `puedenHablar`... — ver abajo |
 | `lesiones` | `lesiones`, `notas_clinicas` | `estadosDe`, `estadoDe` (apto / en recuperación / baja médica) |
 | `avisos` | — (decide qué correo mandar y a quién) | `bienvenida`, `restablecerPassword`, `alertaSalud`, `alertaCarga` |
 
@@ -32,6 +33,12 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 1. **Cada tabla tiene un dueño.** Solo el módulo dueño hace `INSERT`, `UPDATE` o `DELETE` en ella. Los demás pueden leerla con `SELECT`/`JOIN`, pero si necesitan escribir, llaman a una función del dueño.
 2. **Cada módulo tiene un `index.js` público.** Desde otro módulo solo se importa `require('../<modulo>')`, nunca un archivo interno como `require('../panel/historial.service')`.
 3. **Lo común va en `compartido/`.** Si algo lo usan varios módulos y no pertenece a ninguno, va ahí.
+
+## Equipos: qué atletas ve cada profesional (módulo `equipos`)
+
+- **Sin ningún equipo creado**, la app es un club único: cada nutricionista y médico ve a todos los atletas.
+- **Con equipos**, un nutricionista o médico solo ve, abre y escribe a los atletas de sus equipos. Las rutas `/:userId` de un atleta usan el middleware `accesoAtleta`, y las listas pasan por `filtrarAtletas`. Los correos de alerta van solo a los médicos del atleta.
+- El administrador ve siempre a todos. Crea los equipos y añade a los profesionales; los atletas se unen con el código del equipo (un atleta está en un solo equipo).
 
 ## Quién puede hablar con quién (módulo `mensajes`)
 

@@ -7,9 +7,9 @@
 const router    = require('express').Router();
 const rateLimit = require('express-rate-limit');
 const ctrl      = require('./ia.controller');
-const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
+const { accesoAtleta } = require('../equipos');
 
-router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
+router.param('userId', accesoAtleta('Administrador', 'Nutricionista'));
 router.get('/:userId/consulta', ctrl.getConsulta);
 
 // Cada mensaje con Claude cuesta dinero: límite por persona (no por IP)

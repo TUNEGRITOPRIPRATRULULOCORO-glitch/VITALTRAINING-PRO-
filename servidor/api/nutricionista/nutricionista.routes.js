@@ -4,6 +4,9 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./nutricionista.controller');
+const { accesoAtleta } = require('../equipos');
+
+router.param('userId', accesoAtleta('Nutricionista', 'Administrador'));
 
 router.get('/futbolistas',                     ctrl.getFutbolistas);
 router.get('/futbolistas/:userId',             ctrl.getDetalle);

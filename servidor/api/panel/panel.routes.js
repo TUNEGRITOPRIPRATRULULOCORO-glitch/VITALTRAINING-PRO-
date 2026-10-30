@@ -10,9 +10,9 @@ const router   = require('express').Router();
 const perfil   = require('./perfil.controller');
 const dash     = require('./dashboard.controller');
 const historial = require('./historial.controller');
-const { requireOwnerOrRol } = require('../../compartido/middleware/roles');
+const { accesoAtleta } = require('../equipos');
 
-router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
+router.param('userId', accesoAtleta('Administrador', 'Nutricionista'));
 
 router.get('/:userId/perfil',            perfil.getPerfil);
 router.put('/:userId/perfil',            perfil.putPerfil);

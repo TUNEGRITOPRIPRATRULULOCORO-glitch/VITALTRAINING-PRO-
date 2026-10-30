@@ -1,6 +1,6 @@
 /* =============================================
    VitalTraining — admin.js
-   Panel del administrador: dashboard, usuarios, reportes y soporte.
+   Panel del administrador: dashboard, usuarios, equipos (equipos.js), reportes y soporte.
 ============================================= */
 /* global currentUser:writable, chartInstances:writable -- declaradas en comun.js; aquí se les asigna valor */
 
@@ -23,7 +23,7 @@ function showPanel(user) {
 // filtros: { rol, estado, prioridad } para abrir la vista ya filtrada (desde una tarjeta)
 async function renderView(view, filtros = {}) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', usuarios:'Usuarios', reportes:'Reportes', soporte:'Soporte' };
+    const titles = { dashboard:'Dashboard', usuarios:'Usuarios', equipos:'Equipos', reportes:'Reportes', soporte:'Soporte' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#app .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
@@ -31,6 +31,7 @@ async function renderView(view, filtros = {}) {
     Object.values(chartInstances).forEach(c=>c.destroy()); chartInstances={};
     if(view==='dashboard')     { await renderDashboardAdmin(); startPolling(renderDashboardAdmin, 30); }
     else if(view==='usuarios') await renderUsuarios(filtros);
+    else if(view==='equipos')  await renderEquipos();
     else if(view==='reportes') { await renderReportes(); startPolling(renderReportes, 30); }
     else if(view==='soporte')  await renderSoporte(filtros);
 }
@@ -49,9 +50,10 @@ function statLink(icono, color, valor, etiqueta, accion, activa = false) {
 
 // — DASHBOARD ADMIN —
 async function renderDashboardAdmin() {
-    const [stats, inc] = await Promise.all([
+    const [stats, inc, avisoEquipos] = await Promise.all([
         apiFetch(`${API}/reportes`).then(r=>r.json()).catch(()=>null),
-        apiFetch(`${API}/incidencias`).then(r=>r.json()).catch(()=>[])
+        apiFetch(`${API}/incidencias`).then(r=>r.json()).catch(()=>[]),
+        eqAvisoDashboard().catch(()=>'')
     ]);
     const main = document.getElementById('content');
     if (!stats) { main.innerHTML=showError('No se pudo cargar el dashboard.','renderView(\'dashboard\')'); return; }
@@ -68,6 +70,7 @@ async function renderDashboardAdmin() {
             <div id="live-indicator" style="font-size:11px;opacity:0.6;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;background:#4ade80;border-radius:50%;display:inline-block;animation:pulse 2s infinite"></span>En vivo · actualiza cada 30s</div>
         </div>
         </div>
+        ${avisoEquipos}
         <div class="stats-grid" style="margin-bottom:24px">
             ${statLink('👥','green',stats.activos,'Usuarios activos',"renderView('usuarios',{estado:'Activo'})")}
             ${statLink('🎫','red',abiertas,'Tickets abiertos',"renderView('soporte',{estado:'abierta'})")}

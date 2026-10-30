@@ -1,4 +1,10 @@
 jest.mock('../base-de-datos/db');
+// Los equipos se prueban en equipos.test.js; aquí, sin equipos creados (cada profesional ve a todos)
+jest.mock('../servidor/api/equipos', () => ({
+  filtrarAtletas: async (usuario, lista) => lista,
+  nombresDeEquipos: async () => ({}),
+  accesoAtleta: () => (req, res, next) => next(),
+}));
 const { query } = require('../base-de-datos/db');
 const svc = require('../servidor/api/perfilMedico/perfilMedico.service');
 
@@ -12,7 +18,7 @@ describe('listarAtletas', () => {
   test('devuelve atletas con el estado de su ficha médica', async () => {
     const atletas = [{ id: 5, nombre: 'Carlos', email: 'carlos@vital.com', completado: true }];
     query.mockResolvedValueOnce({ rows: atletas });
-    expect(await svc.listarAtletas()).toEqual(atletas);
+    expect(await svc.listarAtletas()).toEqual(atletas.map(a => ({ ...a, equipos: [] })));
     expect(query.mock.calls[0][0]).toContain('LEFT JOIN perfiles_medicos');
   });
 });

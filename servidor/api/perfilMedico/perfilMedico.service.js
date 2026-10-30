@@ -201,15 +201,19 @@ function generarPlanAlimenticio(perfilMedico, opciones = {}) {
 // ═══════════════════════════════════════════════════════════════
 // CRUD
 // ═══════════════════════════════════════════════════════════════
-async function listarAtletas() {
-  const { rows } = await query(
+/** Atletas activos que puede ver el médico (sus equipos), con el nombre del equipo. */
+async function listarAtletas(usuario) {
+  const equipos = require('../equipos');
+  const { rows: todos } = await query(
     `SELECT u.id, u.nombre, u.email, pm.completado
        FROM usuarios u
        LEFT JOIN perfiles_medicos pm ON pm.user_id = u.id
       WHERE u.rol IN ('Atleta', 'Futbolista') AND u.estado = 'Activo'
       ORDER BY u.nombre`
   );
-  return rows;
+  const rows = await equipos.filtrarAtletas(usuario, todos);
+  const nombres = await equipos.nombresDeEquipos(rows.map(r => Number(r.id)));
+  return rows.map(r => ({ ...r, equipos: nombres[String(r.id)] || [] }));
 }
 
 /** Ficha deportiva (deporte, posición, peso, altura...) para el expediente del médico. */

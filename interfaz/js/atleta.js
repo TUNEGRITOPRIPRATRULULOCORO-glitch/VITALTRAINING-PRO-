@@ -280,7 +280,12 @@ async function pfRenderPerfil() {
                 <div class="form-actions"><button class="btn btn-primary" onclick="pfGuardarPerfil()">Guardar cambios</button></div>
             </div>
         </div>
+        <div class="card" style="max-width:560px;margin-top:20px">
+            <div class="card-header"><h2>👥 Mi equipo</h2></div>
+            <div class="card-body" id="pf-equipo">${showLoading()}</div>
+        </div>
     </div>`;
+    enSegundoPlano(eqRenderAtleta('pf-equipo'));
 }
 
 function diasPartidoOpciones(actual) {

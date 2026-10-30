@@ -8,8 +8,16 @@
 const correo     = require('../../../servicios/correo');
 const plantillas = require('../../../servicios/correo/plantillas');
 const usuarios   = require('../usuarios');
+const equipos    = require('../equipos');
 
 const ROLES_MEDICOS = ['Medico', 'Médico'];
+
+/** Médicos que llevan a ese atleta (con equipos creados, solo los de su equipo). */
+async function medicosDe(atletaId) {
+  const medicos = await usuarios.contactosPorRol(ROLES_MEDICOS);
+  const conAcceso = await Promise.all(medicos.map(m => equipos.puedeVerAtleta({ id: m.id, rol: 'Medico' }, atletaId)));
+  return medicos.filter((_, i) => conAcceso[i]);
+}
 
 async function enviar(destinatario, plantilla) {
   if (!destinatario?.email) return;
@@ -39,7 +47,7 @@ async function alertaSalud(userId, problemas) {
     if (!problemas.length) return;
     const atleta = await usuarios.contacto(userId);
     if (!atleta) return;
-    const medicos = await usuarios.contactosPorRol(ROLES_MEDICOS);
+    const medicos = await medicosDe(userId);
     const plantilla = plantillas.alertaSalud({ atleta: atleta.nombre, problemas, url: correo.urlApp() });
     await Promise.all(medicos.map(m => enviar(m, plantilla)));
   } catch (err) {
@@ -53,7 +61,7 @@ async function alertaCarga(userId, carga) {
     const atleta = await usuarios.contacto(userId);
     if (!atleta) return;
     const url = correo.urlApp();
-    const medicos = await usuarios.contactosPorRol(ROLES_MEDICOS);
+    const medicos = await medicosDe(userId);
     await Promise.all([
       enviar(atleta, plantillas.alertaCarga({ nombre: atleta.nombre, cambioPorcentaje: carga.cambioPorcentaje, paraAtleta: true, url })),
       ...medicos.map(m => enviar(m, plantillas.alertaCarga({ nombre: atleta.nombre, cambioPorcentaje: carga.cambioPorcentaje, paraAtleta: false, url }))),

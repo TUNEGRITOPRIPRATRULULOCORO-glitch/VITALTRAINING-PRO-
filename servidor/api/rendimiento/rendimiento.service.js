@@ -85,13 +85,14 @@ async function obtenerResumen(userId) {
   return construirResumen(datos[String(userId)], hoy);
 }
 
-/** Vista de equipo para médico, nutricionista y admin: un resumen corto por atleta activo. */
-async function obtenerEquipo() {
-  const { rows: atletas } = await query(
+/** Vista de equipo para médico, nutricionista y admin: un resumen corto por atleta activo que puede ver. */
+async function obtenerEquipo(usuario) {
+  const { rows: todos } = await query(
     `SELECT id, nombre, email FROM usuarios
      WHERE rol IN ('Atleta', 'Futbolista') AND estado = 'Activo'
      ORDER BY nombre`
   );
+  const atletas = await require('../equipos').filtrarAtletas(usuario, todos);
   if (!atletas.length) return [];
 
   const hoy = hoyISO();

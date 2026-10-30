@@ -200,6 +200,22 @@ CREATE TABLE IF NOT EXISTS notas_clinicas (  -- notas del médico en el expedien
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS equipos (  -- equipos o grupos del club
+  id         BIGSERIAL PRIMARY KEY,
+  nombre     VARCHAR(100) NOT NULL,
+  deporte    VARCHAR(50),
+  codigo     VARCHAR(12) NOT NULL UNIQUE,  -- código de invitación para que el atleta se una
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS equipo_miembros (  -- atletas y profesionales de cada equipo
+  id         BIGSERIAL PRIMARY KEY,
+  equipo_id  BIGINT NOT NULL,
+  user_id    BIGINT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(equipo_id, user_id)
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -217,3 +233,5 @@ ALTER TABLE restablecimientos ADD CONSTRAINT restablecimientos_user_id_fkey FORE
 ALTER TABLE ia_mensajes ADD CONSTRAINT ia_mensajes_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE lesiones ADD CONSTRAINT lesiones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE notas_clinicas ADD CONSTRAINT notas_clinicas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_equipo_id_fkey FOREIGN KEY (equipo_id) REFERENCES equipos(id) ON DELETE CASCADE;
+ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

@@ -1,9 +1,11 @@
 const { query } = require('../../../base-de-datos/db');
 const panel = require('../panel');
+const equipos = require('../equipos');
 
 // Sin subconsultas correlacionadas: pg-mem (la base en memoria de desarrollo) no las soporta
-async function listarFutbolistas() {
-  const { rows: atletas } = await query(
+/** Atletas activos que puede ver el usuario (sus equipos), con su resumen. */
+async function listarFutbolistas(usuario) {
+  const { rows: todos } = await query(
     `SELECT u.id, u.nombre, u.email, u.rol, u.estado, u.deporte_principal, u.posicion AS reg_posicion,
             u.peso AS reg_peso, u.altura AS reg_altura, u.fecha_nacimiento, u.pie, u.frecuencia,
             p.posicion, p.edad, p.peso, p.altura
@@ -11,14 +13,16 @@ async function listarFutbolistas() {
      LEFT JOIN perfiles p ON p.user_id = u.id
      WHERE (u.rol = 'Atleta' OR u.rol = 'Futbolista') AND u.estado = 'Activo'`
   );
+  const atletas = await equipos.filtrarAtletas(usuario, todos);
   if (!atletas.length) return [];
 
   const ids = atletas.map(a => a.id);
   const enLista = ids.map((_, i) => `$${i + 1}`).join(', ');
-  const [salud, comidas, rutinas] = await Promise.all([
+  const [salud, comidas, rutinas, nombresEquipo] = await Promise.all([
     query(`SELECT * FROM salud WHERE user_id IN (${enLista}) ORDER BY fecha DESC, created_at DESC`, ids),
     query(`SELECT user_id, COUNT(*) AS total FROM comidas WHERE user_id IN (${enLista}) GROUP BY user_id`, ids),
-    query(`SELECT user_id, COUNT(*) AS total FROM rutinas WHERE user_id IN (${enLista}) GROUP BY user_id`, ids)
+    query(`SELECT user_id, COUNT(*) AS total FROM rutinas WHERE user_id IN (${enLista}) GROUP BY user_id`, ids),
+    equipos.nombresDeEquipos(ids)
   ]);
 
   const ultimaSalud = {};
@@ -35,7 +39,8 @@ async function listarFutbolistas() {
     ),
     ultimaSalud:  ultimaSalud[a.id] || null,
     totalComidas: totalComidas[a.id] || 0,
-    totalRutinas: totalRutinas[a.id] || 0
+    totalRutinas: totalRutinas[a.id] || 0,
+    equipos:      nombresEquipo[String(a.id)] || []
   }));
 }
 

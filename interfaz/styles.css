@@ -4988,3 +4988,30 @@ body.dark .rd-dia-lesion { background: rgba(139,92,246,0.18); border-color: rgba
     .ls-form-grid { grid-template-columns: 1fr; }
     .ls-estado .btn { margin-left: 0; width: 100%; }
 }
+
+/* ── Equipos ─────────────────────────────────────────────── */
+.eq-info { margin-bottom: 20px; padding: 14px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg-2); font-size: 13px; line-height: 1.6; }
+.eq-info-sub { margin-top: 4px; color: var(--text-muted); }
+.eq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.eq-card .card-header { gap: 8px; flex-wrap: wrap; }
+.eq-acciones { display: flex; gap: 6px; }
+.eq-body { display: flex; flex-direction: column; gap: 16px; }
+.eq-lab { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.eq-codigo { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 12px 14px; border: 1px dashed var(--primary); border-radius: 10px; background: var(--primary-dim); }
+.eq-codigo > div { flex: 1; min-width: 120px; }
+.eq-codigo .eq-lab { margin-bottom: 2px; }
+.eq-codigo-valor { font-family: ui-monospace, Consolas, monospace; font-size: 20px; letter-spacing: 3px; color: var(--primary); }
+.eq-personas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.eq-persona { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); font-size: 12px; font-weight: 600; }
+.eq-persona small { font-weight: 500; color: var(--text-muted); }
+.eq-persona button { border: none; background: none; color: var(--text-muted); cursor: pointer; padding: 0 4px; font-size: 11px; border-radius: 50%; }
+.eq-persona button:hover { color: var(--danger); background: var(--danger-dim); }
+.eq-mio .eq-persona { padding-right: 10px; }
+.eq-anadir { width: 100%; }
+.eq-chip { display: inline-block; white-space: nowrap; margin: 4px 4px 0 0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; background: var(--primary-dim); color: var(--primary); }
+.eq-mio { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.eq-unirse { display: flex; gap: 8px; }
+.eq-unirse input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: var(--font); font-size: 14px; letter-spacing: 1px; background: var(--bg-2); color: var(--text); }
+@media (max-width: 600px) {
+    .eq-grid { grid-template-columns: 1fr; }
+}

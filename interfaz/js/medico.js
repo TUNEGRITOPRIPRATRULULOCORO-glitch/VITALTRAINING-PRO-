@@ -82,7 +82,7 @@ async function medicoRenderAtletas() {
                         const rd = rendimiento[atleta.id];
                         return `
                         <tr class="fila-link" onclick="medicoVerPerfil(${Number(atleta.id)})" title="Ver expediente">
-                            <td><div class="user-name">${escapeHtml(atleta.nombre)}</div><div class="user-email">${escapeHtml(atleta.email)}</div></td>
+                            <td><div class="user-name">${escapeHtml(atleta.nombre)}</div><div class="user-email">${escapeHtml(atleta.email)}</div>${eqChips(atleta.equipos)}</td>
                             <td>${lsBadgeEstado(rd?.estadoMedico)}</td>
                             <td>${rd ? rdBadgeListo(rd.listo) : '—'}</td>
                             <td>${rd ? rdBadgeRiesgo(rd.carga) : '—'}</td>

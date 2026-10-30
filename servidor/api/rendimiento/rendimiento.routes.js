@@ -4,9 +4,10 @@
  */
 const router = require('express').Router();
 const ctrl   = require('./rendimiento.controller');
-const { requireRol, requireOwnerOrRol } = require('../../compartido/middleware/roles');
+const { requireRol } = require('../../compartido/middleware/roles');
+const { accesoAtleta } = require('../equipos');
 
-router.get('/equipo', requireRol('Medico', 'Nutricionista', 'Administrador'), ctrl.getEquipo);
-router.get('/:userId', requireOwnerOrRol('Medico', 'Nutricionista', 'Administrador'), ctrl.getResumen);
+router.get('/equipo', requireRol('Medico', 'Médico', 'Nutricionista', 'Administrador'), ctrl.getEquipo);
+router.get('/:userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador'), ctrl.getResumen);
 
 module.exports = router;

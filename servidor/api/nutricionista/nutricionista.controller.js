@@ -2,7 +2,7 @@ const svc = require('./nutricionista.service');
 
 async function getFutbolistas(req, res) {
   try {
-    res.json(await svc.listarFutbolistas());
+    res.json(await svc.listarFutbolistas(req.user));
   } catch (err) {
     res.status(500).json({ error: 'Error leyendo futbolistas.' });
   }
