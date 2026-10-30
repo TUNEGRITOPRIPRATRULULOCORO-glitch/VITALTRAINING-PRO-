@@ -8,6 +8,7 @@
  *
  * Sin sesión, con el secreto de la tarea programada (cabecera X-Cron-Secreto = CRON_SECRET):
  * POST   /api/notificaciones/recordatorios → Recordatorio diario a quien no registró su salud
+ *                                         (y los lunes, el aviso de tests de la semana)
  */
 const crypto = require('crypto');
 const express = require('express');
@@ -50,7 +51,12 @@ const cron = express.Router();
 cron.post('/recordatorios', async (req, res) => {
   if (!process.env.CRON_SECRET) return res.status(503).json({ error: 'Falta CRON_SECRET en el servidor.' });
   if (!secretoValido(req.get('X-Cron-Secreto'))) return res.status(401).json({ error: 'No autorizado.' });
-  try { res.json({ ok: true, ...(await svc.recordatorioDiario()) }); } catch (err) { fallo(res, err, 'Error enviando los recordatorios.'); }
+  try {
+    const diario = await svc.recordatorioDiario();
+    // Los lunes (la tarea corre a las 7:00 de Colombia = 12:00 UTC), también el aviso de tests de la semana
+    const tests = new Date().getUTCDay() === 1 ? await svc.recordatorioTests() : null;
+    res.json({ ok: true, ...diario, tests });
+  } catch (err) { fallo(res, err, 'Error enviando los recordatorios.'); }
 });
 
 module.exports = { router, cron };

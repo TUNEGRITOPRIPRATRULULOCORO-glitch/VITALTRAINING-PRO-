@@ -66,3 +66,21 @@ test('desactivar en un dispositivo', async () => {
   await svc.desuscribir(carlos, sus('carlos').endpoint);
   expect(await svc.enviar(carlos, { titulo: 'x' })).toBe(0);
 });
+
+test('aviso de tests de la semana: atletas sin equipo y entrenadores con atletas a los que les toca', async () => {
+  const equipos = require('../servidor/api/equipos/equipos.service');
+  const id = async e => Number((await query('SELECT id FROM usuarios WHERE email = $1', [e])).rows[0].id);
+  const entrenador = await id('entrenador@vital.com');
+  const e = await equipos.crear({ nombre: 'Tests semanales' });
+  await equipos.agregarMiembro(e.id, carlos);
+  await equipos.agregarMiembro(e.id, entrenador);
+  await svc.suscribir(carlos, { suscripcion: sus('carlos2') });
+  await svc.suscribir(entrenador, { suscripcion: sus('profe') });
+  await query("INSERT INTO evaluaciones (user_id, prueba, valor, fecha) VALUES ($1, 'cmj', 40, '2026-01-01')", [diego]); // hace mucho
+
+  const r = await svc.recordatorioTests();
+  expect(r).toEqual({ atletasAvisados: 1, entrenadoresAvisados: 1 });            // Diego (sin equipo) y el profe
+  expect(enviados.map(x => x.titulo).sort()).toEqual(['⏱ Semana de tests', '⏱ ¿Te sientes preparado?']);
+  expect(enviados.find(x => x.titulo === '⏱ Semana de tests').cuerpo).toMatch(/^A 1 atleta de tu equipo/);
+  expect(enviados.some(x => x.endpoint.endsWith('/carlos2'))).toBe(false);       // Carlos tiene equipo: lo avisa su profe
+});

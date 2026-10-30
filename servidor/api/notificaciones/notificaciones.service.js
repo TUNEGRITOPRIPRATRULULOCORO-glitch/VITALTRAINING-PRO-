@@ -10,7 +10,7 @@
  */
 const webpush = require('web-push');
 const { query } = require('../../../base-de-datos/db');
-const { hoyISO } = require('../../compartido/fechas');
+const { hoyISO, sumarDias, aFechaISO } = require('../../compartido/fechas');
 
 let _claves = null;
 let _enviador = (suscripcion, datos, opciones) => webpush.sendNotification(suscripcion, datos, opciones);
@@ -137,4 +137,49 @@ async function recordatorioDiario() {
   return { candidatos: rows.length, avisados };
 }
 
-module.exports = { clavePublica, suscribir, desuscribir, estado, enviar, avisoDeAlerta, recordatorioDiario, _usarEnviador };
+/**
+ * Los lunes, aviso de tests de la semana (así se repiten cada semana y se vuelve a la app):
+ * - a los atletas sin equipo cuyo último test fue hace 7 días o más (o que nunca hicieron uno);
+ * - a cada entrenador, con cuántos atletas de sus equipos ya tienen su semana de tests.
+ * (Los atletas con equipo no reciben este aviso: sus tests los registra el entrenador.)
+ */
+async function recordatorioTests() {
+  const desde = sumarDias(hoyISO(), -7);
+  const { rows: atletas } = await query(
+    `SELECT u.id, u.nombre, MAX(e.fecha) AS ultimo FROM usuarios u
+       LEFT JOIN evaluaciones e ON e.user_id = u.id
+      WHERE u.estado = 'Activo' AND u.rol IN ('Atleta', 'Futbolista')
+      GROUP BY u.id, u.nombre`
+  );
+  const tocaTest = new Set(atletas.filter(a => !a.ultimo || aFechaISO(a.ultimo) <= desde).map(a => Number(a.id)));
+  const { rows: miembros } = await query(
+    `SELECT m.equipo_id, m.user_id, u.rol FROM equipo_miembros m JOIN usuarios u ON u.id = m.user_id WHERE u.estado = 'Activo'`
+  );
+  const conEquipo = new Set(miembros.filter(m => ['Atleta', 'Futbolista'].includes(m.rol)).map(m => Number(m.user_id)));
+
+  let atletasAvisados = 0, entrenadoresAvisados = 0;
+  for (const a of atletas) {
+    if (!tocaTest.has(Number(a.id)) || conEquipo.has(Number(a.id))) continue;
+    if (await enviar(a.id, {
+      titulo: '⏱ ¿Te sientes preparado?',
+      cuerpo: 'Esta semana puedes repetir tus tests físicos y ver cuánto mejoraste. ¡Quizá subes de rango!',
+      url: '/', etiqueta: 'tests-semana',
+    })) atletasAvisados++;
+  }
+  // Entrenador → atletas de sus equipos a los que les toca
+  const porEntrenador = {};
+  for (const m of miembros.filter(x => x.rol === 'Entrenador')) {
+    const atletasDelEquipo = miembros.filter(x => x.equipo_id === m.equipo_id && tocaTest.has(Number(x.user_id)) && conEquipo.has(Number(x.user_id)));
+    for (const x of atletasDelEquipo) (porEntrenador[m.user_id] ||= new Set()).add(Number(x.user_id));
+  }
+  for (const [entrenador, ids] of Object.entries(porEntrenador)) {
+    if (await enviar(entrenador, {
+      titulo: '⏱ Semana de tests',
+      cuerpo: `A ${ids.size} ${ids.size === 1 ? 'atleta de tu equipo le toca' : 'atletas de tu equipo les toca'} repetir los tests físicos esta semana.`,
+      url: '/', etiqueta: 'tests-semana',
+    })) entrenadoresAvisados++;
+  }
+  return { atletasAvisados, entrenadoresAvisados };
+}
+
+module.exports = { clavePublica, suscribir, desuscribir, estado, enviar, avisoDeAlerta, recordatorioDiario, recordatorioTests, _usarEnviador };

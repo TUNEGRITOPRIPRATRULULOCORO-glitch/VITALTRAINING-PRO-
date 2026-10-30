@@ -116,7 +116,9 @@ const BATERIAS = {
   'Estar en forma': ['sentarse30', 'flexiones', 'plancha', 'caminata6'],
 };
 
-const DIAS_RECOMENDADOS = { min: 28, max: 42 }; // repetir cada 4-6 semanas
+// Se recomienda repetirlos cada semana (cuando el atleta o su entrenador lo vean preparado);
+// pasadas 3 semanas se avisa de que ya toca. Se pueden registrar en cualquier momento.
+const DIAS_RECOMENDADOS = { min: 7, max: 21 };
 
 function pruebasDe(deporte) {
   const claves = BATERIAS[deporte] || BATERIAS['Fútbol'];

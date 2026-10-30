@@ -27,9 +27,10 @@ function evValor(prueba, valor) {
 function evAvisoHTML(d, propio) {
     const quien = propio ? 'Tu' : 'Su';
     if (d.proxima === 'sin-datos') return `<div class="ev-aviso ev-aviso-info">📋 ${propio ? 'Aún no tienes' : 'Aún no tiene'} tests registrados. Haz la primera evaluación para tener una marca de referencia.</div>`;
-    if (d.proxima === 'atrasada') return `<div class="ev-aviso ev-aviso-alerta">⏰ ${quien} última evaluación fue hace <strong>${d.diasDesde} días</strong>. Toca repetir los tests (se recomiendan cada 4–6 semanas).</div>`;
-    if (d.proxima === 'toca') return `<div class="ev-aviso ev-aviso-info">🗓 Han pasado ${d.diasDesde} días desde la última evaluación: buen momento para repetir los tests.</div>`;
-    return `<div class="ev-aviso ev-aviso-ok">✅ Al día: próxima evaluación en unos ${Math.max(0, d.recomendacion.min - d.diasDesde)} días.</div>`;
+    if (d.proxima === 'atrasada') return `<div class="ev-aviso ev-aviso-alerta">⏰ ${quien} última evaluación fue hace <strong>${d.diasDesde} días</strong>. Toca repetir los tests: lo ideal es cada semana.</div>`;
+    if (d.proxima === 'toca') return `<div class="ev-aviso ev-aviso-info">🗓 Ya pasó una semana desde la última evaluación: si ${propio ? 'te sientes preparado' : 'está preparado'}, buen momento para repetir los tests y ver la mejora. Los de resistencia, mejor lejos del día de partido.</div>`;
+    const faltan = Math.max(0, d.recomendacion.min - d.diasDesde);
+    return `<div class="ev-aviso ev-aviso-ok">✅ Al día. Los tests se pueden repetir cada semana${faltan ? `: el próximo, en ${faltan} ${faltan === 1 ? 'día' : 'días'}` : ''} (o cuando ${propio ? 'te sientas preparado' : 'esté preparado'}).</div>`;
 }
 
 function evTarjetaHTML(p, { puedeRegistrar, userId }) {

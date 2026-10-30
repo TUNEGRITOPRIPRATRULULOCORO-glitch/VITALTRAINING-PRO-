@@ -172,6 +172,9 @@ Junta en una lista lo del día: registrar la salud, la sesión de la rutina y la
 ### Series, récords y sugerencia de carga
 El atleta apunta peso y repeticiones de cada serie viendo la sesión anterior. **Récord** = mejor máximo estimado con la fórmula de **Epley** (`peso × (1 + reps/30)`, fiable hasta ~12 repeticiones). **Sugerencia por doble progresión**: si completó las repeticiones objetivo en todas las series, sube 2,5 kg (1 kg con pesos pequeños); si no, mismo peso y una repetición más. Lesionado o con el cuerpo pidiendo descanso, no sube.
 
+### Tests físicos
+Cada deporte tiene su batería de pruebas (salto, sprints, agilidad, Yo-Yo, Cooper, natación…). **Se recomienda repetirlos cada semana**, cuando el atleta o su entrenador lo vean preparado (pasadas 3 semanas, la app avisa de que ya toca); se pueden registrar en cualquier momento.
+
 ### Rangos
 8 rangos (Bronce, Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Radiante); los 7 primeros con 3 divisiones. En **fuerza** se compara el máximo estimado con el **peso corporal**; en **tests físicos**, la mejor marca. Las referencias son distintas para hombres y mujeres y orientativas. Se guarda el rango más alto alcanzado: **nunca se baja**. Cada rango tiene su emblema (de una medalla de bronce a una corona radiante con alas) y cada división le añade adornos; la app muestra el % que falta para el siguiente, el "Camino a Radiante" y una celebración al subir. El médico y el nutricionista ven los rangos y récords del atleta.
 
@@ -192,7 +195,7 @@ El **entrenador** ve a los atletas de sus equipos, **registra sus tests físicos
 28 insignias en 5 grupos (primeros pasos, constancia, entrenamiento, progreso y resiliencia): rachas de 3 a 30 días, sesiones, comidas, series, récords, tests en meses distintos, marca verificada, rangos de Oro a Radiante, semana completa del plan y volver de una lesión. Muestran el progreso de las que faltan, se celebran al conseguirse y **un logro ganado no se pierde**.
 
 ### Notificaciones en el celular
-Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada. La app **las ofrece sola**: al terminar el perfil médico y unos segundos después de entrar, con un aviso "¿Te avisamos al celular?" (si se responde "Ahora no", no insiste en 14 días).
+Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. **Los lunes**, además, avisa de los **tests de la semana**: al atleta sin equipo cuyo último test fue hace 7 días o más ("¿Te sientes preparado?") y a cada entrenador con cuántos atletas de su equipo les toca. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada. La app **las ofrece sola**: al terminar el perfil médico y unos segundos después de entrar, con un aviso "¿Te avisamos al celular?" (si se responde "Ahora no", no insiste en 14 días).
 
 ### Mi cuenta
 Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un **PDF** para leerlos o imprimirlos (portada, ficha y una tabla por sección), o en JSON para llevarlos a otra app; nunca incluye contraseñas ni notas clínicas privadas y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
@@ -238,7 +241,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **452 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **453 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

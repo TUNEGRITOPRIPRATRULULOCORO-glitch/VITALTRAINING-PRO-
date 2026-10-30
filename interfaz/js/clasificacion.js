@@ -132,7 +132,7 @@ function clAnimo(d) {
         const falta = delante.puntos - yo.puntos + 1;
         return `🔥 Te faltan <strong>${falta} puntos</strong> para pasar a ${escapeHtml(delante.nombre)}: ${falta <= 10 ? 'con registrar tu salud mañana lo logras' : falta <= 30 ? 'una sesión completa y lo pasas' : 'sesión, salud y comidas al día, y lo alcanzas'}.`;
     }
-    return '💪 Cada récord te acerca al siguiente puesto: apunta tus series y repite el test cada 4-6 semanas.';
+    return '💪 Cada récord te acerca al siguiente puesto: apunta tus series y repite el test cada semana.';
 }
 
 async function clVisible(valor) {

@@ -71,9 +71,10 @@ describe('resumir', () => {
 
   test('avisa cuando toca repetir los tests', () => {
     expect(cat.resumir('Fútbol', [], HOY).proxima).toBe('sin-datos');
-    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-10-12')], HOY).proxima).toBe('al-dia');
-    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-09-20')], HOY).proxima).toBe('toca');
-    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-08-01')], HOY)).toMatchObject({ proxima: 'atrasada', diasDesde: 82 });
+    // Se recomienda cada semana; pasadas 3 semanas, ya toca
+    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-10-19')], HOY).proxima).toBe('al-dia');
+    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-10-12')], HOY).proxima).toBe('toca');
+    expect(cat.resumir('Fútbol', [r(1, 'cmj', 40, '2026-09-20')], HOY)).toMatchObject({ proxima: 'atrasada', diasDesde: 32 });
   });
 });
 
