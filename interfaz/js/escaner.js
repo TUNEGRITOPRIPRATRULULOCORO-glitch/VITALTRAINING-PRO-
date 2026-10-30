@@ -70,7 +70,7 @@ async function escanerIniciarCamara() {
                 } catch { /* fotograma sin imagen todavía */ }
                 setTimeout(buscar, 250);
             };
-            buscar();
+            void buscar();
         } else {
             escanerEstado('Preparando el lector…');
             await escanerCargarZXing();
@@ -106,7 +106,7 @@ function escanerLeido(codigo) {
     document.getElementById('esc-caja')?.remove();
     const campo = document.getElementById('esc-codigo');
     if (campo) campo.value = codigo;
-    escanerBuscar(codigo);
+    void escanerBuscar(codigo);
 }
 
 async function escanerBuscar(valor) {

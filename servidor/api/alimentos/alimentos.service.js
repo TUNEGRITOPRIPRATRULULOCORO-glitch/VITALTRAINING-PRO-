@@ -17,7 +17,9 @@ const PUEDEN_CORREGIR = ['Nutricionista', 'Administrador'];
 
 /** Consulta real a Open Food Facts (pide identificarse con un User-Agent propio). */
 async function consultarOpenFoodFacts(codigo) {
-  const r = await fetch(`${URL_OFF}${codigo}.json?fields=${CAMPOS}`, {
+  // Solo dígitos: el código va dentro de la dirección de Open Food Facts
+  if (!/^d{8,14}$/.test(String(codigo))) return null;
+  const r = await fetch(`${URL_OFF}${encodeURIComponent(codigo)}.json?fields=${CAMPOS}`, {
     headers: { 'User-Agent': `VitalTraining/1.0 (${process.env.APP_URL || 'https://vitaltraining-pro.onrender.com'})` },
     signal: AbortSignal.timeout(6000),
   });
