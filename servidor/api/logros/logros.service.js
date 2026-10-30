@@ -7,7 +7,7 @@ const contar = async (sql, id) => Number((await query(sql, [id])).rows[0]?.n || 
 /** Lo que se mide para los logros (todo sale de lo que el atleta ya registra). */
 async function datosDe(userId) {
   const id = Number(userId);
-  const [perfil, salud, sesiones, manuales, comidas, series, ejercicios, tests, verifTests, verifSeries, rango, altas, resumen] = await Promise.all([
+  const [perfil, salud, sesiones, manuales, comidas, series, ejercicios, tests, verifTests, verifSeries, rango, altas, reloj, resumen] = await Promise.all([
     query('SELECT completado FROM perfiles_medicos WHERE user_id = $1', [id]),
     query('SELECT fecha FROM salud WHERE user_id = $1', [id]),
     contar('SELECT COUNT(*) AS n FROM cumplimiento WHERE user_id = $1', id),
@@ -20,6 +20,7 @@ async function datosDe(userId) {
     contar('SELECT COUNT(*) AS n FROM series WHERE user_id = $1 AND verificado = true', id),
     query('SELECT MAX(paso) AS n FROM rangos WHERE user_id = $1', [id]),
     contar('SELECT COUNT(*) AS n FROM lesiones WHERE user_id = $1 AND fecha_alta IS NOT NULL', id),
+    contar('SELECT COUNT(*) AS n FROM sesiones_reloj WHERE user_id = $1', id),
     require('../rendimiento').obtenerResumen(id).catch(() => null),
   ]);
   const fechasSalud = salud.rows.map(r => aFechaISO(r.fecha));
@@ -37,6 +38,7 @@ async function datosDe(userId) {
     verificadas: verifTests + verifSeries,
     mejorRango: rango.rows[0]?.n == null ? 0 : Number(rango.rows[0].n),
     altas,
+    sesionesReloj: reloj,
     semanasCompletas: resumen ? cat.semanasCompletas(resumen.cumplimiento.dias, hoyISO()) : 0,
   };
 }

@@ -11,6 +11,7 @@ const LOGROS = [
   { clave: 'sesiones_1',      grupo: 'Primeros pasos', icono: '👟', nivel: 'bronce',   nombre: 'Primera sesión',    desc: 'Completa tu primera sesión del plan.',                      dato: 'sesiones',      meta: 1 },
   { clave: 'series_1',        grupo: 'Primeros pasos', icono: '📝', nivel: 'bronce',   nombre: 'Primera serie',     desc: 'Apunta tu primera serie en la rutina.',                     dato: 'series',        meta: 1 },
   { clave: 'tests_1',         grupo: 'Primeros pasos', icono: '⏱', nivel: 'bronce',   nombre: 'Punto de partida',  desc: 'Haz tu primer test físico.',                                dato: 'tests',         meta: 1 },
+  { clave: 'reloj_1',         grupo: 'Primeros pasos', icono: '⌚', nivel: 'bronce',   nombre: 'Conectado',         desc: 'Guarda tu primera sesión con el reloj o el pulsómetro.',    dato: 'sesionesReloj', meta: 1 },
   // Constancia
   { clave: 'racha_3',         grupo: 'Constancia',     icono: '🔥', nivel: 'bronce',   nombre: 'Encendido',         desc: '3 días seguidos registrando cómo amaneces.',                dato: 'rachaMax',      meta: 3 },
   { clave: 'racha_7',         grupo: 'Constancia',     icono: '🔥', nivel: 'plata',    nombre: 'Semana en llamas',  desc: '7 días seguidos registrando cómo amaneces.',                dato: 'rachaMax',      meta: 7 },
@@ -27,6 +28,7 @@ const LOGROS = [
   { clave: 'sesiones_100',    grupo: 'Entrenamiento',  icono: '🏆', nivel: 'diamante', nombre: 'Centenario',        desc: 'Completa 100 sesiones.',                                     dato: 'sesiones',      meta: 100 },
   { clave: 'series_100',      grupo: 'Entrenamiento',  icono: '🏋', nivel: 'plata',    nombre: 'Cien series',       desc: 'Apunta 100 series.',                                         dato: 'series',        meta: 100 },
   { clave: 'series_500',      grupo: 'Entrenamiento',  icono: '🏋', nivel: 'oro',      nombre: 'Máquina',           desc: 'Apunta 500 series.',                                         dato: 'series',        meta: 500 },
+  { clave: 'reloj_25',        grupo: 'Entrenamiento',  icono: '❤️', nivel: 'plata',    nombre: 'Corazón de atleta', desc: 'Guarda 25 sesiones con pulso.',                             dato: 'sesionesReloj', meta: 25 },
   // Progreso
   { clave: 'records_3',       grupo: 'Progreso',       icono: '🎯', nivel: 'plata',    nombre: 'Cazador de récords', desc: 'Ten récord en 3 ejercicios distintos.',                     dato: 'ejerciciosConRecord', meta: 3 },
   { clave: 'records_10',      grupo: 'Progreso',       icono: '🎯', nivel: 'oro',      nombre: 'Coleccionista',     desc: 'Ten récord en 10 ejercicios distintos.',                    dato: 'ejerciciosConRecord', meta: 10 },

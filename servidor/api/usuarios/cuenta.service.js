@@ -39,6 +39,7 @@ const EXPORTAR = [
   ['salud',                'SELECT fecha, fatiga, sueno, recuperacion, notas FROM salud WHERE user_id = $1 ORDER BY fecha'],
   ['comidas',              'SELECT fecha, hora, nombre, tipo, calorias, proteina, notas, registrado_por FROM comidas WHERE user_id = $1 ORDER BY fecha, id'],
   ['entrenamientos',       'SELECT fecha, nombre, tipo, duracion_minutos, intensidad, rpe, descripcion, registrado_por FROM rutinas WHERE user_id = $1 ORDER BY fecha, id'],
+  ['sesionesConReloj',     'SELECT inicio, origen, distancia_m, calorias, fc_media, fc_max, zonas, trimp FROM sesiones_reloj WHERE user_id = $1 ORDER BY inicio'],
   ['sesionesDelPlan',      'SELECT fecha, dia_semana, tipo, estado, rpe, duracion_minutos, notas FROM cumplimiento WHERE user_id = $1 ORDER BY fecha'],
   ['series',               'SELECT fecha, ejercicio, peso, repeticiones FROM series WHERE user_id = $1 ORDER BY fecha, id'],
   ['testsFisicos',         'SELECT fecha, prueba, valor, notas, registrado_por FROM evaluaciones WHERE user_id = $1 ORDER BY fecha, id'],

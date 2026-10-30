@@ -5399,3 +5399,46 @@ body.dark .vf-ok { color: #86efac; }
 .nf-aviso-icono { flex: none; width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; font-size: 22px; background: var(--primary-dim); }
 .nf-aviso-botones { display: flex; gap: 8px; margin-top: 2px; }
 .cu-json { display: block; margin-top: 8px; font-size: 12px; }
+
+/* ── Reloj y pulsómetro ─────────────────────────── */
+.reloj-intro { margin: 0 0 14px; color: var(--text-muted); font-size: 14px; }
+.reloj-acciones { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.reloj-acciones label.btn { cursor: pointer; }
+.reloj-acciones [hidden] { display: none !important; } /* .btn fija su display */
+.reloj-nota { color: var(--text-muted); font-size: 13px; margin: 10px 0; }
+.reloj-ayuda p { margin: 0 0 10px; font-size: 14px; }
+.reloj-subtitulo { font-size: 15px; margin: 18px 0 10px; }
+.reloj-subtitulo small { color: var(--text-muted); font-weight: 400; }
+.reloj-zonas { display: grid; gap: 8px; }
+.reloj-zona { display: grid; grid-template-columns: 120px 1fr 56px; gap: 10px; align-items: center; font-size: 13px; }
+.reloj-zona-barra { height: 10px; border-radius: 6px; background: var(--border); overflow: hidden; }
+.reloj-zona-barra span { display: block; height: 100%; border-radius: 6px; }
+.reloj-zona-min { text-align: right; font-family: var(--mono); color: var(--text-muted); }
+.reloj-grafica { position: relative; height: 220px; margin: 16px 0 4px; }
+.reloj-vivo { text-align: center; }
+.reloj-vivo-bpm { font-size: 72px; font-weight: 700; line-height: 1; font-family: var(--mono); transition: color .3s; }
+.reloj-vivo-lbl { color: var(--text-muted); margin: 6px 0 4px; }
+.reloj-vivo-tiempo { font-family: var(--mono); font-size: 22px; margin-bottom: 18px; }
+.reloj-vivo-campos { text-align: left; margin-bottom: 16px; }
+@media (max-width: 520px) {
+    .reloj-zona { grid-template-columns: 96px 1fr 48px; font-size: 12px; }
+    .reloj-vivo-bpm { font-size: 56px; }
+}
+
+/* ── Escáner de código de barras ────────────────── */
+.escaner-video { position: relative; border-radius: var(--radius); overflow: hidden; background: #000; aspect-ratio: 4 / 3; max-height: 50vh; margin: 0 auto; }
+.escaner-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.escaner-marco { position: absolute; left: 12%; right: 12%; top: 34%; bottom: 34%; border: 3px solid rgba(255,255,255,.9); border-radius: 10px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); pointer-events: none; }
+.escaner-manual { display: flex; gap: 8px; margin: 6px 0 14px; }
+.escaner-manual input { flex: 1; min-width: 0; }
+.escaner-form { display: grid; gap: 12px; margin-top: 12px; }
+.escaner-producto { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
+.escaner-producto-nombre { font-size: 17px; font-weight: 600; }
+.escaner-producto-nombre span { color: var(--text-muted); font-weight: 400; font-size: 14px; }
+.escaner-cantidad { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.escaner-cantidad label { width: 100%; font-size: 13px; color: var(--text-muted); }
+.escaner-cantidad.form-group { margin: 0; }
+.escaner-cantidad.form-group input { width: 120px; }
+.escaner-total { font-size: 15px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--primary-dim); color: var(--text); }
+.escaner-fuente { font-size: 12px; color: var(--text-muted); margin: 0; }
+.escaner-fuente a { color: var(--accent); }

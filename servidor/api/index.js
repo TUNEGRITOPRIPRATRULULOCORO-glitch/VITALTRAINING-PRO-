@@ -38,6 +38,8 @@ router.use('/rangos',        require('./rangos').router);
 router.use('/clasificacion', require('./clasificacion').router);
 router.use('/logros',        require('./logros').router);
 router.use('/notificaciones', require('./notificaciones').router);
+router.use('/alimentos',     require('./alimentos').router);
+router.use('/reloj',         require('./reloj').router);
 router.use('/cuenta',        require('./usuarios').cuentaRouter);
 router.use('/fotos',         require('./usuarios').fotosRouter);
 

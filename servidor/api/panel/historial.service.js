@@ -18,8 +18,11 @@ async function historialRutinas(userId, { page = 1, limit = 10 } = {}) {
   const [countR, dataR] = await Promise.all([
     query('SELECT COUNT(*) AS total FROM rutinas WHERE user_id = $1', [userId]),
     query(
-      `SELECT id, user_id AS "userId", nombre, tipo, duracion_minutos AS "duracionMinutos", intensidad, descripcion, fecha, registrado_por, created_at AS "createdAt"
-       FROM rutinas WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
+      // Las sesiones del reloj traen su pulso medio (relojId abre la gráfica)
+      `SELECT r.id, r.user_id AS "userId", r.nombre, r.tipo, r.duracion_minutos AS "duracionMinutos", r.intensidad, r.descripcion, r.fecha,
+              r.registrado_por, r.created_at AS "createdAt", s.id AS "relojId", s.fc_media AS "fcMedia", s.distancia_m AS "distanciaM"
+       FROM rutinas r LEFT JOIN sesiones_reloj s ON s.rutina_id = r.id
+       WHERE r.user_id = $1 ORDER BY r.created_at DESC LIMIT $2 OFFSET $3`,
       [userId, Number(limit), offset]
     )
   ]);

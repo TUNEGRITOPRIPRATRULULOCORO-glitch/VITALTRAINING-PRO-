@@ -267,6 +267,39 @@ CREATE TABLE IF NOT EXISTS push_claves (  -- claves VAPID que genera el servidor
   privada TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS alimentos_codigos (  -- productos leídos por código de barras (Open Food Facts o el propio club)
+  codigo            VARCHAR(14) PRIMARY KEY,
+  nombre            VARCHAR(160) NOT NULL,
+  marca             VARCHAR(120),
+  kcal_100          NUMERIC,             -- por 100 g (o 100 ml)
+  proteina_100      NUMERIC,
+  carbohidratos_100 NUMERIC,
+  grasa_100         NUMERIC,
+  porcion_g         NUMERIC,             -- porción que indica el empaque
+  fuente            VARCHAR(20) NOT NULL DEFAULT 'openfoodfacts',  -- 'openfoodfacts' o 'club' (lo escribió alguien del club)
+  creado_por        BIGINT,
+  actualizado       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS sesiones_reloj (  -- datos de pulso de una sesión (archivo del reloj o pulsómetro Bluetooth)
+  id           BIGSERIAL PRIMARY KEY,
+  user_id      BIGINT NOT NULL,
+  rutina_id    BIGINT NOT NULL,        -- la sesión en el registro de entrenamientos (de ahí sale la carga)
+  inicio       VARCHAR(30) NOT NULL,   -- hora de inicio ISO: evita importar dos veces la misma sesión
+  origen       VARCHAR(20) NOT NULL,   -- 'archivo' o 'bluetooth'
+  distancia_m  INTEGER,
+  calorias     INTEGER,
+  fc_media     INTEGER,
+  fc_max       INTEGER,
+  fc_max_usada INTEGER,                -- la FC máxima con la que se calcularon las zonas
+  zonas        JSONB,                  -- minutos en Z1..Z5
+  trimp        INTEGER,
+  intervalo_seg INTEGER,
+  pulsos       JSONB,                  -- curva de pulso reducida (para la gráfica)
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, inicio)
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -291,6 +324,8 @@ ALTER TABLE rangos ADD CONSTRAINT rangos_user_id_fkey FOREIGN KEY (user_id) REFE
 ALTER TABLE clasificacion_preferencias ADD CONSTRAINT clasificacion_preferencias_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE logros ADD CONSTRAINT logros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE push_suscripciones ADD CONSTRAINT push_suscripciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE sesiones_reloj ADD CONSTRAINT sesiones_reloj_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE sesiones_reloj ADD CONSTRAINT sesiones_reloj_rutina_id_fkey FOREIGN KEY (rutina_id) REFERENCES rutinas(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_comidas_usuario_fecha  -- índices: casi todo se consulta por atleta y fecha (salud, cumplimiento y rangos ya tienen el de su UNIQUE)
   ON comidas (user_id, fecha);

@@ -601,7 +601,7 @@ async function pfRenderHistorialComidas() {
         </div>
 
         <div class="card" style="margin-bottom:20px">
-            <div class="card-header"><h2>➕ Nueva comida</h2></div>
+            <div class="card-header"><h2>➕ Nueva comida</h2><button class="btn btn-ghost btn-sm" onclick="escanerAbrir()">📷 Escanear código de barras</button></div>
             <div style="padding:20px">
                 <div class="form-row" style="margin-bottom:14px">
                     <div class="form-group" style="margin:0">
@@ -661,6 +661,8 @@ async function pfRenderHistorialRutinas() {
             </div>
         </div>
 
+        ${relojTarjetaHTML(userId)}
+
         <div class="card" style="margin-bottom:20px">
             <div class="card-header"><h2>➕ Nueva sesión</h2></div>
             <div style="padding:20px">
@@ -697,11 +699,11 @@ async function pfRenderHistorialRutinas() {
             <div class="card-header"><h2>🏃 Sesiones de entrenamiento (${rutinas.total||0})</h2></div>
             <div style="padding:16px" id="lista-rutinas">
                 ${rutinas.datos?.length?rutinas.datos.map(r=>`
-                <div class="mini-item" id="rutina-${r.id}" onclick="verDetalleRutina(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="cursor:pointer">
-                    <div class="mini-item-icon green">🏃</div>
+                <div class="mini-item" id="rutina-${r.id}" onclick="${r.relojId?`verSesionReloj(${userId},${Number(r.relojId)})`:`verDetalleRutina(${JSON.stringify(r).replace(/"/g,'&quot;')})`}" style="cursor:pointer">
+                    <div class="mini-item-icon ${r.relojId?'red':'green'}">${r.relojId?'⌚':'🏃'}</div>
                     <div class="mini-item-body">
                         <div class="mini-item-title">${escapeHtml(r.nombre)}</div>
-                        <div class="mini-item-sub">${escapeHtml(r.tipo)}${r.duracionMinutos?` · ${escapeHtml(r.duracionMinutos)} min`:''}${r.intensidad?` · ${escapeHtml(r.intensidad)}`:''}${r.descripcion?` · ${escapeHtml(r.descripcion)}`:''} · ${formatFecha(r.fecha)}</div>
+                        <div class="mini-item-sub">${escapeHtml(r.tipo)}${r.duracionMinutos?` · ${escapeHtml(r.duracionMinutos)} min`:''}${r.fcMedia?` · ❤️ ${Number(r.fcMedia)} ppm`:''}${r.distanciaM?` · ${relojFormatoDistancia(Number(r.distanciaM))}`:''}${r.intensidad?` · ${escapeHtml(r.intensidad)}`:''}${r.descripcion&&!r.relojId?` · ${escapeHtml(r.descripcion)}`:''} · ${formatFecha(r.fecha)}</div>
                     </div>
                     <button class="btn btn-ghost btn-sm" data-tooltip="Eliminar sesión" onclick="event.stopPropagation();pfEliminarRutina(${userId},${r.id})">✕</button>
                 </div>`).join(''):showEmptyState('🏃','Sin sesiones registradas','Usa el formulario de arriba para registrar tu primer entrenamiento.')}

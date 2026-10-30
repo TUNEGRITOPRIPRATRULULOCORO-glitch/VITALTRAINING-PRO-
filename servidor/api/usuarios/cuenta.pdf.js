@@ -46,6 +46,10 @@ const TABLAS = [
   { clave: 'entrenamientos', titulo: 'Entrenamientos apuntados', columnas: [
     ['Fecha', 1.1, r => fecha(r.fecha)], ['Entrenamiento', 2.2, r => texto(r.nombre)], ['Tipo', 1.1, r => texto(r.tipo)],
     ['Minutos', 0.8, r => texto(r.duracion_minutos)], ['Intensidad', 1, r => texto(r.intensidad)], ['Esfuerzo', 0.8, r => texto(r.rpe)]] },
+  { clave: 'sesionesConReloj', titulo: 'Sesiones con reloj o pulsómetro', columnas: [
+    ['Fecha', 1.1, r => fecha(r.inicio)], ['Origen', 1, r => (r.origen === 'bluetooth' ? 'Pulsómetro' : 'Reloj')],
+    ['Distancia', 0.9, r => (r.distancia_m ? `${(r.distancia_m / 1000).toFixed(1)} km` : '')],
+    ['Pulso medio', 1, r => texto(r.fc_media)], ['Pulso máx.', 0.9, r => texto(r.fc_max)], ['TRIMP', 0.7, r => texto(r.trimp)]] },
   { clave: 'sesionesDelPlan', titulo: 'Sesiones del plan', columnas: [
     ['Fecha', 1.1, r => fecha(r.fecha)], ['Día', 1, r => texto(r.dia_semana)], ['Sesión', 2, r => texto(r.tipo)],
     ['Estado', 1, r => texto(r.estado)], ['Minutos', 0.8, r => texto(r.duracion_minutos)], ['Esfuerzo', 0.8, r => texto(r.rpe)]] },

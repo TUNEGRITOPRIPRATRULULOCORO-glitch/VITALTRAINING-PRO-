@@ -28,14 +28,14 @@ Cómo está construida la app, por qué se tomó cada decisión y cómo funciona
             │ pg (SSL verificado)    │ HTTPS
 ┌───────────▼───────────┐   ┌───────▼───────────────────────┐
 │ PostgreSQL · Neon      │   │ Brevo (correos) · Google      │
-│ 25 tablas · 14 índices │   │ (entrar con Google) · Claude  │
+│ 27 tablas · 14 índices │   │ (entrar con Google) · Claude  │
 └───────────────────────┘   │ (opcional)                     │
                             └───────────────────────────────┘
 ```
 
 ### Monolito modular
 
-Una sola aplicación (un proceso, un despliegue), dividida en **20 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
+Una sola aplicación (un proceso, un despliegue), dividida en **22 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
 
 1. **Cada tabla tiene un dueño.** Solo su módulo hace `INSERT`, `UPDATE` o `DELETE`; los demás leen o llaman a una función del dueño.
 2. **Cada módulo expone un `index.js` público.** Nadie importa archivos internos de otro módulo.
@@ -82,12 +82,13 @@ El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js`
 
 **¿Por qué PostgreSQL y no MySQL o MongoDB?** Por las restricciones y la integridad (claves foráneas con `ON DELETE CASCADE`, `UNIQUE` compuestos), y por **JSONB** para guardar estructuras anidadas como el plan de comidas de 7 días o la rutina semanal, que siempre se leen completas.
 
-### Tablas (25)
+### Tablas (27)
 
 | Grupo | Tablas |
 |---|---|
 | Cuentas | `usuarios`, `fotos_perfil`, `restablecimientos` |
-| Atleta | `perfiles`, `perfiles_medicos` (JSONB: condiciones, alergias, plan de comidas, rutina), `salud`, `comidas`, `rutinas`, `cumplimiento`, `alertas` |
+| Atleta | `perfiles`, `perfiles_medicos` (JSONB: condiciones, alergias, plan de comidas, rutina), `salud`, `comidas`, `rutinas`, `cumplimiento`, `alertas`, `sesiones_reloj` (pulso, zonas y curva de cada sesión del reloj) |
+| Alimentos | `alimentos_codigos` (productos por código de barras, de Open Food Facts o escritos por el club) |
 | Rendimiento | `evaluaciones`, `series` (ambas con marca de *verificado*), `rangos`, `logros`, `clasificacion_preferencias` |
 | Notificaciones | `push_suscripciones`, `push_claves` |
 | Médico y nutrición | `lesiones`, `notas_clinicas`, `notas_nutricionista` |
@@ -192,10 +193,20 @@ El **entrenador** ve a los atletas de sus equipos, **registra sus tests físicos
 - En la de **todo el deporte** (atletas sin equipo) entran también las propias, salvo las sospechosas sin verificar: de nivel Diamante o más, o una mejora de golpe de más de un 15 % en un test (en 60 días) o un 25 % en fuerza (en 30 días). Al atleta se le explica por qué su marca quedó fuera.
 
 ### Logros
-28 insignias en 5 grupos (primeros pasos, constancia, entrenamiento, progreso y resiliencia): rachas de 3 a 30 días, sesiones, comidas, series, récords, tests en meses distintos, marca verificada, rangos de Oro a Radiante, semana completa del plan y volver de una lesión. Muestran el progreso de las que faltan, se celebran al conseguirse y **un logro ganado no se pierde**.
+30 insignias en 5 grupos (primeros pasos, constancia, entrenamiento, progreso y resiliencia): rachas de 3 a 30 días, sesiones, comidas, series, récords, tests en meses distintos, marca verificada, rangos de Oro a Radiante, semana completa del plan, sesiones con el reloj y volver de una lesión. Muestran el progreso de las que faltan, se celebran al conseguirse y **un logro ganado no se pierde**.
 
 ### Notificaciones en el celular
 Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. **Los lunes**, además, avisa de los **tests de la semana**: al atleta sin equipo cuyo último test fue hace 7 días o más ("¿Te sientes preparado?") y a cada entrenador con cuántos atletas de su equipo les toca. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada. La app **las ofrece sola**: al terminar el perfil médico y unos segundos después de entrar, con un aviso "¿Te avisamos al celular?" (si se responde "Ahora no", no insiste en 14 días).
+
+### Reloj y pulsómetro
+Dos formas de guardar una sesión con pulso, desde **Historial → Entrenamientos**:
+- **Importar el archivo del reloj** (.tcx o .gpx): Garmin, Polar, Coros, Suunto, Amazfit, Strava y Apple Watch (con apps como HealthFit) exportan en esos formatos. El navegador lee el archivo (`interfaz/js/reloj-archivos.js`) y manda al servidor el resumen y la curva de pulso cada 5 s; si la misma sesión se importa dos veces, se rechaza.
+- **Pulso en vivo** por **Bluetooth** (Chrome en Android o computador): bandas de pecho o relojes que *transmiten la frecuencia cardiaca*. Muestra el pulso, la zona y el tiempo, y al terminar guarda la sesión.
+
+El servidor calcula la **FC máxima** (Tanaka: 208 − 0,7 × edad, o la más alta vista en la sesión), los **minutos en cada zona** (Z1 50-60 % … Z5 90 % o más), la carga **TRIMP** y un **esfuerzo estimado** (zona media × 2, de 1 a 10). La sesión entra en `rutinas` con ese esfuerzo, así que cuenta en la **carga aguda/crónica**, la alerta de carga alta, la clasificación y los logros. Al abrirla se ve la gráfica del pulso y el tiempo en cada zona. Los archivos `.fit` aún no se leen (se exporta TCX o GPX).
+
+### Escáner de código de barras
+En **Historial → Comidas**, "📷 Escanear código de barras" abre la cámara: usa el lector del navegador (BarcodeDetector, Chrome en Android) o, si no existe (iPhone), **ZXing**, que se descarga solo la primera vez desde jsDelivr con su huella SRI. También se puede escribir el número. El servidor valida el dígito de control y busca el producto primero en `alimentos_codigos` y luego en **Open Food Facts** (base abierta y gratuita; se guarda y se refresca al mes). El atleta indica cuántos gramos comió y se rellenan las calorías y la proteína de la comida. Si el producto no existe en ninguna base, se escriben una vez los datos de la etiqueta y **quedan para todo el club** (solo los corrige quien los escribió, un nutricionista o el admin).
 
 ### Mi cuenta
 Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un **PDF** para leerlos o imprimirlos (portada, ficha y una tabla por sección), o en JSON para llevarlos a otra app; nunca incluye contraseñas ni notas clínicas privadas y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
@@ -218,6 +229,8 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 | Auth | `POST /api/auth/login` · `/google` · `/registro` · `/olvide` · `/restablecer` · `GET /config` |
 | Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `PUT /api/cuenta/password` · `GET /api/cuenta/datos` · `DELETE /api/cuenta` · `GET /api/fotos/:userId` |
 | Logros | `GET /api/logros/:userId` |
+| Reloj | `POST/GET /api/reloj/:userId/sesiones` · `GET /sesiones/:id` (con la curva de pulso) |
+| Alimentos | `GET /api/alimentos/codigo/:codigo` · `POST` (producto escrito desde la etiqueta) |
 | Notificaciones | `GET /api/notificaciones/clave` · `GET /estado` · `POST/DELETE /suscribir` · `POST /prueba` · `POST /recordatorios` (sin sesión, con `X-Cron-Secreto`) |
 | Clasificación (atletas) | `GET /api/clasificacion/opciones` · `GET /constancia?ambito=&periodo=` · `GET /marcas?ambito=&clave=` · `PUT /visible` |
 | Usuarios (admin) | `GET/POST /api/usuarios` · `PUT/DELETE /api/usuarios/:id` · `DELETE /:id/foto` |
@@ -241,7 +254,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **453 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **473 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.
@@ -308,4 +321,5 @@ Es una app de un proceso: el mismo servidor publica la interfaz y la API, sin co
 
 - **Render gratis se duerme** a los 15 minutos sin visitas; la primera visita tarda cerca de un minuto.
 - **Neon gratis** solo permite volver atrás unas horas: no hay copias de seguridad propias.
+- **Reloj:** no hay conexión automática con Garmin, Apple Salud o Google Health (piden apps nativas o convenios); se importa el archivo o se usa el pulsómetro Bluetooth, que no funciona en iPhone.
 - Las **referencias de los rangos** son orientativas y no se ajustan por edad.
