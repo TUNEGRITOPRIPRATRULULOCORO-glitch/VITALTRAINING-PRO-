@@ -2,6 +2,7 @@ const { query } = require('../../../base-de-datos/db');
 const panel = require('../panel');
 const { generarRutina } = require('./rutinas');
 const nutricion = require('./nutricion');
+const { competicionDe } = require('../../compartido/deportes');
 
 // ═══════════════════════════════════════════════════════════════
 // CATÁLOGOS
@@ -84,6 +85,20 @@ function ingredientesProhibidos(alergias, condiciones, prefKey) {
   return prohibidos;
 }
 
+const sinAcentos = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+/**
+ * Alergias escritas a mano (las que no están en el catálogo): se descarta cualquier plato que las
+ * nombre. "Aguacates" o "alergia al aguacate" descartan los platos con aguacate.
+ */
+function palabrasProhibidas(alergias) {
+  return alergias
+    .filter(a => !ALERGIAS.includes(a))
+    .map(a => sinAcentos(a).replace(/^(alergia|intolerancia)\s+(a la|al|a)\s+/, '').trim())
+    .map(p => (p.length > 4 ? p.replace(/e?s$/, '') : p))
+    .filter(p => p.length >= 3);
+}
+
 function puntajeMediterraneo(comida) {
   const texto = `${comida.nombre} ${comida.desc}`.toLowerCase();
   const positivos = (texto.match(/aceite de oliva|salmón|pescado|quinoa|garbanzos|lentejas|verduras|vegetales|espinaca|tomate|aguacate|nueces|almendra/g) || []).length;
@@ -98,7 +113,9 @@ function puntajeMediterraneo(comida) {
 function filtrarComidas(pool, alergias, preferencia, condiciones) {
   const prefKey = claveDePreferencia(preferencia);
   const prohibidos = ingredientesProhibidos(alergias, condiciones, prefKey);
-  let opciones = pool.filter(comida => !comida.contiene.some(i => prohibidos.has(i)));
+  const palabras = palabrasProhibidas(alergias);
+  let opciones = pool.filter(comida => !comida.contiene.some(i => prohibidos.has(i))
+    && !palabras.some(p => sinAcentos(`${comida.nombre} ${comida.desc}`).includes(p)));
 
   // Preferencias suaves: se aplican solo si dejan opciones suficientes
   const suave = filtro => { const quedan = opciones.filter(filtro); if (quedan.length >= MINIMO_OPCIONES) opciones = quedan; };
@@ -152,9 +169,12 @@ function generarPlanAlimenticio(perfilMedico, opciones = {}) {
 
   // Estas preferencias ya ordenan el catálogo: hay que respetar ese orden al elegir
   const respetarOrden = /mediterr|alto en prote/i.test(preferencias);
+  const competicion = competicionDe(ficha?.deporte); // "Partido", "Sparring o pelea", "Carrera"…
 
   const semana = dias.map((dia, i) => {
     const objetivo = nutricion.objetivosDelDia(base, tipoDe(i), preferencias, { lesion: conLesion });
+    if (objetivo.tipoDia === 'partido') objetivo.etiqueta = competicion.corto;
+    if (objetivo.tipoDia === 'precompetencia') objetivo.etiqueta = competicion.vispera;
     const comidas = {};
     for (const [toma, parte] of Object.entries(nutricion.REPARTO)) {
       // Las dos meriendas usan el mismo catálogo: se desplaza el índice para que no se repitan
@@ -233,7 +253,7 @@ async function listarAtletas(usuario) {
 /** Ficha deportiva (deporte, posición, peso, altura...) para el expediente del médico. */
 async function obtenerFicha(userId) {
   const [{ rows: u }, { rows: p }] = await Promise.all([
-    query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia, objetivo FROM usuarios WHERE id = $1', [userId]),
+    query('SELECT deporte_principal, posicion, peso, altura, fecha_nacimiento, pie, frecuencia, objetivo, estilo FROM usuarios WHERE id = $1', [userId]),
     query('SELECT posicion, edad, peso, altura, sexo, dia_partido FROM perfiles WHERE user_id = $1', [userId])
   ]);
   return u[0] ? panel.fichaDeportiva(u[0], p[0]) : null;
@@ -258,7 +278,7 @@ async function refrescarPlanes(userId, perfil, ficha) {
     alergias:     perfil.alergias     || [],
     preferencias: perfil.preferencias || 'Sin restricciones'
   };
-  const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte, ficha.diaPartido);
+  const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte, ficha.diaPartido, ficha.estilo);
   // El estado médico (módulo lesiones) cambia las comidas: de baja se come como en descanso
   const estado = await require('../lesiones').estadoDe(userId).catch(() => null);
   const planAlimenticio = generarPlanAlimenticio(datos, { ficha, rutina: rutinaSemanal, lesion: estado?.estado || null });
@@ -291,14 +311,33 @@ async function obtener(userId) {
   };
 }
 
+const MAX_ELEGIDAS = 40;
+const MAX_TEXTO_ELEGIDA = 60;
+
+/** Condiciones o alergias: las del catálogo y las que la persona escribió (limpias, sin repetir). */
+function listaLimpia(lista) {
+  if (!Array.isArray(lista)) return [];
+  const vistas = new Set();
+  const salida = [];
+  for (const valor of lista) {
+    const texto = String(valor ?? '').replace(/\s+/g, ' ').trim().slice(0, MAX_TEXTO_ELEGIDA);
+    if (texto.length < 2 || vistas.has(texto.toLowerCase())) continue;
+    vistas.add(texto.toLowerCase());
+    salida.push(texto);
+    if (salida.length >= MAX_ELEGIDAS) break;
+  }
+  return salida;
+}
+
 async function guardar(userId, datos, posicion, deporte = 'Fútbol', ficha = null) {
+  const preferencia = datos.preferencia || datos.preferencias;
   const datosNorm = {
-    condiciones:  datos.condiciones  || [],
-    alergias:     datos.alergias     || [],
-    preferencias: datos.preferencia  || datos.preferencias || 'Sin restricciones'
+    condiciones:  listaLimpia(datos.condiciones),
+    alergias:     listaLimpia(datos.alergias),
+    preferencias: PREFERENCIAS.includes(preferencia) ? preferencia : 'Sin restricciones'
   };
 
-  const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte, ficha?.diaPartido);
+  const rutinaSemanal   = generarRutina(datosNorm, posicion, deporte, ficha?.diaPartido, ficha?.estilo);
   const planAlimenticio = generarPlanAlimenticio(datosNorm, { ficha: { ...(ficha || {}), posicion, deporte }, rutina: rutinaSemanal });
 
   await query(

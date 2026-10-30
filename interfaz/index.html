@@ -52,7 +52,7 @@
         </nav>
         <div class="ip-barra-botones">
             <button class="ip-btn ip-btn-texto" onclick="abrirAuth('screen-login')">Iniciar sesión</button>
-            <button class="ip-btn ip-btn-principal ip-btn-chico" onclick="abrirAuth('screen-register-1')">Crear cuenta</button>
+            <button class="ip-btn ip-btn-principal ip-btn-chico" onclick="abrirAuth('screen-register-0')">Crear cuenta</button>
         </div>
     </header>
 
@@ -63,7 +63,7 @@
                 <h1>Entrena con un plan <span>hecho para ti.</span></h1>
                 <p class="ip-sub">Compitas o entrenes por gusto, VitalTraining junta tu rutina, tu alimentación y tu salud en un solo lugar: ganar músculo, definir, rendir en tu deporte o simplemente ponerte en forma.</p>
                 <div class="ip-cta">
-                    <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-1')">Crear cuenta gratis →</button>
+                    <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-0')">Crear cuenta gratis →</button>
                     <button class="ip-btn ip-btn-secundario" onclick="abrirAuth('screen-login')">Ya tengo cuenta</button>
                 </div>
                 <div class="google-bloque hidden ip-google">
@@ -148,7 +148,7 @@
 
         <section class="ip-final ip-aparece">
             <h2>¿Listo para entrenar mejor?</h2>
-            <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-1')">Crear cuenta gratis →</button>
+            <button class="ip-btn ip-btn-principal" onclick="abrirAuth('screen-register-0')">Crear cuenta gratis →</button>
         </section>
     </main>
 
@@ -233,12 +233,73 @@
                     <div class="google-btn" data-texto="signin_with"></div>
                 </div>
             </div>
-            <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-1')">Regístrate aquí</a></p>
+            <p class="auth-switch">¿No tienes cuenta? <a href="#" onclick="showAuthScreen('screen-register-0')">Regístrate aquí</a></p>
             <p class="auth-switch"><a href="#" onclick="event.preventDefault(); mostrarInicio()">← Conoce VitalTraining</a></p>
         </div>
     </div>
 
     <!-- REGISTRO PASO 1 -->
+    <!-- REGISTRO PASO 0: cómo va a usar la app (solo, unirse a su equipo o crear uno) -->
+    <div id="screen-register-0" class="auth-container hidden">
+        <div class="auth-brand">
+            <div class="auth-brand-top">
+                <div class="auth-logo-wrap">
+                    <div class="auth-logo"><svg class="logo-svg" viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-marca"/></svg></div>
+                    <span class="auth-logo-name">VitalTraining</span>
+                </div>
+                <h1>Empieza<br>con tu<br><span>equipo.</span></h1>
+                <p class="auth-tagline">Entrena por tu cuenta o con tu club: tu entrenador, tu nutricionista y tu médico en el mismo lugar.</p>
+            </div>
+            <div class="auth-brand-bottom">
+                <p>© 2026 VitalTraining · <a href="/privacidad" class="auth-legal">Privacidad</a></p>
+            </div>
+        </div>
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h2>¿Cómo vas a usar VitalTraining?</h2>
+                <p>Elige una opción: luego te pedimos tus datos.</p>
+            </div>
+            <div class="auth-form">
+                <div class="reg-modos" role="radiogroup" aria-label="Cómo vas a usar VitalTraining">
+                    <button type="button" class="reg-modo" data-modo="solo" onclick="elegirModoRegistro('solo')">
+                        <span class="reg-modo-icono">🏃</span><span><strong>Entreno por mi cuenta</strong><small>Atleta independiente: tu plan, tus registros y tus rangos.</small></span>
+                    </button>
+                    <button type="button" class="reg-modo" data-modo="unirse" onclick="elegirModoRegistro('unirse')">
+                        <span class="reg-modo-icono">🤝</span><span><strong>Me uno a mi equipo</strong><small>Tengo el código que me dio mi entrenador o mi club.</small></span>
+                    </button>
+                    <button type="button" class="reg-modo" data-modo="crear" onclick="elegirModoRegistro('crear')">
+                        <span class="reg-modo-icono">📋</span><span><strong>Voy a crear un equipo</strong><small>Soy entrenador: invito a mis atletas con un código.</small></span>
+                    </button>
+                </div>
+                <div id="reg-unirse" class="hidden">
+                    <div class="auth-input-group">
+                        <label for="reg-codigo">Código de tu equipo *</label>
+                        <input type="text" id="reg-codigo" maxlength="8" placeholder="Ej. K7Q2MX" autocomplete="off" style="text-transform:uppercase"
+                               onkeydown="if(event.key==='Enter') comprobarCodigoEquipo()">
+                    </div>
+                    <button class="auth-btn" onclick="comprobarCodigoEquipo()"><span>Buscar mi equipo</span></button>
+                </div>
+                <div id="reg-crear" class="hidden">
+                    <div class="auth-input-group">
+                        <label for="reg-equipo-nombre">Nombre del equipo *</label>
+                        <input type="text" id="reg-equipo-nombre" maxlength="100" placeholder="Ej. Boxeo Club Norte">
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="reg-equipo-deporte">Deporte del equipo</label>
+                        <select id="reg-equipo-deporte"><option value="">Selecciona el deporte</option>
+                            <option value="Fútbol">⚽ Fútbol</option><option value="Baloncesto">🏀 Baloncesto</option><option value="Tenis">🎾 Tenis</option>
+                            <option value="Béisbol">⚾ Béisbol</option><option value="Atletismo">🏃 Atletismo</option><option value="Running">👟 Running</option>
+                            <option value="Natación">🏊 Natación</option><option value="Boxeo">🥊 Boxeo</option><option value="Gimnasio">🏋️ Gimnasio</option>
+                            <option value="Estar en forma">💪 Estar en forma</option></select>
+                    </div>
+                    <button class="auth-btn" onclick="confirmarCrearEquipo()"><span>Continuar</span></button>
+                </div>
+                <div id="reg0-error" class="auth-error hidden"></div>
+            </div>
+            <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="showAuthScreen('screen-login')">Inicia sesión</a></p>
+        </div>
+    </div>
+
     <div id="screen-register-1" class="auth-container hidden">
         <div class="auth-brand">
             <div class="auth-brand-top">
@@ -278,6 +339,7 @@
                 <p>Cuéntanos sobre ti para personalizar tu plan</p>
             </div>
             <div class="auth-form">
+                <div id="reg-modo-aviso" class="auth-aviso-ok hidden"></div>
                 <div class="google-bloque hidden" id="reg-google-bloque">
                     <div class="google-btn" data-texto="signup_with"></div>
                     <div class="auth-separador"><span>o con tu correo</span></div>
@@ -307,7 +369,7 @@
                         <input type="password" id="reg-password" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
                     </div>
                 </div>
-                <div class="auth-input-row">
+                <div class="auth-input-row" id="reg-cuerpo">
                     <div class="auth-input-group">
                         <label for="reg-peso">Peso (kg) *</label>
                         <input type="number" id="reg-peso" placeholder="70">
@@ -317,17 +379,17 @@
                         <input type="number" id="reg-altura" placeholder="175">
                     </div>
                 </div>
-                <div class="auth-input-group">
+                <div class="auth-input-group" id="reg-fecha-grupo">
                     <label for="reg-fecha">Fecha de nacimiento *</label>
                     <input type="date" id="reg-fecha">
                 </div>
                 <div id="reg1-error" class="auth-error hidden"></div>
                 <button class="auth-btn" onclick="goToStep2()">
-                    <span>Continuar</span>
+                    <span id="reg1-boton">Continuar</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
-            <p class="auth-switch">¿Ya tienes cuenta? <a href="#" onclick="showAuthScreen('screen-login')">Inicia sesión</a></p>
+            <button class="auth-btn-back" onclick="showAuthScreen('screen-register-0')">← Cambiar cómo voy a usar la app</button>
         </div>
     </div>
 
@@ -423,6 +485,24 @@
                         <option>Ambos</option>
                     </select>
                 </div>
+                <div class="auth-input-group hidden" id="reg-estilo-grupo">
+                    <label for="reg-estilo">Estilo de pelea *</label>
+                    <select id="reg-estilo"></select>
+                    <span class="auth-ayuda">Cambia tu entrenamiento: no entrena igual un fajador que un estilista.</span>
+                </div>
+                <div class="auth-input-row">
+                    <div class="auth-input-group">
+                        <label for="reg-sexo">Sexo *</label>
+                        <select id="reg-sexo">
+                            <option value="">Selecciona</option>
+                            <option>Hombre</option><option>Mujer</option><option>Prefiero no decirlo</option>
+                        </select>
+                    </div>
+                    <div class="auth-input-group" id="reg-partido-grupo">
+                        <label for="reg-partido" id="reg-partido-label">¿Qué día tienes partido?</label>
+                        <select id="reg-partido"></select>
+                    </div>
+                </div>
                 <div class="auth-input-group">
                     <label for="reg-objetivo">Objetivo principal *</label>
                     <select id="reg-objetivo">
@@ -485,6 +565,7 @@
             <div class="auth-success-icon">✓</div>
             <h2>¡Perfil creado!</h2>
             <p>Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión.</p>
+            <div id="reg-exito-equipo" class="auth-aviso-ok hidden"></div>
             <button class="auth-btn" onclick="showAuthScreen('screen-login')">
                 <span>Ir al inicio de sesión</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -811,6 +892,10 @@
             <button class="nav-btn" data-pf-view="historial" onclick="pfRenderView('historial')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
                 Historial
+            </button>
+            <button class="nav-btn" data-pf-view="reloj" onclick="pfRenderView('reloj')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6V2h6v4M9 18v4h6v-4M12 9v3l2 1"/></svg>
+                Mi reloj
             </button>
             <button class="nav-btn" data-pf-view="plan" onclick="pfRenderView('plan')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>

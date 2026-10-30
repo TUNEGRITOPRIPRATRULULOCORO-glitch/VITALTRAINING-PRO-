@@ -2,7 +2,9 @@
  * GET  /api/auth/config      → Configuración pública (id de cliente de Google, si lo hay)
  * POST /api/auth/login       → Iniciar sesión
  * POST /api/auth/google      → Entrar con Google { credencial }
- * POST /api/auth/registro    → Crear cuenta de atleta (envía correo de bienvenida; con Google, sin contraseña)
+ * POST /api/auth/registro    → Crear cuenta: atleta por su cuenta, uniéndose a su equipo (codigoEquipo)
+ *                              o entrenador creando su equipo (equipoNombre). Con Google, sin contraseña
+ * GET  /api/auth/equipo/:codigo → Nombre y deporte del equipo de ese código (antes de registrarse)
  * POST /api/auth/olvide      → Pedir enlace para cambiar la contraseña { email }
  * POST /api/auth/restablecer → Cambiar la contraseña con el enlace { token, password }
  */
@@ -31,6 +33,8 @@ router.get('/config',                           ctrl.getConfig);
 router.post('/login',       loginLimiter,       ctrl.postLogin);
 router.post('/google',      loginLimiter,       ctrl.postGoogle);
 router.post('/registro',    registroLimiter,    ctrl.postRegistro);
+// Límite para que nadie pruebe códigos al azar
+router.get('/equipo/:codigo', limite(20, 'Demasiados intentos con códigos de equipo. Intenta de nuevo en 15 minutos.'), ctrl.getEquipo);
 router.post('/olvide',      olvideLimiter,      ctrl.postOlvide);
 router.post('/restablecer', restablecerLimiter, ctrl.postRestablecer);
 

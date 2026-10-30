@@ -29,7 +29,7 @@ const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', logros:'Logros', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
+    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', reloj:'Mi reloj', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', logros:'Logros', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
@@ -39,6 +39,7 @@ function pfRenderView(view) {
     else if(view==='perfil')    enSegundoPlano(pfRenderPerfil());
     else if(view==='salud')     enSegundoPlano(pfRenderSalud());
     else if(view==='historial') enSegundoPlano(pfRenderHistorial());
+    else if(view==='reloj')     enSegundoPlano(pfRenderReloj());
     else if(view==='ia')        enSegundoPlano(pfRenderIA());
     else if(view==='plan')      enSegundoPlano(pfRenderPlan());
     else if(view==='tests')     enSegundoPlano(pfRenderTests());
@@ -275,9 +276,14 @@ async function pfRenderPerfil() {
                     <div class="form-group"><label>Peso (kg)</label><input type="number" id="pf-f-peso" value="${p.peso||''}" placeholder="72"></div>
                     <div class="form-group"><label>Sexo <span class="campo-ayuda">(para calcular tus calorías)</span></label><select id="pf-f-sexo">${['','Hombre','Mujer','Prefiero no decirlo'].map(s=>`<option value="${s}" ${(p.sexo||'')===s?'selected':''}>${s||'Selecciona…'}</option>`).join('')}</select></div>
                 </div>
+                <div class="form-group ${deporteActual==='Boxeo'?'':'hidden'}" id="pf-f-estilo-grupo">
+                    <label>🥊 Estilo de pelea</label>
+                    <select id="pf-f-estilo">${['', ...ESTILOS_BOXEO].map(e=>`<option value="${e}" ${(p.estilo||'')===e?'selected':''}>${e||'Selecciona…'}</option>`).join('')}</select>
+                    <span class="campo-ayuda">Tu rutina cambia según cómo peleas: volumen y corta distancia, distancia y piernas, contragolpe o potencia.</span>
+                </div>
                 <div class="form-group ${SIN_COMPETICION.includes(deporteActual)?'hidden':''}" id="pf-f-partido-grupo">
-                    <label>📅 ¿Qué día tienes partido o competición?</label>
-                    <select id="pf-f-partido">${diasPartidoOpciones(p.diaPartido)}</select>
+                    <label id="pf-f-partido-label">📅 ${competicionDe(deporteActual).pregunta}</label>
+                    <select id="pf-f-partido">${diasCompeticionOpciones(p.diaPartido, deporteActual)}</select>
                     <span class="campo-ayuda">Tu rutina, tus comidas y los consejos de sueño se organizan alrededor de ese día: la víspera es suave y con más carbohidratos, y el día siguiente es de recuperación.</span>
                 </div>
                 <div class="form-row">
@@ -301,11 +307,6 @@ async function pfRenderPerfil() {
     enSegundoPlano(eqRenderAtleta('pf-equipo'));
 }
 
-function diasPartidoOpciones(actual) {
-    const opciones = [['', 'Selecciona…'], ...DIAS_SEMANA.map(d => [d, d]), ['Ninguno', 'No tengo partidos / día variable']];
-    return opciones.map(([v, t]) => `<option value="${v}" ${(actual||'')===v?'selected':''}>${t}</option>`).join('');
-}
-
 // Cambiar de deporte cambia las posiciones disponibles sin perder lo que ya escribió
 function pfCambiarDeporte() {
     const deporte = document.getElementById('pf-f-deporte').value;
@@ -313,6 +314,10 @@ function pfCambiarDeporte() {
     document.getElementById('pf-f-posicion-label').textContent = cfg.posicionLabel.replace('*','');
     document.getElementById('pf-f-posicion').innerHTML = cfg.posicionOptions.map(p => `<option value="${p}">${p}</option>`).join('');
     document.getElementById('pf-f-partido-grupo').classList.toggle('hidden', SIN_COMPETICION.includes(deporte));
+    document.getElementById('pf-f-estilo-grupo').classList.toggle('hidden', deporte !== 'Boxeo');
+    document.getElementById('pf-f-partido-label').textContent = `📅 ${competicionDe(deporte).pregunta}`;
+    const partido = document.getElementById('pf-f-partido');
+    partido.innerHTML = diasCompeticionOpciones(partido.value, deporte);
 }
 
 async function pfGuardarPerfil() {
@@ -325,7 +330,8 @@ async function pfGuardarPerfil() {
         peso: Number(document.getElementById('pf-f-peso').value),
         altura: Number(document.getElementById('pf-f-altura').value),
         deportePrincipal: document.getElementById('pf-f-deporte').value,
-        sexo: document.getElementById('pf-f-sexo').value
+        sexo: document.getElementById('pf-f-sexo').value,
+        estilo: document.getElementById('pf-f-estilo').value || undefined
     };
     const res=await apiFetch(`${API}/panel/${userId}/perfil`,{method:'PUT',body:JSON.stringify(body)});
     if(res.ok){
@@ -661,7 +667,7 @@ async function pfRenderHistorialRutinas() {
             </div>
         </div>
 
-        ${relojTarjetaHTML(userId)}
+        <div class="reloj-atajo">⌚ ¿Entrenaste con reloj o pulsómetro? <button class="btn btn-ghost btn-sm" onclick="pfRenderView('reloj')">Ir a Mi reloj →</button></div>
 
         <div class="card" style="margin-bottom:20px">
             <div class="card-header"><h2>➕ Nueva sesión</h2></div>

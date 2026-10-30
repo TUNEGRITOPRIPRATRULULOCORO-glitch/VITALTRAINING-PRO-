@@ -31,4 +31,24 @@ function ultimosDias(hoy, n) {
   return Array.from({ length: n }, (_, i) => sumarDias(hoy, i - n + 1));
 }
 
-module.exports = { hoyISO, aFechaISO, sumarDias, ultimosDias };
+const EDAD_MINIMA = 5;
+const EDAD_MAXIMA = 100;
+
+/**
+ * Comprueba una fecha de nacimiento 'YYYY-MM-DD': que exista, que no sea futura y que la
+ * persona tenga entre 5 y 100 años. Devuelve el mensaje de error o null si está bien.
+ */
+function problemaFechaNacimiento(fecha, hoy = hoyISO()) {
+  const f = String(fecha || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(f)) return 'Escribe tu fecha de nacimiento.';
+  const d = new Date(`${f}T00:00:00Z`);
+  if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== f) return 'Esa fecha de nacimiento no existe.';
+  if (f > hoy) return 'La fecha de nacimiento no puede ser futura.';
+  const [a, m, dd] = hoy.split('-').map(Number);
+  const pad = n => String(n).padStart(2, '0');
+  if (f > `${a - EDAD_MINIMA}-${pad(m)}-${pad(dd)}`) return `Debes tener al menos ${EDAD_MINIMA} años.`;
+  if (f < `${a - EDAD_MAXIMA}-${pad(m)}-${pad(dd)}`) return 'Revisa el año de tu fecha de nacimiento.';
+  return null;
+}
+
+module.exports = { hoyISO, aFechaISO, sumarDias, ultimosDias, problemaFechaNacimiento, EDAD_MINIMA };

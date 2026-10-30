@@ -150,11 +150,11 @@ Casi todas las pantallas consultan "los datos de este atleta en estas fechas". H
 ### Plan de comidas
 1. **Calorías**: gasto en reposo con la fórmula **Mifflin-St Jeor** (peso, altura, edad, sexo) por un factor según el tipo de día (descanso ×1,40, entreno ×1,70, víspera de partido ×1,60, partido ×1,85…).
 2. **Macros**: carbohidratos por kg según el día (3,5 a 7 g/kg, guías ACSM 2016 y consenso UEFA), proteína 1,6-2,0 g/kg, grasa entre el 20 % y el 35 %.
-3. **Platos**: catálogo de 83 platos, cada uno con sus ingredientes clave. Las **alergias y la dieta (vegana, vegetariana, pescetariana) son filtros estrictos**; las condiciones médicas solo quitan platos si quedan al menos 3 opciones.
+3. **Platos**: catálogo de 83 platos, cada uno con sus ingredientes clave. Las **alergias y la dieta (vegana, vegetariana, pescetariana) son filtros estrictos**; las condiciones médicas solo quitan platos si quedan al menos 3 opciones. Si una alergia o condición no aparece en la lista, el atleta **la escribe** (por ejemplo "aguacate") y el plan descarta los platos que la nombran; lo escrito también lo ven su nutricionista y su médico. Lo marcado en cada paso del perfil médico se conserva al volver atrás.
 4. **Porciones**: se reparte la energía del día (desayuno 25 %, almuerzo 30 %, cena 25 %, meriendas 10 % + 10 %) y se escala la porción del plato.
 
 ### Rutina
-Plantillas por **deporte y posición**, basadas en evidencia (citada en `servidor/api/perfilMedico/rutinas.js`). Se quitan los ejercicios contraindicados por las condiciones médicas del atleta, y la semana se organiza alrededor de su **día de partido** (víspera suave, día siguiente de recuperación).
+Plantillas por **deporte y posición**, basadas en evidencia (citada en `servidor/api/perfilMedico/rutinas.js`). Se quitan los ejercicios contraindicados por las condiciones médicas del atleta, y la semana se organiza alrededor de su **día de competición** (víspera suave, día siguiente de recuperación). Ese día se llama según el deporte: partido, partido o torneo, competencia, carrera o **sparring o pelea** en boxeo. En **boxeo el estilo cambia la rutina**: fajador (volumen y corta distancia), estilista (jab y juego de piernas), contragolpeador (reacción y defensa) o pegador (potencia); cada uno suma su trabajo específico a los días de técnica.
 
 ### Listo para entrenar, carga y cumplimiento
 - **Listo para entrenar (0-100)**: `((11 − fatiga) + sueño + recuperación) / 30 × 100`, menos 10 si la carga está en riesgo. ≥75 listo, ≥50 bajar intensidad, <50 descanso.
@@ -166,6 +166,8 @@ El médico registra zona, tipo, gravedad e indicaciones, y decide si el atleta e
 
 ### Equipos
 Mientras no hay equipos, la app es un club único: cada profesional ve a todos los atletas. Con equipos, **un nutricionista o médico solo ve, abre y escribe a los atletas de sus equipos**, y los correos de alerta van solo a sus médicos. El admin crea los equipos y añade a los profesionales; los atletas se unen con un **código de 6 caracteres**.
+
+**Registro con equipo.** Lo primero que pregunta el registro es cómo se va a usar la app: *Entreno por mi cuenta* (atleta independiente), *Me uno a mi equipo* (pide el código **antes** que los datos y muestra el nombre del equipo) o *Voy a crear un equipo* (la cuenta es de **entrenador**, el equipo nace con su código y el entrenador lo ve en su panel para invitar a sus atletas). Todo se comprueba antes de crear la cuenta, así no quedan cuentas a medias. El atleta da desde el registro su **fecha de nacimiento** (válida, no futura y de **5 años o más**), su **sexo**, su **día de competición** y, en boxeo, su **estilo de pelea**.
 
 ### "Hoy te toca…"
 Junta en una lista lo del día: registrar la salud, la sesión de la rutina y las 3 comidas del plan, con progreso ("2/5 hecho"), según el tipo de día (entreno, víspera, partido, descanso, baja). "La comí" apunta la comida del plan con un toque. Nunca regaña.
@@ -199,7 +201,7 @@ El **entrenador** ve a los atletas de sus equipos, **registra sus tests físicos
 Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. **Los lunes**, además, avisa de los **tests de la semana**: al atleta sin equipo cuyo último test fue hace 7 días o más ("¿Te sientes preparado?") y a cada entrenador con cuántos atletas de su equipo les toca. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada. La app **las ofrece sola**: al terminar el perfil médico y unos segundos después de entrar, con un aviso "¿Te avisamos al celular?" (si se responde "Ahora no", no insiste en 14 días).
 
 ### Reloj y pulsómetro
-Dos formas de guardar una sesión con pulso, desde **Historial → Entrenamientos**:
+Dos formas de guardar una sesión con pulso, desde **Mi reloj** (en el menú del atleta, con la lista de sus sesiones y el reparto de zonas):
 - **Importar el archivo del reloj** (.tcx o .gpx): Garmin, Polar, Coros, Suunto, Amazfit, Strava y Apple Watch (con apps como HealthFit) exportan en esos formatos. El navegador lee el archivo (`interfaz/js/reloj-archivos.js`) y manda al servidor el resumen y la curva de pulso cada 5 s; si la misma sesión se importa dos veces, se rechaza.
 - **Pulso en vivo** por **Bluetooth** (Chrome en Android o computador): bandas de pecho o relojes que *transmiten la frecuencia cardiaca*. Muestra el pulso, la zona y el tiempo, y al terminar guarda la sesión.
 
@@ -226,7 +228,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 | Módulo | Rutas principales |
 |---|---|
-| Auth | `POST /api/auth/login` · `/google` · `/registro` · `/olvide` · `/restablecer` · `GET /config` |
+| Auth | `POST /api/auth/login` · `/google` · `/registro` (modo `solo`, `unirse` con `codigoEquipo` o `crear` con `equipoNombre`) · `/olvide` · `/restablecer` · `GET /config` · `GET /equipo/:codigo` |
 | Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `PUT /api/cuenta/password` · `GET /api/cuenta/datos` · `DELETE /api/cuenta` · `GET /api/fotos/:userId` |
 | Logros | `GET /api/logros/:userId` |
 | Reloj | `POST/GET /api/reloj/:userId/sesiones` · `GET /sesiones/:id` (con la curva de pulso) |
@@ -254,7 +256,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **477 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **482 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

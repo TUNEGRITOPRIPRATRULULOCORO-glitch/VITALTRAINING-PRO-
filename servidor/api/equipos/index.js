@@ -17,4 +17,9 @@ module.exports = {
   filtrarContactos: svc.filtrarContactos,  // (yo, usuarios) → contactos permitidos
   nombresDeEquipos: svc.nombresDeEquipos,  // ([ids]) → { [id]: ['Sub-17', ...] }
   tieneEquipo:      svc.tieneEquipo,       // (userId) → ¿está en algún equipo?
+  // Registro: unirse con código o crear el equipo propio (entrenador)
+  porCodigo:        svc.porCodigo,         // (codigo) → { id, nombre, deporte } o null
+  nombreRepetido:   svc.nombreRepetido,    // (nombre) → ¿ya hay un equipo con ese nombre?
+  crear:            svc.crear,             // ({ nombre, deporte }) → equipo con su código
+  agregarMiembro:   svc.agregarMiembro,    // (equipoId, userId)
 };

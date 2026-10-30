@@ -103,7 +103,7 @@ async function respuestaGoogle({ credential }) {
         document.getElementById('reg-password-grupo').classList.add('hidden');
         document.getElementById('reg-google-aviso').classList.remove('hidden');
         errorEl?.classList.add('hidden');
-        showAuthScreen('screen-register-1');
+        showAuthScreen('screen-register-0');
     } catch { mostrarErrorGoogle('No se pudo conectar al servidor.'); }
 }
 
@@ -152,36 +152,144 @@ document.addEventListener('DOMContentLoaded', ()=>{
     ['login-email','login-password'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('keydown', e=>{ if(e.key==='Enter') enSegundoPlano(doLogin()); }); });
 });
 
+// ── Registro ───────────────────────────────────────────────────
+// Paso 0: atleta por su cuenta ('solo'), se une a su equipo con un código ('unirse') o es
+// entrenador y crea su equipo ('crear'). El entrenador no necesita ficha deportiva.
+const _registro = { modo: 'solo', codigo: null, equipo: null, equipoNombre: '', equipoDeporte: '' };
+
+function regError(id, texto) {
+    const el = document.getElementById(id);
+    el.textContent = texto || '';
+    el.classList.toggle('hidden', !texto);
+}
+
+function elegirModoRegistro(modo) {
+    _registro.modo = modo;
+    document.querySelectorAll('.reg-modo').forEach(b => b.classList.toggle('activo', b.dataset.modo === modo));
+    document.getElementById('reg-unirse').classList.toggle('hidden', modo !== 'unirse');
+    document.getElementById('reg-crear').classList.toggle('hidden', modo !== 'crear');
+    regError('reg0-error', '');
+    if (modo === 'solo') { _registro.codigo = null; _registro.equipo = null; irAlPaso1(); }
+    else document.getElementById(modo === 'unirse' ? 'reg-codigo' : 'reg-equipo-nombre').focus();
+}
+
+async function comprobarCodigoEquipo() {
+    const codigo = document.getElementById('reg-codigo').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (codigo.length !== 6) return regError('reg0-error', 'El código tiene 6 letras o números.');
+    const res = await fetch(`${API}/auth/equipo/${encodeURIComponent(codigo)}`)
+        .then(async r => ({ ok: r.ok, datos: await r.json().catch(() => ({})) })).catch(() => null);
+    if (!res) return regError('reg0-error', 'No se pudo conectar al servidor.');
+    if (!res.ok) return regError('reg0-error', res.datos.error || 'No encontramos ese equipo.');
+    Object.assign(_registro, { codigo, equipo: res.datos.equipo });
+    // El deporte del equipo queda elegido (se puede cambiar)
+    if (res.datos.equipo.deporte) {
+        document.getElementById('reg-deporte').value = res.datos.equipo.deporte;
+        updateSportSpecificFields();
+    }
+    irAlPaso1();
+}
+
+function confirmarCrearEquipo() {
+    const nombre = document.getElementById('reg-equipo-nombre').value.trim();
+    if (nombre.length < 2) return regError('reg0-error', 'Escribe el nombre de tu equipo.');
+    Object.assign(_registro, { equipoNombre: nombre, equipoDeporte: document.getElementById('reg-equipo-deporte').value });
+    irAlPaso1();
+}
+
+/** Paso 1 según el modo: el entrenador solo pone nombre, correo y contraseña. */
+function irAlPaso1() {
+    const crear = _registro.modo === 'crear';
+    const aviso = document.getElementById('reg-modo-aviso');
+    const texto = _registro.modo === 'unirse' && _registro.equipo ? `🤝 Te unirás a <strong>${escapeHtml(_registro.equipo.nombre)}</strong>.`
+        : crear ? `📋 Crearás el equipo <strong>${escapeHtml(_registro.equipoNombre)}</strong> como entrenador.` : '';
+    aviso.innerHTML = texto;
+    aviso.classList.toggle('hidden', !texto);
+    document.getElementById('reg-cuerpo').classList.toggle('hidden', crear);
+    document.getElementById('reg-fecha-grupo').classList.toggle('hidden', crear);
+    document.getElementById('reg1-boton').textContent = crear ? 'Crear mi equipo' : 'Continuar';
+    regError('reg1-error', '');
+    showAuthScreen('screen-register-1');
+}
+
+// Fecha de nacimiento: entre 5 y 100 años (lo mismo que comprueba el servidor)
+const EDAD_MINIMA = 5;
+function fechaConAnios(anios) {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - anios);
+    return d.toISOString().slice(0, 10);
+}
+function problemaFecha(fecha) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha || '')) return 'Escribe tu fecha de nacimiento.';
+    const d = new Date(`${fecha}T00:00:00Z`);
+    if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== fecha) return 'Esa fecha de nacimiento no existe.';
+    if (fecha > new Date().toISOString().slice(0, 10)) return 'La fecha de nacimiento no puede ser futura.';
+    if (fecha > fechaConAnios(EDAD_MINIMA)) return `Debes tener al menos ${EDAD_MINIMA} años.`;
+    if (fecha < fechaConAnios(100)) return 'Revisa el año de tu fecha de nacimiento.';
+    return null;
+}
+
 function goToStep2() {
     const nombre=document.getElementById('reg-nombre').value.trim(), email=document.getElementById('reg-email').value.trim(),
           password=document.getElementById('reg-password').value, peso=document.getElementById('reg-peso').value,
-          altura=document.getElementById('reg-altura').value, fecha=document.getElementById('reg-fecha').value,
-          errorEl=document.getElementById('reg1-error');
-    if(!nombre||!email||(!_googleCredencial&&!password)||!peso||!altura||!fecha){errorEl.textContent='Completa todos los campos obligatorios.';errorEl.classList.remove('hidden');return;}
-    if(!_googleCredencial&&password.length<8){errorEl.textContent='La contraseña debe tener al menos 8 caracteres.';errorEl.classList.remove('hidden');return;}
-    errorEl.classList.add('hidden'); showAuthScreen('screen-register-2');
+          altura=document.getElementById('reg-altura').value, fecha=document.getElementById('reg-fecha').value;
+    const crear = _registro.modo === 'crear';
+    if(!nombre||!email||(!_googleCredencial&&!password)||(!crear&&(!peso||!altura||!fecha))) return regError('reg1-error','Completa todos los campos obligatorios.');
+    if(!_googleCredencial&&password.length<8) return regError('reg1-error','La contraseña debe tener al menos 8 caracteres.');
+    if(!crear){
+        const problema = problemaFecha(fecha);
+        if(problema) return regError('reg1-error', problema);
+    }
+    regError('reg1-error', '');
+    if (crear) return enSegundoPlano(enviarRegistro('reg1-error'));
+    showAuthScreen('screen-register-2');
 }
 
-async function doRegistro() {
-    const nombre=document.getElementById('reg-nombre').value.trim(), email=document.getElementById('reg-email').value.trim(),
-          password=document.getElementById('reg-password').value, peso=document.getElementById('reg-peso').value,
-          altura=document.getElementById('reg-altura').value, fechaNacimiento=document.getElementById('reg-fecha').value,
-          deporte=document.getElementById('reg-deporte').value, posicion=document.getElementById('reg-posicion').value,
-          frecuencia=document.getElementById('reg-frecuencia').value, pie=document.getElementById('reg-pie').value,
-          objetivo=document.getElementById('reg-objetivo').value, errorEl=document.getElementById('reg2-error');
-    if(!deporte||!posicion||!frecuencia||!pie||!objetivo){errorEl.textContent='Completa todos los campos del perfil deportivo.';errorEl.classList.remove('hidden');return;}
-    errorEl.classList.add('hidden'); document.getElementById('reg-loading').classList.remove('hidden');
+function doRegistro() {
+    const v = id => document.getElementById(id).value;
+    const deporte = v('reg-deporte');
+    const faltaEstilo = deporte === 'Boxeo' && !v('reg-estilo');
+    if(!deporte||!v('reg-posicion')||!v('reg-frecuencia')||!v('reg-pie')||!v('reg-objetivo')||!v('reg-sexo')||faltaEstilo)
+        return regError('reg2-error','Completa todos los campos del perfil deportivo.');
+    regError('reg2-error', '');
+    enSegundoPlano(enviarRegistro('reg2-error'));
+}
+
+async function enviarRegistro(errorId) {
+    const v = id => document.getElementById(id)?.value ?? '';
+    const deporte = v('reg-deporte');
+    const datos = {
+        nombre: v('reg-nombre').trim(), email: v('reg-email').trim(), modo: _registro.modo,
+        ...(_registro.modo === 'crear'
+            ? { equipoNombre: _registro.equipoNombre, equipoDeporte: _registro.equipoDeporte }
+            : { peso: v('reg-peso'), altura: v('reg-altura'), fechaNacimiento: v('reg-fecha'), deporte, posicion: v('reg-posicion'),
+                frecuencia: v('reg-frecuencia'), pie: v('reg-pie'), objetivo: v('reg-objetivo'), sexo: v('reg-sexo'),
+                diaPartido: SIN_COMPETICION.includes(deporte) ? undefined : v('reg-partido') || undefined,
+                estilo: deporte === 'Boxeo' ? v('reg-estilo') : undefined,
+                codigoEquipo: _registro.modo === 'unirse' ? _registro.codigo : undefined }),
+        ...(_googleCredencial ? { googleCredencial: _googleCredencial } : { password: v('reg-password') }),
+    };
+    document.getElementById('reg-loading').classList.remove('hidden');
     try {
-        const datos={nombre,email,peso,altura,fechaNacimiento,deporte,posicion,frecuencia,pie,objetivo,
-            ...(_googleCredencial?{googleCredencial:_googleCredencial}:{password})};
         const res=await fetch(`${API}/auth/registro`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(datos)});
         const data=await res.json();
         document.getElementById('reg-loading').classList.add('hidden');
-        if(!res.ok){errorEl.textContent=data.error||'Error al crear la cuenta';errorEl.classList.remove('hidden');}
-        else if(data.token){_googleCredencial=null;routeUser(data.user,data.token);} // con Google entra directamente
-        else showAuthScreen('screen-success');
-    } catch{document.getElementById('reg-loading').classList.add('hidden');errorEl.textContent='No se pudo conectar al servidor.';errorEl.classList.remove('hidden');}
+        if(!res.ok) return regError(errorId, data.error||'Error al crear la cuenta');
+        if(data.token){_googleCredencial=null;routeUser(data.user,data.token);return;} // con Google entra directamente
+        const exito = document.getElementById('reg-exito-equipo');
+        exito.innerHTML = data.equipo?.codigo
+            ? `📋 Tu equipo <strong>${escapeHtml(data.equipo.nombre)}</strong> está listo.<br>Código para tus atletas: <strong class="reg-codigo-grande">${escapeHtml(data.equipo.codigo)}</strong><br><small>Compártelo: al registrarse eligen "Me uno a mi equipo" y lo escriben. También lo verás en tu panel.</small>`
+            : data.equipo ? `🤝 Ya eres parte de <strong>${escapeHtml(data.equipo.nombre)}</strong>.` : '';
+        exito.classList.toggle('hidden', !data.equipo);
+        showAuthScreen('screen-success');
+    } catch{document.getElementById('reg-loading').classList.add('hidden');regError(errorId,'No se pudo conectar al servidor.');}
 }
+
+// Límites de la fecha de nacimiento en el calendario
+document.addEventListener('DOMContentLoaded', () => {
+    const fecha = document.getElementById('reg-fecha');
+    if (fecha) { fecha.max = fechaConAnios(EDAD_MINIMA); fecha.min = fechaConAnios(100); }
+    updateSportSpecificFields(); // estilo de boxeo y día de competición con su nombre
+});
 
 function doLogout() {
     if(!confirm('¿Cerrar sesión?')) return;

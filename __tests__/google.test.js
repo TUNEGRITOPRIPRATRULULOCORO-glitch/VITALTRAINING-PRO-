@@ -38,6 +38,7 @@ test('un correo nuevo pide completar el registro y luego entra sin contraseña',
   const r = await auth.registro({
     nombre: 'Ana Nueva', email: 'otro@correo.com', googleCredencial: 'credencial',
     deporte: 'Natación', posicion: 'Fondista', frecuencia: '4-5 veces por semana', pie: 'Ambos', objetivo: 'Mantener forma física',
+    fechaNacimiento: '2004-03-15', sexo: 'Mujer',
   });
   expect(r.token).toBeTruthy();
   // El correo es el que verificó Google, no el que venga en el formulario

@@ -14,7 +14,39 @@ const RELOJ_ZONAS = [
 const RELOJ_TIPOS = ['Cardio', 'Resistencia', 'Velocidad', 'Técnica', 'Fuerza', 'Otro'];
 const RELOJ_MAX_ARCHIVO_MB = 40;
 
-/** Tarjeta para la página de entrenamientos del atleta. */
+/** Mi reloj (en el menú del atleta): importar, pulso en vivo y las sesiones guardadas con su pulso. */
+async function pfRenderReloj() {
+    const userId = currentUser.id;
+    const res = await apiFetch(`${API}/reloj/${userId}/sesiones`).then(r => r.json()).catch(() => null);
+    const sesiones = res?.sesiones || [];
+    const fila = s => `
+        <div class="mini-item" onclick="verSesionReloj(${userId}, ${Number(s.id)})" style="cursor:pointer">
+            <div class="mini-item-icon red">${s.origen === 'bluetooth' ? '❤️' : '⌚'}</div>
+            <div class="mini-item-body">
+                <div class="mini-item-title">${escapeHtml(s.nombre)}</div>
+                <div class="mini-item-sub">${formatFecha(s.fecha)} · ${s.minutos} min${s.distanciaM ? ` · ${relojFormatoDistancia(s.distanciaM)}` : ''}${s.fcMedia ? ` · ❤️ ${s.fcMedia} ppm` : ''}${s.carga ? ` · carga ${s.carga}` : ''}</div>
+                ${s.zonas ? relojBarraZonasHTML(s.zonas) : ''}
+            </div>
+        </div>`;
+    document.getElementById('pf-content').innerHTML = `
+    <div class="view-enter">
+        <div class="view-header"><div class="view-title"><h1>⌚ Mi reloj</h1><p>Tus sesiones con pulso: zonas, esfuerzo y carga calculados solos</p></div></div>
+        ${relojTarjetaHTML(userId)}
+        <div class="card">
+            <div class="card-header"><h2>❤️ Sesiones con pulso (${sesiones.length})</h2></div>
+            <div style="padding:16px">${sesiones.length ? sesiones.map(fila).join('')
+                : showEmptyState('⌚', 'Aún no hay sesiones', 'Importa el archivo de tu reloj o mide tu pulso en vivo: verás tus zonas y la carga de cada sesión.')}</div>
+        </div>
+    </div>`;
+}
+
+/** Barra fina con el reparto de zonas (para la lista). */
+function relojBarraZonasHTML(zonas) {
+    const total = zonas.reduce((t, m) => t + m, 0) || 1;
+    return `<div class="reloj-barra-zonas" aria-label="Tiempo en cada zona">${zonas.map((m, i) => m ? `<span style="width:${(m / total) * 100}%;background:${RELOJ_ZONAS[i].color}" title="${RELOJ_ZONAS[i].nombre}: ${Math.round(m)} min"></span>` : '').join('')}</div>`;
+}
+
+/** Tarjeta para importar o medir una sesión (en Mi reloj). */
 function relojTarjetaHTML(userId) {
     return `
     <div class="card" style="margin-bottom:20px">
@@ -66,7 +98,8 @@ async function relojGuardar(userId, datos) {
         .then(r => r.json()).catch(() => null);
     if (!res?.ok) { showToast(res?.error || 'No se pudo guardar la sesión.', 'error', 5000); return false; }
     relojMostrarResumen(res.sesion);
-    if (typeof pfRenderHistorialRutinas === 'function' && document.getElementById('lista-rutinas')) enSegundoPlano(pfRenderHistorialRutinas());
+    if (typeof pfRenderReloj === 'function' && document.querySelector('[data-pf-view="reloj"].active')) enSegundoPlano(pfRenderReloj());
+    else if (typeof pfRenderHistorialRutinas === 'function' && document.getElementById('lista-rutinas')) enSegundoPlano(pfRenderHistorialRutinas());
     return true;
 }
 

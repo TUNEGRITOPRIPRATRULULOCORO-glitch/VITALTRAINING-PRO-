@@ -4,7 +4,12 @@ const jwt    = require('jsonwebtoken');
 const { query } = require('../../../base-de-datos/db');
 const usuarios = require('../usuarios');
 const avisos   = require('../avisos');
-const { DEPORTES } = require('../../compartido/deportes');
+const { DEPORTES, DIAS_SEMANA, SIN_COMPETICION, ESTILOS_BOXEO } = require('../../compartido/deportes');
+const { problemaFechaNacimiento } = require('../../compartido/fechas');
+const equipos  = require('../equipos');
+
+const SEXOS = ['Hombre', 'Mujer', 'Prefiero no decirlo'];
+const MODOS = ['solo', 'unirse', 'crear']; // atleta por su cuenta, se une a su equipo, crea su equipo (entrenador)
 const google   = require('./google');
 
 const JWT_SECRET  = process.env.JWT_SECRET || 'vt-super-secret-key-2026';
@@ -60,11 +65,48 @@ const EMAIL_RE = /^[^\s@.]+(?:\.[^\s@.]+)*@[^\s@.]+(?:\.[^\s@.]+)+$/; // lineal:
  * Crea una cuenta de atleta. Con datos.googleCredencial la cuenta se crea con el correo que
  * Google verificó y una contraseña aleatoria (si algún día quiere una, usa "¿Olvidaste tu contraseña?").
  */
+/** El equipo al que se va a unir, para mostrarlo antes de pedir los datos. */
+async function equipoPorCodigo(codigo) {
+  const equipo = await equipos.porCodigo(codigo);
+  return equipo ? { nombre: equipo.nombre, deporte: equipo.deporte } : null;
+}
+
+/**
+ * Lo que depende del modo de registro, comprobado antes de crear la cuenta (así no quedan
+ * cuentas a medias): el equipo al que se une o el nombre del equipo que va a crear.
+ */
+async function prepararModo(modo, datos) {
+  if (modo === 'unirse') {
+    const equipo = await equipos.porCodigo(datos.codigoEquipo);
+    if (!equipo) return { error: 'No hay ningún equipo con ese código. Revísalo con tu entrenador o tu club.', status: 404 };
+    return { equipo };
+  }
+  if (modo === 'crear') {
+    const nombre = String(datos.equipoNombre || '').trim().slice(0, 100);
+    if (nombre.length < 2) return { error: 'Escribe el nombre de tu equipo.', status: 400 };
+    if (await equipos.nombreRepetido(nombre)) return { error: 'Ya existe un equipo con ese nombre: elige otro.', status: 409 };
+    return { nuevoEquipo: { nombre, deporte: DEPORTES.includes(datos.equipoDeporte) ? datos.equipoDeporte : null } };
+  }
+  return {};
+}
+
+/** Datos del atleta: fecha de nacimiento válida (5 años o más), sexo, día de competición y estilo. */
+function problemaDatosAtleta(datos, deporte) {
+  const fecha = problemaFechaNacimiento(datos.fechaNacimiento);
+  if (fecha) return fecha;
+  if (!SEXOS.includes(datos.sexo)) return 'Elige tu sexo (lo usamos para calcular tus calorías y tus rangos).';
+  if (deporte === 'Boxeo' && datos.estilo && !ESTILOS_BOXEO.includes(datos.estilo)) return 'Elige tu estilo de boxeo.';
+  return null;
+}
+
 async function registro(datos) {
   const { nombre } = datos;
   let { email, password } = datos;
-  const deportePrincipal = DEPORTES.includes(datos.deporte) ? datos.deporte : 'Fútbol';
-  const rolUsuario = ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
+  const modo = MODOS.includes(datos.modo) ? datos.modo : 'solo';
+  const entrenador = modo === 'crear';
+  const deportePrincipal = DEPORTES.includes(datos.deporte) ? datos.deporte
+    : DEPORTES.includes(datos.equipoDeporte) ? datos.equipoDeporte : 'Fútbol';
+  const rolUsuario = entrenador ? 'Entrenador' : ['Atleta', 'Futbolista'].includes(datos.rol) ? datos.rol : 'Atleta';
 
   if (datos.googleCredencial) {
     const perfil = await google.verificar(datos.googleCredencial);
@@ -79,18 +121,51 @@ async function registro(datos) {
   if (!password || password.length < 8)
     return { error: 'La contraseña debe tener al menos 8 caracteres.', status: 400 };
 
+  if (!entrenador) {
+    const problema = problemaDatosAtleta(datos, deportePrincipal);
+    if (problema) return { error: problema, status: 400 };
+  }
+
   if (await usuarios.buscarIdPorEmail(email) !== null)
     return { error: 'Ya existe una cuenta con ese correo.', status: 409 };
+  const preparado = await prepararModo(modo, datos);
+  if (preparado.error) return preparado;
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const datosCuenta = entrenador
+    ? { objetivo: null } // el entrenador no necesita ficha deportiva
+    : { ...datos, estilo: deportePrincipal === 'Boxeo' && ESTILOS_BOXEO.includes(datos.estilo) ? datos.estilo : null };
   const nuevo = await usuarios.registrarAtleta({
-    nombre, email, hashedPassword, rol: rolUsuario, deportePrincipal, datos
+    nombre, email, hashedPassword, rol: rolUsuario, deportePrincipal, datos: datosCuenta
   });
 
+  let equipo = null;
+  try {
+    if (!entrenador) {
+      // Sexo y día de competición van a su ficha deportiva desde el primer día
+      const diaPartido = SIN_COMPETICION.includes(deportePrincipal) ? null : [...DIAS_SEMANA, 'Ninguno'].includes(datos.diaPartido) ? datos.diaPartido : null;
+      await require('../panel').actualizarPerfil(Number(nuevo.id), { sexo: datos.sexo, diaPartido });
+    }
+    if (preparado.equipo) {
+      await equipos.agregarMiembro(preparado.equipo.id, nuevo.id);
+      equipo = { nombre: preparado.equipo.nombre };
+    }
+    if (preparado.nuevoEquipo) {
+      const creado = await equipos.crear(preparado.nuevoEquipo);
+      await equipos.agregarMiembro(creado.id, nuevo.id);
+      equipo = { nombre: creado.nombre, codigo: creado.codigo };
+    }
+  } catch (err) {
+    // Sin equipo la cuenta quedaría a medias: se deshace y se pide intentarlo de nuevo
+    await query('DELETE FROM usuarios WHERE id = $1', [nuevo.id]);
+    if (err.status && err.status < 500) return { error: err.message, status: err.status };
+    throw err;
+  }
+
   // Con Google ya está verificado quién es: entra directamente
-  if (datos.googleCredencial) return sesion(nuevo);
+  if (datos.googleCredencial) return { ...sesion(nuevo), equipo };
   const { password: _, ...usuarioSeguro } = nuevo;
-  return { usuario: usuarioSeguro };
+  return { usuario: usuarioSeguro, equipo };
 }
 
 // ─── Recuperar contraseña ──────────────────────────────────────────────────────
@@ -146,4 +221,4 @@ async function restablecerPassword(token, password) {
   return { ok: true };
 }
 
-module.exports = { login, loginGoogle, registro, solicitarRestablecimiento, restablecerPassword };
+module.exports = { login, loginGoogle, registro, equipoPorCodigo, solicitarRestablecimiento, restablecerPassword };

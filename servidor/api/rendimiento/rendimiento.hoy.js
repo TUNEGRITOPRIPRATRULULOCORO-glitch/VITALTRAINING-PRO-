@@ -6,6 +6,8 @@
  * apuntó y si el médico lo tiene de baja. Nunca regaña: lo que falta queda "pendiente".
  */
 
+const { competicionDe } = require('../../compartido/deportes');
+
 // Las tres comidas principales cuentan en el progreso; las meriendas se muestran como sugerencia
 const COMIDAS_PRINCIPALES = [
   { toma: 'desayuno', titulo: 'Desayuno' },
@@ -45,9 +47,14 @@ function construirHoy({ fecha, dia, plan, saludHoy, listo, sesion, comidasHoy = 
   const indicaciones = (estadoMedico?.activas || []).map(l => l.indicaciones).filter(Boolean).join(' · ');
   const zonas = (estadoMedico?.zonas || []).join(', ');
 
-  const contexto = deBaja
+  const contexto = { ...(deBaja
     ? { icono: '🩹', etiqueta: 'Baja médica', mensaje: `Estás de baja (${zonas}): hoy tu trabajo es recuperarte.${indicaciones ? ` Indicaciones del médico: ${indicaciones}` : ''}` }
-    : CONTEXTO[tipoDia] || { icono: '📋', etiqueta: 'Hoy', mensaje: 'Completa tu perfil médico en Mi Plan para tener tu rutina y tus comidas de cada día.' };
+    : CONTEXTO[tipoDia] || { icono: '📋', etiqueta: 'Hoy', mensaje: 'Completa tu perfil médico en Mi Plan para tener tu rutina y tus comidas de cada día.' }) };
+  // No siempre es un "partido": en boxeo es pelea o sparring, en running una carrera…
+  if (!deBaja && ['partido', 'precompetencia'].includes(tipoDia)) {
+    const comp = competicionDe(plan?.rutinaSemanal?.deporte);
+    contexto.etiqueta = tipoDia === 'partido' ? comp.dia : comp.vispera;
+  }
 
   const tareas = [];
 

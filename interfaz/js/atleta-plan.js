@@ -80,6 +80,7 @@ function pfOnboardingStep1() {
         <div class="onb-section-title">¿Tienes alguna de estas condiciones de salud?</div>
         <p class="onb-hint">Selecciona las que apliquen. Cada categoría tiene su botón <strong>Ninguna</strong> si no aplica ninguna de ese grupo.</p>
         <div class="onb-conditions">${condHTML}</div>
+        ${pfOnbOtrasHTML('condiciones', '¿Tienes otra condición que no aparece? Escríbela', 'Ej: Escoliosis leve, operación de rodilla en 2024…')}
         <div class="onb-actions">
             <div></div>
             <button class="btn btn-primary" onclick="pfOnboardingGoStep2()">Siguiente: Alergias →</button>
@@ -87,12 +88,55 @@ function pfOnboardingStep1() {
     </div>`;
 }
 
+/** Lo que la persona escribió a mano (no está en el catálogo): chips que se pueden quitar. */
+function pfOnbPropias(campo) {
+    const catalogo = campo === 'condiciones' ? Object.values(_onbCat.CONDICIONES).flat() : _onbCat.ALERGIAS;
+    return _onbDatos[campo].filter(v => !catalogo.includes(v));
+}
+
+function pfOnbOtrasHTML(campo, titulo, ejemplo) {
+    const chips = pfOnbPropias(campo).map(v => `
+        <span class="onb-chip">${escapeHtml(v)}<button type="button" aria-label="Quitar ${escapeHtml(v)}" onclick="pfOnbQuitarOtra('${campo}', ${JSON.stringify(v).replace(/"/g, '&quot;')})">✕</button></span>`).join('');
+    return `
+        <div class="onb-otras">
+            <label class="onb-section-title" for="onb-otra-${campo}">${titulo}</label>
+            <div class="onb-otra-fila">
+                <input type="text" id="onb-otra-${campo}" maxlength="60" placeholder="${ejemplo}" onkeydown="if(event.key==='Enter'){event.preventDefault();pfOnbAgregarOtra('${campo}')}">
+                <button type="button" class="btn btn-ghost" onclick="pfOnbAgregarOtra('${campo}')">＋ Agregar</button>
+            </div>
+            <div class="onb-chips" id="onb-chips-${campo}">${chips}</div>
+        </div>`;
+}
+
+/** Guarda lo marcado en pantalla antes de cambiar de paso (así "Atrás" no borra nada). */
+function pfOnbLeerMarcadas(campo) {
+    const marcadas = Array.from(document.querySelectorAll('.onb-conditions input[type=checkbox]:checked')).map(el => el.value);
+    _onbDatos[campo] = [...marcadas, ...pfOnbPropias(campo)];
+}
+
+function pfOnbAgregarOtra(campo) {
+    const input = document.getElementById(`onb-otra-${campo}`);
+    const texto = input.value.replace(/\s+/g, ' ').trim();
+    if (texto.length < 2) return showToast('Escribe al menos 2 letras.', 'error');
+    pfOnbLeerMarcadas(campo);
+    if (_onbDatos[campo].some(v => v.toLowerCase() === texto.toLowerCase())) return showToast('Ya está en tu lista.', 'error');
+    _onbDatos[campo].push(texto.slice(0, 60));
+    if (campo === 'condiciones') pfOnboardingStep1(); else pfOnboardingStep2();
+    document.getElementById(`onb-otra-${campo}`)?.focus();
+}
+
+function pfOnbQuitarOtra(campo, valor) {
+    pfOnbLeerMarcadas(campo);
+    _onbDatos[campo] = _onbDatos[campo].filter(v => v !== valor);
+    if (campo === 'condiciones') pfOnboardingStep1(); else pfOnboardingStep2();
+}
+
 function pfOnboardingNingunaCat(grupoId) {
     document.querySelectorAll(`#${grupoId} input[type=checkbox]`).forEach(cb=>cb.checked=false);
 }
 
 function pfOnboardingGoStep2() {
-    _onbDatos.condiciones=Array.from(document.querySelectorAll('.onb-conditions input[type=checkbox]:checked')).map(el=>el.value);
+    pfOnbLeerMarcadas('condiciones');
     pfOnboardingStep2();
 }
 
@@ -135,15 +179,17 @@ function pfOnboardingStep2() {
         </div>
         <div class="onb-section-title">¿Eres alérgico o intolerante a alguno de estos alimentos?</div>
         <div class="onb-conditions">${alergGruposHTML}</div>
+        ${pfOnbOtrasHTML('alergias', '¿Eres alérgico o intolerante a algo que no aparece? Escríbelo', 'Ej: Aguacate, piña, colorantes…')}
+        <p class="onb-hint">Lo que escribas se quita de tu plan de comidas y lo verán tu nutricionista y tu médico.</p>
         <div class="onb-actions">
-            <button class="btn btn-ghost" onclick="pfOnboardingStep1()">← Atrás</button>
+            <button class="btn btn-ghost" onclick="pfOnbLeerMarcadas('alergias');pfOnboardingStep1()">← Atrás</button>
             <button class="btn btn-primary" onclick="pfOnboardingGoStep3()">Siguiente: Preferencias →</button>
         </div>
     </div>`;
 }
 
 function pfOnboardingGoStep3() {
-    _onbDatos.alergias=Array.from(document.querySelectorAll('.onb-conditions input[type=checkbox]:checked')).map(el=>el.value);
+    pfOnbLeerMarcadas('alergias');
     pfOnboardingStep3();
 }
 
@@ -170,15 +216,19 @@ function pfOnboardingStep3() {
         <div class="onb-section-title">¿Cuál es tu preferencia alimentaria?</div>
         <div class="onb-radios">${prefHTML}</div>
         <div class="onb-actions">
-            <button class="btn btn-ghost" onclick="pfOnboardingStep2()">← Atrás</button>
+            <button class="btn btn-ghost" onclick="pfOnbLeerPreferencia();pfOnboardingStep2()">← Atrás</button>
             <button class="btn btn-primary" onclick="pfOnboardingGuardar()">✓ Generar mi plan personalizado</button>
         </div>
     </div>`;
 }
 
-async function pfOnboardingGuardar() {
+function pfOnbLeerPreferencia() {
     const sel=document.querySelector('.onb-radios input[type=radio]:checked');
-    _onbDatos.preferencia=sel?sel.value:'Sin restricciones';
+    if(sel) _onbDatos.preferencia=sel.value;
+}
+
+async function pfOnboardingGuardar() {
+    pfOnbLeerPreferencia();
     const main=document.getElementById('pf-content');
     main.innerHTML=`
     <div class="onb-wizard">
@@ -232,7 +282,7 @@ async function pfRenderPlan() {
             <button class="btn btn-ghost" onclick="pfRenderOnboarding(true)">⚙️ Actualizar perfil</button>
         </div>
 
-        ${SIN_COMPETICION.includes(deporte) ? '' : planSemanaPartidoHTML(rutinaSemanal?.diaPartidoElegido ?? rutinaSemanal?.diaPartido)}
+        ${SIN_COMPETICION.includes(deporte) ? '' : planSemanaPartidoHTML(rutinaSemanal?.diaPartidoElegido ?? rutinaSemanal?.diaPartido, deporte)}
 
         <div class="card" style="margin-bottom:24px">
             <div class="card-header"><h2>🩺 Tu Perfil Médico</h2></div>
@@ -260,24 +310,25 @@ async function pfRenderPlan() {
     </div>`;
 }
 
-/** Día de partido: se elige aquí mismo y la semana (rutina, comidas, sueño) se reorganiza. */
-function planSemanaPartidoHTML(diaPartido) {
+/** Día de competición (partido, pelea, carrera…): se elige aquí mismo y la semana se reorganiza. */
+function planSemanaPartidoHTML(diaPartido, deporte) {
+    const { nombre, pregunta } = competicionDe(deporte || undefined);
     const i = DIAS_SEMANA.indexOf(diaPartido);
     const detalle = i >= 0 ? `
         <ul class="partido-semana">
             <li><strong>${DIAS_SEMANA[(i+6)%7]}</strong> (víspera): sesión corta y suave, más carbohidratos en las comidas.</li>
-            <li><strong>Noches antes del partido</strong>: duerme 8-9 h.</li>
-            <li><strong>${diaPartido}</strong>: partido. Comida principal 3-4 h antes.</li>
+            <li><strong>Noches antes de tu ${nombre}</strong>: duerme 8-9 h.</li>
+            <li><strong>${diaPartido}</strong>: ${nombre}. Comida principal 3-4 h antes.</li>
             <li><strong>${DIAS_SEMANA[(i+1)%7]}</strong>: recuperación (descanso o actividad muy suave).</li>
         </ul>` : diaPartido === 'Ninguno'
-        ? '<p class="msg-ayuda">Semana sin partido fijo: el día que antes era de partido ahora es una sesión normal de práctica. Si un día compites, elígelo aquí.</p>'
+        ? `<p class="msg-ayuda">Semana sin ${nombre} fijo: ese día ahora es una sesión normal de práctica. Si un día compites, elígelo aquí.</p>`
         : '<p class="msg-ayuda">Elige el día y organizamos tu semana: la víspera suave y con más carbohidratos, y el día siguiente de recuperación.</p>';
     return `
         <div class="card partido-card" style="margin-bottom:24px">
-            <div class="card-header"><h2>📅 Tu semana de partido</h2></div>
+            <div class="card-header"><h2>📅 Tu semana de ${nombre}</h2></div>
             <div style="padding:16px 20px">
-                <label class="partido-label">¿Qué día tienes partido o competición?
-                    <select onchange="pfCambiarDiaPartido(this.value)">${diasPartidoOpciones(diaPartido || '')}</select>
+                <label class="partido-label">${pregunta}
+                    <select onchange="pfCambiarDiaPartido(this.value)">${diasCompeticionOpciones(diaPartido || '', deporte)}</select>
                 </label>
                 ${detalle}
             </div>
@@ -288,7 +339,7 @@ async function pfCambiarDiaPartido(dia) {
     if (!dia) return;
     const res = await apiFetch(`${API}/panel/${currentUser.id}/perfil`, { method:'PUT', body: JSON.stringify({ diaPartido: dia }) });
     if (!res.ok) { showToast('No se pudo guardar el día', 'error'); return; }
-    showToast(dia === 'Ninguno' ? 'Listo: semana sin partido fijo' : `Listo: tu semana se organiza para el ${dia.toLowerCase()}`);
+    showToast(dia === 'Ninguno' ? 'Listo: semana sin día fijo de competencia' : `Listo: tu semana se organiza para el ${dia.toLowerCase()}`);
     enSegundoPlano(pfRenderPlan());
 }
 

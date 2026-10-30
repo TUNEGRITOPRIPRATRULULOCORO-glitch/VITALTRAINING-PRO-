@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   altura        NUMERIC,
   fecha_nacimiento DATE,
   posicion      VARCHAR(100),
+  estilo        VARCHAR(40),  -- boxeo: estilo de pelea (cambia la rutina)
   frecuencia    VARCHAR(100),
   pie           VARCHAR(50),
   objetivo      TEXT,

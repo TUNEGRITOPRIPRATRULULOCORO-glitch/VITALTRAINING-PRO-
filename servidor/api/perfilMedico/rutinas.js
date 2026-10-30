@@ -50,6 +50,8 @@
  * BOXEO — los asaltos son de 3 min con 1 min de pausa, así que el acondicionamiento usa esa misma
  *   estructura. La potencia del golpe nace de piernas y tronco (trabajo rotacional), y el cuello
  *   fuerte ayuda a absorber impactos. Recreativo: misma base, sin sparring.
+ *   El estilo cambia el trabajo específico: el fajador necesita volumen y corta distancia, el
+ *   estilista jab y piernas, el contragolpeador reacción y defensa, y el pegador potencia.
  *
  * GIMNASIO — para ganar músculo: entrenar cada grupo muscular 2 veces por semana (Schoenfeld et al.,
  *   Sports Medicine 2016) con unas 10 series semanales o más por músculo (Schoenfeld et al., J Sports
@@ -366,6 +368,28 @@ const EJERCICIOS = {
   boxSparring: [
     { nombre: 'Sparring técnico controlado', impacto: 'alto', evitar: [...CORAZON, 'Migraña crónica'], series: 4, tiempo: '3 min' },
     { nombre: 'Trabajo de distancia con compañero (sin golpes a la cabeza)', impacto: 'medio', evitar: [], series: 3, tiempo: '3 min' },
+  ],
+
+  // Trabajo específico de cada estilo de boxeo (se añade a los días de técnica)
+  boxFajador: [
+    { nombre: 'Corta distancia en saco: ganchos y uppercuts al cuerpo', impacto: 'alto', evitar: CORAZON, series: 4, tiempo: '3 min' },
+    { nombre: 'Cabeceo y entrada bajo la cuerda tensa', impacto: 'medio', evitar: [], series: 3, tiempo: '2 min' },
+    { nombre: 'Ráfagas de volumen: 20 seg sin parar / 10 seg pausa', impacto: 'alto', evitar: CORAZON, series: 6, tiempo: '30 seg' },
+  ],
+  boxEstilista: [
+    { nombre: 'Jab y doble jab en desplazamiento', impacto: 'medio', evitar: [], series: 4, tiempo: '3 min' },
+    { nombre: 'Juego de piernas en escalera de agilidad', impacto: 'medio', evitar: TOBILLO, series: 3, tiempo: '2 min' },
+    { nombre: 'Sombra en distancia: entrar, golpear y salir en ángulo', impacto: 'medio', evitar: [], series: 3, tiempo: '3 min' },
+  ],
+  boxContragolpe: [
+    { nombre: 'Contras con el entrenador: esquiva y responde', impacto: 'alto', evitar: CORAZON, series: 4, tiempo: '3 min' },
+    { nombre: 'Reacción con pelota de tenis o luces', impacto: 'bajo', evitar: [], series: 3, tiempo: '1 min' },
+    { nombre: 'Bloqueo y contragolpe con compañero (lento y técnico)', impacto: 'medio', evitar: [], series: 3, tiempo: '2 min' },
+  ],
+  boxPegador: [
+    { nombre: 'Golpes de potencia en saco pesado (uno a uno, máxima intención)', impacto: 'alto', evitar: CORAZON, series: 5, tiempo: '1 min' },
+    { nombre: 'Lanzamiento rotacional de balón medicinal contra la pared', impacto: 'medio', evitar: ['Hernia discal'], series: 4, repeticiones: 6 },
+    { nombre: 'Saltos al cajón (potencia de piernas)', impacto: 'alto', evitar: RODILLA, series: 3, repeticiones: 5 },
   ],
 
   // ── Gimnasio ───────────────────────────────────────────────────────────────
@@ -885,25 +909,42 @@ function notasPartido(semana) {
   ];
 }
 
-/** Rutina semanal según deporte, posición, condiciones médicas y día de partido. */
-function generarRutina(perfilMedico, posicion, deporte = 'Fútbol', diaPartido = null) {
+/** Estilos de boxeo (los mismos que ESTILOS_BOXEO en compartido/deportes.js): ejercicios y enfoque propios. */
+const ESTILOS_BOXEO = {
+  'Fajador (presión)':     { grupo: 'boxFajador',     enfoque: 'Fajador: mucho volumen de golpes y corta distancia; la resistencia anaeróbica y el trabajo al cuerpo son la base.' },
+  'Estilista (distancia)': { grupo: 'boxEstilista',   enfoque: 'Estilista: jab, juego de piernas y control de la distancia; más resistencia aeróbica para moverte los asaltos completos.' },
+  'Contragolpeador':       { grupo: 'boxContragolpe', enfoque: 'Contragolpeador: defensa, tiempo de reacción y respuesta inmediata después de esquivar.' },
+  'Pegador':               { grupo: 'boxPegador',     enfoque: 'Pegador: potencia de piernas y tronco para golpes que definen; descansos completos entre series de potencia.' },
+};
+
+/** Añade el trabajo del estilo de boxeo a los días de técnica (no al día de pelea). */
+function conEstilo(semanaBase, estilo) {
+  const e = ESTILOS_BOXEO[estilo];
+  if (!e) return semanaBase;
+  return semanaBase.map(s => (s.grupos.includes('boxTecnica') && !ES_PARTIDO.test(s.tipo) ? { ...s, grupos: [...s.grupos, e.grupo] } : s));
+}
+
+/** Rutina semanal según deporte, posición, condiciones médicas, día de partido y (en boxeo) estilo. */
+function generarRutina(perfilMedico, posicion, deporte = 'Fútbol', diaPartido = null, estilo = null) {
   const { condiciones = [] } = perfilMedico;
   const deporteValido = RUTINAS[deporte] ? deporte : 'Fútbol';
   const plantillas = RUTINAS[deporteValido];
   const posicionValida = plantillas[posicion] ? posicion : POR_DEFECTO[deporteValido];
   const plantilla = plantillas[posicionValida];
 
-  const semana = ordenarSemana(plantilla.semana, diaPartido);
+  const estiloBoxeo = deporteValido === 'Boxeo' && ESTILOS_BOXEO[estilo] ? estilo : null;
+  const semana = ordenarSemana(estiloBoxeo ? conEstilo(plantilla.semana, estiloBoxeo) : plantilla.semana, diaPartido);
   const porCondicion = notasPorCondicion(condiciones);
   const notas = [
     `🎯 ${plantilla.enfoque}`,
+    ...(estiloBoxeo ? [`🥊 ${ESTILOS_BOXEO[estiloBoxeo].enfoque}`] : []),
     NOTAS_DEPORTE[deporteValido],
     ...notasPartido(semana),
     ...(porCondicion.length ? porCondicion : ['✅ Sin restricciones especiales. Sigue el plan completo con buena técnica.']),
   ];
   const titulo = deporteValido === 'Estar en forma'
     ? `Rutina para estar en forma · nivel ${posicionValida.toLowerCase()}`
-    : `Rutina de ${deporteValido.toLowerCase()} para ${posicionValida}`;
+    : `Rutina de ${deporteValido.toLowerCase()} para ${posicionValida}${estiloBoxeo ? ` · ${estiloBoxeo.split(' (')[0].toLowerCase()}` : ''}`;
 
   return {
     descripcion: `${titulo}${condiciones.length ? ' · adaptada a condiciones' : ''}`,
@@ -922,4 +963,4 @@ function generarRutina(perfilMedico, posicion, deporte = 'Fútbol', diaPartido =
   };
 }
 
-module.exports = { generarRutina, RUTINAS, EJERCICIOS };
+module.exports = { generarRutina, RUTINAS, EJERCICIOS, ESTILOS_BOXEO };

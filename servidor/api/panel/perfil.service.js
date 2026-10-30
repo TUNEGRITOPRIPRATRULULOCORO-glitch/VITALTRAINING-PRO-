@@ -1,7 +1,7 @@
 const { query } = require('../../../base-de-datos/db');
 const usuarios = require('../usuarios');
 const { edadDesde } = require('./ficha');
-const { DEPORTES, DIAS_SEMANA } = require('../../compartido/deportes');
+const { DEPORTES, DIAS_SEMANA, ESTILOS_BOXEO } = require('../../compartido/deportes');
 
 // Día de la semana con partido o competición; "Ninguno" si no compite
 const DIAS_PARTIDO = [...DIAS_SEMANA, 'Ninguno'];
@@ -19,6 +19,7 @@ async function obtenerPerfil(userId) {
             p.dia_partido AS "diaPartido",
             u.fecha_nacimiento AS "fechaNacimiento",
             u.deporte_principal AS "deportePrincipal",
+            u.estilo,
             p.updated_at AS "updatedAt"
      FROM usuarios u
      LEFT JOIN perfiles p ON p.user_id = u.id
@@ -51,6 +52,11 @@ async function actualizarPerfil(userId, datos) {
   );
 
   const perfil = rows[0];
+  // Boxeo: el estilo de pelea cambia la rutina (se guarda en la cuenta, como el deporte)
+  if (ESTILOS_BOXEO.includes(datos.estilo)) {
+    await query('UPDATE usuarios SET estilo = $1 WHERE id = $2', [datos.estilo, userId]);
+    perfil.estilo = datos.estilo;
+  }
   if (DEPORTES.includes(datos.deportePrincipal)) {
     const deporte = await usuarios.actualizarDeporte(userId, datos.deportePrincipal);
     perfil.deportePrincipal = deporte || datos.deportePrincipal;

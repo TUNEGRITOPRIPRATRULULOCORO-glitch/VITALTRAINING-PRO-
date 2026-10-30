@@ -10,6 +10,7 @@ module.exports = {
   crearAlerta:             historial.crearAlerta,
   registrarComidaAsignada: historial.registrarComidaAsignada,
   registrarRutinaAsignada: historial.registrarRutinaAsignada,
-  revisarCargaAlta:        historial.revisarCargaAlta,   // tras una sesión: ¿la carga entró en riesgo alto?
+  revisarCargaAlta:        historial.revisarCargaAlta,
+  actualizarPerfil:        require('./perfil.service').actualizarPerfil, // sexo y día de competición del registro   // tras una sesión: ¿la carga entró en riesgo alto?
   fichaDeportiva,          // (usuario, perfil) → deporte, posición, peso, altura, edad...
 };

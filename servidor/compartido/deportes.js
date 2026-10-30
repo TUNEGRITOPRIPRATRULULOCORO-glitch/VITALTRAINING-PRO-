@@ -13,4 +13,23 @@ const SIN_COMPETICION = ['Gimnasio', 'Estar en forma'];
 
 const DIAS_SEMANA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-module.exports = { DEPORTES, SIN_COMPETICION, DIAS_SEMANA };
+/**
+ * Cómo se llama la competición en cada deporte: no siempre es un "partido".
+ * (La interfaz tiene la misma lista en comun.js.)
+ */
+const COMPETICION = {
+  'Fútbol': 'partido', 'Baloncesto': 'partido', 'Béisbol': 'partido', 'Tenis': 'partido o torneo',
+  'Atletismo': 'competencia', 'Running': 'carrera', 'Natación': 'competencia', 'Boxeo': 'sparring o pelea',
+};
+
+/** { nombre, dia, vispera, pregunta } para mostrar en la app según el deporte. */
+function competicionDe(deporte = 'Fútbol') {
+  const nombre = COMPETICION[deporte] || 'competencia';
+  const mayus = nombre[0].toUpperCase() + nombre.slice(1);
+  return { nombre, dia: `Día de ${nombre}`, vispera: `Víspera de ${nombre}`, corto: mayus, pregunta: `¿Qué día tienes ${nombre}?` };
+}
+
+/** Estilos de boxeo: cambian los ejercicios de técnica y acondicionamiento de la rutina. */
+const ESTILOS_BOXEO = ['Fajador (presión)', 'Estilista (distancia)', 'Contragolpeador', 'Pegador', 'Mixto / todavía no lo sé'];
+
+module.exports = { DEPORTES, SIN_COMPETICION, DIAS_SEMANA, COMPETICION, competicionDe, ESTILOS_BOXEO };

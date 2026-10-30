@@ -245,9 +245,10 @@ async function misEquipos(usuario) {
   const miembros = (await miembrosDe(ids)).filter(m => m.estado === 'Activo');
   return rows.map(r => {
     const e = aEquipo(r, miembros);
-    // El código solo lo reparte el administrador; el atleta no ve la lista de compañeros (privacidad)
+    // El código lo reparten el administrador y el entrenador del equipo; el atleta no ve la lista de compañeros (privacidad)
     const { codigo, ...resto } = e;
-    return esAtleta(usuario.rol) ? { ...resto, atletas: undefined } : resto;
+    if (esAtleta(usuario.rol)) return { ...resto, atletas: undefined };
+    return usuario.rol === 'Entrenador' ? e : resto;
   });
 }
 
@@ -262,6 +263,14 @@ async function unirseConCodigo(usuario, codigo) {
   return { id: Number(rows[0].id), nombre: rows[0].nombre };
 }
 
+/** Equipo por su código de invitación (para unirse al registrarse), o null. */
+async function porCodigo(codigo) {
+  const limpio = String(codigo || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (limpio.length !== LARGO_CODIGO) return null;
+  const { rows } = await query('SELECT id, nombre, deporte FROM equipos WHERE codigo = $1', [limpio]);
+  return rows[0] ? { id: Number(rows[0].id), nombre: rows[0].nombre, deporte: rows[0].deporte } : null;
+}
+
 /** ¿Está el atleta en algún equipo? (En un equipo, sus tests los registra el entrenador.) */
 async function tieneEquipo(userId) {
   return (await equiposIdsDe(userId)).length > 0;
@@ -271,5 +280,5 @@ module.exports = {
   tieneEquipo,
   atletasVisibles, puedeVerAtleta, filtrarAtletas, puedenHablar, filtrarContactos, accesoAtleta, nombresDeEquipos,
   listar, crear, actualizar, renovarCodigo, eliminar, agregarMiembro, quitarMiembro, misEquipos, unirseConCodigo,
-  hayEquipos, nuevoCodigo, LARGO_CODIGO,
+  hayEquipos, nuevoCodigo, LARGO_CODIGO, porCodigo, nombreRepetido,
 };

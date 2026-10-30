@@ -40,8 +40,12 @@ async function entRenderMensajes() {
 async function entRenderAtletas() {
     const main = document.getElementById('en-content');
     main.innerHTML = showLoading();
-    const data = await apiFetch(`${API}/rendimiento/equipo`).then(r => r.json()).catch(() => null);
+    const [data, mios] = await Promise.all([
+        apiFetch(`${API}/rendimiento/equipo`).then(r => r.json()).catch(() => null),
+        apiFetch(`${API}/equipos/mios`).then(r => r.json()).catch(() => null),
+    ]);
     if (!data?.ok) { main.innerHTML = showError('No se pudieron cargar tus atletas.', 'entRenderAtletas()'); return; }
+    const misEquipos = (mios?.equipos || []).filter(e => e.codigo);
     _enAtletas = data.atletas || [];
     const deBaja = _enAtletas.filter(a => a.estadoMedico?.estado === 'no_apto');
     main.innerHTML = `
@@ -50,6 +54,12 @@ async function entRenderAtletas() {
             <div class="view-title"><h1>Mis atletas</h1><p>${_enAtletas.length} ${_enAtletas.length === 1 ? 'atleta' : 'atletas'} en tus equipos</p></div>
             <button class="btn btn-ghost" onclick="entRenderAtletas()">Actualizar</button>
         </div>
+        ${misEquipos.map(e => `
+        <div class="en-codigo">
+            <div><span class="eq-lab">👥 ${escapeHtml(e.nombre)} · código para invitar a tus atletas</span><strong class="eq-codigo-valor">${escapeHtml(e.codigo)}</strong>
+                <div class="eq-info-sub">Al registrarse eligen "Me uno a mi equipo" y escriben este código.</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="eqCopiar('${escapeHtml(e.codigo)}')">Copiar</button>
+        </div>`).join('')}
         <div class="eq-info">✓ <strong>Tú registras los tests físicos de tus atletas y verificas sus récords de fuerza.</strong>
             <div class="eq-info-sub">Solo las marcas verificadas cuentan en la clasificación del equipo: así nadie sube números falsos.</div></div>
         ${deBaja.length ? `<div class="ls-aviso rd-bad"><strong>⛔ De baja médica (no entrenan):</strong> <div>${deBaja.map(a => escapeHtml(a.nombre)).join(', ')}</div></div>` : ''}
@@ -63,7 +73,7 @@ async function entRenderAtletas() {
                     <td>${rdBadgeRiesgo(a.carga)}</td>
                     <td>${a.cumplimiento?.porcentaje != null ? a.cumplimiento.porcentaje + '%' : '—'}</td>
                     <td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();entVerAtleta(${Number(a.id)})">Abrir →</button></td>
-                </tr>`).join('') : '<tr><td colspan="6"><div class="empty-state"><p>Aún no tienes atletas. Pide al administrador que te añada a un equipo.</p></div></td></tr>'}
+                </tr>`).join('') : `<tr><td colspan="6"><div class="empty-state"><p>${misEquipos.length ? 'Aún no tienes atletas: comparte el código de tu equipo para que se unan.' : 'Aún no tienes atletas. Pide al administrador que te añada a un equipo.'}</p></div></td></tr>`}
             </tbody></table></div>
         </div>
     </div>`;

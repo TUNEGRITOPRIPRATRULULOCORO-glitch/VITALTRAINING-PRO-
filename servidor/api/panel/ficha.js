@@ -32,6 +32,7 @@ function fichaDeportiva(usuario = {}, perfil = null) {
     altura:      numero(p.altura) ?? numero(usuario.altura),
     edad:        numero(p.edad) ?? edadDesde(usuario.fecha_nacimiento),
     lateralidad: usuario.pie || null,                    // pie o mano dominante según el deporte
+    estilo:      usuario.estilo || null,                 // boxeo: fajador, estilista, contragolpeador, pegador…
     frecuencia:  usuario.frecuencia || null,
     sexo:        p.sexo || null,                         // para calcular calorías (opcional)
     diaPartido:  p.dia_partido || null,                  // organiza la semana (rutina, comidas, sueño)

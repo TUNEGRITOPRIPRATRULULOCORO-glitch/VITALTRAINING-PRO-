@@ -27,11 +27,23 @@ async function postRegistro(req, res) {
     const resultado = await svc.registro(req.body);
     if (resultado.error) return res.status(resultado.status).json({ error: resultado.error });
 
-    res.status(201).json({ ok: true, user: resultado.usuario, ...(resultado.token ? { token: resultado.token } : {}) });
+    res.status(201).json({ ok: true, user: resultado.usuario, ...(resultado.token ? { token: resultado.token } : {}), ...(resultado.equipo ? { equipo: resultado.equipo } : {}) });
     // Después de responder: un fallo del correo no afecta al registro
     avisos.bienvenida(resultado.usuario).catch(err => console.error('❌ Correo de bienvenida:', err.message));
   } catch (err) {
     console.error('❌ Registro:', err.message);
+    res.status(500).json({ error: 'Error interno del servidor.' });
+  }
+}
+
+/** Antes de registrarse: ¿existe el equipo de ese código? (nombre y deporte, sin más datos) */
+async function getEquipo(req, res) {
+  try {
+    const equipo = await svc.equipoPorCodigo(req.params.codigo);
+    if (!equipo) return res.status(404).json({ error: 'No hay ningún equipo con ese código. Revísalo con tu entrenador o tu club.' });
+    res.json({ ok: true, equipo });
+  } catch (err) {
+    console.error('❌ Código de equipo:', err.message);
     res.status(500).json({ error: 'Error interno del servidor.' });
   }
 }
@@ -77,4 +89,4 @@ async function postRestablecer(req, res) {
   }
 }
 
-module.exports = { postLogin, postRegistro, postGoogle, getConfig, postOlvide, postRestablecer };
+module.exports = { postLogin, postRegistro, getEquipo, postGoogle, getConfig, postOlvide, postRestablecer };

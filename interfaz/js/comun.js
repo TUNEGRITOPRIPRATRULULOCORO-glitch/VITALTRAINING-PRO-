@@ -265,6 +265,27 @@ function updateSportSpecificFields() {
     posicionSelect.innerHTML = `<option value="">${choice.posicionLabel.replace('*','')}</option>${choice.posicionOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
     frecuenciaSelect.innerHTML = `<option value="">${choice.frecuenciaLabel.replace('*','')}</option>${choice.frecuenciaOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
     pieSelect.innerHTML = `<option value="">${choice.pieLabel.replace('*','')}</option>${choice.pieOptions.map(v => `<option value="${v}">${v}</option>`).join('')}`;
+
+    // Estilo (solo boxeo) y día de competición con su nombre (no en gimnasio ni "estar en forma")
+    const estilo = document.getElementById('reg-estilo');
+    if (estilo) {
+        document.getElementById('reg-estilo-grupo').classList.toggle('hidden', deporte !== 'Boxeo');
+        if (!estilo.options.length) estilo.innerHTML = `<option value="">¿Cómo peleas?</option>${ESTILOS_BOXEO.map(e => `<option>${e}</option>`).join('')}`;
+    }
+    const partido = document.getElementById('reg-partido');
+    if (partido) {
+        document.getElementById('reg-partido-grupo').classList.toggle('hidden', SIN_COMPETICION.includes(deporte));
+        document.getElementById('reg-partido-label').textContent = competicionDe(deporte || undefined).pregunta;
+        const actual = partido.value;
+        partido.innerHTML = diasCompeticionOpciones(actual, deporte);
+    }
+}
+
+/** Opciones del día de competición, con el nombre que tiene en ese deporte. */
+function diasCompeticionOpciones(actual, deporte) {
+    const nombre = competicionDe(deporte || undefined).nombre;
+    const opciones = [['', 'Selecciona…'], ...DIAS_SEMANA.map(d => [d, d]), ['Ninguno', `No tengo ${nombre} fijo / día variable`]];
+    return opciones.map(([v, t]) => `<option value="${v}" ${(actual||'')===v?'selected':''}>${t}</option>`).join('');
 }
 
 // ── Utilidades ─────────────────────────────────
@@ -554,6 +575,14 @@ const DEPORTES_APP = ['Fútbol','Baloncesto','Tenis','Béisbol','Atletismo','Run
 const ICONOS_DEPORTE = { 'Fútbol':'⚽', 'Baloncesto':'🏀', 'Tenis':'🎾', 'Béisbol':'⚾', 'Atletismo':'🏃', 'Running':'👟', 'Natación':'🏊', 'Boxeo':'🥊', 'Gimnasio':'🏋️', 'Estar en forma':'💪' };
 const SIN_COMPETICION = ['Gimnasio','Estar en forma'];
 const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+// Cómo se llama la competición en cada deporte (igual que en el servidor): no siempre es un "partido"
+const COMPETICION = { 'Fútbol':'partido', 'Baloncesto':'partido', 'Béisbol':'partido', 'Tenis':'partido o torneo',
+    'Atletismo':'competencia', 'Running':'carrera', 'Natación':'competencia', 'Boxeo':'sparring o pelea' };
+function competicionDe(deporte = 'Fútbol') {
+    const nombre = COMPETICION[deporte] || 'competencia';
+    return { nombre, dia: `Día de ${nombre}`, vispera: `Víspera de ${nombre}`, pregunta: `¿Qué día tienes ${nombre}?` };
+}
+const ESTILOS_BOXEO = ['Fajador (presión)', 'Estilista (distancia)', 'Contragolpeador', 'Pegador', 'Mixto / todavía no lo sé'];
 function getSportIcon(sport) { return ICONOS_DEPORTE[sport] || '🏅'; }
 function getSportLabel(sport) { return sport || 'Deporte'; }
 function getSportBadge(sport) { return `${getSportIcon(sport)} ${sport || 'Deporte'}`; }

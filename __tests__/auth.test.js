@@ -55,7 +55,8 @@ describe('auth.service — registro', () => {
   test('crea un nuevo usuario correctamente', async () => {
     query.mockResolvedValueOnce({ rows: [] });
     query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Juan Test', email: 'juan@test.com', rol: 'Atleta', estado: 'Activo' }] });
-    const result = await authService.registro({ nombre: 'Juan Test', email: 'juan@test.com', password: 'abc12345' });
+    query.mockResolvedValueOnce({ rows: [{}] }); // ficha deportiva (sexo y día de competición)
+    const result = await authService.registro({ nombre: 'Juan Test', email: 'juan@test.com', password: 'abc12345', fechaNacimiento: '2000-01-01', sexo: 'Hombre' });
     expect(result.usuario).toBeDefined();
     expect(result.usuario.email).toBe('juan@test.com');
     expect(result.usuario.password).toBeUndefined();
@@ -68,14 +69,15 @@ describe('auth.service — registro', () => {
       capturedParams = params;
       return Promise.resolve({ rows: [{ id: 1, nombre: 'Test Hash', email: 'hash@test.com', rol: 'Futbolista', estado: 'Activo' }] });
     });
-    await authService.registro({ nombre: 'Test Hash', email: 'hash@test.com', password: 'mipassword' });
+    query.mockResolvedValueOnce({ rows: [{}] }); // ficha deportiva (sexo y día de competición)
+    await authService.registro({ nombre: 'Test Hash', email: 'hash@test.com', password: 'mipassword', fechaNacimiento: '2000-01-01', sexo: 'Hombre' });
     expect(capturedParams[2]).toMatch(/^\$2b\$/);
     expect(capturedParams[2]).not.toBe('mipassword');
   });
 
   test('retorna error si el email ya existe', async () => {
     query.mockResolvedValueOnce({ rows: [{ id: 1 }] });
-    const result = await authService.registro({ nombre: 'Duplicado', email: 'admin@test.com', password: 'cualquiera123' });
+    const result = await authService.registro({ nombre: 'Duplicado', email: 'admin@test.com', password: 'cualquiera123', fechaNacimiento: '2000-01-01', sexo: 'Hombre' });
     expect(result.error).toBeDefined();
     expect(result.status).toBe(409);
   });
@@ -83,7 +85,8 @@ describe('auth.service — registro', () => {
   test('el nuevo usuario tiene rol Atleta por defecto', async () => {
     query.mockResolvedValueOnce({ rows: [] });
     query.mockResolvedValueOnce({ rows: [{ id: 1, nombre: 'Nuevo', email: 'nuevo@test.com', rol: 'Atleta', estado: 'Activo' }] });
-    const result = await authService.registro({ nombre: 'Nuevo', email: 'nuevo@test.com', password: '12345678' });
+    query.mockResolvedValueOnce({ rows: [{}] }); // ficha deportiva (sexo y día de competición)
+    const result = await authService.registro({ nombre: 'Nuevo', email: 'nuevo@test.com', password: '12345678', fechaNacimiento: '2000-01-01', sexo: 'Hombre' });
     expect(result.usuario.rol).toBe('Atleta');
     expect(result.usuario.estado).toBe('Activo');
   });
