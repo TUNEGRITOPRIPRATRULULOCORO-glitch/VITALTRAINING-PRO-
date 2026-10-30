@@ -5132,3 +5132,37 @@ body.dark .rd-dia-lesion { background: rgba(139,92,246,0.18); border-color: rgba
     .plan-ejercicio { flex-wrap: wrap; gap: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .ser-record-nuevo { animation: none; } }
+
+/* ── Rangos ──────────────────────────────────────────────── */
+.rg-emblema { flex: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.18)); }
+.rg-emblema-txt { fill: #fff; font-family: var(--font); font-weight: 800; font-size: 19px; }
+.rg-radiante { animation: rg-brillo 2.4s ease-in-out infinite; }
+@keyframes rg-brillo { 50% { filter: drop-shadow(0 0 10px rgba(245,158,11,0.75)); } }
+.rg-hero { display: flex; align-items: center; gap: 20px; padding: 20px 24px; margin-bottom: 20px; }
+.rg-hero h2 { margin: 2px 0 4px; font-size: 26px; }
+.rg-hero p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.rg-tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.rg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.rg-card { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 18px 20px; overflow: hidden; }
+.rg-card-subio { box-shadow: 0 0 0 2px var(--warning), var(--shadow); }
+.rg-cinta { position: absolute; top: 12px; right: 12px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; background: var(--warning); color: #fff; }
+.rg-card-cab { display: flex; align-items: center; gap: 14px; }
+.rg-card-titulo { display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: 70px; }
+.rg-card-titulo strong { font-size: 15px; }
+.rg-etiqueta { font-size: 16px; font-weight: 800; }
+.rg-marca { font-size: 13px; color: var(--text); }
+.rg-barra { height: 6px; border-radius: 6px; background: var(--border); overflow: hidden; }
+.rg-barra div { height: 100%; border-radius: 6px; }
+.rg-falta { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+.rg-vacio p { margin: 0 0 10px; }
+.rg-explica summary { cursor: pointer; list-style: none; }
+.rg-explica summary::-webkit-details-marker { display: none; }
+.rg-explica p { font-size: 13px; line-height: 1.55; margin: 0 0 8px; }
+.rg-escalera { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.rg-escalera span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--text-muted); }
+@media (max-width: 600px) {
+    .rg-hero { padding: 16px; gap: 14px; }
+    .rg-hero h2 { font-size: 22px; }
+    .rg-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .rg-radiante { animation: none; } }

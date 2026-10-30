@@ -14,4 +14,5 @@ async function planActual(userId) {
 module.exports = {
   router: require('./perfilMedico.routes'),
   planActual,
+  obtenerFicha: svc.obtenerFicha, // (userId) → deporte, posición, peso, altura, edad, sexo...
 };

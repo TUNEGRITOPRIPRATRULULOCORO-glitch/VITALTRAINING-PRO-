@@ -4,4 +4,5 @@
  */
 module.exports = {
   router: require('./evaluaciones.routes'),
+  mejoresMarcas: require('./evaluaciones.service').mejoresMarcas, // (userId) → mejor marca de cada prueba
 };

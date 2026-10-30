@@ -62,4 +62,19 @@ async function eliminar(userId, id) {
   return rows.length > 0;
 }
 
-module.exports = { obtener, registrar, eliminar };
+/** Mejor marca de cada prueba que hizo el atleta (de cualquier batería), para los rangos. */
+async function mejoresMarcas(userId) {
+  const { rows } = await query('SELECT prueba, valor, fecha FROM evaluaciones WHERE user_id = $1', [Number(userId)]);
+  const mejores = {};
+  for (const r of rows) {
+    const p = catalogo.PRUEBAS[r.prueba];
+    if (!p) continue;
+    const valor = Number(r.valor);
+    const actual = mejores[r.prueba];
+    if (!actual || (p.mejor === 'mayor' ? valor > actual.valor : valor < actual.valor))
+      mejores[r.prueba] = { prueba: { id: r.prueba, ...p }, valor, fecha: aFechaISO(r.fecha) };
+  }
+  return Object.values(mejores);
+}
+
+module.exports = { obtener, registrar, eliminar, mejoresMarcas };

@@ -226,6 +226,15 @@ CREATE TABLE IF NOT EXISTS series (  -- registro serie a serie del atleta
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS rangos (  -- el rango más alto alcanzado en cada marca (nunca se baja)
+  id         BIGSERIAL PRIMARY KEY,
+  user_id    BIGINT NOT NULL,
+  clave      VARCHAR(140) NOT NULL,  -- 'fuerza:<ejercicio>' o 'test:<prueba>'
+  paso       INTEGER NOT NULL,       -- 0 = Bronce I … 21 = Radiante
+  fecha      DATE,
+  UNIQUE(user_id, clave)
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -246,3 +255,4 @@ ALTER TABLE notas_clinicas ADD CONSTRAINT notas_clinicas_user_id_fkey FOREIGN KE
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_equipo_id_fkey FOREIGN KEY (equipo_id) REFERENCES equipos(id) ON DELETE CASCADE;
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE series ADD CONSTRAINT series_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE rangos ADD CONSTRAINT rangos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

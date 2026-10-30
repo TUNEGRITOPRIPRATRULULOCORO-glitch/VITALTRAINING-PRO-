@@ -96,6 +96,9 @@ async function serAnadir(i) {
         celebrar = `${serSerieTxt(res.serie)}${res.e1rm ? ` (≈ ${serKg(res.e1rm)} máximo estimado)` : ''}. ¡Vita está orgullosa! 💪`;
         showToast('🏆 ¡Nuevo récord personal!');
     }
+    // Un récord (o la primera marca) puede subir el rango del ejercicio
+    const rango = await rgCelebrarSubida(`fuerza:${ej.nombre}`);
+    if (rango) celebrar = `${celebrar ? `${celebrar} ` : ''}${rango.subio ? 'Subiste' : 'Tu primer rango'}: ${rango.rango.etiqueta}.`;
     await serPintar(i, celebrar);
 }
 

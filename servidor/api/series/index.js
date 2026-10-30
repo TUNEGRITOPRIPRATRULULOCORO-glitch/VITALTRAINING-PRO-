@@ -4,4 +4,5 @@
  */
 module.exports = {
   router: require('./series.routes'),
+  records: require('./series.service').records, // (userId) → mejor marca de cada ejercicio
 };

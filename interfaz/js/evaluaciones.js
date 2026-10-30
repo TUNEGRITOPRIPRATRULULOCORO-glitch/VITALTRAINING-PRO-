@@ -134,6 +134,7 @@ async function evGuardar(userId) {
     closeModal();
     showToast('Resultado guardado');
     enSegundoPlano(evRender(_evDatos.contenedorId, userId, { propio: _evDatos.propio }));
+    if (_evDatos.propio) enSegundoPlano(rgCelebrarSubida(`test:${body.prueba}`));
 }
 
 async function evBorrar(userId, id) {
