@@ -173,7 +173,7 @@ function resumir(deporte, resultados, hoy) {
     };
   });
 
-  const fechas = resultados.map(r => r.fecha).sort();
+  const fechas = resultados.map(r => r.fecha).sort((a, b) => a.localeCompare(b));
   const ultimaFecha = fechas.at(-1) || null;
   const diasDesde = ultimaFecha ? diasEntre(ultimaFecha, hoy) : null;
   let proxima = 'sin-datos';

@@ -42,7 +42,7 @@ const LOGROS = [
 
 /** Racha más larga de días seguidos en una lista de fechas 'YYYY-MM-DD'. */
 function rachaMaxima(fechas) {
-  const dias = [...new Set(fechas)].sort();
+  const dias = [...new Set(fechas)].sort((a, b) => a.localeCompare(b));
   let max = 0, actual = 0, anterior = null;
   for (const f of dias) {
     const seguido = anterior && (new Date(`${f}T00:00:00Z`) - new Date(`${anterior}T00:00:00Z`)) === 86400000;

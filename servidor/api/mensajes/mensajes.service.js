@@ -115,8 +115,8 @@ async function enviar(yo, otroId, texto) {
      RETURNING id, texto, created_at`,
     [Number(yo.id), Number(otro.id), limpio]
   );
-  // Aviso al celular de quien lo recibe (no espera: enviar() nunca falla)
-  require('../notificaciones').enviar(otro.id, {
+  // Aviso al celular de quien lo recibe (sin esperar: enviar() nunca falla)
+  void require('../notificaciones').enviar(otro.id, {
     titulo: `💬 ${yo.nombre || 'Nuevo mensaje'}`, cuerpo: limpio.slice(0, 120), url: '/', etiqueta: `mensaje-${yo.id}`,
   });
   return { id: Number(rows[0].id), texto: rows[0].texto, fecha: rows[0].created_at, mio: true, leido: false };

@@ -156,7 +156,7 @@ async function crearAlerta(userId, tipo, mensaje, fecha) {
   );
   // También al celular, si lo tiene activado (no espera: el aviso no frena a quien crea la alerta)
   const notificaciones = require('../notificaciones');
-  notificaciones.enviar(userId, notificaciones.avisoDeAlerta(tipo, mensaje));
+  void notificaciones.enviar(userId, notificaciones.avisoDeAlerta(tipo, mensaje)); // nunca falla
 }
 
 // Comidas y rutinas asignadas por un nutricionista (quedan marcadas con registrado_por)
