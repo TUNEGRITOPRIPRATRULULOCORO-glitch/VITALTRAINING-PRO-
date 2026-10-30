@@ -5405,6 +5405,8 @@ body.dark .vf-ok { color: #86efac; }
 .reloj-acciones { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .reloj-acciones label.btn { cursor: pointer; }
 .reloj-acciones [hidden] { display: none !important; } /* .btn fija su display */
+#rv-aviso.hidden { display: none; }
+#rv-aviso { text-align: left; margin: 14px 0 0; }
 .reloj-nota { color: var(--text-muted); font-size: 13px; margin: 10px 0; }
 .reloj-ayuda p { margin: 0 0 10px; font-size: 14px; }
 .reloj-subtitulo { font-size: 15px; margin: 18px 0 10px; }

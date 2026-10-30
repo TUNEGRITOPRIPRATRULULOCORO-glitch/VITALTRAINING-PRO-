@@ -72,6 +72,7 @@ function relojAyuda() {
             <p><strong>Coros / Suunto / Amazfit:</strong> en su app, abre la actividad → compartir o exportar → TCX o GPX.</p>
             <p><strong>Strava:</strong> en la web, abre la actividad → ⋯ → <em>Exportar GPX</em>.</p>
             <p><strong>Apple Watch:</strong> con una app como HealthFit, exporta el entrenamiento como TCX o GPX.</p>
+            <p><strong>Relojes económicos (H Band, FitCloudPro, Da Fit…):</strong> muchos solo envían el pulso a su propia app. Pulsa "¿No aparece tu reloj? Buscar todos": la app te dirá si el tuyo es compatible.</p>
             <p class="reloj-nota">❤️ <strong>Pulso en vivo</strong> funciona en Chrome (Android o computador) con una banda de pecho, o con un reloj que pueda <em>transmitir la frecuencia cardiaca</em> (Garmin, Polar, Coros, Amazfit…). En iPhone, importa el archivo.</p>
         </div>`);
 }
@@ -201,19 +202,44 @@ function relojAbrirEnVivo(userId) {
             </div>
             <div class="reloj-acciones" style="justify-content:center">
                 <button class="btn btn-primary" id="rv-conectar" onclick="relojConectar()" ${grabando ? 'hidden' : ''}>🔗 Conectar sensor y empezar</button>
+                <button class="btn btn-ghost btn-sm" onclick="relojConectar(true)" ${grabando ? 'hidden' : ''}>¿No aparece tu reloj? Buscar todos</button>
                 <button class="btn btn-primary" id="rv-terminar" onclick="relojTerminar()" ${grabando ? '' : 'hidden'}>✅ Terminar y guardar</button>
                 <button class="btn btn-ghost" id="rv-cancelar" onclick="relojCancelar()" ${grabando ? '' : 'hidden'}>Descartar</button>
             </div>
+            <div id="rv-aviso" class="ev-aviso ev-aviso-alerta hidden"></div>
             <p class="reloj-nota">Puedes cerrar esta ventana: la sesión sigue midiendo hasta que la termines.</p>
         </div>`);
     relojPintar();
 }
 
-async function relojConectar() {
+/** Mensaje claro para cada fallo de Bluetooth (antes algunos se quedaban sin aviso). */
+function relojMensajeError(err, nombre) {
+    const texto = String(err?.message || '');
+    if (err?.name === 'NotFoundError' && /cancel/i.test(texto)) return null; // cerró la lista sin elegir
+    if (err?.sinPulso) return `${nombre || 'Tu reloj'} se conectó, pero no comparte el pulso con otras apps: solo lo envía a su propia app. Importa sus entrenamientos como archivo o usa una banda de pecho.`;
+    if (navigator.brave) return 'Brave trae el Bluetooth apagado para las páginas web. Abre VitalTraining en Google Chrome para usar el pulso en vivo.';
+    if (/globally disabled|not available|adapter/i.test(texto) || err?.name === 'NotFoundError')
+        return 'No se pudo usar el Bluetooth: enciéndelo y, en Ajustes del celular → Apps → Chrome → Permisos, permite "Dispositivos cercanos" (o "Ubicación").';
+    if (err?.name === 'SecurityError' || err?.name === 'NotAllowedError') return 'El navegador no dio permiso para usar el Bluetooth. Revisa los permisos de Chrome y vuelve a intentarlo.';
+    if (err?.name === 'NetworkError') return 'No se pudo conectar: acerca el reloj y cierra su app oficial (algunos relojes solo hablan con un celular a la vez).';
+    return 'No se pudo conectar el sensor: ' + texto;
+}
+
+/**
+ * todos=false: solo aparecen los sensores que comparten el pulso en formato estándar.
+ * todos=true: aparece cualquier dispositivo cercano, para saber si un reloj que no salía es compatible.
+ */
+async function relojConectar(todos = false) {
+    let dispositivo = null;
     try {
-        const dispositivo = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
+        dispositivo = await navigator.bluetooth.requestDevice(todos
+            ? { acceptAllDevices: true, optionalServices: ['heart_rate'] }
+            : { filters: [{ services: ['heart_rate'] }] });
         const servidor = await dispositivo.gatt.connect();
-        const servicio = await servidor.getPrimaryService('heart_rate');
+        const servicio = await servidor.getPrimaryService('heart_rate').catch(() => {
+            try { dispositivo.gatt.disconnect(); } catch { /* ya desconectado */ }
+            throw Object.assign(new Error('Sin servicio de pulso'), { sinPulso: true });
+        });
         const medida = await servicio.getCharacteristic('heart_rate_measurement');
         await medida.startNotifications();
         medida.addEventListener('characteristicvaluechanged', e => {
@@ -235,8 +261,15 @@ async function relojConectar() {
         const b = document.getElementById('rv-conectar'); if (b) b.hidden = true;
         showToast(`Conectado a ${dispositivo.name || 'tu sensor'} ✓`);
     } catch (err) {
-        if (err.name !== 'NotFoundError') showToast('No se pudo conectar el sensor: ' + err.message, 'error', 5000);
+        const mensaje = relojMensajeError(err, dispositivo?.name);
+        if (mensaje) relojAvisoConexion(mensaje);
     }
+}
+
+function relojAvisoConexion(mensaje) {
+    const el = document.getElementById('rv-aviso');
+    if (el) { el.textContent = mensaje; el.classList.remove('hidden'); }
+    else showToast(mensaje, 'error', 7000);
 }
 
 function relojPintar() {
