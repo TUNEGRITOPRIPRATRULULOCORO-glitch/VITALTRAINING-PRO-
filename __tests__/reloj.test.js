@@ -140,6 +140,25 @@ describe('guardar sesiones del reloj', () => {
     await expect(svc.registrar(carlos, { ...base, pulsos: Array(20000).fill(100) })).rejects.toThrow(/demasiados/);
   });
 
+  test('sesión sin pulso: el atleta dice el esfuerzo y cuenta en la carga', async () => {
+    const r = await svc.registrar(carlos, { origen: 'archivo', inicio: hace(0.5).toISOString(), duracionSeg: 3480, pulsos: [], distanciaM: 5830, nombre: 'Carrera (reloj)' });
+    expect(r).toMatchObject({ minutos: 58, rpe: null, carga: null });
+    await expect(svc.ponerEsfuerzo(carlos, r.id, 11)).rejects.toMatchObject({ status: 400 });
+    const s = await svc.ponerEsfuerzo(carlos, r.id, 7);
+    expect(s).toMatchObject({ rpe: 7, intensidad: 'Alta', carga: 406 });
+    const [conPulso] = (await svc.listar(carlos)).filter(x => x.fcMedia);
+    await expect(svc.ponerEsfuerzo(carlos, conPulso.id, 5)).rejects.toMatchObject({ status: 409 });
+  });
+
+  test('GPX con el pulso escrito de otras formas', () => {
+    const punto = (i, extra) => `<trkpt lat="4.6" lon="-74.0${i}"><time>${new Date(Date.UTC(2026, 9, 1, 10, 0, i * 5)).toISOString()}</time>${extra}</trkpt>`;
+    for (const forma of [v => `<extensions><heartrate>${v}</heartrate></extensions>`, v => `<extensions><ns3:TrackPointExtension><ns3:hr>${v}</ns3:hr></ns3:TrackPointExtension></extensions>`,
+      v => `<extensions><HeartRateBpm><Value>${v}</Value></HeartRateBpm></extensions>`, v => `<extensions><heart_rate>${v}</heart_rate></extensions>`]) {
+      const texto = `<gpx><trk><trkseg>${[0, 1, 2].map(i => punto(i, forma(140))).join('')}</trkseg></trk></gpx>`;
+      expect(archivos.leerArchivo('x.gpx', texto).pulsos).toEqual([140, 140, 140]);
+    }
+  });
+
   test('cuenta para los logros y se borra con la sesión', async () => {
     const logros = await require('../servidor/api/logros/logros.service').obtener(carlos, { id: carlos, rol: 'Atleta' });
     expect(logros.logros.find(l => l.clave === 'reloj_1')).toMatchObject({ conseguido: true });

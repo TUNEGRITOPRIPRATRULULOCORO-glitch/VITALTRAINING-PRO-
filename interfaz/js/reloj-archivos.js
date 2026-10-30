@@ -105,7 +105,9 @@
         if (anterior) distanciaM += distancia(anterior, { lat, lon });
         anterior = { lat, lon };
       }
-      const hr = etiqueta(p, 'hr') ?? etiqueta(p, 'heartrate');
+      // Cada app escribe el pulso a su manera: <gpxtpx:hr>, <ns3:hr>, <heartrate>, <heart_rate>, <HeartRateBpm><Value>, hr="…"
+      const hr = etiqueta(p, 'hr') ?? etiqueta(p, 'heartrate') ?? etiqueta(p, 'heart_rate') ?? etiqueta(p, 'heartRate')
+        ?? (/<(?:\w+:)?HeartRateBpm[^>]*>\s*<(?:\w+:)?Value>\s*(\d+)/i.exec(p) || /\b(?:hr|heartrate)="(\d+)"/i.exec(p) || [])[1] ?? null;
       puntos.push({ t, hr: hr == null ? 0 : Number(hr) });
     }
     return armar(puntos, { deporte, distanciaM });

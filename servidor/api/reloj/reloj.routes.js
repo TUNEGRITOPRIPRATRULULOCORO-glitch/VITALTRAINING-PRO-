@@ -2,6 +2,7 @@
  * POST /api/reloj/:userId/sesiones     → Guardar una sesión del reloj (archivo) o del pulsómetro Bluetooth
  * GET  /api/reloj/:userId/sesiones     → Últimas sesiones con pulso (zonas, carga, distancia)
  * GET  /api/reloj/:userId/sesiones/:id → Una sesión con su curva de pulso
+ * PUT  /api/reloj/:userId/sesiones/:id/esfuerzo → Esfuerzo 1-10 de una sesión que llegó sin pulso { rpe }
  *
  * Registran: el propio atleta y su entrenador. Consultan además el médico y el nutricionista.
  */
@@ -35,6 +36,14 @@ router.get('/:userId/sesiones', accesoAtleta(...CONSULTAN), async (req, res) => 
 router.get('/:userId/sesiones/:id', accesoAtleta(...CONSULTAN), async (req, res) => {
   try { res.json({ ok: true, sesion: await svc.detalle(req.params.userId, req.params.id) }); }
   catch (err) { fallo(res, err, 'Error cargando la sesión.'); }
+});
+
+router.put('/:userId/sesiones/:id/esfuerzo', accesoAtleta('Administrador', 'Entrenador'), async (req, res) => {
+  try {
+    const sesion = await svc.ponerEsfuerzo(req.params.userId, req.params.id, req.body?.rpe);
+    res.json({ ok: true, sesion });
+    revisarCargaAlta(Number(req.params.userId)).catch(err => console.error('❌ Revisar carga:', err.message));
+  } catch (err) { fallo(res, err, 'Error guardando el esfuerzo.'); }
 });
 
 module.exports = router;

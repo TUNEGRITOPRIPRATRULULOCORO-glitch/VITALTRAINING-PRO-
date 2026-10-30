@@ -125,4 +125,18 @@ async function detalle(userId, sesionId) {
   return aSesion(rows[0], true);
 }
 
-module.exports = { registrar, listar, detalle };
+/**
+ * Sesión sin pulso (el archivo no lo traía): el atleta dice qué tan dura fue (1-10) y con eso
+ * cuenta en la carga como cualquier sesión registrada a mano (minutos × esfuerzo).
+ */
+async function ponerEsfuerzo(userId, sesionId, rpe) {
+  const esfuerzo = Number(rpe);
+  if (!Number.isInteger(esfuerzo) || esfuerzo < 1 || esfuerzo > 10) throw error('El esfuerzo va de 1 a 10.');
+  const s = await detalle(userId, sesionId);
+  if (s.fcMedia) throw error('Esta sesión ya tiene su esfuerzo calculado con el pulso.', 409);
+  await query('UPDATE rutinas SET rpe = $1, intensidad = $2 WHERE id = $3 AND user_id = $4',
+    [esfuerzo, calc.intensidadDe(esfuerzo), s.rutinaId, Number(userId)]);
+  return detalle(userId, sesionId);
+}
+
+module.exports = { registrar, listar, detalle, ponerEsfuerzo };

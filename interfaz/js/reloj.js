@@ -137,9 +137,33 @@ function relojDatosHTML(s) {
 function relojMostrarResumen(s) {
     openModal(`✅ ${escapeHtml(s.nombre)}`, `
         ${relojDatosHTML(s)}
+        ${relojPedirEsfuerzoHTML(s)}
         <h3 class="reloj-subtitulo">Tiempo en cada zona</h3>
         ${relojZonasHTML(s.zonas)}
         <p class="reloj-nota">La sesión ya cuenta en tu carga de entrenamiento, tus logros y la clasificación.</p>`);
+}
+
+/** Sin pulso: el atleta dice qué tan dura fue la sesión para que cuente bien en su carga. */
+function relojPedirEsfuerzoHTML(s) {
+    if (s.fcMedia || !s.id) return '';
+    const ayuda = { 1: 'Muy suave', 3: 'Suave', 5: 'Moderada', 7: 'Dura', 9: 'Muy dura', 10: 'Máxima' };
+    return `
+        <div class="reloj-esfuerzo">
+            <strong>${s.rpe ? 'Esfuerzo guardado: ' + s.rpe + '/10 · puedes cambiarlo' : '¿Qué tan dura fue esta sesión?'}</strong>
+            <p class="reloj-nota">El archivo no traía tu pulso: con tu respuesta calculamos el esfuerzo y la carga.</p>
+            <div class="reloj-esfuerzo-botones">${Array.from({ length: 10 }, (_, i) => i + 1).map(n => `
+                <button type="button" class="btn btn-sm ${s.rpe === n ? 'btn-primary' : 'btn-ghost'}" title="${ayuda[n] || ''}" onclick="relojGuardarEsfuerzo(${Number(s.id)}, ${n})">${n}</button>`).join('')}</div>
+            <div class="reloj-esfuerzo-escala"><span>Muy suave</span><span>Máxima</span></div>
+        </div>`;
+}
+
+async function relojGuardarEsfuerzo(sesionId, rpe) {
+    const res = await apiFetch(`${API}/reloj/${currentUser.id}/sesiones/${sesionId}/esfuerzo`, { method: 'PUT', body: JSON.stringify({ rpe }) })
+        .then(r => r.json()).catch(() => null);
+    if (!res?.ok) return showToast(res?.error || 'No se pudo guardar el esfuerzo.', 'error');
+    showToast(`Esfuerzo ${rpe}/10 guardado · carga ${res.sesion.carga} ✓`);
+    enSegundoPlano(verSesionReloj(currentUser.id, sesionId));
+    if (document.querySelector('[data-pf-view="reloj"].active')) enSegundoPlano(pfRenderReloj());
 }
 
 let relojGrafica = null;
@@ -151,6 +175,7 @@ async function verSesionReloj(userId, sesionId) {
     openModal(`⌚ ${escapeHtml(s.nombre)}`, `
         <p class="reloj-nota">${formatFecha(s.fecha)} · ${s.origen === 'bluetooth' ? 'Pulsómetro Bluetooth' : 'Archivo del reloj'}</p>
         ${relojDatosHTML(s)}
+        ${relojPedirEsfuerzoHTML(s)}
         ${s.pulsos?.some(Boolean) ? '<div class="reloj-grafica"><canvas id="reloj-canvas"></canvas></div>' : ''}
         <h3 class="reloj-subtitulo">Tiempo en cada zona${s.fcMaxUsada ? ` <small>(FC máx. ${s.fcMaxUsada} ppm)</small>` : ''}</h3>
         ${relojZonasHTML(s.zonas)}`);
