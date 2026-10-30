@@ -58,23 +58,85 @@ function relojTarjetaHTML(userId) {
                     <input type="file" accept=".tcx,.gpx,.fit" hidden onchange="relojImportar(this, ${Number(userId)})">
                 </label>
                 <button class="btn btn-ghost" onclick="relojAbrirEnVivo(${Number(userId)})">❤️ Pulso en vivo</button>
-                <button class="btn btn-ghost btn-sm" onclick="relojAyuda()">¿Cómo exporto desde mi reloj?</button>
+                <button class="btn btn-ghost btn-sm" onclick="relojGuia()">📘 Guía para conectar tu reloj</button>
             </div>
         </div>
     </div>`;
 }
 
-function relojAyuda() {
-    openModal('⌚ Exportar la sesión del reloj', `
-        <div class="reloj-ayuda">
-            <p><strong>Garmin:</strong> en Garmin Connect (web), abre la actividad → ⚙️ → <em>Exportar a TCX</em>.</p>
-            <p><strong>Polar:</strong> en Polar Flow, abre la sesión → <em>Exportar sesión</em> → TCX.</p>
-            <p><strong>Coros / Suunto / Amazfit:</strong> en su app, abre la actividad → compartir o exportar → TCX o GPX.</p>
-            <p><strong>Strava:</strong> en la web, abre la actividad → ⋯ → <em>Exportar GPX</em>.</p>
-            <p><strong>Apple Watch:</strong> con una app como HealthFit, exporta el entrenamiento como TCX o GPX.</p>
-            <p><strong>Relojes económicos (H Band, FitCloudPro, Da Fit…):</strong> muchos solo envían el pulso a su propia app. Pulsa "¿No aparece tu reloj? Buscar todos": la app te dirá si el tuyo es compatible.</p>
-            <p class="reloj-nota">❤️ <strong>Pulso en vivo</strong> funciona en Chrome (Android o computador) con una banda de pecho, o con un reloj que pueda <em>transmitir la frecuencia cardiaca</em> (Garmin, Polar, Coros, Amazfit…). En iPhone, importa el archivo.</p>
+// ── Guía por marca ───────────────────────────────────
+// Cómo activar el pulso en vivo (transmitir la frecuencia cardiaca por Bluetooth) y cómo sacar el
+// archivo de cada marca. Los menús cambian según el modelo y la versión: los nombres son orientativos.
+const STRAVA_GPX = 'Con la cuenta de Strava conectada, abre la actividad en strava.com desde un computador → ⋯ → <em>Exportar GPX</em> e impórtalo en Mi reloj.';
+const RELOJ_GUIAS = [
+    { id: 'xiaomi', nombre: 'Xiaomi / Redmi', patron: /xiaomi|redmi|mi band|mi smart|band \d/i,
+      vivo: ['En la banda o el reloj: <em>Ajustes → Frecuencia cardiaca</em> (o <em>Ejercicio</em>) → activa <em>Transmitir frecuencia cardiaca</em> ("Heart rate broadcast"). No todos los modelos la tienen.',
+             'Si no está en la banda, búscala en <em>Mi Fitness → Dispositivo → Frecuencia cardiaca</em>.',
+             'En algunos modelos solo transmite con un entrenamiento en curso: inicia uno (por ejemplo "Correr") y luego conecta.'],
+      archivo: ['En <em>Mi Fitness → Perfil → Cuentas de terceros</em> (o "Servicios conectados") conecta <strong>Strava</strong>.', STRAVA_GPX] },
+    { id: 'amazfit', nombre: 'Amazfit (Zepp)', patron: /amazfit|zepp|gtr|gts|bip|balance|cheetah|t-rex/i,
+      vivo: ['En el reloj: <em>Ajustes → Frecuencia cardiaca → Compartir frecuencia cardiaca</em>, o en la app <em>Zepp → tu reloj → Compartir frecuencia cardiaca</em>.',
+             'Si no aparece en la lista, inicia un entrenamiento en el reloj y vuelve a conectar.'],
+      archivo: ['En <em>Zepp → Perfil → Agregar cuentas</em> conecta <strong>Strava</strong>.', STRAVA_GPX] },
+    { id: 'garmin', nombre: 'Garmin', patron: /garmin|forerunner|fenix|venu|vivo|instinct|epix/i,
+      vivo: ['En el reloj: <em>Ajustes → Sensores y accesorios → Frecuencia cardiaca de muñeca → Transmitir frecuencia cardiaca</em> (en algunos modelos, desde el widget de frecuencia cardiaca).'],
+      archivo: ['En <strong>Garmin Connect</strong> desde el navegador: abre la actividad → ⚙️ → <em>Exportar a TCX</em>.'] },
+    { id: 'polar', nombre: 'Polar', patron: /polar/i,
+      vivo: ['Activa <em>Compartir frecuencia cardiaca con otros dispositivos</em> en el perfil deportivo (en Polar Flow o en el reloj) e inicia un entrenamiento.',
+             'Las bandas Polar H9/H10 funcionan directamente: póntelas y pulsa "Conectar sensor".'],
+      archivo: ['En <strong>Polar Flow</strong> (web): abre la sesión → <em>Exportar sesión</em> → TCX o GPX.'] },
+    { id: 'coros', nombre: 'Coros', patron: /coros|pace|apex|vertix/i,
+      vivo: ['En el reloj: <em>Ajustes → Compartir FC</em> ("Heart rate broadcast") y luego conecta.'],
+      archivo: ['En la app <strong>Coros</strong>: abre la actividad → compartir/exportar → .tcx o .gpx.'] },
+    { id: 'huawei', nombre: 'Huawei / Honor', patron: /huawei|honor|watch gt|watch fit/i,
+      vivo: ['En algunos modelos: <em>Huawei Health → tu reloj → Compartir datos de frecuencia cardiaca</em> (o en el reloj, en Ajustes de ejercicio). Si no está, tu modelo no lo transmite.'],
+      archivo: ['Huawei Health no exporta archivos directamente. Si tu versión permite conectar <strong>Strava</strong> (en Perfil → Compartir datos), úsalo: ' + STRAVA_GPX,
+                'Si no, guarda la sesión con su duración y marca qué tan dura fue (1 a 10).'] },
+    { id: 'samsung', nombre: 'Samsung Galaxy Watch', patron: /galaxy|samsung/i,
+      vivo: ['El Galaxy Watch no transmite el pulso a otras apps sin instalar una app adicional en el reloj: lo más fácil es importar el archivo.'],
+      archivo: ['En <strong>Samsung Health → Ajustes → Servicios conectados</strong> conecta <strong>Strava</strong> (si aparece en tu versión).', STRAVA_GPX] },
+    { id: 'apple', nombre: 'Apple Watch', patron: /apple/i,
+      vivo: ['En iPhone las páginas web no pueden usar Bluetooth: usa la importación de archivo.'],
+      archivo: ['Instala una app como <strong>HealthFit</strong> o <strong>RunGap</strong>, exporta el entrenamiento como TCX o GPX y súbelo aquí. También puedes conectar Strava y exportar desde strava.com.'] },
+    { id: 'fitbit', nombre: 'Fitbit / Google Pixel Watch', patron: /fitbit|pixel/i,
+      vivo: ['Fitbit no transmite el pulso en vivo a otras apps.'],
+      archivo: ['Desde fitbit.com o la app: abre el ejercicio → <em>Exportar como TCX</em> (si tu cuenta lo permite), o conecta Strava y exporta el GPX.'] },
+    { id: 'economicos', nombre: 'Relojes económicos (H Band, FitCloudPro, Da Fit…)', patron: /zw\d|hband|fitcloud|dafit|da fit|glory|wearfit|jyou/i,
+      vivo: ['La mayoría solo envía el pulso a su propia app. Pruébalo: pulsa <em>"¿No aparece tu reloj? Buscar todos"</em> y elige tu reloj; la app te dirá si es compatible.',
+             'Cierra antes su app oficial: muchos solo se conectan a una app a la vez.'],
+      archivo: ['Busca en su app si permite conectar <strong>Strava</strong> o exportar la actividad. Si no, guarda la sesión con su duración y marca qué tan dura fue (1 a 10).'] },
+    { id: 'banda', nombre: 'Banda de pecho', patron: /h10|h9|hrm|tickr|chest|banda|heart rate/i,
+      vivo: ['Humedece los electrodos, ajústala bajo el pecho y pulsa <em>"Conectar sensor y empezar"</em>: aparece sola en la lista (Polar H9/H10, Garmin HRM, Wahoo TICKR, Coospo, Magene…).',
+             'Es la opción más fiable para medir el pulso en vivo.'],
+      archivo: ['La banda no guarda archivos: usa el pulso en vivo.'] },
+];
+
+function relojMarcaDe(nombre) {
+    return RELOJ_GUIAS.find(g => g.patron.test(String(nombre || '')))?.id || null;
+}
+
+/** Guía para conectar el reloj: requisitos y pasos de la marca elegida. */
+function relojGuia(marca = null) {
+    const g = RELOJ_GUIAS.find(x => x.id === marca);
+    const lista = pasos => `<ol class="reloj-guia-pasos">${pasos.map(p => `<li>${p}</li>`).join('')}</ol>`;
+    openModal('📘 Conecta tu reloj', `
+        <div class="reloj-guia">
+            <p class="reloj-nota">Elige tu marca. Hay dos formas: <strong>pulso en vivo</strong> (el reloj transmite tu pulso mientras entrenas) o <strong>importar el archivo</strong> de tu entrenamiento.</p>
+            <div class="reloj-guia-marcas">${RELOJ_GUIAS.map(x => `<button type="button" class="btn btn-sm ${x.id === marca ? 'btn-primary' : 'btn-ghost'}" onclick="relojGuia('${x.id}')">${x.nombre}</button>`).join('')}</div>
+            ${g ? `
+            <h3 class="reloj-subtitulo">❤️ Pulso en vivo · ${g.nombre}</h3>${lista(g.vivo)}
+            <h3 class="reloj-subtitulo">📂 Importar el archivo · ${g.nombre}</h3>${lista(g.archivo)}` : ''}
+            <div class="reloj-guia-requisitos">
+                <strong>Para el pulso en vivo necesitas:</strong>
+                <ul>
+                    <li><strong>Google Chrome</strong> en Android o en el computador (en iPhone y en Brave no funciona).</li>
+                    <li>Bluetooth encendido y, en <em>Ajustes → Apps → Chrome → Permisos</em>, permitir <em>Dispositivos cercanos</em> (o <em>Ubicación</em>).</li>
+                    <li>Cerrar la app oficial del reloj si no aparece: algunos solo se conectan a una app a la vez.</li>
+                </ul>
+                <p class="reloj-nota">¿Tu sesión llegó sin pulso? Ábrela en Mi reloj y marca qué tan dura fue (1 a 10): así cuenta en tu carga igual.</p>
+            </div>
         </div>`);
+    document.querySelector('#modal-overlay .modal')?.classList.add('modal-wide');
 }
 
 // ── Importar archivo ─────────────────────────────────
@@ -241,7 +303,7 @@ function relojAbrirEnVivo(userId) {
 function relojMensajeError(err, nombre) {
     const texto = String(err?.message || '');
     if (err?.name === 'NotFoundError' && /cancel/i.test(texto)) return null; // cerró la lista sin elegir
-    if (err?.sinPulso) return `${nombre || 'Tu reloj'} se conectó, pero no comparte el pulso con otras apps: solo lo envía a su propia app. Importa sus entrenamientos como archivo o usa una banda de pecho.`;
+    if (err?.sinPulso) return `${nombre || 'Tu reloj'} se conectó, pero ahora no está compartiendo el pulso. Muchos relojes traen esa opción apagada ("Transmitir frecuencia cardiaca"): mira cómo activarla en tu marca. Si tu modelo no la tiene, importa sus entrenamientos como archivo o usa una banda de pecho.`;
     if (navigator.brave) return 'Brave trae el Bluetooth apagado para las páginas web. Abre VitalTraining en Google Chrome para usar el pulso en vivo.';
     if (/globally disabled|not available|adapter/i.test(texto) || err?.name === 'NotFoundError')
         return 'No se pudo usar el Bluetooth: enciéndelo y, en Ajustes del celular → Apps → Chrome → Permisos, permite "Dispositivos cercanos" (o "Ubicación").';
@@ -287,14 +349,17 @@ async function relojConectar(todos = false) {
         showToast(`Conectado a ${dispositivo.name || 'tu sensor'} ✓`);
     } catch (err) {
         const mensaje = relojMensajeError(err, dispositivo?.name);
-        if (mensaje) relojAvisoConexion(mensaje);
+        if (mensaje) relojAvisoConexion(mensaje, relojMarcaDe(dispositivo?.name) || (err?.sinPulso ? '' : null));
     }
 }
 
-function relojAvisoConexion(mensaje) {
+/** marca: id de la guía de esa marca ('' = guía general, null = sin enlace). */
+function relojAvisoConexion(mensaje, marca = null) {
     const el = document.getElementById('rv-aviso');
-    if (el) { el.textContent = mensaje; el.classList.remove('hidden'); }
-    else showToast(mensaje, 'error', 7000);
+    if (!el) return showToast(mensaje, 'error', 7000);
+    const nombreMarca = RELOJ_GUIAS.find(g => g.id === marca)?.nombre;
+    el.innerHTML = `${escapeHtml(mensaje)}${marca === null ? '' : `<br><button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="relojGuia('${marca}')">📘 Cómo activarlo ${nombreMarca ? 'en ' + escapeHtml(nombreMarca.split(' (')[0]) : 'en tu reloj'}</button>`}`;
+    el.classList.remove('hidden');
 }
 
 function relojPintar() {
