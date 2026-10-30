@@ -435,7 +435,11 @@ async function pfRenderPlanRutina() {
     const semanaRutina = rutinaSemanal?.semana || [];
     const notasRutina  = rutinaSemanal?.notas  || [];
 
-    const cumplData=await apiFetch(`${API}/panel/${userId}/cumplimiento`).then(r=>r.json()).catch(()=>({datos:[]}));
+    const [cumplData, lesiones]=await Promise.all([
+        apiFetch(`${API}/panel/${userId}/cumplimiento`).then(r=>r.json()).catch(()=>({datos:[]})),
+        lsCargar(userId)
+    ]);
+    const deBaja=lesiones?.estado.estado==='no_apto';
     const cumplidos=cumplData.datos||[];
     const hoy=new Date().toISOString().slice(0,10);
     const diasSemana=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -456,14 +460,14 @@ async function pfRenderPlanRutina() {
                 const nombreEsc=e.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;');
                 return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${e.nombre}</span><span class="plan-ejercicio-series">${det}</span></div><button class="btn-video" onclick="verVideoEjercicio('${nombreEsc}')">▶ Ver video</button></div>`;
             }).join('');
-        const cumplBtn=esDescanso?''
+        const cumplBtn=esDescanso||deBaja?''
             :yaCompleto
                 ?`<span class="cumpl-badge cumpl-ok">✅ Completado hoy</span>`
                 :esHoy
                     ?`<button class="btn btn-primary btn-sm cumpl-btn" onclick="pfModalCumplimiento('${dia.dia}','${(dia.tipo||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✓ Marcar como completado</button>`
                     :``;
         return `
-        <div class="plan-rutina-dia ${yaCompleto?'plan-dia-completo':''}">
+        <div class="plan-rutina-dia ${yaCompleto?'plan-dia-completo':''} ${deBaja&&!esDescanso?'plan-dia-pausa':''}">
             <div class="plan-rutina-dia-header">
                 <div class="plan-rutina-dia-nombre">${dia.dia||''} — ${dia.tipo||''}</div>
                 <div style="display:flex;align-items:center;gap:8px">
@@ -488,7 +492,7 @@ async function pfRenderPlanRutina() {
             </div>
         </div>
         <div class="card">
-            <div style="padding:20px">${notasRutinaHTML}${rutinaHTML}</div>
+            <div style="padding:20px">${lsAvisoRutina(lesiones)}${notasRutinaHTML}${rutinaHTML}</div>
         </div>
     </div>`;
 }

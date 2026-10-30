@@ -24,6 +24,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `rendimiento` | — (solo lectura) | — |
 | `mensajes` | `mensajes` | — |
 | `evaluaciones` | `evaluaciones` | — |
+| `lesiones` | `lesiones`, `notas_clinicas` | `estadosDe`, `estadoDe` (apto / en recuperación / baja médica) |
 | `avisos` | — (decide qué correo mandar y a quién) | `bienvenida`, `restablecerPassword`, `alertaSalud`, `alertaCarga` |
 
 ## Las 3 reglas

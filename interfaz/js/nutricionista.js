@@ -176,6 +176,7 @@ function ntCardFutbolista(f) {
             <div class="paciente-info">
                 <div class="paciente-nombre">${escapeHtml(f.nombre)}</div>
                 <div class="paciente-pos">${ntResumenFicha(f.ficha)}</div>
+                ${f.rendimiento?.estadoMedico && f.rendimiento.estadoMedico.estado !== 'apto' ? `<div style="margin-top:4px">${lsBadgeEstado(f.rendimiento.estadoMedico)}</div>` : ''}
             </div>
         </div>
         <div class="paciente-stats">
@@ -197,9 +198,10 @@ function ntCardFutbolista(f) {
 
 async function ntVerDetalle(userId) {
     try {
-        const [data, medico]=await Promise.all([
+        const [data, medico, lesiones]=await Promise.all([
             apiFetch(`${API}/nutricionista/futbolistas/${userId}`).then(r=>r.json()).catch(()=>null),
-            apiFetch(`${API}/perfil-medico/${userId}`).then(r=>r.json()).catch(()=>null)
+            apiFetch(`${API}/perfil-medico/${userId}`).then(r=>r.json()).catch(()=>null),
+            lsCargar(userId)
         ]);
         if(!data?.ok) return showToast('No se pudo cargar el atleta. Intenta de nuevo.','error');
         const d=data.detalle;
@@ -224,7 +226,14 @@ async function ntVerDetalle(userId) {
             }
         }
 
+        // Lesionado: el nutricionista lo ve para ajustar las comidas (las notas clínicas no le llegan)
+        const lesionHTML=lesiones?.activas.length?`
+            <div class="ls-aviso ${LS_ESTADO[lesiones.estado.estado]?.clase||''}">
+                <strong>${LS_ESTADO[lesiones.estado.estado]?.icono||''} ${escapeHtml(lesiones.estado.etiqueta)}: ${lesiones.activas.map(lsTitulo).join(' · ')}</strong>
+                <div>${lesiones.estado.estado==='no_apto'?'No está entrenando: ajusta la energía a días de descanso y mantén la proteína alta para la recuperación.':'Entrena adaptado, con menos carga de lo habitual.'}</div>
+            </div>`:'';
         const saludHTML=`
+            ${lesionHTML}
             ${statusBanner}
             ${d.salud.length>=2?`<div class="chart-wrap" style="margin-bottom:16px"><canvas id="${chartId}"></canvas></div>`:''}
             ${d.salud.length?d.salud.slice(0,7).map(s=>`

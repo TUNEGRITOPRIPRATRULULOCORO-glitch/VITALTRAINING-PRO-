@@ -109,7 +109,12 @@ async function contextoAtleta(userId) {
     : 'No registró comidas en los últimos 7 días.');
 
   if (rendimiento) {
-    const { listo, carga, cumplimiento } = rendimiento;
+    const { listo, carga, cumplimiento, estadoMedico } = rendimiento;
+    if (estadoMedico?.activas?.length) {
+      lineas.push(`Estado médico: ${estadoMedico.etiqueta}. Lesiones activas: ${estadoMedico.activas.map(l =>
+        `${l.zona} (${l.tipo}, ${l.gravedad}${l.altaEstimada ? `, alta estimada ${l.altaEstimada}` : ''}${l.indicaciones ? `, indicaciones del médico: "${l.indicaciones.slice(0, 200)}"` : ''})`).join('; ')}.`
+        + (estadoMedico.estado === 'no_apto' ? ' Está de baja: no debe entrenar hasta el alta.' : ' Entrena adaptado, solo lo que indicó el médico.'));
+    }
     if (listo?.puntaje != null) lineas.push(`Listo para entrenar hoy: ${listo.puntaje}/100 (${listo.nivel}).`);
     if (carga?.riesgo && carga.riesgo !== 'sin-datos')
       lineas.push(`Carga de entrenamiento: ${carga.riesgo}${carga.cambioPorcentaje != null ? `, ${carga.cambioPorcentaje > 0 ? '+' : ''}${carga.cambioPorcentaje} % frente a su semana normal` : ''}.`);
@@ -182,6 +187,27 @@ const TEMA_EN_PALABRAS = {
 };
 const AVISO_LESION = '⚠️ Si es un dolor fuerte, hay hinchazón o no puedes apoyar, para y consúltalo con tu médico (puedes escribirle desde Mensajes).\n\n';
 
+// Temas en los que una lesión cambia la respuesta: lo primero es lo que dijo el médico
+const TEMAS_DE_ENTRENO = ['entrenar_hoy', 'entrenamiento_personalizado', 'partido', 'riesgo', 'sobrecarga', 'mejorar', 'recuperacion', 'fatiga'];
+// De baja, la respuesta normal de estos temas ("estás listo", "tu rutina de hoy") contradiría al médico
+const TEMAS_EN_PAUSA_DE_BAJA = ['entrenar_hoy', 'entrenamiento_personalizado', 'partido', 'sobrecarga'];
+const MIENTRAS_DE_BAJA = 'Mientras estés de baja, tu trabajo es recuperarte: sigue esas indicaciones, duerme bien y come suficiente proteína. '
+  + 'Si tienes dudas o crees que ya estás mejor, escríbele a tu médico desde Mensajes.';
+
+/** Aviso de lesión para anteponer a la respuesta, o null si está apto o el tema no tiene que ver. */
+async function avisoEstadoMedico(userId, intencion) {
+  if (!TEMAS_DE_ENTRENO.includes(intencion)) return null;
+  const estado = await require('../lesiones').estadoDe(userId).catch(() => null);
+  if (!estado || estado.estado === 'apto') return null;
+  const indicaciones = estado.activas.map(l => l.indicaciones).filter(Boolean);
+  const zonas = estado.zonas.join(', ');
+  const texto = (estado.estado === 'no_apto'
+    ? `🩹 Ojo: tu médico te tiene de baja por tu lesión (${zonas}). No entrenes hasta que te dé el alta.`
+    : `🩹 Recuerda que estás en recuperación (${zonas}): entrena solo lo que te indicó tu médico.`)
+    + (indicaciones.length ? `\n📌 Sus indicaciones: ${indicaciones.join(' · ')}` : '');
+  return { texto, enPausa: estado.estado === 'no_apto' && TEMAS_EN_PAUSA_DE_BAJA.includes(intencion) };
+}
+
 /**
  * Modo básico: el modelo de machine learning (clasificador.js, entrenado en ml/) decide de qué
  * se habla. Si duda, se prueba con palabras clave; si tampoco, Vita pregunta entre las dos
@@ -202,8 +228,11 @@ async function responderLocal(userId, texto) {
     return `No estoy segura de haberte entendido. ¿Me preguntas por ${opciones.join(' o por ')}? Puedes decírmelo con otras palabras.`;
   }
 
+  const aviso = await avisoEstadoMedico(userId, intencion);
+  if (aviso?.enPausa) return `${aviso.texto}\n\n${MIENTRAS_DE_BAJA}`;
   const r = await consulta(userId, intencion);
   const respuesta = r.respuesta || 'No tengo datos suficientes todavía. Registra tu salud y tus comidas para que pueda ayudarte mejor.';
+  if (aviso) return `${aviso.texto}\n\n${respuesta}`;
   return intencion === 'riesgo' ? AVISO_LESION + respuesta : respuesta;
 }
 

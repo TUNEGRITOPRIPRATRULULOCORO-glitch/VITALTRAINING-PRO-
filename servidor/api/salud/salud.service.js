@@ -4,7 +4,7 @@ const panel = require('../panel');
 async function listar(userId) {
   const { rows } = await query(
     `SELECT id, user_id AS "userId", fecha, fatiga, sueno, recuperacion, notas, created_at AS "createdAt"
-     FROM salud WHERE user_id = $1 ORDER BY created_at DESC`,
+     FROM salud WHERE user_id = $1 ORDER BY fecha DESC, created_at DESC`,
     [userId]
   );
   return rows;

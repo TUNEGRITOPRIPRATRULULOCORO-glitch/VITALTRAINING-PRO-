@@ -17,6 +17,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 | `mensajes.js` | Chat entre roles y contadores de no leídos |
 | `rendimiento.js` | Listo para entrenar, carga y cumplimiento (atleta, nutricionista y médico) |
 | `evaluaciones.js` | Tests físicos (atleta y médico) |
+| `lesiones.js` | Lesiones, estado médico y notas clínicas (el médico las registra; atleta y nutricionista las consultan) |
 | `admin.js` | Panel del administrador |
 | `nutricionista.js` | Panel del nutricionista |
 | `medico.js` | Panel del médico |

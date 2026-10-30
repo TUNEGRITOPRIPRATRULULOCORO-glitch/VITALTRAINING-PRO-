@@ -108,8 +108,21 @@ function clasificarRatio(ratio) {
 /**
  * Puntaje 0-100 a partir del registro de salud de hoy.
  * La fatiga resta; el sueño y la recuperación suman. Si la carga está en riesgo alto, resta 10.
+ * El estado médico manda: de baja no se entrena, y en recuperación como mucho "medio".
  */
-function calcularListo(saludHoy, riesgoCarga) {
+function calcularListo(saludHoy, riesgoCarga, estadoMedico = null) {
+  const zonas = estadoMedico?.zonas?.length ? ` (${estadoMedico.zonas.join(', ')})` : '';
+  if (estadoMedico?.estado === 'no_apto') {
+    return { puntaje: null, nivel: 'baja', mensaje: `Estás de baja médica${zonas}. No entrenes hasta que el médico te dé el alta.` };
+  }
+  const listo = listoPorSalud(saludHoy, riesgoCarga);
+  if (estadoMedico?.estado !== 'adaptado') return listo;
+  const mensaje = `Estás en recuperación${zonas}: entrena solo lo que te indicó el médico.`;
+  if (listo.nivel === 'sin-datos') return { ...listo, mensaje: `${mensaje} ${listo.mensaje}` };
+  return { ...listo, nivel: listo.nivel === 'alto' ? 'medio' : listo.nivel, mensaje };
+}
+
+function listoPorSalud(saludHoy, riesgoCarga) {
   if (!saludHoy) {
     return { puntaje: null, nivel: 'sin-datos', mensaje: 'Registra tu salud de hoy para saber si estás listo para entrenar.' };
   }
@@ -135,9 +148,10 @@ function lunesDe(fechaISO) {
  * de la semana actual (así cada día queda siempre en la misma columna).
  * Estados: completo | parcial | fallado (tocaba entrenar y no se registró)
  * | pendiente (hoy, aún sin registrar) | proximo (día de entreno que aún no llega)
- * | descanso | sin-plan (antes de tener plan)
+ * | descanso | sin-plan (antes de tener plan) | lesion (estaba lesionado: no cuenta como fallado)
+ * periodosLesion: [{ desde, hasta }] con los días de cada lesión (del módulo lesiones).
  */
-function calcularCumplimiento(rutinaSemanal, registros, hoy, inicioPlan) {
+function calcularCumplimiento(rutinaSemanal, registros, hoy, inicioPlan, periodosLesion = []) {
   const diasConEntreno = new Set(
     (rutinaSemanal?.semana || []).filter(d => d.ejercicios?.length).map(d => d.dia)
   );
@@ -156,6 +170,7 @@ function calcularCumplimiento(rutinaSemanal, registros, hoy, inicioPlan) {
     if (registroPorFecha[fecha])        estado = registroPorFecha[fecha];
     else if (inicio && fecha < inicio)  estado = 'sin-plan';
     else if (!diasConEntreno.has(dia))  estado = 'descanso';
+    else if (periodosLesion.some(p => fecha >= p.desde && fecha <= p.hasta)) estado = 'lesion';
     else if (fecha > hoy)               estado = 'proximo';
     else if (fecha === hoy)             estado = 'pendiente';
     else                                estado = 'fallado';

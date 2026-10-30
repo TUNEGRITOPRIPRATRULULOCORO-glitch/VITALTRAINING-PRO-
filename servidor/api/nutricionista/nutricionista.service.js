@@ -16,7 +16,7 @@ async function listarFutbolistas() {
   const ids = atletas.map(a => a.id);
   const enLista = ids.map((_, i) => `$${i + 1}`).join(', ');
   const [salud, comidas, rutinas] = await Promise.all([
-    query(`SELECT * FROM salud WHERE user_id IN (${enLista}) ORDER BY created_at DESC`, ids),
+    query(`SELECT * FROM salud WHERE user_id IN (${enLista}) ORDER BY fecha DESC, created_at DESC`, ids),
     query(`SELECT user_id, COUNT(*) AS total FROM comidas WHERE user_id IN (${enLista}) GROUP BY user_id`, ids),
     query(`SELECT user_id, COUNT(*) AS total FROM rutinas WHERE user_id IN (${enLista}) GROUP BY user_id`, ids)
   ]);
@@ -49,7 +49,7 @@ async function detalleFutbolista(userId) {
 
   const [perfilR, saludR, comidasR, rutinasR, alertasR, notasR] = await Promise.all([
     query('SELECT * FROM perfiles WHERE user_id = $1', [usuario.id]),
-    query('SELECT * FROM salud WHERE user_id = $1 ORDER BY created_at DESC', [usuario.id]),
+    query('SELECT * FROM salud WHERE user_id = $1 ORDER BY fecha DESC, created_at DESC', [usuario.id]),
     query('SELECT * FROM comidas WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10', [usuario.id]),
     query('SELECT * FROM rutinas WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10', [usuario.id]),
     query('SELECT * FROM alertas WHERE user_id = $1 ORDER BY created_at DESC LIMIT 5', [usuario.id]),

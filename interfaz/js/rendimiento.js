@@ -9,6 +9,7 @@ const RD_NIVEL = {
     alto:        { clase:'rd-ok',   etiqueta:'Listo' },
     medio:       { clase:'rd-warn', etiqueta:'Moderado' },
     bajo:        { clase:'rd-bad',  etiqueta:'Descanso' },
+    baja:        { clase:'rd-bad',  etiqueta:'Baja médica' },
     'sin-datos': { clase:'rd-none', etiqueta:'Sin registro' }
 };
 const RD_RIESGO = {
@@ -20,7 +21,7 @@ const RD_RIESGO = {
 };
 const RD_CUMPL = {
     completo:'Completado', parcial:'Parcial', fallado:'No realizado', pendiente:'Pendiente hoy',
-    proximo:'Próximo', descanso:'Descanso', 'sin-plan':'Sin plan'
+    proximo:'Próximo', descanso:'Descanso', 'sin-plan':'Sin plan', lesion:'Lesionado'
 };
 
 function rdBadgeListo(listo) {
@@ -111,7 +112,9 @@ function rdTarjetaCumplimiento(cumpl, racha) {
     const celdas = cumpl.dias.map(d =>
         `<div class="rd-dia rd-dia-${d.estado} ${d.hoy ? 'rd-dia-hoy' : ''}" title="${d.dia} ${formatFecha(d.fecha)} · ${RD_CUMPL[d.estado]}">${Number(d.fecha.slice(8))}</div>`
     ).join('');
-    const leyenda = ['completo','parcial','fallado','proximo','descanso'].map(e =>
+    const estados = ['completo','parcial','fallado','proximo','descanso'];
+    if (cumpl.dias.some(d => d.estado === 'lesion')) estados.push('lesion');
+    const leyenda = estados.map(e =>
         `<span><i class="rd-dia rd-dia-${e}"></i>${RD_CUMPL[e]}</span>`).join('');
     return `
     <div class="card rd-card">

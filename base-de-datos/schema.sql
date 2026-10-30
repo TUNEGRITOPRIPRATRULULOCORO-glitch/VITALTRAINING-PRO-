@@ -175,6 +175,31 @@ CREATE TABLE IF NOT EXISTS mensajes (
   created_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS lesiones (  -- lesiones que registra el médico
+  id             BIGSERIAL PRIMARY KEY,
+  user_id        BIGINT NOT NULL,
+  zona           VARCHAR(40) NOT NULL,
+  tipo           VARCHAR(40) NOT NULL,
+  gravedad       VARCHAR(20) NOT NULL,
+  restriccion    VARCHAR(20) NOT NULL DEFAULT 'no_apto',  -- 'no_apto' o 'adaptado'
+  fecha_inicio   DATE NOT NULL,
+  alta_estimada  DATE,
+  fecha_alta     DATE,                                     -- vacía mientras sigue activa
+  indicaciones   TEXT DEFAULT '',
+  registrado_por VARCHAR(255),
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS notas_clinicas (  -- notas del médico en el expediente
+  id             BIGSERIAL PRIMARY KEY,
+  user_id        BIGINT NOT NULL,
+  autor_id       BIGINT,
+  autor_nombre   VARCHAR(255),
+  texto          TEXT NOT NULL,
+  visible_atleta BOOLEAN DEFAULT TRUE,
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -190,3 +215,5 @@ ALTER TABLE fotos_perfil ADD CONSTRAINT fotos_perfil_user_id_fkey FOREIGN KEY (u
 ALTER TABLE evaluaciones ADD CONSTRAINT evaluaciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE restablecimientos ADD CONSTRAINT restablecimientos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE ia_mensajes ADD CONSTRAINT ia_mensajes_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE lesiones ADD CONSTRAINT lesiones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE notas_clinicas ADD CONSTRAINT notas_clinicas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

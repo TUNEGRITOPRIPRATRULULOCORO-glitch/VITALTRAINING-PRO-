@@ -4924,3 +4924,67 @@ body.dark .badge-medico { background: rgba(2,132,199,0.18); color: #7dd3fc; bord
 
 /* Espacio al final de cada panel para que el reproductor de música no tape la última fila */
 .main-content { padding-bottom: 96px; }
+
+/* ── Lesiones y estado médico ─────────────────────────────── */
+.ls-aviso {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--rd-color, var(--warning)) 45%, transparent);
+    background: var(--rd-fondo, var(--warning-dim));
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.ls-tarjeta { margin-bottom: 24px; border-left: 4px solid var(--rd-color, var(--primary)); }
+.ls-tarjeta .card-header { gap: 8px; flex-wrap: wrap; }
+.ls-tarjeta .card-body, #md-lesiones { display: flex; flex-direction: column; gap: 10px; }
+.ls-mensaje { margin: 0; font-size: 14px; }
+.ls-estado { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--text-muted); }
+.ls-estado .btn { margin-left: auto; }
+.ls-lesion {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+}
+.ls-lesion-cerrada { opacity: 0.75; margin-top: 8px; }
+.ls-lesion-titulo { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-weight: 700; font-size: 14px; }
+.ls-lesion-sub { font-size: 12px; color: var(--text-muted); }
+.ls-indicaciones { font-size: 13px; padding-top: 2px; }
+.ls-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.ls-historial summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--primary); }
+.ls-sub { margin-top: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.ls-nota { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-left: 3px solid var(--primary); background: var(--bg); border-radius: 0 8px 8px 0; font-size: 13px; }
+.ls-nota-texto { white-space: pre-wrap; }
+.ls-nota-form { display: flex; flex-direction: column; gap: 8px; }
+.ls-nota-form textarea, #ls-indicaciones {
+    width: 100%;
+    min-height: 70px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font);
+    font-size: 13px;
+    background: var(--bg-2);
+    color: var(--text);
+    resize: vertical;
+    box-sizing: border-box;
+}
+.ls-nota-form-pie { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.ls-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+.ls-vacio { margin: 0; font-size: 13px; color: var(--text-muted); }
+.ls-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+.plan-dia-pausa .plan-ejercicios { opacity: 0.45; }
+.rd-dia-lesion { background: #ede9fe; border-color: #8b5cf6; color: #6d28d9; }
+body.dark .rd-dia-lesion { background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.6); color: #c4b5fd; }
+@media (max-width: 600px) {
+    .ls-form-grid { grid-template-columns: 1fr; }
+    .ls-estado .btn { margin-left: 0; width: 100%; }
+}

@@ -14,7 +14,7 @@ async function leerDatos(userIds, hoy) {
   const ids = userIds.map((_, i) => `$${i + 1}`).join(', ');
   const desde = `$${userIds.length + 1}`;
 
-  const [salud, rutinas, cumplimiento, planes] = await Promise.all([
+  const [salud, rutinas, cumplimiento, planes, lesiones] = await Promise.all([
     query(
       `SELECT user_id, fecha, fatiga, sueno, recuperacion FROM salud
        WHERE user_id IN (${ids}) AND fecha >= ${desde}`,
@@ -33,10 +33,11 @@ async function leerDatos(userIds, hoy) {
     query(
       `SELECT user_id, rutina_semanal, creado_en FROM perfiles_medicos WHERE user_id IN (${ids})`,
       userIds
-    )
+    ),
+    require('../lesiones').estadosDe(userIds)
   ]);
 
-  const porUsuario = Object.fromEntries(userIds.map(id => [String(id), { salud: [], sesiones: [], cumplimiento: [], plan: null }]));
+  const porUsuario = Object.fromEntries(userIds.map(id => [String(id), { salud: [], sesiones: [], cumplimiento: [], plan: null, lesion: lesiones[String(id)] }]));
   const de = row => porUsuario[String(row.user_id)];
 
   salud.rows.forEach(r => de(r)?.salud.push(r));
@@ -52,16 +53,28 @@ async function leerDatos(userIds, hoy) {
   return porUsuario;
 }
 
+/** Lo que se muestra del estado médico (sin el detalle interno de los periodos). */
+function resumirEstado(lesion) {
+  if (!lesion) return { estado: 'apto', etiqueta: 'Apto', zonas: [], activas: [] };
+  const { estado, etiqueta, mensaje, zonas, activas } = lesion;
+  return {
+    estado, etiqueta, mensaje, zonas,
+    activas: activas.map(l => ({ zona: l.zona, tipo: l.tipo, gravedad: l.gravedad, restriccion: l.restriccion,
+      fechaInicio: l.fechaInicio, altaEstimada: l.altaEstimada, indicaciones: l.indicaciones })),
+  };
+}
+
 function construirResumen(datos, hoy) {
   const saludHoy = datos.salud.find(s => calc.aFechaISO(s.fecha) === hoy) || null;
   const carga = calc.calcularCarga(datos.sesiones, hoy);
   return {
     fecha: hoy,
-    listo: calc.calcularListo(saludHoy, carga.riesgo),
+    listo: calc.calcularListo(saludHoy, carga.riesgo, datos.lesion),
     carga,
     cumplimiento: calc.calcularCumplimiento(
-      datos.plan?.rutina_semanal, datos.cumplimiento, hoy, datos.plan?.creado_en
+      datos.plan?.rutina_semanal, datos.cumplimiento, hoy, datos.plan?.creado_en, datos.lesion?.periodos
     ),
+    estadoMedico: resumirEstado(datos.lesion),
     racha: calc.calcularRacha(datos.salud.map(s => s.fecha), hoy)
   };
 }
@@ -93,6 +106,7 @@ async function obtenerEquipo() {
       listo: r.listo,
       carga: { ratio: r.carga.ratio, riesgo: r.carga.riesgo },
       cumplimiento: { porcentaje: r.cumplimiento.porcentaje },
+      estadoMedico: { estado: r.estadoMedico.estado, etiqueta: r.estadoMedico.etiqueta, zonas: r.estadoMedico.zonas },
       racha: r.racha
     };
   });
