@@ -910,6 +910,8 @@ function generarRutina(perfilMedico, posicion, deporte = 'Fútbol', diaPartido =
     deporte: deporteValido,
     posicion: posicionValida,
     diaPartido: semana.find(s => ES_PARTIDO.test(s.tipo))?.dia || null,
+    // Lo que eligió la persona (un día, "Ninguno" o null si nunca eligió): la pantalla lo muestra tal cual
+    diaPartidoElegido: diaPartido || null,
     semana: semana.map(sesion => ({
       dia: sesion.dia,
       tipo: sesion.tipo,

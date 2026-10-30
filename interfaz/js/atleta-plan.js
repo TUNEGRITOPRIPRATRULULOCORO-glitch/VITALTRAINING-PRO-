@@ -230,7 +230,7 @@ async function pfRenderPlan() {
             <button class="btn btn-ghost" onclick="pfRenderOnboarding(true)">⚙️ Actualizar perfil</button>
         </div>
 
-        ${SIN_COMPETICION.includes(deporte) ? '' : planSemanaPartidoHTML(rutinaSemanal?.diaPartido)}
+        ${SIN_COMPETICION.includes(deporte) ? '' : planSemanaPartidoHTML(rutinaSemanal?.diaPartidoElegido ?? rutinaSemanal?.diaPartido)}
 
         <div class="card" style="margin-bottom:24px">
             <div class="card-header"><h2>🩺 Tu Perfil Médico</h2></div>
@@ -267,7 +267,9 @@ function planSemanaPartidoHTML(diaPartido) {
             <li><strong>Noches antes del partido</strong>: duerme 8-9 h.</li>
             <li><strong>${diaPartido}</strong>: partido. Comida principal 3-4 h antes.</li>
             <li><strong>${DIAS_SEMANA[(i+1)%7]}</strong>: recuperación (descanso o actividad muy suave).</li>
-        </ul>` : '<p class="msg-ayuda">Elige el día y organizamos tu semana: la víspera suave y con más carbohidratos, y el día siguiente de recuperación.</p>';
+        </ul>` : diaPartido === 'Ninguno'
+        ? '<p class="msg-ayuda">Semana sin partido fijo: el día que antes era de partido ahora es una sesión normal de práctica. Si un día compites, elígelo aquí.</p>'
+        : '<p class="msg-ayuda">Elige el día y organizamos tu semana: la víspera suave y con más carbohidratos, y el día siguiente de recuperación.</p>';
     return `
         <div class="card partido-card" style="margin-bottom:24px">
             <div class="card-header"><h2>📅 Tu semana de partido</h2></div>

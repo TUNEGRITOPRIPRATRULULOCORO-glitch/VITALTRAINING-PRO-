@@ -131,17 +131,64 @@ describe('guardar', () => {
     });
   });
 
-  test('no usa comidas incompatibles como fallback si no hay opciones seguras', async () => {
+  // Todas las comidas de la semana de un plan
+  const comidasDe = perfil => perfil.planAlimenticio.semana.flatMap(dia => [
+    dia.desayuno, dia.meriendaMañana, dia.almuerzo, dia.meriendaTarde, dia.cena
+  ]);
+  const SIN_OPCION = 'Sin opción segura disponible en el catálogo';
+
+  test('con todas las alergias a la vez sigue habiendo un plato seguro en cada comida', async () => {
     const perfil = await svc.guardar(13, {
       condiciones: [], alergias: svc.ALERGIAS, preferencia: 'Sin restricciones'
     }, 'Mediocampista');
 
-    const comidas = perfil.planAlimenticio.semana.flatMap(dia => [
-      dia.desayuno, dia.meriendaMañana, dia.almuerzo, dia.meriendaTarde, dia.cena
-    ]);
+    const comidas = comidasDe(perfil);
+    expect(comidas.some(comida => comida.nombre === SIN_OPCION)).toBe(false);
+    // Carne y pollo no son alérgenos: pueden aparecer. Ningún ingrediente de la lista de alergias, sí.
+    const noSonAlergenos = ['carne', 'ave'];
+    comidas.forEach(comida => expect(comida.contiene.filter(i => !noSonAlergenos.includes(i))).toEqual([]));
+  });
 
-    expect(comidas.some(comida => comida.nombre === 'Sin opción segura disponible en el catálogo')).toBe(true);
-    expect(perfil.planAlimenticio.notas.join(' ')).toContain('Se dejaron sin asignar');
+  test('sin huevo ni lácteos la semana queda completa y sin esos ingredientes', async () => {
+    const perfil = await svc.guardar(15, {
+      condiciones: [], alergias: ['Huevo', 'Lácteos / Lactosa'], preferencia: 'Sin restricciones'
+    }, 'Lateral');
+
+    comidasDe(perfil).forEach(comida => {
+      expect(comida.nombre).not.toBe(SIN_OPCION);
+      expect(comida.contiene).not.toContain('huevo');
+      expect(comida.contiene).not.toContain('lacteos');
+    });
+  });
+
+  test('una persona vegana con alergia a la soya y al gluten tiene todas sus comidas', async () => {
+    const perfil = await svc.guardar(16, {
+      condiciones: [], alergias: ['Soya / Soja', 'Gluten (trigo, cebada, centeno)'], preferencia: 'Vegano (sin productos animales)'
+    }, 'Mediocampista');
+
+    const animales = ['carne', 'ave', 'pescado', 'mariscos', 'huevo', 'lacteos'];
+    comidasDe(perfil).forEach(comida => {
+      expect(comida.nombre).not.toBe(SIN_OPCION);
+      expect(comida.contiene.filter(i => [...animales, 'soya', 'gluten'].includes(i))).toEqual([]);
+    });
+    expect(perfil.planAlimenticio.notas.join(' ')).toMatch(/B12/);
+  });
+
+  test('la intolerancia a la lactosa marcada como condición también quita los lácteos', async () => {
+    const perfil = await svc.guardar(17, {
+      condiciones: ['Intolerancia a la lactosa'], alergias: [], preferencia: 'Sin restricciones'
+    }, 'Portero');
+    comidasDe(perfil).forEach(comida => expect(comida.contiene).not.toContain('lacteos'));
+  });
+
+  test('pescetariano: pescado sí, carne y pollo no', async () => {
+    const perfil = await svc.guardar(18, {
+      condiciones: [], alergias: [], preferencia: 'Pescetariano (pescado sí, carne no)'
+    }, 'Delantero');
+    comidasDe(perfil).forEach(comida => {
+      expect(comida.contiene).not.toContain('carne');
+      expect(comida.contiene).not.toContain('ave');
+    });
   });
 
   test('rutina semanal tiene 7 días', async () => {
