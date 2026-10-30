@@ -93,7 +93,8 @@ const RELOJ_GUIAS = [
       archivo: ['Huawei Health no exporta archivos directamente. Si tu versión permite conectar <strong>Strava</strong> (en Perfil → Compartir datos), úsalo: ' + STRAVA_GPX,
                 'Si no, guarda la sesión con su duración y marca qué tan dura fue (1 a 10).'] },
     { id: 'samsung', nombre: 'Samsung Galaxy Watch', patron: /galaxy|samsung/i,
-      vivo: ['El Galaxy Watch no transmite el pulso a otras apps sin instalar una app adicional en el reloj: lo más fácil es importar el archivo.'],
+      vivo: ['Pulsa <em>"Conectar sensor y empezar"</em>: varios Galaxy Watch aparecen directamente en la lista y transmiten el pulso (lo comprobamos con uno).',
+             'Si no aparece, inicia un entrenamiento en el reloj y vuelve a intentarlo, o prueba <em>"¿No aparece tu reloj? Buscar todos"</em>. Algunos modelos no lo transmiten: entonces importa el archivo.'],
       archivo: ['En <strong>Samsung Health → Ajustes → Servicios conectados</strong> conecta <strong>Strava</strong> (si aparece en tu versión).', STRAVA_GPX] },
     { id: 'apple', nombre: 'Apple Watch', patron: /apple/i,
       vivo: ['En iPhone las páginas web no pueden usar Bluetooth: usa la importación de archivo.'],
@@ -172,15 +173,21 @@ function relojFormatoDistancia(m) {
     return m ? `${(m / 1000).toFixed(m >= 10000 ? 1 : 2).replace('.', ',')} km` : '—';
 }
 
-function relojZonasHTML(zonas) {
+function relojZonasHTML(zonas, minutos = 0) {
     if (!zonas) return '<p class="reloj-nota">Esta sesión no trae pulso: se guardó con su duración.</p>';
-    const total = zonas.reduce((t, m) => t + m, 0) || 1;
+    const enZonas = zonas.reduce((t, m) => t + m, 0);
+    const total = enZonas || 1;
+    // Por debajo del 50 % de la FC máxima no cuenta como zona (reposo): se dice, para que no parezca un error
+    const reposo = Math.round(minutos - enZonas);
+    const notaReposo = enZonas < 0.5
+        ? '<p class="reloj-nota">Tu pulso estuvo en reposo toda la sesión (por debajo de la zona 1, menos del 50 % de tu frecuencia máxima).</p>'
+        : reposo >= 1 ? `<p class="reloj-nota">Además, ${reposo} min en reposo (por debajo de la zona 1).</p>` : '';
     return `<div class="reloj-zonas">${zonas.map((m, i) => `
         <div class="reloj-zona">
             <span class="reloj-zona-nombre">${RELOJ_ZONAS[i].nombre}</span>
             <span class="reloj-zona-barra"><span style="width:${Math.round((m / total) * 100)}%;background:${RELOJ_ZONAS[i].color}"></span></span>
             <span class="reloj-zona-min">${Math.round(m)} min</span>
-        </div>`).join('')}</div>`;
+        </div>`).join('')}</div>${notaReposo}`;
 }
 
 function relojDatosHTML(s) {
@@ -201,7 +208,7 @@ function relojMostrarResumen(s) {
         ${relojDatosHTML(s)}
         ${relojPedirEsfuerzoHTML(s)}
         <h3 class="reloj-subtitulo">Tiempo en cada zona</h3>
-        ${relojZonasHTML(s.zonas)}
+        ${relojZonasHTML(s.zonas, s.minutos)}
         <p class="reloj-nota">La sesión ya cuenta en tu carga de entrenamiento, tus logros y la clasificación.</p>`);
 }
 
@@ -240,7 +247,7 @@ async function verSesionReloj(userId, sesionId) {
         ${relojPedirEsfuerzoHTML(s)}
         ${s.pulsos?.some(Boolean) ? '<div class="reloj-grafica"><canvas id="reloj-canvas"></canvas></div>' : ''}
         <h3 class="reloj-subtitulo">Tiempo en cada zona${s.fcMaxUsada ? ` <small>(FC máx. ${s.fcMaxUsada} ppm)</small>` : ''}</h3>
-        ${relojZonasHTML(s.zonas)}`);
+        ${relojZonasHTML(s.zonas, s.minutos)}`);
     document.querySelector('#modal-overlay .modal')?.classList.add('modal-wide');
     const canvas = document.getElementById('reloj-canvas');
     if (!canvas || typeof Chart === 'undefined') return;
@@ -337,10 +344,12 @@ async function relojConectar(todos = false) {
             if (bpm > 0) relojVivo.muestras.push({ t: Date.now(), hr: bpm });
         });
         dispositivo.addEventListener('gattserverdisconnected', () => {
+            if (relojVivo.dispositivo !== dispositivo) return; // la desconectó la app al terminar o descartar
             if (relojVivo.inicio) showToast('Se perdió la conexión con el sensor. Termina la sesión o vuelve a conectar.', 'error', 5000);
             const b = document.getElementById('rv-conectar'); if (b) b.hidden = false;
         });
         relojVivo.dispositivo = dispositivo;
+        document.getElementById('rv-aviso')?.classList.add('hidden'); // conectó: fuera el aviso de un intento anterior
         relojVivo.inicio ||= Date.now();
         relojVivo.reloj ||= setInterval(relojPintar, 1000);
         try { relojVivo.bloqueo = await navigator.wakeLock?.request('screen'); } catch { /* la pantalla puede apagarse */ }
@@ -377,10 +386,12 @@ function relojPintar() {
 }
 
 function relojLimpiar() {
-    try { relojVivo.dispositivo?.gatt?.disconnect(); } catch { /* ya estaba desconectado */ }
-    clearInterval(relojVivo.reloj);
-    relojVivo.bloqueo?.release?.();
+    const { dispositivo, reloj, bloqueo } = relojVivo;
+    // Primero se olvida el sensor: así su desconexión no se avisa como "se perdió la conexión"
     Object.assign(relojVivo, { dispositivo: null, muestras: [], inicio: null, ultimo: null, reloj: null, bloqueo: null });
+    clearInterval(reloj);
+    bloqueo?.release?.();
+    try { dispositivo?.gatt?.disconnect(); } catch { /* ya estaba desconectado */ }
 }
 
 function relojCancelar() {
