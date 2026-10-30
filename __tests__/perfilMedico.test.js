@@ -244,12 +244,38 @@ describe('refrescarPlanes', () => {
       : v;
     const guardado = { ...datos, rutinaSemanal: reordenar(actual.rutinaSemanal), planAlimenticio: reordenar(actual.planAlimenticio) };
     await svc.refrescarPlanes(5, guardado, ficha);
-    expect(query).not.toHaveBeenCalled();
+    // Lee el estado médico, pero no guarda nada
+    expect(query).not.toHaveBeenCalledWith(expect.stringContaining('UPDATE'), expect.anything());
   });
 
   test('sin perfil o sin ficha no hace nada', async () => {
     expect(await svc.refrescarPlanes(5, null, ficha)).toBeNull();
     expect(await svc.refrescarPlanes(5, datos, null)).toBe(datos);
     expect(query).not.toHaveBeenCalled();
+  });
+});
+
+// ─── plan de comidas con una lesión ───────────────────────────────────────────
+describe('plan de comidas con una lesión', () => {
+  const ficha = { peso: 70, altura: 178, edad: 24, sexo: 'Hombre', deporte: 'Fútbol', posicion: 'Delantero', objetivo: 'Perder peso' };
+  const datos = { condiciones: [], alergias: [], preferencias: 'Sin restricciones' };
+  const rutina = { semana: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((dia, i) => ({
+    dia, tipo: i === 5 ? 'Partido' : i === 6 ? 'Descanso' : 'Entreno', ejercicios: i === 6 ? [] : [{ nombre: 'X' }],
+  })) };
+
+  test('de baja: toda la semana como descanso, más proteína y sin déficit', () => {
+    const normal = svc.generarPlanAlimenticio(datos, { ficha, rutina });
+    const baja = svc.generarPlanAlimenticio(datos, { ficha, rutina, lesion: 'no_apto' });
+    expect(baja.semana.every(d => d.tipoDia === 'descanso')).toBe(true);
+    expect(baja.semana[0].objetivo.proteina).toBe(140); // 2,0 g/kg
+    expect(baja.semana[0].objetivo.carbs).toBeLessThan(normal.semana[0].objetivo.carbs);
+    expect(baja.semana[6].objetivo.kcal).toBeGreaterThan(normal.semana[6].objetivo.kcal); // sin el déficit de "perder peso"
+    expect(baja.notas[0]).toMatch(/baja médica/);
+  });
+
+  test('en recuperación: los días de entreno y partido pasan a ser de recuperación', () => {
+    const plan = svc.generarPlanAlimenticio(datos, { ficha, rutina, lesion: 'adaptado' });
+    expect(plan.semana.map(d => d.tipoDia)).toEqual([...Array(6).fill('recuperacion'), 'descanso']);
+    expect(plan.notas[0]).toMatch(/recuperación/);
   });
 });

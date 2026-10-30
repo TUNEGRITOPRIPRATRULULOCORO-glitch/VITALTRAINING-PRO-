@@ -55,7 +55,8 @@ async function obtener(userId, lector) {
   const rangos = [];
   const pendientes = [];
 
-  const anotar = async (clave, base, pasoCalculado, falta) => {
+  const anotar = async (clave, base, exacto, falta) => {
+    const pasoCalculado = Math.min(cat.PASO_MAX, Math.floor(exacto + 1e-9));
     const previo = antes[clave];
     const paso = Math.max(previo ?? 0, pasoCalculado);
     let subio = false, nuevo = false;
@@ -67,7 +68,12 @@ async function obtener(userId, lector) {
     rangos.push({
       clave, ...base,
       rango: cat.rangoDe(paso),
-      siguiente: paso < cat.PASO_MAX && !enPausa ? { rango: cat.rangoDe(paso + 1), falta: falta(paso) } : null,
+      siguiente: paso < cat.PASO_MAX && !enPausa ? {
+        rango: cat.rangoDe(paso + 1),
+        falta: falta(paso),
+        // Cuánto lleva hacia el siguiente (si su marca actual quedó por debajo del rango guardado, empieza en 0)
+        progreso: pasoCalculado === paso ? Math.round((exacto - paso) * 100) / 100 : 0,
+      } : null,
       subio, nuevo,
     });
   };
@@ -81,7 +87,7 @@ async function obtener(userId, lector) {
     await anotar(`fuerza:${r.ejercicio}`, {
       tipo: 'fuerza', nombre: r.ejercicio,
       marca: `${kg(r.record.peso)} × ${r.record.repeticiones} · ≈ ${kg(r.record.e1rm)} máx. (${numero(relativo, 2)} × tu peso)${def.mancuerna ? ' · por mancuerna' : ''}`,
-    }, cat.pasoDe(relativo, refs), paso => faltaFuerza(r.record, pesoCorporal, refs, paso));
+    }, cat.pasoExacto(relativo, refs), paso => faltaFuerza(r.record, pesoCorporal, refs, paso));
   }
 
   for (const t of tests) {
@@ -91,7 +97,7 @@ async function obtener(userId, lector) {
     await anotar(`test:${t.prueba.id}`, {
       tipo: 'test', nombre: t.prueba.corto,
       marca: `${numero(t.valor, t.prueba.decimales ?? 2)} ${t.prueba.unidad}`,
-    }, cat.pasoDe(t.valor, refs), paso => faltaTest(t.prueba, t.valor, cat.valorParaPaso(paso + 1, refs)));
+    }, cat.pasoExacto(t.valor, refs), paso => faltaTest(t.prueba, t.valor, cat.valorParaPaso(paso + 1, refs)));
   }
 
   rangos.sort((a, b) => b.rango.paso - a.rango.paso || a.nombre.localeCompare(b.nombre, 'es'));

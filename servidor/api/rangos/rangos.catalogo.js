@@ -83,6 +83,11 @@ function escala(refs) {
 
 /** Paso (0-21) de un valor. */
 function pasoDe(valor, refs) {
+  return Math.min(PASO_MAX, Math.floor(pasoExacto(valor, refs) + 1e-9));
+}
+
+/** Paso con decimales: la parte decimal es cuánto llevas hacia el siguiente (0,62 = 62 %). */
+function pasoExacto(valor, refs) {
   const puntos = escala(refs);
   const mejora = refs[1] > refs[0]; // ¿más es mejor?
   const mejorQue = (a, b) => (mejora ? a >= b : a <= b);
@@ -91,7 +96,7 @@ function pasoDe(valor, refs) {
   for (let i = 1; i < puntos.length; i++) {
     const [v0, p0] = puntos[i - 1], [v1, p1] = puntos[i];
     if (mejorQue(valor, v0) && !mejorQue(valor, v1)) {
-      return Math.min(PASO_MAX, Math.floor(p0 + ((valor - v0) / (v1 - v0)) * (p1 - p0) + 1e-9));
+      return Math.min(PASO_MAX, p0 + ((valor - v0) / (v1 - v0)) * (p1 - p0));
     }
   }
   return PASO_MAX;
@@ -122,5 +127,5 @@ function ejercicioDeFuerza(nombre) {
 
 module.exports = {
   RANGOS, DIVISIONES, PASO_MAX, PASOS_REFERENCIA, FUERZA, TESTS,
-  referenciasPara, pasoDe, valorParaPaso, rangoDe, ejercicioDeFuerza,
+  referenciasPara, pasoDe, pasoExacto, valorParaPaso, rangoDe, ejercicioDeFuerza,
 };

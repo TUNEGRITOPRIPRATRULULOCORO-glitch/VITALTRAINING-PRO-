@@ -77,8 +77,12 @@ function tiposDeDia(rutinaSemanal) {
   return tipos.map((t, i) => (t !== 'partido' && tipos[i + 1] === 'partido' ? 'precompetencia' : t));
 }
 
-/** Calorías, macros y agua para un tipo de día. */
-function objetivosDelDia(base, tipoDia, preferencias = '') {
+/**
+ * Calorías, macros y agua para un tipo de día.
+ * lesion: con una lesión activa la proteína sube a 2,0 g/kg (ayuda a reparar el tejido y a no
+ * perder músculo con la inactividad) y no se aplica déficit para perder peso.
+ */
+function objetivosDelDia(base, tipoDia, preferencias = '', { lesion = false } = {}) {
   const cfg = MACROS_POR_DIA[tipoDia] || MACROS_POR_DIA.entreno;
   const { peso, objetivo, posicion } = base;
 
@@ -87,11 +91,11 @@ function objetivosDelDia(base, tipoDia, preferencias = '') {
 
   let proteinaGkg = 1.6;
   if (objetivo === 'Ganar masa muscular') proteinaGkg = 1.8;
-  if (objetivo === 'Perder peso' || /alto en prote/i.test(preferencias)) proteinaGkg = 2.0;
+  if (objetivo === 'Perder peso' || /alto en prote/i.test(preferencias) || lesion) proteinaGkg = 2.0;
 
   let energia = gastoEnReposo(base) * cfg.factor;
   const diaClave = tipoDia === 'partido' || tipoDia === 'precompetencia';
-  if (objetivo === 'Perder peso' && !diaClave) {
+  if (objetivo === 'Perder peso' && !diaClave && !lesion) {
     energia *= 0.85;
     carbsGkg = Math.max(3, carbsGkg - 1); // el déficit sale sobre todo de carbohidratos en días suaves
   }

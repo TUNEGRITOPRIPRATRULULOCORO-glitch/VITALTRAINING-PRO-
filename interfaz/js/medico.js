@@ -133,6 +133,10 @@ async function medicoVerPerfil(userId) {
                 <div class="card-body"><div id="md-lesiones">${showLoading()}</div></div>
             </div>
             <div class="card" style="margin-bottom:20px">
+                <div class="card-header"><h2>🏅 Fuerza, récords y rangos</h2></div>
+                <div class="card-body"><div id="md-rangos">${showLoading()}</div></div>
+            </div>
+            <div class="card" style="margin-bottom:20px">
                 <div class="card-header"><h2>📊 Salud diaria · últimos 14 registros</h2></div>
                 <div class="card-body"><div id="md-salud">${showLoading()}</div></div>
             </div>
@@ -150,6 +154,7 @@ async function medicoVerPerfil(userId) {
         enSegundoPlano(evRender('md-tests', userId, { propio: false }));
         enSegundoPlano(lsRender('md-lesiones', userId, { editable: true }));
         enSegundoPlano(medicoRenderSalud(userId));
+        enSegundoPlano(rgRenderResumen('md-rangos', userId));
     } catch (error) {
         main.innerHTML = showError(escapeHtml(error.message), `medicoVerPerfil(${Number(userId)})`);
     }

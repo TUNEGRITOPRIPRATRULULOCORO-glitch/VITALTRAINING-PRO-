@@ -325,11 +325,14 @@ async function ntVerDetalle(userId) {
                 <button class="detalle-tab" onclick="switchTab(this,'tab-notas')">📝 Notas</button>
                 <button class="detalle-tab" onclick="switchTab(this,'tab-comidas')">🍽 Comidas</button>
                 <button class="detalle-tab" onclick="switchTab(this,'tab-rutinas')">🏃 Rutinas</button>
+                <button class="detalle-tab" onclick="switchTab(this,'tab-fuerza')">🏅 Fuerza</button>
             </div>
             <div id="tab-salud" class="detalle-tab-content" style="padding:16px">${saludHTML}</div>
             <div id="tab-notas" class="detalle-tab-content hidden" style="padding:16px">${notasHTML}</div>
             <div id="tab-comidas" class="detalle-tab-content hidden" style="padding:16px">${comidasHTML}</div>
-            <div id="tab-rutinas" class="detalle-tab-content hidden" style="padding:16px">${rutinasHTML}</div>`;
+            <div id="tab-rutinas" class="detalle-tab-content hidden" style="padding:16px">${rutinasHTML}</div>
+            <div id="tab-fuerza" class="detalle-tab-content hidden" style="padding:16px"><div id="nt-rangos">${showLoading()}</div></div>`;
+        enSegundoPlano(rgRenderResumen('nt-rangos', userId));
 
         const ov=document.getElementById('modal-overlay');
         ov.querySelector('.modal').classList.add('modal-wide');

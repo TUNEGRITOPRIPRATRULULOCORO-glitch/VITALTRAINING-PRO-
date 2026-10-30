@@ -157,7 +157,7 @@ Plantillas por **deporte y posición**, basadas en evidencia (citada en `servido
 - **Cumplimiento**: calendario de 4 semanas con lo completado, parcial o no hecho. Los días de lesión no cuentan como fallados.
 
 ### Lesiones y estado médico
-El médico registra zona, tipo, gravedad e indicaciones, y decide si el atleta está de **baja** o puede entrenar **adaptado**. El estado manda en todo lo demás: de baja, "listo para entrenar" muestra *Baja médica*, la rutina queda en pausa, los rangos se congelan y Vita no le dice que está listo. El atleta recibe un aviso al registrar, cambiar o dar el alta.
+El médico registra zona, tipo, gravedad e indicaciones, y decide si el atleta está de **baja** o puede entrenar **adaptado**. El estado manda en todo lo demás: de baja, "listo para entrenar" muestra *Baja médica*, la rutina queda en pausa, los rangos se congelan, Vita no le dice que está listo y el **plan de comidas pasa a días de descanso con más proteína** (2,0 g/kg y sin déficit para perder peso); en recuperación, los días de entreno pasan a ser de recuperación. El atleta recibe un aviso al registrar, cambiar o dar el alta.
 
 ### Equipos
 Mientras no hay equipos, la app es un club único: cada profesional ve a todos los atletas. Con equipos, **un nutricionista o médico solo ve, abre y escribe a los atletas de sus equipos**, y los correos de alerta van solo a sus médicos. El admin crea los equipos y añade a los profesionales; los atletas se unen con un **código de 6 caracteres**.
@@ -169,7 +169,7 @@ Junta en una lista lo del día: registrar la salud, la sesión de la rutina y la
 El atleta apunta peso y repeticiones de cada serie viendo la sesión anterior. **Récord** = mejor máximo estimado con la fórmula de **Epley** (`peso × (1 + reps/30)`, fiable hasta ~12 repeticiones). **Sugerencia por doble progresión**: si completó las repeticiones objetivo en todas las series, sube 2,5 kg (1 kg con pesos pequeños); si no, mismo peso y una repetición más. Lesionado o con el cuerpo pidiendo descanso, no sube.
 
 ### Rangos
-8 rangos (Bronce, Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Radiante); los 7 primeros con 3 divisiones. En **fuerza** se compara el máximo estimado con el **peso corporal**; en **tests físicos**, la mejor marca. Las referencias son distintas para hombres y mujeres y orientativas. Se guarda el rango más alto alcanzado: **nunca se baja**.
+8 rangos (Bronce, Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Radiante); los 7 primeros con 3 divisiones. En **fuerza** se compara el máximo estimado con el **peso corporal**; en **tests físicos**, la mejor marca. Las referencias son distintas para hombres y mujeres y orientativas. Se guarda el rango más alto alcanzado: **nunca se baja**. Cada rango tiene su emblema (de una medalla de bronce a una corona radiante con alas) y cada división le añade adornos; la app muestra el % que falta para el siguiente, el "Camino a Radiante" y una celebración al subir. El médico y el nutricionista ven los rangos y récords del atleta.
 
 ### Vita, el asistente
 - **Sin coste**: un **modelo de machine learning propio** (TF-IDF por trozos de letras + regresión logística, entrenado con scikit-learn sobre 782 frases) clasifica cada mensaje en 17 intenciones con un **81 % de precisión**. Con confianza ≥ 0,35 responde con los datos reales del atleta; si duda, pregunta. El servidor no necesita Python: el modelo se exporta a JSON y Node.js repite las cuentas (un test comprueba que da lo mismo). Detalles en [ml/README.md](ml/README.md).
@@ -277,6 +277,4 @@ Es una app de un proceso: el mismo servidor publica la interfaz y la API, sin co
 - **Render gratis se duerme** a los 15 minutos sin visitas; la primera visita tarda cerca de un minuto.
 - **Neon gratis** solo permite volver atrás unas horas: no hay copias de seguridad propias.
 - Las **referencias de los rangos** son orientativas y no se ajustan por edad.
-- Mientras el atleta está de baja, el **plan de comidas** no se recalcula como días de descanso (el nutricionista ve el aviso).
-- El médico y el nutricionista aún **no tienen pantalla** para ver las series y los rangos del atleta (el servidor ya lo permite).
 - El usuario no puede **cambiar su contraseña desde su perfil** (solo con "Olvidé mi contraseña") ni **borrar su cuenta o descargar sus datos** por sí mismo.

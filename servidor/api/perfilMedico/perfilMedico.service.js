@@ -115,17 +115,27 @@ const NOMBRES_ESTIMADOS = { peso: 'peso', altura: 'altura', edad: 'edad', sexo: 
 /**
  * Plan semanal de comidas con calorías y macros calculados para el atleta.
  * @param perfilMedico  condiciones, alergias y preferencias
- * @param opciones      { ficha, rutina } — ficha deportiva y rutina semanal (para saber qué día
- *                      es de entreno, descanso o partido). Acepta una posición suelta por compatibilidad.
+ * @param opciones      { ficha, rutina, lesion } — ficha deportiva, rutina semanal (para saber qué día
+ *                      es de entreno, descanso o partido) y estado médico ('no_apto' | 'adaptado' | 'apto').
+ *                      Acepta una posición suelta por compatibilidad.
  */
 function generarPlanAlimenticio(perfilMedico, opciones = {}) {
   const { condiciones = [], alergias = [], preferencias = 'Sin restricciones' } = perfilMedico;
-  const { ficha = null, rutina = null } = typeof opciones === 'string' ? { ficha: { posicion: opciones } } : opciones;
+  const { ficha = null, rutina = null, lesion = null } = typeof opciones === 'string' ? { ficha: { posicion: opciones } } : opciones;
   const dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 
   const base = nutricion.datosBase(ficha || {});
   const tipos = rutina ? nutricion.tiposDeDia(rutina) : [];
-  const tipoDe = i => tipos[i] || (i === 6 ? 'descanso' : 'entreno');
+  const tipoSegunRutina = i => tipos[i] || (i === 6 ? 'descanso' : 'entreno');
+  // De baja no se entrena: toda la semana come como en descanso. En recuperación, los días de
+  // entreno o partido pasan a ser de recuperación (sesiones suaves).
+  const tipoDe = i => {
+    const tipo = tipoSegunRutina(i);
+    if (lesion === 'no_apto') return 'descanso';
+    if (lesion === 'adaptado' && tipo !== 'descanso') return 'recuperacion';
+    return tipo;
+  };
+  const conLesion = lesion === 'no_apto' || lesion === 'adaptado';
 
   const opcionesPorToma = {
     desayuno:       filtrarComidas(DESAYUNOS, alergias, preferencias, condiciones),
@@ -144,7 +154,7 @@ function generarPlanAlimenticio(perfilMedico, opciones = {}) {
   const respetarOrden = /mediterr|alto en prote/i.test(preferencias);
 
   const semana = dias.map((dia, i) => {
-    const objetivo = nutricion.objetivosDelDia(base, tipoDe(i), preferencias);
+    const objetivo = nutricion.objetivosDelDia(base, tipoDe(i), preferencias, { lesion: conLesion });
     const comidas = {};
     for (const [toma, parte] of Object.entries(nutricion.REPARTO)) {
       // Las dos meriendas usan el mismo catálogo: se desplaza el índice para que no se repitan
@@ -157,10 +167,14 @@ function generarPlanAlimenticio(perfilMedico, opciones = {}) {
     return { dia, tipoDia: objetivo.tipoDia, objetivo, total, ...comidas };
   });
 
-  const entreno  = semana.find(d => d.tipoDia === 'entreno')?.objetivo || nutricion.objetivosDelDia(base, 'entreno', preferencias);
-  const descanso = semana.find(d => d.tipoDia === 'descanso')?.objetivo || nutricion.objetivosDelDia(base, 'descanso', preferencias);
+  const entreno  = semana.find(d => d.tipoDia === 'entreno')?.objetivo || nutricion.objetivosDelDia(base, conLesion ? 'recuperacion' : 'entreno', preferencias, { lesion: conLesion });
+  const descanso = semana.find(d => d.tipoDia === 'descanso')?.objetivo || nutricion.objetivosDelDia(base, 'descanso', preferencias, { lesion: conLesion });
 
   const notas = [];
+  if (lesion === 'no_apto')
+    notas.push('🩹 Estás de baja médica: el plan usa días de descanso (menos carbohidratos) y sube la proteína para ayudar a recuperar el tejido. Sin dietas estrictas mientras te recuperas.');
+  else if (lesion === 'adaptado')
+    notas.push('🩹 Estás en recuperación: los días de entreno son suaves, así que el plan baja algo los carbohidratos y mantiene la proteína alta.');
   if (base.estimados.length)
     notas.push(`📝 Faltan datos (${base.estimados.map(c => NOMBRES_ESTIMADOS[c]).join(', ')}): se usaron valores de referencia. Complétalos en Mi Perfil para afinar el cálculo.`);
   if (condiciones.includes('Diabetes tipo 1') || condiciones.includes('Diabetes tipo 2'))
@@ -245,7 +259,9 @@ async function refrescarPlanes(userId, perfil, ficha) {
     preferencias: perfil.preferencias || 'Sin restricciones'
   };
   const rutinaSemanal   = generarRutina(datos, ficha.posicion, ficha.deporte, ficha.diaPartido);
-  const planAlimenticio = generarPlanAlimenticio(datos, { ficha, rutina: rutinaSemanal });
+  // El estado médico (módulo lesiones) cambia las comidas: de baja se come como en descanso
+  const estado = await require('../lesiones').estadoDe(userId).catch(() => null);
+  const planAlimenticio = generarPlanAlimenticio(datos, { ficha, rutina: rutinaSemanal, lesion: estado?.estado || null });
   const cambio = estable(rutinaSemanal) !== estable(perfil.rutinaSemanal) || estable(planAlimenticio) !== estable(perfil.planAlimenticio);
   if (cambio) {
     await query(
