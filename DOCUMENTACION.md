@@ -238,7 +238,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **453 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **452 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

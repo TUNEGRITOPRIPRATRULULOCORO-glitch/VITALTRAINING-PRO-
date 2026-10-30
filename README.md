@@ -32,7 +32,7 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 | Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
 | IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |
 | Servicios | Brevo (correos) · Google (entrar con Google) |
-| Calidad | Jest (453 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
+| Calidad | Jest (452 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
 | Publicación | Docker · Render |
 
 ---
@@ -102,7 +102,7 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 ## Pruebas
 
 ```bash
-npm test                 # 453 pruebas
+npm test                 # 452 pruebas
 npm run test:coverage    # con informe de cobertura en coverage/lcov-report/index.html
 ```
 
