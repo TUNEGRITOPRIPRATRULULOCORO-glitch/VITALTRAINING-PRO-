@@ -10,6 +10,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+    <!-- App instalable (PWA): manifiesto, color de la barra del celular e icono para iPhone -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#0f1f14">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="VitalTraining">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 
@@ -822,6 +829,7 @@
 <!-- El orden importa: comun.js primero (lo usan todos) e inicio.js al final (arranca la app) -->
 <script src="js/comun.js"></script>
 <script src="js/musica.js"></script>
+<script src="js/pwa.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/mensajes.js"></script>
 <script src="js/rendimiento.js"></script>

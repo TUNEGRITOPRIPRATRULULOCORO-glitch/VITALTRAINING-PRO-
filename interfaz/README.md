@@ -6,6 +6,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 - `ayuda.html` — guía de uso
 - `styles.css` — estilos
 - `privacidad.html` — política de privacidad (pública, en `/privacidad`)
+- `manifest.webmanifest`, `sw.js` y `offline.html` — app instalable en el celular (PWA): nombre e iconos, service worker y la página que se ve sin internet
 - `js/` — lógica del navegador, un archivo por rol; llama al servidor con `fetch('/api/...')` y un token JWT
 
 ## Archivos de `js/` (en el orden en que se cargan)
@@ -13,6 +14,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 | Archivo | Qué tiene |
 |---|---|
 | `comun.js` | Sesión, `apiFetch`, enrutador por rol, fotos de perfil, deportes, avisos, ventanas. Lo usan todos |
+| `pwa.js` | App instalable: registra `sw.js` y ofrece "Instalar VitalTraining" (en iPhone explica los pasos) |
 | `auth.js` | Portada pública, entrar, registro (también con Google), recuperar contraseña |
 | `mensajes.js` | Chat entre roles y contadores de no leídos |
 | `rendimiento.js` | Listo para entrenar, carga y cumplimiento (atleta, nutricionista y médico) |

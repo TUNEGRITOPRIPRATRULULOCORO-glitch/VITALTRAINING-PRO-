@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1f14">
+<title>Sin conexión · VitalTraining</title>
+<link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+<style>
+  :root { --fondo: #f0fdf4; --texto: #14532d; --suave: #4b6b57; --tarjeta: #ffffff; }
+  @media (prefers-color-scheme: dark) { :root { --fondo: #0f1117; --texto: #e2e8f0; --suave: #94a3b8; --tarjeta: #1a1f2e; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+         background: var(--fondo); color: var(--texto); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 380px; width: 100%; text-align: center; background: var(--tarjeta); border-radius: 20px; padding: 32px 24px;
+         box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+  img { width: 64px; height: 64px; }
+  h1 { font-size: 22px; margin: 16px 0 8px; }
+  p { color: var(--suave); line-height: 1.5; margin: 0 0 22px; }
+  button { border: none; border-radius: 12px; padding: 12px 22px; font-size: 15px; font-weight: 700; color: #fff;
+           background: linear-gradient(135deg, #22c55e, #16a34a); cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/img/logo.svg" alt="VitalTraining">
+  <h1>Estás sin conexión</h1>
+  <p>VitalTraining necesita internet para mostrar tus datos. Revisa tu conexión y vuelve a intentarlo.</p>
+  <button type="button" onclick="location.reload()">Reintentar</button>
+</main>
+</body>
+</html>
