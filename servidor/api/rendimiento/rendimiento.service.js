@@ -1,5 +1,6 @@
 const { query } = require('../../../base-de-datos/db');
 const calc = require('./rendimiento.calculos');
+const { construirHoy } = require('./rendimiento.hoy');
 const { hoyISO } = require('../../compartido/fechas');
 
 // La racha puede ir más atrás que la ventana de 28 días
@@ -113,4 +114,26 @@ async function obtenerEquipo(usuario) {
   });
 }
 
-module.exports = { obtenerResumen, obtenerEquipo };
+/** "Hoy te toca…": las tareas del día del atleta (salud, sesión y comidas del plan). */
+async function obtenerHoy(userId) {
+  const hoy = hoyISO();
+  const id = Number(userId);
+  const [resumen, { plan }, salud, sesiones, rutinas, comidas] = await Promise.all([
+    obtenerResumen(id),
+    require('../perfilMedico').planActual(id),
+    query('SELECT id FROM salud WHERE user_id = $1 AND fecha = $2', [id, hoy]),
+    query('SELECT estado FROM cumplimiento WHERE user_id = $1 AND fecha = $2', [id, hoy]),
+    query('SELECT id FROM rutinas WHERE user_id = $1 AND fecha = $2', [id, hoy]),
+    query('SELECT tipo FROM comidas WHERE user_id = $1 AND fecha = $2', [id, hoy]),
+  ]);
+  // Una sesión del plan marcada o un entreno apuntado a mano cuentan como hecho; "completo" gana a "parcial"
+  const estados = sesiones.rows.map(s => s.estado || 'completo');
+  const sesion = estados.includes('completo') || rutinas.rows.length ? 'completo' : estados.includes('parcial') ? 'parcial' : null;
+  return construirHoy({
+    fecha: hoy, dia: calc.nombreDia(hoy), plan,
+    saludHoy: salud.rows.length > 0, listo: resumen.listo, sesion,
+    comidasHoy: comidas.rows.map(c => c.tipo), estadoMedico: resumen.estadoMedico,
+  });
+}
+
+module.exports = { obtenerResumen, obtenerEquipo, obtenerHoy };

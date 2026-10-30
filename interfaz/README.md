@@ -22,6 +22,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 | `admin.js` | Panel del administrador |
 | `nutricionista.js` | Panel del nutricionista |
 | `medico.js` | Panel del médico |
+| `hoy.js` | Atleta: tarjeta "Hoy te toca…" del dashboard (salud, sesión y comidas del día) |
 | `atleta.js` | Atleta: inicio, perfil, salud, historial, soporte |
 | `atleta-plan.js` | Atleta: perfil médico, rutina, plan de comidas, asistente IA |
 | `inicio.js` | Arranque: decide qué pantalla mostrar. Va el último |

@@ -48,11 +48,12 @@ function pfRenderView(view) {
 // — DASHBOARD —
 async function pfRenderDashboard() {
     const userId=currentUser.id;
-    const [data, saludData, rdData, lesiones] = await Promise.all([
+    const [data, saludData, rdData, lesiones, hoy] = await Promise.all([
         apiFetch(`${API}/panel/${userId}/dashboard`).then(r=>r.json()).catch(()=>null),
         apiFetch(`${API}/salud/${userId}`).then(r=>r.json()).catch(()=>[]),
         apiFetch(`${API}/rendimiento/${userId}`).then(r=>r.json()).catch(()=>null),
-        lsCargar(userId)
+        lsCargar(userId),
+        hoyCargar(userId)
     ]);
     const main=document.getElementById('pf-content');
     if(!data?.ok){main.innerHTML=showError('No se pudo cargar el dashboard.','pfRenderView(\'dashboard\')');return;}
@@ -72,6 +73,7 @@ async function pfRenderDashboard() {
             </div>
             <button class="btn btn-primary" onclick="pfRenderView('salud')">+ Registrar salud</button>
         </div>
+        ${hoyTarjeta(hoy)}
         ${lsTarjetaAtleta(lesiones)}
         ${rendimiento?rdSeccionDashboard(rendimiento):''}
         ${pfTarjetasResumen(data.resumen.hoy, saludHoy)}

@@ -18,4 +18,13 @@ async function getEquipo(req, res) {
   }
 }
 
-module.exports = { getResumen, getEquipo };
+async function getHoy(req, res) {
+  try {
+    res.json({ ok: true, hoy: await svc.obtenerHoy(Number(req.params.userId)) });
+  } catch (err) {
+    console.error('Hoy te toca:', err.message);
+    res.status(500).json({ error: 'Error preparando tu día.' });
+  }
+}
+
+module.exports = { getResumen, getEquipo, getHoy };

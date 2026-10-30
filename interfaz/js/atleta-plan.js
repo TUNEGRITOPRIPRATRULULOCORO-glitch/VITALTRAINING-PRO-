@@ -524,7 +524,7 @@ async function pfMarcarCumplimiento(diaSemana, tipo) {
     const rpe=Number(document.getElementById('cumpl-rpe')?.value)||null;
     const res=await apiFetch(`${API}/panel/${userId}/cumplimiento`,{method:'POST',body:JSON.stringify({diaSemana,tipo,fecha,estado,duracionMinutos,rpe})}).then(r=>r.json()).catch(()=>null);
     closeModal();
-    if(res?.ok){showToast(estado==='parcial'?`${diaSemana} registrado como parcial`:`¡${diaSemana} completado! 💪`);enSegundoPlano(pfRenderPlanRutina());}
+    if(res?.ok){showToast(estado==='parcial'?`${diaSemana} registrado como parcial`:`¡${diaSemana} completado! 💪`);enSegundoPlano(document.getElementById('hoy-card')?hoyRefrescar():pfRenderPlanRutina());}
     else showToast('Error al registrar cumplimiento','error');
 }
 
