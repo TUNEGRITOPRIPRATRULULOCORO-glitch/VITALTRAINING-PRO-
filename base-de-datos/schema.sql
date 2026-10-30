@@ -216,6 +216,16 @@ CREATE TABLE IF NOT EXISTS equipo_miembros (  -- atletas y profesionales de cada
   UNIQUE(equipo_id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS series (  -- registro serie a serie del atleta
+  id           BIGSERIAL PRIMARY KEY,
+  user_id      BIGINT NOT NULL,
+  ejercicio    VARCHAR(120) NOT NULL,
+  fecha        DATE NOT NULL,
+  peso         NUMERIC,                -- kg, vacío si es con el propio cuerpo
+  repeticiones INTEGER NOT NULL,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -235,3 +245,4 @@ ALTER TABLE lesiones ADD CONSTRAINT lesiones_user_id_fkey FOREIGN KEY (user_id) 
 ALTER TABLE notas_clinicas ADD CONSTRAINT notas_clinicas_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_equipo_id_fkey FOREIGN KEY (equipo_id) REFERENCES equipos(id) ON DELETE CASCADE;
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE series ADD CONSTRAINT series_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;

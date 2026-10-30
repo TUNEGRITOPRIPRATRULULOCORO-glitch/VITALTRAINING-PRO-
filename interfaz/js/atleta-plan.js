@@ -436,9 +436,10 @@ async function pfRenderPlanRutina() {
     const notasRutina  = rutinaSemanal?.notas  || [];
 
     const [cumplData, lesiones]=await Promise.all([
+        serCargarHoy(),
         apiFetch(`${API}/panel/${userId}/cumplimiento`).then(r=>r.json()).catch(()=>({datos:[]})),
         lsCargar(userId)
-    ]);
+    ]).then(([, cumpl, les])=>[cumpl, les]);
     const deBaja=lesiones?.estado.estado==='no_apto';
     const cumplidos=cumplData.datos||[];
     const hoy=new Date().toISOString().slice(0,10);
@@ -458,7 +459,7 @@ async function pfRenderPlanRutina() {
                     : e.series===1 ? (e.tiempo||'')
                     : `${e.series}×${e.tiempo||''}`;
                 const nombreEsc=e.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-                return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${e.nombre}</span><span class="plan-ejercicio-series">${det}</span></div><button class="btn-video" onclick="verVideoEjercicio('${nombreEsc}')">▶ Ver video</button></div>`;
+                return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${e.nombre}</span><span class="plan-ejercicio-series">${det}</span></div><div class="plan-ejercicio-botones">${!deBaja&&serApuntable(e)?serBoton(e):''}<button class="btn-video" onclick="verVideoEjercicio('${nombreEsc}')">▶ Ver video</button></div></div>`;
             }).join('');
         const cumplBtn=esDescanso||deBaja?''
             :yaCompleto
@@ -491,10 +492,12 @@ async function pfRenderPlanRutina() {
                 <p>Tu programa de ejercicio semanal</p>
             </div>
         </div>
+        <div id="ser-records"></div>
         <div class="card">
             <div style="padding:20px">${lsAvisoRutina(lesiones)}${notasRutinaHTML}${rutinaHTML}</div>
         </div>
     </div>`;
+    enSegundoPlano(serPintarRecords('ser-records'));
 }
 
 const RPE_ETIQUETAS = ['', 'Muy fácil', 'Muy fácil', 'Fácil', 'Fácil', 'Moderado', 'Moderado', 'Duro', 'Duro', 'Muy duro', 'Máximo'];

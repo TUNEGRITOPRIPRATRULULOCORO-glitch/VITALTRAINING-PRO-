@@ -25,6 +25,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `mensajes` | `mensajes` | — |
 | `evaluaciones` | `evaluaciones` | — |
 | `equipos` | `equipos`, `equipo_miembros` | `accesoAtleta` (middleware), `filtrarAtletas`, `puedenHablar`... — ver abajo |
+| `series` | `series` | — (registro serie a serie, récords y sugerencia de carga) |
 | `lesiones` | `lesiones`, `notas_clinicas` | `estadosDe`, `estadoDe` (apto / en recuperación / baja médica) |
 | `avisos` | — (decide qué correo mandar y a quién) | `bienvenida`, `restablecerPassword`, `alertaSalud`, `alertaCarga` |
 

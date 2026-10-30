@@ -31,6 +31,7 @@ router.use('/mensajes',      require('./mensajes').router);
 router.use('/evaluaciones',  require('./evaluaciones').router);
 router.use('/lesiones',      require('./lesiones').router);
 router.use('/equipos',       require('./equipos').router);
+router.use('/series',        require('./series').router);
 router.use('/cuenta',        require('./usuarios').cuentaRouter);
 router.use('/fotos',         require('./usuarios').fotosRouter);
 
