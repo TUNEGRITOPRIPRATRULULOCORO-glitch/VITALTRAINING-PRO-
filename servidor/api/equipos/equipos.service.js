@@ -11,7 +11,7 @@ const { DEPORTES } = require('../../compartido/deportes');
  */
 
 const ROLES_ATLETA = ['Atleta', 'Futbolista'];
-const ROLES_PROFESIONAL = ['Nutricionista', 'Medico', 'Médico'];
+const ROLES_PROFESIONAL = ['Nutricionista', 'Entrenador', 'Medico', 'Médico'];
 const esAtleta = rol => ROLES_ATLETA.includes(rol);
 const esProfesional = rol => ROLES_PROFESIONAL.includes(rol);
 
@@ -262,7 +262,13 @@ async function unirseConCodigo(usuario, codigo) {
   return { id: Number(rows[0].id), nombre: rows[0].nombre };
 }
 
+/** ¿Está el atleta en algún equipo? (En un equipo, sus tests los registra el entrenador.) */
+async function tieneEquipo(userId) {
+  return (await equiposIdsDe(userId)).length > 0;
+}
+
 module.exports = {
+  tieneEquipo,
   atletasVisibles, puedeVerAtleta, filtrarAtletas, puedenHablar, filtrarContactos, accesoAtleta, nombresDeEquipos,
   listar, crear, actualizar, renovarCodigo, eliminar, agregarMiembro, quitarMiembro, misEquipos, unirseConCodigo,
   hayEquipos, nuevoCodigo, LARGO_CODIGO,

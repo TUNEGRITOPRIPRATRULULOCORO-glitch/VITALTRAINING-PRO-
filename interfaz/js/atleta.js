@@ -29,7 +29,7 @@ const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
+    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', logros:'Logros', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
@@ -43,6 +43,7 @@ function pfRenderView(view) {
     else if(view==='plan')      enSegundoPlano(pfRenderPlan());
     else if(view==='tests')     enSegundoPlano(pfRenderTests());
     else if(view==='rangos')    enSegundoPlano(pfRenderRangos());
+    else if(view==='logros')    enSegundoPlano(pfRenderLogros());
     else if(view==='clasificacion') { _cl.opciones = null; enSegundoPlano(pfRenderClasificacion()); }
     else if(view==='soporte')   enSegundoPlano(pfRenderSoporte());
 }
@@ -57,6 +58,7 @@ async function pfRenderDashboard() {
         lsCargar(userId),
         hoyCargar(userId)
     ]);
+    enSegundoPlano(lgComprobarNuevos());
     const main=document.getElementById('pf-content');
     if(!data?.ok){main.innerHTML=showError('No se pudo cargar el dashboard.','pfRenderView(\'dashboard\')');return;}
     const{perfil,ultimasComidas,ultimasRutinas,alertasRecientes}=data.resumen;

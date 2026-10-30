@@ -20,7 +20,7 @@ const medico = requireRol('Medico', 'Médico');
 
 router.get('/catalogos',                 ctrl.getCatalogos);
 // Para cualquier ruta con :userId, el profesional tiene que compartir equipo con el atleta
-router.param('userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador'));
+router.param('userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Entrenador', 'Administrador'));
 router.get('/:userId',                   ctrl.getExpediente);
 router.post('/:userId',                  medico,   ctrl.postLesion);
 router.post('/:userId/notas',            medico,   ctrl.postNota);

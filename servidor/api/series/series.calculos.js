@@ -31,7 +31,7 @@ function porSesion(series) {
   }
   return [...sesiones].map(([fecha, lista]) => ({
     fecha,
-    series: lista.map(s => ({ id: s.id, peso: s.peso, repeticiones: s.repeticiones })),
+    series: lista.map(s => ({ id: s.id, peso: s.peso, repeticiones: s.repeticiones, verificado: !!s.verificado })),
     volumen: Math.round(lista.reduce((t, s) => t + (s.peso || 0) * s.repeticiones, 0)),
   }));
 }
@@ -44,7 +44,7 @@ function mejorMarca(series) {
   let mejor = null;
   for (const s of series) {
     const valor = s.peso > 0 ? e1rm(s.peso, s.repeticiones) : null;
-    const candidato = { peso: s.peso || null, repeticiones: s.repeticiones, e1rm: valor, fecha: s.fecha, id: s.id };
+    const candidato = { peso: s.peso || null, repeticiones: s.repeticiones, e1rm: valor, fecha: s.fecha, id: s.id, verificado: !!s.verificado };
     if (!mejor) { mejor = candidato; continue; }
     const supera = valor != null || mejor.e1rm != null
       ? (valor ?? 0) > (mejor.e1rm ?? 0)

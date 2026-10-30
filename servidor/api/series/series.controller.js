@@ -37,4 +37,10 @@ async function deleteSerie(req, res) {
   } catch (err) { fallo(res, err, 'Error borrando la serie.'); }
 }
 
-module.exports = { getEjercicio, getHoy, getRecords, postSerie, deleteSerie };
+async function postVerificar(req, res) {
+  try {
+    res.json({ ok: true, serie: await svc.verificar(req.params.userId, req.params.id, req.user) });
+  } catch (err) { fallo(res, err, 'Error verificando la serie.'); }
+}
+
+module.exports = { getEjercicio, getHoy, getRecords, postSerie, deleteSerie, postVerificar };

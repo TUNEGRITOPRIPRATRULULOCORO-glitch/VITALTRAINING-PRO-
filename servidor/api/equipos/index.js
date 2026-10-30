@@ -16,4 +16,5 @@ module.exports = {
   puedenHablar:     svc.puedenHablar,      // (yo, otro) → boolean (atleta ↔ profesional del mismo equipo)
   filtrarContactos: svc.filtrarContactos,  // (yo, usuarios) → contactos permitidos
   nombresDeEquipos: svc.nombresDeEquipos,  // ([ids]) → { [id]: ['Sub-17', ...] }
+  tieneEquipo:      svc.tieneEquipo,       // (userId) → ¿está en algún equipo?
 };

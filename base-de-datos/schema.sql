@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS evaluaciones (
   fecha          DATE NOT NULL,
   notas          TEXT DEFAULT '',
   registrado_por VARCHAR(255),
+  verificado     BOOLEAN DEFAULT FALSE,  -- lo registró un profesional (entrenador, médico, admin)
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -223,6 +224,8 @@ CREATE TABLE IF NOT EXISTS series (  -- registro serie a serie del atleta
   fecha        DATE NOT NULL,
   peso         NUMERIC,                -- kg, vacío si es con el propio cuerpo
   repeticiones INTEGER NOT NULL,
+  verificado     BOOLEAN DEFAULT FALSE,  -- un entrenador vio la serie y la confirmó
+  verificado_por VARCHAR(255),
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -238,6 +241,30 @@ CREATE TABLE IF NOT EXISTS rangos (  -- el rango más alto alcanzado en cada mar
 CREATE TABLE IF NOT EXISTS clasificacion_preferencias (  -- quién prefiere no aparecer en las clasificaciones
   user_id BIGINT PRIMARY KEY,
   visible BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS logros (  -- insignias conseguidas (un logro ganado no se pierde)
+  id      BIGSERIAL PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  clave   VARCHAR(60) NOT NULL,
+  fecha   DATE,
+  UNIQUE(user_id, clave)
+);
+
+CREATE TABLE IF NOT EXISTS push_suscripciones (  -- dispositivos con notificaciones activadas
+  id           BIGSERIAL PRIMARY KEY,
+  user_id      BIGINT NOT NULL,
+  endpoint     TEXT NOT NULL UNIQUE,
+  p256dh       TEXT NOT NULL,
+  auth         TEXT NOT NULL,
+  recordatorio BOOLEAN DEFAULT TRUE,  -- recordatorio diario de registrar la salud
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS push_claves (  -- claves VAPID que genera el servidor la primera vez
+  id      INTEGER PRIMARY KEY,
+  publica TEXT NOT NULL,
+  privada TEXT NOT NULL
 );
 
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -262,6 +289,8 @@ ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN 
 ALTER TABLE series ADD CONSTRAINT series_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE rangos ADD CONSTRAINT rangos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE clasificacion_preferencias ADD CONSTRAINT clasificacion_preferencias_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE logros ADD CONSTRAINT logros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE push_suscripciones ADD CONSTRAINT push_suscripciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_comidas_usuario_fecha  -- índices: casi todo se consulta por atleta y fecha (salud, cumplimiento y rangos ya tienen el de su UNIQUE)
   ON comidas (user_id, fecha);

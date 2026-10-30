@@ -47,7 +47,8 @@ flowchart LR
 
 ### GitHub: el código
 - Cada cambio queda guardado con su explicación.
-- El CI pasa los 416 tests y construye la imagen de Docker en cada subida.
+- El CI pasa los 450 tests y construye la imagen de Docker en cada subida.
+- Cada mañana a las 7:00 una tarea programada (Actions → "Recordatorio diario") pide a la app que mande el recordatorio al celular. Necesita el secreto `CRON_SECRET`.
 
 ### SonarQube Cloud: calidad del código
 - Analiza solo cada cambio: fallos probables, seguridad y mantenibilidad.
@@ -85,6 +86,7 @@ Vive en Render, en el grupo de variables **Pro**. El código nunca lleva estos v
 | `DATOS_DEMO` | `false`: no crear cuentas de prueba |
 | `BREVO_API_KEY`, `CORREO_REMITENTE` | Enviar correos con Brevo |
 | `GOOGLE_CLIENT_ID` | Botón "Entrar con Google" (este no es secreto) |
+| `CRON_SECRET` | Secreto del recordatorio diario (el mismo en GitHub → Settings → Secrets → Actions) |
 
 ## Cómo llega un cambio a la web
 

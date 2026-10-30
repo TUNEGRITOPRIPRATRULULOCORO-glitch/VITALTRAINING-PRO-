@@ -6,7 +6,7 @@ const router = require('express').Router();
 const ctrl   = require('./salud.controller');
 const { accesoAtleta } = require('../equipos');
 
-router.get('/:userId',  accesoAtleta('Administrador', 'Nutricionista', 'Medico', 'Médico'), ctrl.getSalud);
+router.get('/:userId',  accesoAtleta('Administrador', 'Nutricionista', 'Medico', 'Médico', 'Entrenador'), ctrl.getSalud);
 router.post('/:userId', accesoAtleta('Administrador', 'Nutricionista'), ctrl.postSalud);
 
 module.exports = router;

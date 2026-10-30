@@ -14,6 +14,8 @@ router.get('/estado', async (req, res) => {
   }
 });
 router.use('/auth', require('./auth').router);
+// Recordatorio diario: lo llama una tarea programada con su propio secreto, sin sesión
+router.use('/notificaciones', require('./notificaciones').cronRouter);
 
 // Todas las rutas siguientes requieren sesión iniciada
 router.use(auth);
@@ -34,6 +36,8 @@ router.use('/equipos',       require('./equipos').router);
 router.use('/series',        require('./series').router);
 router.use('/rangos',        require('./rangos').router);
 router.use('/clasificacion', require('./clasificacion').router);
+router.use('/logros',        require('./logros').router);
+router.use('/notificaciones', require('./notificaciones').router);
 router.use('/cuenta',        require('./usuarios').cuentaRouter);
 router.use('/fotos',         require('./usuarios').fotosRouter);
 

@@ -5,7 +5,7 @@
 ============================================= */
 
 const EQ_ES_ATLETA = rol => ['Atleta', 'Futbolista'].includes(rol);
-const EQ_ES_PROFESIONAL = rol => ['Nutricionista', 'Medico', 'Médico'].includes(rol);
+const EQ_ES_PROFESIONAL = rol => ['Nutricionista', 'Entrenador', 'Medico', 'Médico'].includes(rol);
 let _eqEquipos = [];
 
 /** Etiquetas con los equipos de un atleta, para las listas del médico y el nutricionista. */
@@ -77,7 +77,7 @@ function eqTarjeta(e, activos) {
             <div>
                 <span class="eq-lab">🩺 Profesionales (${e.profesionales.length})</span>
                 <div class="eq-personas">${e.profesionales.map(m => eqPersona(e, m)).join('') || '<span class="ls-vacio">Nadie todavía: sin profesionales, nadie ve a estos atletas.</span>'}</div>
-                ${opciones('profesional') ? `<select class="eq-anadir" onchange="eqAgregar(${e.id},this)"><option value="">+ Añadir nutricionista o médico…</option>${opciones('profesional')}</select>` : ''}
+                ${opciones('profesional') ? `<select class="eq-anadir" onchange="eqAgregar(${e.id},this)"><option value="">+ Añadir entrenador, nutricionista o médico…</option>${opciones('profesional')}</select>` : ''}
             </div>
             <div>
                 <span class="eq-lab">🏅 Atletas (${e.atletas.length})</span>

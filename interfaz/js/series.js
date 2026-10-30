@@ -132,7 +132,7 @@ async function serPintarRecords(contenedorId) {
             ${lista.map(r => `
             <div class="ser-record">
                 <div class="ser-record-nombre">${escapeHtml(r.ejercicio)}</div>
-                <strong>${serSerieTxt(r.record)}</strong>
+                <strong>${serSerieTxt(r.record)}${r.record.verificado ? ' <span class="vf-badge vf-ok" title="Verificado por tu entrenador">✓</span>' : ''}</strong>
                 <span class="ls-lesion-sub">${r.record.e1rm ? `≈ ${serKg(r.record.e1rm)} máx. · ` : ''}${formatFecha(r.record.fecha)}</span>
             </div>`).join('')}
         </div>

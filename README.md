@@ -10,8 +10,9 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, **clasificación** con su equipo o su deporte, tests físicos, chat con su nutricionista y su médico, y **Vita**, el asistente con IA |
+| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, **logros**, **clasificación** con su equipo o su deporte, tests físicos, **notificaciones en el celular**, chat con su entrenador, su nutricionista y su médico, y **Vita**, el asistente con IA |
 | **Nutricionista** | Sus atletas, con estado de salud, carga de entrenamiento, cumplimiento y lesiones activas. Notas, comidas y rutinas asignadas, y mensajes |
+| **Entrenador** | Sus atletas, con estado médico, "listo para entrenar" y carga. **Registra los tests físicos** (quedan ✓ verificados) y **verifica los récords de fuerza** que vio: así la clasificación del equipo no tiene marcas falsas |
 | **Médico** | Expedientes: lesiones con estado **apto / en recuperación / baja médica**, notas clínicas (visibles para el atleta o solo para médicos), salud diaria, riesgo de lesión por carga y tests físicos |
 | **Administrador** | Usuarios, **equipos** (cada profesional solo ve a los atletas de sus equipos), reportes y soporte |
 
@@ -26,12 +27,12 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 | Capa | Tecnología |
 |---|---|
 | Interfaz | HTML, CSS y JavaScript sin frameworks (SPA) · app instalable (PWA) · Chart.js |
-| Servidor | Node.js 20 · Express 4 · monolito modular (18 módulos) |
+| Servidor | Node.js 20 · Express 4 · monolito modular (20 módulos) |
 | Base de datos | PostgreSQL: **Neon** en la web, **PGlite** en tu computador, **pg-mem** en los tests |
 | Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
 | IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |
 | Servicios | Brevo (correos) · Google (entrar con Google) |
-| Calidad | Jest (416 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
+| Calidad | Jest (450 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
 | Publicación | Docker · Render |
 
 ---
@@ -72,6 +73,7 @@ Abre **http://localhost:4000**. No hace falta configurar nada: la base de datos 
 | Administrador | `admin@vital.com` | `admin123` |
 | Nutricionista | `maria@vital.com` | `nutri123` |
 | Médico | `medico@vital.com` | `medico123` |
+| Entrenador | `entrenador@vital.com` | `entrenador123` |
 | Atleta | `carlos@vital.com` · `diego@vital.com` | `futbol123` |
 
 Con Docker (base PostgreSQL en un contenedor): copia `.env.example` como `.env`, rellena `POSTGRES_PASSWORD` y `JWT_SECRET`, y ejecuta `docker-compose up --build`.
@@ -91,6 +93,8 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 | `BREVO_API_KEY` · `CORREO_REMITENTE` · `CORREO_NOMBRE` · `APP_URL` | Correos (bienvenida, contraseña, alertas) |
 | `GOOGLE_CLIENT_ID` | Botón "Entrar con Google" |
 | `ANTHROPIC_API_KEY` | Opcional: Vita conversa con Claude. Sin ella usa el modelo propio, gratis |
+| `CRON_SECRET` | Secreto de la tarea diaria de GitHub Actions que envía el recordatorio al celular (mismo valor en GitHub y en Render) |
+| `VAPID_PUBLIC_KEY` · `VAPID_PRIVATE_KEY` | Opcional: claves de las notificaciones. Sin ellas el servidor las genera y las guarda en la base |
 | `CORS_ORIGIN` · `PORT` | Dominio permitido si la interfaz va aparte · puerto (4000) |
 
 ---
@@ -98,7 +102,7 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 ## Pruebas
 
 ```bash
-npm test                 # 416 pruebas
+npm test                 # 450 pruebas
 npm run test:coverage    # con informe de cobertura en coverage/lcov-report/index.html
 ```
 

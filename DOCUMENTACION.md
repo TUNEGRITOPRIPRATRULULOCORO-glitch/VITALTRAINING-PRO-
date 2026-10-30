@@ -6,7 +6,7 @@ Cómo está construida la app, por qué se tomó cada decisión y cómo funciona
 
 ## 1. Qué es y qué problema resuelve
 
-**VitalTraining** es una plataforma web para gestionar el entrenamiento, la alimentación y la salud de deportistas, con cuatro roles: **Atleta**, **Nutricionista**, **Médico** y **Administrador**. Sirve para clubes (fútbol, baloncesto, tenis, béisbol, atletismo, natación, boxeo…) y también para quien entrena por su cuenta (gimnasio, running, "estar en forma").
+**VitalTraining** es una plataforma web para gestionar el entrenamiento, la alimentación y la salud de deportistas, con cinco roles: **Atleta**, **Entrenador**, **Nutricionista**, **Médico** y **Administrador**. Sirve para clubes (fútbol, baloncesto, tenis, béisbol, atletismo, natación, boxeo…) y también para quien entrena por su cuenta (gimnasio, running, "estar en forma").
 
 **Problema:** en los clubes amateur y semiprofesionales el atleta, el nutricionista, el médico y la administración no comparten la información. Cada uno usa su hoja de cálculo, su chat o su app, y nadie ve el cuadro completo. Las apps del mercado que estudiamos (TrainingPeaks, Fitbod, Volt, MacroFactor, Peak, TrainHeroic, Strong, TrainUp) cubren entrenamiento **o** nutrición, pero ninguna junta a los tres profesionales ni tiene expediente médico.
 
@@ -28,14 +28,14 @@ Cómo está construida la app, por qué se tomó cada decisión y cómo funciona
             │ pg (SSL verificado)    │ HTTPS
 ┌───────────▼───────────┐   ┌───────▼───────────────────────┐
 │ PostgreSQL · Neon      │   │ Brevo (correos) · Google      │
-│ 22 tablas · 14 índices │   │ (entrar con Google) · Claude  │
+│ 25 tablas · 14 índices │   │ (entrar con Google) · Claude  │
 └───────────────────────┘   │ (opcional)                     │
                             └───────────────────────────────┘
 ```
 
 ### Monolito modular
 
-Una sola aplicación (un proceso, un despliegue), dividida en **18 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
+Una sola aplicación (un proceso, un despliegue), dividida en **20 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
 
 1. **Cada tabla tiene un dueño.** Solo su módulo hace `INSERT`, `UPDATE` o `DELETE`; los demás leen o llaman a una función del dueño.
 2. **Cada módulo expone un `index.js` público.** Nadie importa archivos internos de otro módulo.
@@ -55,7 +55,9 @@ Cada módulo sigue el patrón **routes → controller → service**: las rutas d
 | `equipos` | `equipos`, `equipo_miembros` | Equipos y qué atletas ve cada profesional |
 | `series` | `series` | Registro serie a serie, récords y sugerencia de carga |
 | `rangos` | `rangos` | Rangos de Bronce a Radiante en fuerza y tests |
-| `clasificacion` | `clasificacion_preferencias` | Clasificaciones de constancia y de marcas |
+| `clasificacion` | `clasificacion_preferencias` | Clasificaciones de constancia y de marcas (con anti-trampas) |
+| `logros` | `logros` | Insignias por constancia, entrenamiento, progreso y resiliencia |
+| `notificaciones` | `push_suscripciones`, `push_claves` | Avisos en el celular (Web Push) y recordatorio diario |
 | `evaluaciones` | `evaluaciones` | Tests físicos periódicos por deporte |
 | `nutricionista` | `notas_nutricionista` | Panel del nutricionista |
 | `mensajes` | `mensajes` | Chat entre roles |
@@ -80,13 +82,14 @@ El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js`
 
 **¿Por qué PostgreSQL y no MySQL o MongoDB?** Por las restricciones y la integridad (claves foráneas con `ON DELETE CASCADE`, `UNIQUE` compuestos), y por **JSONB** para guardar estructuras anidadas como el plan de comidas de 7 días o la rutina semanal, que siempre se leen completas.
 
-### Tablas (22)
+### Tablas (25)
 
 | Grupo | Tablas |
 |---|---|
 | Cuentas | `usuarios`, `fotos_perfil`, `restablecimientos` |
 | Atleta | `perfiles`, `perfiles_medicos` (JSONB: condiciones, alergias, plan de comidas, rutina), `salud`, `comidas`, `rutinas`, `cumplimiento`, `alertas` |
-| Rendimiento | `evaluaciones`, `series`, `rangos`, `clasificacion_preferencias` |
+| Rendimiento | `evaluaciones`, `series` (ambas con marca de *verificado*), `rangos`, `logros`, `clasificacion_preferencias` |
+| Notificaciones | `push_suscripciones`, `push_claves` |
 | Médico y nutrición | `lesiones`, `notas_clinicas`, `notas_nutricionista` |
 | Club | `equipos`, `equipo_miembros` |
 | Comunicación | `mensajes`, `incidencias` (JSONB: comentarios), `ia_mensajes` |
@@ -179,6 +182,18 @@ Tablas entre los atletas de su **equipo** (o, sin equipo, de todo su **deporte**
 
 Nunca se muestran datos de salud ni lesiones, y cada atleta puede elegir no aparecer.
 
+### Entrenador y marcas verificadas (anti-trampas)
+El **entrenador** ve a los atletas de sus equipos, **registra sus tests físicos** y **verifica los récords de fuerza** que vio. Lo que registra o verifica un profesional queda marcado como **verificado**.
+- En un equipo, el atleta **no registra sus propios tests** (los mide el entrenador) ni puede verificar sus series; tampoco borrar una marca verificada.
+- En la clasificación del **equipo** solo cuentan las marcas verificadas.
+- En la de **todo el deporte** (atletas sin equipo) entran también las propias, salvo las sospechosas sin verificar: de nivel Diamante o más, o una mejora de golpe de más de un 15 % en un test (en 60 días) o un 25 % en fuerza (en 30 días). Al atleta se le explica por qué su marca quedó fuera.
+
+### Logros
+28 insignias en 5 grupos (primeros pasos, constancia, entrenamiento, progreso y resiliencia): rachas de 3 a 30 días, sesiones, comidas, series, récords, tests en meses distintos, marca verificada, rangos de Oro a Radiante, semana completa del plan y volver de una lesión. Muestran el progreso de las que faltan, se celebran al conseguirse y **un logro ganado no se pierde**.
+
+### Notificaciones en el celular
+Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada.
+
 ### Mi cuenta
 Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un archivo JSON (sin contraseñas ni notas clínicas privadas) y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
 
@@ -199,6 +214,8 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 |---|---|
 | Auth | `POST /api/auth/login` · `/google` · `/registro` · `/olvide` · `/restablecer` · `GET /config` |
 | Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `PUT /api/cuenta/password` · `GET /api/cuenta/datos` · `DELETE /api/cuenta` · `GET /api/fotos/:userId` |
+| Logros | `GET /api/logros/:userId` |
+| Notificaciones | `GET /api/notificaciones/clave` · `GET /estado` · `POST/DELETE /suscribir` · `POST /prueba` · `POST /recordatorios` (sin sesión, con `X-Cron-Secreto`) |
 | Clasificación (atletas) | `GET /api/clasificacion/opciones` · `GET /constancia?ambito=&periodo=` · `GET /marcas?ambito=&clave=` · `PUT /visible` |
 | Usuarios (admin) | `GET/POST /api/usuarios` · `PUT/DELETE /api/usuarios/:id` · `DELETE /:id/foto` |
 | Panel | `GET/PUT /api/panel/:userId/perfil` · `GET /dashboard` · historial de comidas, rutinas y alertas · `POST/DELETE` comidas y rutinas · `GET/POST /cumplimiento` |
@@ -221,7 +238,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **416 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **450 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

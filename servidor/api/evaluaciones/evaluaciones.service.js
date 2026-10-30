@@ -20,6 +20,7 @@ function aResultado(r) {
     fecha: aFechaISO(r.fecha),
     notas: r.notas || '',
     registradoPor: r.registrado_por || null,
+    verificado: r.verificado === true,
   };
 }
 
@@ -27,13 +28,25 @@ function aResultado(r) {
 async function obtener(userId) {
   const deporte = await deporteDe(userId);
   const { rows } = await query(
-    'SELECT id, prueba, valor, fecha, notas, registrado_por FROM evaluaciones WHERE user_id = $1 ORDER BY fecha, id',
+    'SELECT id, prueba, valor, fecha, notas, registrado_por, verificado FROM evaluaciones WHERE user_id = $1 ORDER BY fecha, id',
     [Number(userId)]
   );
   return catalogo.resumir(deporte, rows.map(aResultado), hoyISO());
 }
 
+// Quién da por buena una marca: un profesional que la midió (no el propio atleta)
+const ROLES_VERIFICAN = ['Entrenador', 'Medico', 'Médico', 'Administrador'];
+const esVerificador = (autor, userId) => !!autor && Number(autor.id) !== Number(userId) && ROLES_VERIFICAN.includes(autor.rol);
+
+/**
+ * Registra un resultado. Si lo registra un profesional queda verificado.
+ * Un atleta que está en un equipo no registra sus propios tests: los mide su entrenador
+ * (así nadie sube marcas falsas a la clasificación del equipo).
+ */
 async function registrar(userId, datos, autor) {
+  const verificado = esVerificador(autor, userId);
+  if (!verificado && await require('../equipos').tieneEquipo(userId))
+    throw error('En tu equipo los tests los registra tu entrenador: así todas las marcas son reales.', 403);
   const deporte = await deporteDe(userId);
   const prueba = String(datos.prueba || '');
   if (!catalogo.pruebasDe(deporte).some(p => p.id === prueba))
@@ -46,15 +59,20 @@ async function registrar(userId, datos, autor) {
   if (fecha > hoyISO()) throw error('La fecha no puede ser futura.', 400);
 
   const { rows } = await query(
-    `INSERT INTO evaluaciones (user_id, prueba, valor, fecha, notas, registrado_por)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id, prueba, valor, fecha, notas, registrado_por`,
-    [Number(userId), prueba, Number(datos.valor), fecha, String(datos.notas || '').slice(0, 300), autor?.nombre || null]
+    `INSERT INTO evaluaciones (user_id, prueba, valor, fecha, notas, registrado_por, verificado)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, prueba, valor, fecha, notas, registrado_por, verificado`,
+    [Number(userId), prueba, Number(datos.valor), fecha, String(datos.notas || '').slice(0, 300), autor?.nombre || null, verificado]
   );
   return aResultado(rows[0]);
 }
 
-async function eliminar(userId, id) {
+/** El atleta puede borrar lo que apuntó él, pero no una marca verificada por un profesional. */
+async function eliminar(userId, id, autor = null) {
+  if (autor && !esVerificador(autor, userId)) {
+    const { rows: [r] } = await query('SELECT verificado FROM evaluaciones WHERE id = $1 AND user_id = $2', [Number(id), Number(userId)]);
+    if (r?.verificado) throw error('Esta marca la registró tu entrenador: solo él puede borrarla.', 403);
+  }
   const { rows } = await query(
     'DELETE FROM evaluaciones WHERE id = $1 AND user_id = $2 RETURNING id',
     [Number(id), Number(userId)]

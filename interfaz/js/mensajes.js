@@ -9,17 +9,19 @@ const MSG_ROL = {
     Atleta:        { grupo:'Atletas',        etiqueta:'Atleta' },
     Nutricionista: { grupo:'Nutricionistas', etiqueta:'Nutricionista' },
     Medico:        { grupo:'Médicos',        etiqueta:'Médico' },
+    Entrenador:    { grupo:'Entrenadores',   etiqueta:'Entrenador' },
     Administrador: { grupo:'Administración', etiqueta:'Administración' }
 };
 // Orden de los grupos de contactos según quién mira
 const MSG_ORDEN_GRUPOS = {
-    Atleta:        ['Nutricionista', 'Medico'],
-    Nutricionista: ['Atleta', 'Medico', 'Administrador'],
-    Medico:        ['Atleta', 'Nutricionista', 'Administrador'],
-    Administrador: ['Nutricionista', 'Medico']
+    Atleta:        ['Entrenador', 'Nutricionista', 'Medico'],
+    Nutricionista: ['Atleta', 'Entrenador', 'Medico', 'Administrador'],
+    Medico:        ['Atleta', 'Entrenador', 'Nutricionista', 'Administrador'],
+    Entrenador:    ['Atleta', 'Nutricionista', 'Medico', 'Administrador'],
+    Administrador: ['Entrenador', 'Nutricionista', 'Medico']
 };
 const MSG_BADGE_POR_ROL = {
-    Atleta: 'badge-pf-mensajes', Nutricionista: 'badge-nt-soporte', Medico: 'badge-md-mensajes', Administrador: 'badge-soporte'
+    Atleta: 'badge-pf-mensajes', Nutricionista: 'badge-nt-soporte', Medico: 'badge-md-mensajes', Entrenador: 'badge-en-mensajes', Administrador: 'badge-soporte'
 };
 
 let _msg = { contenedor:null, contactos:[], activo:null, filtro:'', ultimoId:null };

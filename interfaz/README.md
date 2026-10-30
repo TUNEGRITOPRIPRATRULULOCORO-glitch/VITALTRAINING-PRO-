@@ -15,6 +15,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 |---|---|
 | `comun.js` | Sesión, `apiFetch`, enrutador por rol, fotos de perfil, deportes, avisos, ventanas. Lo usan todos |
 | `pwa.js` | App instalable: registra `sw.js` y ofrece "Instalar VitalTraining" (en iPhone explica los pasos) |
+| `notificaciones.js` | Activar las notificaciones en el dispositivo (Web Push) y el recordatorio diario |
 | `cuenta.js` | "Mi cuenta" (todos los roles): foto, cambiar contraseña, descargar mis datos y borrar la cuenta |
 | `auth.js` | Portada pública, entrar, registro (también con Google), recuperar contraseña |
 | `mensajes.js` | Chat entre roles y contadores de no leídos |
@@ -25,9 +26,11 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 | `admin.js` | Panel del administrador |
 | `nutricionista.js` | Panel del nutricionista |
 | `medico.js` | Panel del médico |
+| `entrenador.js` | Panel del entrenador: sus atletas, registrar tests (verificados) y verificar récords |
 | `hoy.js` | Atleta: tarjeta "Hoy te toca…" del dashboard (salud, sesión y comidas del día) |
 | `series.js` | Atleta: registro serie a serie en la rutina (sesión anterior, récord, sugerencia) y "Mis récords" |
 | `rangos.js` | Atleta: rangos de Bronce a Radiante (fuerza y tests), qué falta para subir y celebración |
+| `logros.js` | Atleta: logros (insignias con progreso) y su celebración |
 | `clasificacion.js` | Atleta: clasificación de constancia y de marcas con su equipo o su deporte |
 | `atleta.js` | Atleta: inicio, perfil, salud, historial, soporte |
 | `atleta-plan.js` | Atleta: perfil médico, rutina, plan de comidas, asistente IA |

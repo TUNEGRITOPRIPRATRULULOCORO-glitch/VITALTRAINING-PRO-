@@ -163,7 +163,7 @@ async function renderUsuarios(filtros = {}) {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                         <input type="text" id="search-u" placeholder="Buscar..." oninput="filtrarUsuarios()">
                     </div>
-                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option value="Futbolista">Atleta</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select>
+                    <select id="filter-rol" onchange="filtrarUsuarios()"><option>Todos los roles</option><option value="Futbolista">Atleta</option><option>Entrenador</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select>
                     <select id="filter-estado" onchange="filtrarUsuarios()"><option>Todos los estados</option><option>Activo</option><option>Inactivo</option></select>
                 </div>
             </div>
@@ -196,7 +196,7 @@ function modalNuevoUsuario() {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" placeholder="Ej: Juan Pérez"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" placeholder="juan@email.com"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol"><option value="Futbolista">Atleta</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol"><option value="Futbolista">Atleta</option><option>Entrenador</option><option>Nutricionista</option><option value="Medico">Médico</option><option>Administrador</option></select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado"><option>Activo</option><option>Inactivo</option></select></div>
         </div>
         <div class="form-group"><label>Contraseña inicial (mín. 8 caracteres)</label><input type="text" id="f-password" placeholder="Mínimo 8 caracteres"></div>
@@ -222,7 +222,7 @@ async function modalEditarUsuario(id) {
         <div class="form-group"><label>Nombre completo</label><input type="text" id="f-nombre" value="${escapeHtml(u.nombre)}"></div>
         <div class="form-group"><label>Correo electrónico</label><input type="text" id="f-email" value="${escapeHtml(u.email)}"></div>
         <div class="form-row">
-            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Nutricionista','Medico','Administrador'].map(r=>`<option value="${r}" ${r===u.rol?'selected':''}>${r === 'Futbolista' ? 'Atleta' : r === 'Medico' ? 'Médico' : r}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Rol</label><select id="f-rol">${['Futbolista','Entrenador','Nutricionista','Medico','Administrador'].map(r=>`<option value="${r}" ${r===u.rol?'selected':''}>${r === 'Futbolista' ? 'Atleta' : r === 'Medico' ? 'Médico' : r}</option>`).join('')}</select></div>
             <div class="form-group"><label>Estado</label><select id="f-estado">${['Activo','Inactivo'].map(e=>`<option ${e===u.estado?'selected':''}>${e}</option>`).join('')}</select></div>
         </div>
         <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="guardarEdicionUsuario(${id})">Guardar</button></div>

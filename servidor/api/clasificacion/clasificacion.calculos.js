@@ -76,4 +76,39 @@ function nombreCorto(nombre = '') {
   return segundo ? `${primero} ${segundo[0].toUpperCase()}.` : primero || 'Atleta';
 }
 
-module.exports = { PUNTOS, MAX_COMIDAS_DIA, puntosConstancia, ordenar, nombreCorto };
+/*
+ * Marcas sin verificar (anti-trampas). Una marca que registró o confirmó un entrenador está
+ * verificada. Las demás pueden entrar en la clasificación de todo el deporte, salvo que sean
+ * sospechosas: de nivel Diamante o más, o una mejora demasiado grande de golpe.
+ */
+const ELITE = 18;                                  // Diamante I: a partir de aquí hay que verificar
+const MAX_MEJORA = { test: 15, fuerza: 25 };       // % de mejora sobre su mejor marca anterior…
+const VENTANA_MEJORA_DIAS = { test: 60, fuerza: 30 }; // …en tan pocos días
+
+/** Por qué una marca sin verificar no entra, o null si puede entrar. */
+function motivoSospecha({ tipo, verificado, puntos, mejoraPct, dias }) {
+  if (verificado) return null;
+  if (puntos >= ELITE) return 'Las marcas de nivel Diamante o superior necesitan que un entrenador las verifique.';
+  if (mejoraPct != null && mejoraPct > MAX_MEJORA[tipo] && dias != null && dias <= VENTANA_MEJORA_DIAS[tipo])
+    return `Mejoraste más de un ${MAX_MEJORA[tipo]} % de golpe: para entrar en la clasificación, pide a un entrenador que la verifique.`;
+  return null;
+}
+
+/**
+ * Recorre las marcas de un atleta en orden de fecha y calcula cuánto mejoró cada una sobre
+ * su mejor marca anterior (en %, siempre positivo si es mejor) y cuántos días pasaron.
+ * filas: [{ fecha, valor }] · mayorEsMejor: true en saltos o kilos, false en tiempos
+ */
+function conMejora(filas, mayorEsMejor = true) {
+  const orden = [...filas].sort((a, b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0));
+  let mejor = null;
+  return orden.map(f => {
+    const mejoraPct = mejor ? Math.round(((mayorEsMejor ? f.valor - mejor.valor : mejor.valor - f.valor) / mejor.valor) * 1000) / 10 : null;
+    const dias = mejor ? Math.round((new Date(f.fecha) - new Date(mejor.fecha)) / 86400000) : null;
+    const salida = { ...f, mejoraPct, dias };
+    if (!mejor || (mayorEsMejor ? f.valor > mejor.valor : f.valor < mejor.valor)) mejor = f;
+    return salida;
+  });
+}
+
+module.exports = { PUNTOS, MAX_COMIDAS_DIA, ELITE, MAX_MEJORA, puntosConstancia, ordenar, nombreCorto, motivoSospecha, conMejora };

@@ -99,6 +99,7 @@ function routeUser(user, token) {
     if      (isAtletaRole(user.rol))       enSegundoPlano(showPanelFutbolista(user));
     else if (user.rol === 'Nutricionista') showPanelNutricionista(user);
     else if (['Medico', 'Médico'].includes(user.rol)) showPanelMedico(user);
+    else if (user.rol === 'Entrenador')    showPanelEntrenador(user);
     else if (user.rol === 'Administrador') showPanel(user);
     else { clearSession(); showAuthPanel(); }
 }
@@ -124,7 +125,7 @@ function actualizarNombrePropio(nombre) {
 }
 
 function hideAllPanels() {
-    ['app','panel-nutricionista','panel-medico','panel-futbolista','auth-screen','inicio-publico'].forEach(id => {
+    ['app','panel-nutricionista','panel-medico','panel-entrenador','panel-futbolista','auth-screen','inicio-publico'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
     });
 }
@@ -315,7 +316,7 @@ function cargarFotosPendientes(raiz = document) {
 // Cualquier avatar que aparezca en pantalla (vistas, chat, ventanas) carga su foto solo
 new MutationObserver(() => cargarFotosPendientes()).observe(document.documentElement, { childList: true, subtree: true });
 
-const AVATAR_PROPIO = ['sidebar-avatar', 'nt-avatar', 'md-avatar', 'pf-avatar'];
+const AVATAR_PROPIO = ['sidebar-avatar', 'nt-avatar', 'md-avatar', 'en-avatar', 'pf-avatar'];
 
 function pintarAvatarPropio() {
     if (!currentUser) return;
@@ -554,7 +555,7 @@ const DIAS_SEMANA = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado',
 function getSportIcon(sport) { return ICONOS_DEPORTE[sport] || '🏅'; }
 function getSportLabel(sport) { return sport || 'Deporte'; }
 function getSportBadge(sport) { return `${getSportIcon(sport)} ${sport || 'Deporte'}`; }
-function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador','Medico':'badge-medico','Médico':'badge-medico'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
+function rolBadge(rol)      { const m={'Atleta':'badge-futbolista','Futbolista':'badge-futbolista','Nutricionista':'badge-nutricionista','Administrador':'badge-administrador','Medico':'badge-medico','Médico':'badge-medico','Entrenador':'badge-entrenador'}; return `<span class="badge ${m[rol]||''}">${normalizeDisplayRole(rol)}</span>`; }
 function getSportBadgeNeutral(sport) { return getSportBadge(sport || 'Fútbol'); }
 function estadoBadge(e)     { const m={'Activo':'badge-activo','Inactivo':'badge-inactivo'}; return `<span class="badge ${m[e]||''}">${e}</span>`; }
 function prioridadBadge(p)  { const m={'alta':'badge-alta','media':'badge-media','baja':'badge-baja','critica':'badge-critica'}; return `<span class="badge ${m[p]||''}">${p}</span>`; }
@@ -620,7 +621,7 @@ function toggleSidebar(panelId) {
 }
 
 function closeSidebar() {
-    ['app','panel-nutricionista','panel-futbolista'].forEach(id => {
+    ['app','panel-nutricionista','panel-medico','panel-entrenador','panel-futbolista'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.remove('sidebar-open');
     });

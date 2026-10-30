@@ -56,9 +56,9 @@ describe('mensajes.service', () => {
 
   afterAll(() => console.log.mockRestore());
 
-  test('el atleta ve solo nutricionistas y médicos', async () => {
+  test('el atleta ve solo nutricionistas, médicos y entrenadores', async () => {
     const contactos = await svc.listarContactos(u.carlos);
-    expect(new Set(contactos.map(c => c.rol))).toEqual(new Set(['Nutricionista', 'Medico']));
+    expect(new Set(contactos.map(c => c.rol))).toEqual(new Set(['Nutricionista', 'Medico', 'Entrenador']));
   });
 
   test('enviar y leer una conversación marca los mensajes como leídos', async () => {

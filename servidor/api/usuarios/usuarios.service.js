@@ -52,7 +52,7 @@ async function crear(datos) {
   const plain  = datos.password;
   const hashed = await bcrypt.hash(plain, 10);
 
-  const rolesValidos = ['Atleta', 'Futbolista', 'Nutricionista', 'Administrador', 'Medico'];
+  const rolesValidos = ['Atleta', 'Futbolista', 'Nutricionista', 'Entrenador', 'Administrador', 'Medico'];
   const rolUsuario = rolesValidos.includes(datos.rol) ? datos.rol : 'Atleta';
   const { rows } = await query(
     `INSERT INTO usuarios (nombre, email, password, rol, estado)
@@ -63,7 +63,7 @@ async function crear(datos) {
   return rows[0];
 }
 
-const ROLES = ['Atleta', 'Futbolista', 'Nutricionista', 'Medico', 'Médico', 'Administrador'];
+const ROLES = ['Atleta', 'Futbolista', 'Nutricionista', 'Entrenador', 'Medico', 'Médico', 'Administrador'];
 const ESTADOS = ['Activo', 'Inactivo'];
 const errorDe = (mensaje, status = 400) => Object.assign(new Error(mensaje), { status });
 

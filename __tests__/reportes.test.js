@@ -31,8 +31,8 @@ describe('obtenerReporte', () => {
   test('cuenta usuarios por estado y por rol (incluye médicos)', async () => {
     await query("UPDATE usuarios SET estado = 'Inactivo' WHERE id = $1", [ids.pedro]);
     const r = await svc.obtenerReporte();
-    expect(r).toMatchObject({ totalUsuarios: 6, activos: 5, inactivos: 1 });
-    expect(r.porRol).toEqual({ Futbolista: 2, Nutricionista: 2, Medico: 1, Administrador: 1 });
+    expect(r).toMatchObject({ totalUsuarios: 7, activos: 6, inactivos: 1 });
+    expect(r.porRol).toEqual({ Futbolista: 2, Nutricionista: 2, Entrenador: 1, Medico: 1, Administrador: 1 });
     await query("UPDATE usuarios SET estado = 'Activo' WHERE id = $1", [ids.pedro]);
   });
 

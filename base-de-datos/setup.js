@@ -34,6 +34,9 @@ const MIGRACIONES = [
   'ALTER TABLE cumplimiento ADD COLUMN duracion_minutos INTEGER',
   'ALTER TABLE perfiles     ADD COLUMN sexo VARCHAR(20)',
   'ALTER TABLE perfiles     ADD COLUMN dia_partido VARCHAR(12)',
+  'ALTER TABLE evaluaciones ADD COLUMN verificado BOOLEAN DEFAULT FALSE',
+  'ALTER TABLE series       ADD COLUMN verificado BOOLEAN DEFAULT FALSE',
+  'ALTER TABLE series       ADD COLUMN verificado_por VARCHAR(255)',
 ];
 
 // PostgreSQL y PGlite permiten comprobar antes; pg-mem (tests) no, y ahí se usa el error "ya existe".
@@ -85,6 +88,7 @@ async function seedUsuarios() {
       { nombre: 'Maria Gomez',   email: 'maria@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Baloncesto' },
       { nombre: 'Pedro Lopez',   email: 'pedro@vital.com',  password: 'nutri123',  rol: 'Nutricionista', deporte_principal: 'Tenis' },
       { nombre: 'Dr. Vital',     email: 'medico@vital.com', password: 'medico123', rol: 'Medico',         deporte_principal: 'Fútbol' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
+      { nombre: 'Profe Ramírez', email: 'entrenador@vital.com', password: 'entrenador123', rol: 'Entrenador', deporte_principal: 'Fútbol' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
       { nombre: 'Carlos Ruiz',   email: 'carlos@vital.com', password: 'futbol123', rol: 'Atleta', deporte_principal: 'Fútbol' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
       { nombre: 'Diego Torres',  email: 'diego@vital.com',  password: 'futbol123', rol: 'Atleta', deporte_principal: 'Baloncesto' }, // NOSONAR: cuenta de demostración con contraseña pública a propósito
     ] : []),

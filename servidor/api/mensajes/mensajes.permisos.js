@@ -1,15 +1,16 @@
 /**
  * Quién puede escribirle a quién.
- * - Atletas ↔ nutricionistas y médicos (canal directo).
+ * - Atletas ↔ nutricionistas, médicos y entrenadores (canal directo).
  * - Nutricionistas ↔ médicos.
  * - Nutricionistas y médicos ↔ administración.
  * - Atletas → administración NO por chat: van por ticket a la bandeja de soporte.
  */
 const PUEDE_ESCRIBIR_A = {
-  Atleta:        ['Nutricionista', 'Medico'],
-  Nutricionista: ['Atleta', 'Medico', 'Administrador'],
-  Medico:        ['Atleta', 'Nutricionista', 'Administrador'],
-  Administrador: ['Nutricionista', 'Medico'],
+  Atleta:        ['Nutricionista', 'Medico', 'Entrenador'],
+  Nutricionista: ['Atleta', 'Medico', 'Entrenador', 'Administrador'],
+  Medico:        ['Atleta', 'Nutricionista', 'Entrenador', 'Administrador'],
+  Entrenador:    ['Atleta', 'Nutricionista', 'Medico', 'Administrador'],
+  Administrador: ['Nutricionista', 'Medico', 'Entrenador'],
 };
 
 const ALIAS = { Futbolista: 'Atleta', 'Médico': 'Medico' };

@@ -105,8 +105,12 @@ async function constancia(yo, { ambito, periodo } = {}) {
 
 /**
  * Mejor marca de cada atleta en un test o un levantamiento, ordenada por su puntuación de rango.
- * Para que la comparación sea justa, solo compite quien indicó su sexo (y su peso, en fuerza):
- * con el punto medio de las escalas alguien saldría favorecido. Si a mí me falta, se me avisa.
+ * Para que la comparación sea justa:
+ * - solo compite quien indicó su sexo (y su peso, en fuerza): con el punto medio de las escalas
+ *   alguien saldría favorecido;
+ * - en el equipo solo cuentan marcas verificadas por un profesional, y en todo el deporte no
+ *   entran las sospechosas sin verificar (ver clasificacion.calculos.js).
+ * Si mi mejor marca se queda fuera, se me dice por qué.
  */
 async function marcas(yo, { ambito, clave } = {}) {
   const pob = await poblacion(yo, ambito);
@@ -121,51 +125,73 @@ async function marcas(yo, { ambito, clave } = {}) {
       WHERE u.id IN (${enLista(ids)})`, ids
   );
   const ficha = Object.fromEntries(fichas.map(f => [Number(f.id), { peso: Number(f.peso) || null, sexo: ['Hombre', 'Mujer'].includes(f.sexo) ? f.sexo : null }]));
-  const mejores = {};
+  // Todas las marcas de cada atleta: { valor comparable, fecha, verificado, texto }
+  const porAtleta = {};
+  const anotar = (uid, marca) => (porAtleta[uid] ||= []).push(marca);
+  let mayorEsMejor = true, puntuar;
 
   if (tipo === 'test') {
     const prueba = require('../evaluaciones').pruebasDe(pob.deporte).find(p => p.id === id);
     if (!prueba) throw error('Esa prueba no es de tu deporte.', 400);
+    mayorEsMejor = prueba.mejor === 'mayor';
     const { rows } = await query(
-      `SELECT user_id, valor, fecha FROM evaluaciones WHERE prueba = $1 AND user_id IN (${enLista(ids, 2)})`, [id, ...ids]
+      `SELECT user_id, valor, fecha, verificado FROM evaluaciones WHERE prueba = $1 AND user_id IN (${enLista(ids, 2)})`, [id, ...ids]
     );
     for (const r of rows) {
-      const uid = Number(r.user_id), valor = Number(r.valor), actual = mejores[uid];
-      if (!actual || (prueba.mejor === 'mayor' ? valor > actual.valor : valor < actual.valor))
-        mejores[uid] = { valor, fecha: aFechaISO(r.fecha), texto: `${String(valor).replace('.', ',')} ${prueba.unidad}` };
+      const valor = Number(r.valor);
+      anotar(Number(r.user_id), { valor, fecha: aFechaISO(r.fecha), verificado: r.verificado === true, texto: `${String(valor).replace('.', ',')} ${prueba.unidad}` });
     }
-    for (const [uid, m] of Object.entries(mejores)) m.puntos = rangos.puntuarTest(id, m.valor, ficha[uid]?.sexo);
+    puntuar = (uid, m) => rangos.puntuarTest(id, m.valor, ficha[uid]?.sexo);
   } else if (tipo === 'fuerza') {
     if (!rangos.levantamientos().some(l => l.id === id)) throw error('Levantamiento desconocido.', 400);
     const { rows } = await query(
-      `SELECT user_id, ejercicio, peso, repeticiones, fecha FROM series WHERE peso > 0 AND user_id IN (${enLista(ids)})`, ids
+      `SELECT user_id, ejercicio, peso, repeticiones, fecha, verificado FROM series WHERE peso > 0 AND user_id IN (${enLista(ids)})`, ids
     );
     for (const r of rows) {
       if (rangos.ejercicioDeFuerza(r.ejercicio)?.id !== id) continue;
-      const uid = Number(r.user_id), peso = Number(r.peso), reps = Number(r.repeticiones);
+      const peso = Number(r.peso), reps = Number(r.repeticiones);
       const e1rm = Math.round(peso * (1 + Math.min(reps, 12) / 30) * 2) / 2; // Epley, igual que en series
-      if (!mejores[uid] || e1rm > mejores[uid].e1rm)
-        mejores[uid] = { e1rm, fecha: aFechaISO(r.fecha), texto: `${String(peso).replace('.', ',')} kg × ${reps}` };
+      anotar(Number(r.user_id), { valor: e1rm, fecha: aFechaISO(r.fecha), verificado: r.verificado === true, texto: `${String(peso).replace('.', ',')} kg × ${reps}` });
     }
-    for (const [uid, m] of Object.entries(mejores)) {
-      m.puntos = rangos.puntuarFuerza(id, m.e1rm, ficha[uid]?.peso, ficha[uid]?.sexo);
-      if (ficha[uid]?.peso) m.texto += ` · ${String(Math.round(m.e1rm / ficha[uid].peso * 100) / 100).replace('.', ',')} × su peso`;
-    }
+    puntuar = (uid, m) => rangos.puntuarFuerza(id, m.valor, ficha[uid]?.peso, ficha[uid]?.sexo);
   } else {
     throw error('Elige una prueba o un levantamiento.', 400);
   }
 
+  // En el equipo solo cuentan las marcas verificadas por un profesional; en todo el deporte,
+  // también las del atleta, salvo las sospechosas (anti-trampas)
+  const soloVerificadas = pob.ambito === 'equipo';
+  const mejores = {};
+  let avisoVerificar = null;
+  for (const [uid, marcas] of Object.entries(porAtleta)) {
+    const evaluadas = calc.conMejora(marcas, mayorEsMejor).map(m => {
+      const puntos = puntuar(uid, m);
+      const motivo = soloVerificadas
+        ? (m.verificado ? null : 'En tu equipo solo cuentan las marcas que registra o verifica tu entrenador.')
+        : calc.motivoSospecha({ tipo, verificado: m.verificado, puntos, mejoraPct: m.mejoraPct, dias: m.dias });
+      return { ...m, puntos, motivo };
+    }).filter(m => m.puntos != null);
+    const mejorDe = lista => lista.reduce((a, b) => (!a || b.puntos > a.puntos ? b : a), null);
+    const valida = mejorDe(evaluadas.filter(m => !m.motivo));
+    if (valida) mejores[uid] = valida;
+    const mejorTotal = mejorDe(evaluadas);
+    if (Number(uid) === Number(yo.id) && mejorTotal?.motivo && (!valida || mejorTotal.puntos > valida.puntos)) avisoVerificar = mejorTotal.motivo;
+  }
+  for (const [uid, m] of Object.entries(mejores)) {
+    if (tipo === 'fuerza' && ficha[uid]?.peso) m.texto += ` · ${String(Math.round(m.valor / ficha[uid].peso * 100) / 100).replace('.', ',')} × su peso`;
+  }
+
   const completo = a => ficha[a.id]?.sexo && (tipo !== 'fuerza' || ficha[a.id]?.peso);
   const yo_ = pob.atletas.find(a => a.esYo);
-  const meFalta = yo_ && mejores[yo_.id] && !completo(yo_)
+  const meFalta = yo_ && porAtleta[yo_.id] && !completo(yo_)
     ? (tipo === 'fuerza' && !ficha[yo_.id]?.peso ? 'Indica tu peso y tu sexo en Mi Perfil para entrar en esta clasificación.' : 'Indica tu sexo en Mi Perfil para entrar en esta clasificación: las escalas son distintas para hombres y mujeres.')
-    : null;
+    : avisoVerificar;
   const lista = calc.ordenar(
     pob.atletas
-      .filter(a => mejores[a.id]?.puntos != null && completo(a))
+      .filter(a => mejores[a.id] && completo(a))
       .map(a => {
         const m = mejores[a.id];
-        return { ...a, puntos: Math.round(m.puntos * 100) / 100, marca: m.texto, fecha: m.fecha, rango: rangos.rangoDe(Math.floor(m.puntos + 1e-9)) };
+        return { ...a, puntos: Math.round(m.puntos * 100) / 100, marca: m.texto, fecha: m.fecha, verificado: m.verificado, rango: rangos.rangoDe(Math.floor(m.puntos + 1e-9)) };
       }),
     (a, b) => (a.fecha < b.fecha ? -1 : a.fecha > b.fecha ? 1 : 0) // en empate, quien lo logró antes
   );

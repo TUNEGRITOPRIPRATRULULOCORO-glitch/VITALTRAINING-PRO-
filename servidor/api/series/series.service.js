@@ -17,6 +17,8 @@ function aSerie(r) {
     fecha: aFechaISO(r.fecha),
     peso: r.peso == null ? null : Number(r.peso),
     repeticiones: Number(r.repeticiones),
+    verificado: r.verificado === true,
+    verificadoPor: r.verificado_por || null,
   };
 }
 
@@ -62,6 +64,17 @@ async function registrar(userId, datos) {
   );
   const serie = aSerie(rows[0]);
   return { serie, record: calc.esRecord(serie, anteriores), e1rm: calc.e1rm(serie.peso, serie.repeticiones) };
+}
+
+/** Un entrenador (o médico/admin) confirma que vio la serie: cuenta como marca verificada. */
+async function verificar(userId, id, autor) {
+  if (Number(autor?.id) === Number(userId)) throw error('No puedes verificar tus propias series: lo hace tu entrenador.', 403);
+  const { rows } = await query(
+    'UPDATE series SET verificado = true, verificado_por = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+    [autor?.nombre || 'Entrenador', Number(id), Number(userId)]
+  );
+  if (!rows[0]) throw error('Serie no encontrada.', 404);
+  return aSerie(rows[0]);
 }
 
 async function eliminar(userId, id) {
@@ -118,4 +131,4 @@ async function records(userId) {
     .sort((a, b) => (a.ultimaVez < b.ultimaVez ? 1 : -1));
 }
 
-module.exports = { registrar, eliminar, ejercicio, resumenHoy, records };
+module.exports = { registrar, eliminar, verificar, ejercicio, resumenHoy, records };

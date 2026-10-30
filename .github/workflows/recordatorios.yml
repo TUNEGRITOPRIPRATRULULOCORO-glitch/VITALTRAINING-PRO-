@@ -1,0 +1,25 @@
+name: Recordatorio diario
+
+# Cada mañana a las 7:00 de Colombia (12:00 UTC) pide a la app que envíe el recordatorio
+# "¿Cómo amaneciste?" a quien tenga las notificaciones activadas y aún no registró su salud.
+# Necesita el secreto CRON_SECRET (el mismo valor en GitHub → Settings → Secrets → Actions
+# y en Render → Environment). Sin él, la tarea termina sin hacer nada.
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:   # botón "Run workflow" para probarlo a mano
+
+jobs:
+  recordatorio:
+    runs-on: ubuntu-latest
+    env:
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      APP_URL: https://vitaltraining-pro.onrender.com
+    steps:
+      - name: Enviar recordatorio
+        if: ${{ env.CRON_SECRET != '' }}
+        # Render gratis puede estar dormido: la primera petición lo despierta (hasta ~1 min)
+        run: |
+          curl --fail --silent --show-error --retry 3 --retry-delay 20 --max-time 120 \
+            -X POST "$APP_URL/api/notificaciones/recordatorios" \
+            -H "X-Cron-Secreto: $CRON_SECRET"

@@ -7,7 +7,9 @@ function responderError(res, err, porDefecto) {
 
 async function getEvaluaciones(req, res) {
   try {
-    res.json({ ok: true, ...(await svc.obtener(req.params.userId)) });
+    const [datos, enEquipo] = await Promise.all([svc.obtener(req.params.userId), require('../equipos').tieneEquipo(req.params.userId)]);
+    // En un equipo los tests los registra el entrenador (la interfaz oculta el botón al atleta)
+    res.json({ ok: true, ...datos, registraEntrenador: enEquipo });
   } catch (err) {
     responderError(res, err, 'Error cargando los tests físicos.');
   }
@@ -24,7 +26,7 @@ async function postEvaluacion(req, res) {
 
 async function deleteEvaluacion(req, res) {
   try {
-    if (!(await svc.eliminar(req.params.userId, req.params.id)))
+    if (!(await svc.eliminar(req.params.userId, req.params.id, req.user)))
       return res.status(404).json({ error: 'Resultado no encontrado.' });
     res.json({ ok: true });
   } catch (err) {

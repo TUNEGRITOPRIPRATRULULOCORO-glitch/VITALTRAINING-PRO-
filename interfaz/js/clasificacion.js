@@ -55,6 +55,7 @@ async function pfRenderClasificacion() {
                 <p><strong>🔥 Constancia</strong> premia cumplir tu plan, no el talento: cualquiera puede ir primero.</p>
                 <p>· Registrar cómo amaneciste: <strong>10 puntos</strong> al día · Sesión del plan completa: <strong>30</strong> (a medias o apuntada a mano: 15) · Cada comida apuntada: <strong>5</strong> (hasta 4 al día). Cuenta una sesión por día.</p>
                 <p><strong>🏅 Marcas</strong> ordena tu mejor resultado con la misma escala de los rangos, que tiene en cuenta si eres hombre o mujer y, en fuerza, tu peso corporal. Así es justo comparar a todos.</p>
+                <p><strong>✓ Marcas verificadas:</strong> en tu equipo solo cuentan las que registra o verifica tu entrenador. En todo el deporte también entran las tuyas, salvo las sospechosas sin verificar: de nivel Diamante o más, o una mejora demasiado grande de golpe (más de un 15 % en un test o un 25 % en fuerza en pocas semanas).</p>
                 <p>En tu equipo se ven los nombres completos; en todo el deporte, solo el nombre y la inicial del apellido.</p>
             </div>
         </details>
@@ -85,7 +86,8 @@ async function clCargarTabla() {
             : 'Aún no hay puntos en este periodo.'}</p></div>`;
         return;
     }
-    const valor = f => esMarca ? escapeHtml(f.marca) : `<strong>${f.puntos}</strong> pts`;
+    const verif = f => esMarca ? (f.verificado ? ' <span class="vf-badge vf-ok" title="Registrada o verificada por un entrenador">✓</span>' : ' <span class="vf-badge" title="La apuntó el propio atleta">sin verificar</span>') : '';
+    const valor = f => esMarca ? `${escapeHtml(f.marca)}${verif(f)}` : `<strong>${f.puntos}</strong> pts`;
     const detalle = f => esMarca
         ? `<span class="cl-rango" style="color:${f.rango.color}">${rgEmblema(f.rango, 26)} ${escapeHtml(f.rango.etiqueta)}</span>`
         : `<span class="cl-detalle">🌅 ${f.salud} · 🏃 ${f.sesiones} · 🍽 ${f.comidas}</span>`;

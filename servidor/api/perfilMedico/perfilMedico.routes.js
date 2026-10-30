@@ -6,7 +6,7 @@ const { accesoAtleta } = require('../equipos');
 router.get('/catalogos', ctrl.getCatalogos);
 router.get('/atletas', requireRol('Medico', 'Médico'), ctrl.getAtletas);
 
-router.param('userId', accesoAtleta('Administrador', 'Nutricionista', 'Medico', 'Médico'));
+router.param('userId', accesoAtleta('Administrador', 'Nutricionista', 'Medico', 'Médico', 'Entrenador'));
 router.get('/:userId',  ctrl.getObtener);
 router.post('/:userId', requireOwnerOrRol('Administrador', 'Nutricionista'), ctrl.postGuardar);
 

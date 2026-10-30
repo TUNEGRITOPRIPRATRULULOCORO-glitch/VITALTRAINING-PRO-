@@ -25,6 +25,8 @@ function cuentaModal() {
             <button class="btn btn-primary btn-sm" onclick="cuentaCambiarPassword()">Guardar contraseña</button>
         </section>
 
+        ${nfSeccionHTML()}
+
         <section class="cu-seccion">
             <h3>📦 Mis datos</h3>
             <p class="campo-ayuda">Descarga todo lo que la app guarda de ti (perfil, salud, comidas, entrenamientos, series, tests, mensajes…) en un archivo.</p>
@@ -41,6 +43,7 @@ function cuentaModal() {
             <p class="campo-ayuda">Se borran para siempre tu cuenta y <strong>todos tus datos</strong>. No se puede deshacer: si quieres guardarlos, descárgalos antes.</p>
             <button class="btn btn-danger btn-sm" onclick="cuentaConfirmarBorrado()">Borrar mi cuenta…</button>
         </section>`}`);
+    enSegundoPlano(nfPintar());
 }
 
 async function cuentaCambiarPassword() {

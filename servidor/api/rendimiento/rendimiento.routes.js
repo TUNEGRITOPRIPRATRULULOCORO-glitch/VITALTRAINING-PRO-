@@ -8,8 +8,8 @@ const ctrl   = require('./rendimiento.controller');
 const { requireRol } = require('../../compartido/middleware/roles');
 const { accesoAtleta } = require('../equipos');
 
-router.get('/equipo', requireRol('Medico', 'Médico', 'Nutricionista', 'Administrador'), ctrl.getEquipo);
-router.get('/:userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador'), ctrl.getResumen);
-router.get('/:userId/hoy', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Administrador'), ctrl.getHoy);
+router.get('/equipo', requireRol('Medico', 'Médico', 'Nutricionista', 'Entrenador', 'Administrador'), ctrl.getEquipo);
+router.get('/:userId', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Entrenador', 'Administrador'), ctrl.getResumen);
+router.get('/:userId/hoy', accesoAtleta('Medico', 'Médico', 'Nutricionista', 'Entrenador', 'Administrador'), ctrl.getHoy);
 
 module.exports = router;

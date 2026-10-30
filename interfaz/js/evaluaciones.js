@@ -34,16 +34,19 @@ function evAvisoHTML(d, propio) {
 
 function evTarjetaHTML(p, { puedeRegistrar, userId }) {
     const t = EV_TENDENCIA[p.tendencia] || EV_TENDENCIA['sin-datos'];
+    // El atleta no borra una marca verificada por su entrenador
+    const puedeBorrar = h => puedeRegistrar && (!h.verificado || Number(userId) !== Number(currentUser.id));
     const historial = [...p.historial].reverse().map(h => `
         <li><span>${formatFecha(h.fecha)}</span><strong>${evValor(p, h.valor)}</strong>
-            ${puedeRegistrar ? `<button class="ev-borrar" title="Borrar este resultado" onclick="evBorrar(${Number(userId)}, ${h.id})">✕</button>` : ''}</li>`).join('');
+            ${h.verificado ? `<span class="vf-badge vf-ok" title="Registrado por ${escapeHtml(h.registradoPor || 'un profesional')}">✓</span>` : ''}
+            ${puedeBorrar(h) ? `<button class="ev-borrar" title="Borrar este resultado" onclick="evBorrar(${Number(userId)}, ${h.id})">✕</button>` : ''}</li>`).join('');
     return `
     <div class="card ev-tarjeta">
         <div class="ev-cabecera">
             <div><div class="ev-nombre">${escapeHtml(p.nombre)}</div><div class="ev-mide">${escapeHtml(p.mide)}</div></div>
             <span class="ev-tendencia ${t.clase}">${t.texto(p.cambioPct)}</span>
         </div>
-        <div class="ev-valor">${p.ultimo ? evValor(p, p.ultimo.valor) : '—'}</div>
+        <div class="ev-valor">${p.ultimo ? evValor(p, p.ultimo.valor) : '—'}${p.ultimo?.verificado ? ' <span class="vf-badge vf-ok">✓ Verificado</span>' : ''}</div>
         <div class="ev-detalle">${p.ultimo ? `${formatFecha(p.ultimo.fecha)}${p.mejorMarca ? ` · Mejor: <strong>${evValor(p, p.mejorMarca.valor)}</strong>` : ''}` : (p.mejor === 'menor' ? 'Menos es mejor' : 'Más es mejor')}</div>
         ${p.historial.length >= 2 ? `<div class="ev-grafica"><canvas id="ev-chart-${p.id}" aria-label="Evolución de ${escapeHtml(p.nombre)}"></canvas></div>` : ''}
         <details class="rd-explicacion"><summary>Cómo se hace</summary>${escapeHtml(p.instrucciones)}</details>
@@ -85,8 +88,11 @@ async function evRender(contenedorId, userId, { propio }) {
     if (!d?.ok) { cont.innerHTML = showError(escapeHtml(d?.error || 'No se pudieron cargar los tests.'), `evRender('${contenedorId}', ${Number(userId)}, { propio: ${propio} })`); return; }
     _evDatos = { ...d, userId, contenedorId, propio };
     const rolActual = normalizeRole(currentUser.rol);
-    const puedeRegistrar = propio || ['Medico', 'Médico', 'Administrador'].includes(rolActual);
+    // En un equipo, el atleta no registra sus tests: los mide su entrenador (marcas verificadas)
+    const puedeRegistrar = (propio && !d.registraEntrenador) || ['Medico', 'Médico', 'Entrenador', 'Administrador'].includes(rolActual);
+    if (propio && d.registraEntrenador) document.getElementById('pf-tests-btn')?.remove();
     cont.innerHTML = `
+        ${propio && d.registraEntrenador ? '<div class="ev-aviso ev-aviso-info">✓ En tu equipo <strong>tus tests los registra tu entrenador</strong>: así todas las marcas de la clasificación son reales.</div>' : ''}
         ${evAvisoHTML(d, propio)}
         <div class="ev-grid">${d.pruebas.map(p => evTarjetaHTML(p, { puedeRegistrar, userId })).join('')}</div>`;
     evDibujarGraficas(d.pruebas);
@@ -151,7 +157,7 @@ async function pfRenderTests() {
     <div class="view-enter">
         <div class="view-header">
             <div class="view-title"><h1>⏱ Tests físicos</h1><p>Mide tu progreso en velocidad, salto, agilidad y resistencia</p></div>
-            <button class="btn btn-primary" onclick="evModalRegistrar(${Number(currentUser.id)})">+ Registrar resultado</button>
+            <button class="btn btn-primary" id="pf-tests-btn" onclick="evModalRegistrar(${Number(currentUser.id)})">+ Registrar resultado</button>
         </div>
         <div id="pf-tests"></div>
         <p class="ev-nota">Toda prueba tiene un pequeño margen de error (2–6 %). Solo marcamos mejora o bajada cuando el cambio lo supera; si no, aparece "sin cambio claro".</p>

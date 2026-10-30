@@ -69,6 +69,7 @@ async function obtenerReporte() {
     porRol: {
       Futbolista:    sumar(u, r => ES_ATLETA(r.rol)),
       Nutricionista: sumar(u, r => r.rol === 'Nutricionista'),
+      Entrenador: sumar(u, r => r.rol === 'Entrenador'),
       Medico:        sumar(u, r => ES_MEDICO(r.rol)),
       Administrador: sumar(u, r => r.rol === 'Administrador')
     },
