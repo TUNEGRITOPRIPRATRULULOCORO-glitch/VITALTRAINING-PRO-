@@ -197,6 +197,8 @@ async function pfOnboardingGuardar() {
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>b.disabled=false);
     showToast(_onbActualizando?'Perfil actualizado. Tu plan se ha regenerado.':'¡Perfil médico completado! Tu plan personalizado ha sido generado.','success',5000);
     pfRenderView('plan');
+    // Recién registrado: buen momento para ofrecer las notificaciones (aunque antes dijera "Ahora no")
+    if(!_onbActualizando) setTimeout(()=>enSegundoPlano(nfInvitar({ titulo:'¡Tu plan está listo! ¿Te avisamos al celular?', ignorarCerrado:true })), 1500);
 }
 
 // — MI PLAN (ATLETA) —

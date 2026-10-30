@@ -5394,3 +5394,8 @@ body.dark .vf-ok { color: #86efac; }
     .lg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .lg-resumen { padding: 16px; gap: 14px; }
 }
+
+/* Invitación a activar las notificaciones (usa la misma tarjeta flotante que "Instala la app") */
+.nf-aviso-icono { flex: none; width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center; font-size: 22px; background: var(--primary-dim); }
+.nf-aviso-botones { display: flex; gap: 8px; margin-top: 2px; }
+.cu-json { display: block; margin-top: 8px; font-size: 12px; }

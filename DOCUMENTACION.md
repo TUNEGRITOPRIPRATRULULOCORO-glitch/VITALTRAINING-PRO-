@@ -192,10 +192,10 @@ El **entrenador** ve a los atletas de sus equipos, **registra sus tests físicos
 28 insignias en 5 grupos (primeros pasos, constancia, entrenamiento, progreso y resiliencia): rachas de 3 a 30 días, sesiones, comidas, series, récords, tests en meses distintos, marca verificada, rangos de Oro a Radiante, semana completa del plan y volver de una lesión. Muestran el progreso de las que faltan, se celebran al conseguirse y **un logro ganado no se pierde**.
 
 ### Notificaciones en el celular
-Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada.
+Con **Web Push**: el atleta (o cualquier rol) las activa en Mi cuenta y le llegan los mensajes nuevos, los avisos de su médico, las alertas de salud y de carga, y —si lo deja activado— un **recordatorio cada mañana** ("¿Cómo amaneciste?") cuando aún no registró su salud. Ese recordatorio lo dispara una tarea programada de GitHub Actions (7:00 de Colombia) con el secreto `CRON_SECRET`. El servidor genera sus claves de firma (VAPID) la primera vez. En iPhone funcionan con la app instalada. La app **las ofrece sola**: al terminar el perfil médico y unos segundos después de entrar, con un aviso "¿Te avisamos al celular?" (si se responde "Ahora no", no insiste en 14 días).
 
 ### Mi cuenta
-Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un archivo JSON (sin contraseñas ni notas clínicas privadas) y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
+Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un **PDF** para leerlos o imprimirlos (portada, ficha y una tabla por sección), o en JSON para llevarlos a otra app; nunca incluye contraseñas ni notas clínicas privadas y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
 
 ### Vita, el asistente
 - **Sin coste**: un **modelo de machine learning propio** (TF-IDF por trozos de letras + regresión logística, entrenado con scikit-learn sobre 782 frases) clasifica cada mensaje en 17 intenciones con un **81 % de precisión**. Con confianza ≥ 0,35 responde con los datos reales del atleta; si duda, pregunta. El servidor no necesita Python: el modelo se exporta a JSON y Node.js repite las cuentas (un test comprueba que da lo mismo). Detalles en [ml/README.md](ml/README.md).
@@ -238,7 +238,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **450 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **453 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

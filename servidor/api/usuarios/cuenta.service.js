@@ -48,7 +48,8 @@ const EXPORTAR = [
   ['notasDelNutricionista','SELECT texto, nutricionista_nombre, fecha FROM notas_nutricionista WHERE user_id = $1 ORDER BY created_at'],
   ['alertas',              'SELECT fecha, tipo, mensaje, leida FROM alertas WHERE user_id = $1 ORDER BY created_at'],
   ['equipos',              'SELECT e.nombre, e.deporte FROM equipo_miembros m JOIN equipos e ON e.id = m.equipo_id WHERE m.user_id = $1'],
-  ['mensajes',             'SELECT remitente_id, destinatario_id, texto, created_at FROM mensajes WHERE remitente_id = $1 OR destinatario_id = $1 ORDER BY created_at'],
+  ['mensajes',             'SELECT m.created_at, de.nombre AS de, para.nombre AS para, m.texto FROM mensajes m JOIN usuarios de ON de.id = m.remitente_id JOIN usuarios para ON para.id = m.destinatario_id WHERE m.remitente_id = $1 OR m.destinatario_id = $1 ORDER BY m.created_at'],
+  ['logros',               'SELECT clave, fecha FROM logros WHERE user_id = $1 ORDER BY fecha'],
   ['conversacionConVita',  'SELECT rol, texto, created_at FROM ia_mensajes WHERE user_id = $1 ORDER BY id'],
   ['tickets',              'SELECT titulo, categoria, prioridad, estado, descripcion, comentarios, fecha FROM incidencias WHERE user_id = $1 ORDER BY created_at'],
 ];

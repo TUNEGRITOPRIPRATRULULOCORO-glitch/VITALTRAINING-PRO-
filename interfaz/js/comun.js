@@ -101,7 +101,9 @@ function routeUser(user, token) {
     else if (['Medico', 'Médico'].includes(user.rol)) showPanelMedico(user);
     else if (user.rol === 'Entrenador')    showPanelEntrenador(user);
     else if (user.rol === 'Administrador') showPanel(user);
-    else { clearSession(); showAuthPanel(); }
+    else { clearSession(); showAuthPanel(); return; }
+    // Unos segundos después de entrar, si aún no las activó, se le ofrecen las notificaciones
+    setTimeout(() => enSegundoPlano(nfInvitar()), 6000);
 }
 
 // Trae el nombre y el deporte actuales: si alguien los cambió, la sesión guardada quedó vieja

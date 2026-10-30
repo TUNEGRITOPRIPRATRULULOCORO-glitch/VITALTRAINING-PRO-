@@ -8,7 +8,7 @@
  *
  * Mi cuenta (cualquier rol):
  * PUT    /api/cuenta/password → Cambiar la contraseña { actual, nueva }
- * GET    /api/cuenta/datos    → Descargar todos mis datos (JSON)
+ * GET    /api/cuenta/datos    → Descargar todos mis datos: PDF (?formato=json para el archivo de datos)
  * DELETE /api/cuenta          → Borrar mi cuenta y todos mis datos { password }
  */
 const express = require('express');
@@ -86,8 +86,15 @@ cuenta.put('/password', intentosCuenta, async (req, res) => {
 cuenta.get('/datos', async (req, res) => {
   try {
     const datos = await cuentaSvc.exportar(req.user.id);
-    res.set('Content-Disposition', `attachment; filename="vitaltraining-mis-datos-${new Date().toISOString().slice(0, 10)}.json"`);
-    res.json(datos);
+    const nombre = `vitaltraining-mis-datos-${new Date().toISOString().slice(0, 10)}`;
+    // JSON: para llevar los datos a otra app (portabilidad). PDF (por defecto): para leerlos
+    if (req.query.formato === 'json') {
+      res.set('Content-Disposition', `attachment; filename="${nombre}.json"`);
+      return res.json(datos);
+    }
+    const pdf = await require('./cuenta.pdf').generarPdf(datos);
+    res.set({ 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${nombre}.pdf"` });
+    res.send(pdf);
   } catch (err) {
     fallo(res, err, 'Error preparando tus datos.');
   }

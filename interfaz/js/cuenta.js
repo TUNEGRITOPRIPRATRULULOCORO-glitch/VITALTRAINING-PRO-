@@ -29,8 +29,9 @@ function cuentaModal() {
 
         <section class="cu-seccion">
             <h3>📦 Mis datos</h3>
-            <p class="campo-ayuda">Descarga todo lo que la app guarda de ti (perfil, salud, comidas, entrenamientos, series, tests, mensajes…) en un archivo.</p>
-            <button class="btn btn-ghost btn-sm" onclick="cuentaDescargar(this)">⬇ Descargar mis datos</button>
+            <p class="campo-ayuda">Descarga todo lo que la app guarda de ti (perfil, salud, comidas, entrenamientos, series, tests, mensajes…) en un PDF para leerlo o imprimirlo.</p>
+            <button class="btn btn-ghost btn-sm" onclick="cuentaDescargar(this, 'pdf')">⬇ Descargar mis datos (PDF)</button>
+            <button type="button" class="enlace-atleta cu-json" onclick="cuentaDescargar(this, 'json')">o en formato de datos (JSON), para llevarlos a otra app</button>
         </section>
 
         ${esAdmin ? `
@@ -57,15 +58,15 @@ async function cuentaCambiarPassword() {
     showToast('Contraseña cambiada 🔑');
 }
 
-/** Descarga el archivo con el token (un enlace normal no lleva la sesión). */
-async function cuentaDescargar(boton) {
+/** Descarga el archivo con el token (un enlace normal no lleva la sesión). formato: 'pdf' o 'json'. */
+async function cuentaDescargar(boton, formato = 'pdf') {
     boton.disabled = true;
     try {
-        const res = await apiFetch(`${API}/cuenta/datos`);
+        const res = await apiFetch(`${API}/cuenta/datos?formato=${formato}`);
         if (!res.ok) throw new Error();
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
-        const enlace = Object.assign(document.createElement('a'), { href: url, download: `vitaltraining-mis-datos-${new Date().toISOString().slice(0, 10)}.json` });
+        const enlace = Object.assign(document.createElement('a'), { href: url, download: `vitaltraining-mis-datos-${new Date().toISOString().slice(0, 10)}.${formato === 'json' ? 'json' : 'pdf'}` });
         document.body.appendChild(enlace);
         enlace.click();
         enlace.remove();

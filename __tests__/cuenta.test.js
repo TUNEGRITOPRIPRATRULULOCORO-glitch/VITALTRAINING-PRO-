@@ -53,3 +53,22 @@ describe('borrar mi cuenta', () => {
     await expect(svc.borrar(ids.admin, { password: 'admin123' })).rejects.toMatchObject({ status: 403 });
   });
 });
+
+describe('mis datos en PDF', () => {
+  test('genera un PDF con varias páginas cuando hay muchos datos', async () => {
+    const { generarPdf } = require('../servidor/api/usuarios/cuenta.pdf');
+    const datos = await svc.exportar(ids.diego);
+    datos.comidas = Array.from({ length: 120 }, (_, i) => ({ fecha: '2026-10-01', tipo: 'almuerzo', nombre: `Plato ${i}`, calorias: 600 }));
+    const pdf = await generarPdf(datos);
+    expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+    expect((pdf.toString('latin1').match(/\/Type \/Page\b/g) || []).length).toBeGreaterThan(2);
+  });
+});
+
+test('el PDF no lleva emojis (la fuente no los tiene)', async () => {
+  const { generarPdf } = require('../servidor/api/usuarios/cuenta.pdf');
+  const datos = await svc.exportar(ids.diego);
+  datos.alertas = [{ fecha: '30/10/2026', tipo: 'lesion', mensaje: '🩹 Tu médico registró una lesión ≈ 2 semanas' }];
+  const pdf = await generarPdf(datos);
+  expect(pdf.subarray(0, 5).toString()).toBe('%PDF-');
+});

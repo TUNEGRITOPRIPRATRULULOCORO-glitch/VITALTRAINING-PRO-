@@ -121,3 +121,64 @@ async function nfPrueba(boton) {
     if (res?.enviados) showToast('Prueba enviada: mira tus notificaciones');
     else showToast('No llegó a ningún dispositivo. Desactívalas y vuelve a activarlas.', 'error');
 }
+
+// ── Invitación a activarlas (aparece sola: al terminar el perfil médico y al entrar) ──
+
+const NF_CLAVE_CERRADO = 'vt_nf_invitacion';
+const NF_DIAS_SIN_INSISTIR = 14;
+
+function nfCerradoHacePoco() {
+    try {
+        const cuando = Number(localStorage.getItem(NF_CLAVE_CERRADO));
+        return cuando > 0 && Date.now() - cuando < NF_DIAS_SIN_INSISTIR * 86400000;
+    } catch { return false; }
+}
+
+/** ¿Tiene sentido ofrecerlas? Navegador compatible, sin decidir aún, sin suscripción y sin "Ahora no" reciente. */
+async function nfDebeInvitar({ ignorarCerrado = false } = {}) {
+    if (!currentUser || !nfSoportado() || Notification.permission !== 'default') return false;
+    if (!ignorarCerrado && nfCerradoHacePoco()) return false;
+    try { return !(await nfSuscripcionActual()); } catch { return false; }
+}
+
+async function nfInvitar({ titulo = '¿Te avisamos al celular?', ignorarCerrado = false } = {}) {
+    if (document.getElementById('nf-aviso') || document.getElementById('pwa-aviso')) return; // un aviso a la vez
+    if (!(await nfDebeInvitar({ ignorarCerrado }))) return;
+    const esAtleta = ['Atleta', 'Futbolista'].includes(currentUser.rol);
+    const aviso = document.createElement('div');
+    aviso.id = 'nf-aviso';
+    aviso.className = 'pwa-aviso';
+    aviso.setAttribute('role', 'dialog');
+    aviso.setAttribute('aria-label', 'Activar notificaciones');
+    aviso.innerHTML = `
+        <span class="nf-aviso-icono" aria-hidden="true">🔔</span>
+        <div class="pwa-aviso-texto">
+            <strong>${escapeHtml(titulo)}</strong>
+            <span>${esAtleta
+                ? 'Te avisamos cuando te escriba tu entrenador, tu médico o tu nutricionista, y cada mañana te recordamos registrar cómo amaneciste.'
+                : 'Te avisamos de los mensajes nuevos de tus atletas y del equipo, aunque no tengas la app abierta.'}</span>
+            <div class="nf-aviso-botones">
+                <button type="button" class="btn btn-primary btn-sm" onclick="nfAceptarInvitacion(this)">Activar</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="nfCerrarInvitacion()">Ahora no</button>
+            </div>
+        </div>
+        <button type="button" class="pwa-aviso-cerrar" aria-label="Ahora no" onclick="nfCerrarInvitacion()">✕</button>`;
+    document.body.appendChild(aviso);
+}
+
+async function nfAceptarInvitacion(boton) {
+    boton.disabled = true;
+    try {
+        await nfActivar();
+        document.getElementById('nf-aviso')?.remove();
+        showToast('Notificaciones activadas 🔔 Puedes cambiarlas en Mi cuenta.');
+    } catch (err) {
+        nfCerrarInvitacion();
+        showToast(err.message || 'No se pudieron activar.', 'error');
+    }
+}
+
+function nfCerrarInvitacion() {
+    document.getElementById('nf-aviso')?.remove();
+    try { localStorage.setItem(NF_CLAVE_CERRADO, String(Date.now())); } catch { /* sin almacenamiento: se volverá a ofrecer */ }
+}

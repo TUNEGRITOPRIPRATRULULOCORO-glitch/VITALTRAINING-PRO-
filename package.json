@@ -30,6 +30,7 @@
     "google-auth-library": "^10.5.0",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
+    "pdfkit": "^0.15.2",
     "pg": "^8.21.0",
     "pg-mem": "^1.9.17",
     "web-push": "^3.6.7"
