@@ -324,11 +324,11 @@ function pintarAvatarPropio() {
         if (!el) continue;
         el.innerHTML = avatarContenido(currentUser.id, currentUser.nombre);
         el.classList.add('avatar-editable');
-        el.title = 'Cambiar foto de perfil';
+        el.title = 'Mi cuenta: foto, contraseña y datos';
         el.setAttribute('role', 'button');
         el.tabIndex = 0;
-        el.onclick = modalFotoPerfil;
-        el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); modalFotoPerfil(); } };
+        el.onclick = cuentaModal;
+        el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cuentaModal(); } };
     }
     const grande = document.getElementById('perfil-foto');
     if (grande) grande.innerHTML = avatarContenido(currentUser.id, currentUser.nombre);

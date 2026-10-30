@@ -10,7 +10,7 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, tests físicos, chat con su nutricionista y su médico, y **Vita**, el asistente con IA |
+| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, **clasificación** con su equipo o su deporte, tests físicos, chat con su nutricionista y su médico, y **Vita**, el asistente con IA |
 | **Nutricionista** | Sus atletas, con estado de salud, carga de entrenamiento, cumplimiento y lesiones activas. Notas, comidas y rutinas asignadas, y mensajes |
 | **Médico** | Expedientes: lesiones con estado **apto / en recuperación / baja médica**, notas clínicas (visibles para el atleta o solo para médicos), salud diaria, riesgo de lesión por carga y tests físicos |
 | **Administrador** | Usuarios, **equipos** (cada profesional solo ve a los atletas de sus equipos), reportes y soporte |
@@ -26,7 +26,7 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 | Capa | Tecnología |
 |---|---|
 | Interfaz | HTML, CSS y JavaScript sin frameworks (SPA) · app instalable (PWA) · Chart.js |
-| Servidor | Node.js 20 · Express 4 · monolito modular (17 módulos) |
+| Servidor | Node.js 20 · Express 4 · monolito modular (18 módulos) |
 | Base de datos | PostgreSQL: **Neon** en la web, **PGlite** en tu computador, **pg-mem** en los tests |
 | Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
 | IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |

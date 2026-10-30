@@ -28,14 +28,14 @@ Cómo está construida la app, por qué se tomó cada decisión y cómo funciona
             │ pg (SSL verificado)    │ HTTPS
 ┌───────────▼───────────┐   ┌───────▼───────────────────────┐
 │ PostgreSQL · Neon      │   │ Brevo (correos) · Google      │
-│ 21 tablas · 14 índices │   │ (entrar con Google) · Claude  │
+│ 22 tablas · 14 índices │   │ (entrar con Google) · Claude  │
 └───────────────────────┘   │ (opcional)                     │
                             └───────────────────────────────┘
 ```
 
 ### Monolito modular
 
-Una sola aplicación (un proceso, un despliegue), dividida en **17 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
+Una sola aplicación (un proceso, un despliegue), dividida en **18 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
 
 1. **Cada tabla tiene un dueño.** Solo su módulo hace `INSERT`, `UPDATE` o `DELETE`; los demás leen o llaman a una función del dueño.
 2. **Cada módulo expone un `index.js` público.** Nadie importa archivos internos de otro módulo.
@@ -55,6 +55,7 @@ Cada módulo sigue el patrón **routes → controller → service**: las rutas d
 | `equipos` | `equipos`, `equipo_miembros` | Equipos y qué atletas ve cada profesional |
 | `series` | `series` | Registro serie a serie, récords y sugerencia de carga |
 | `rangos` | `rangos` | Rangos de Bronce a Radiante en fuerza y tests |
+| `clasificacion` | `clasificacion_preferencias` | Clasificaciones de constancia y de marcas |
 | `evaluaciones` | `evaluaciones` | Tests físicos periódicos por deporte |
 | `nutricionista` | `notas_nutricionista` | Panel del nutricionista |
 | `mensajes` | `mensajes` | Chat entre roles |
@@ -79,13 +80,13 @@ El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js`
 
 **¿Por qué PostgreSQL y no MySQL o MongoDB?** Por las restricciones y la integridad (claves foráneas con `ON DELETE CASCADE`, `UNIQUE` compuestos), y por **JSONB** para guardar estructuras anidadas como el plan de comidas de 7 días o la rutina semanal, que siempre se leen completas.
 
-### Tablas (21)
+### Tablas (22)
 
 | Grupo | Tablas |
 |---|---|
 | Cuentas | `usuarios`, `fotos_perfil`, `restablecimientos` |
 | Atleta | `perfiles`, `perfiles_medicos` (JSONB: condiciones, alergias, plan de comidas, rutina), `salud`, `comidas`, `rutinas`, `cumplimiento`, `alertas` |
-| Rendimiento | `evaluaciones`, `series`, `rangos` |
+| Rendimiento | `evaluaciones`, `series`, `rangos`, `clasificacion_preferencias` |
 | Médico y nutrición | `lesiones`, `notas_clinicas`, `notas_nutricionista` |
 | Club | `equipos`, `equipo_miembros` |
 | Comunicación | `mensajes`, `incidencias` (JSONB: comentarios), `ia_mensajes` |
@@ -171,6 +172,16 @@ El atleta apunta peso y repeticiones de cada serie viendo la sesión anterior. *
 ### Rangos
 8 rangos (Bronce, Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Radiante); los 7 primeros con 3 divisiones. En **fuerza** se compara el máximo estimado con el **peso corporal**; en **tests físicos**, la mejor marca. Las referencias son distintas para hombres y mujeres y orientativas. Se guarda el rango más alto alcanzado: **nunca se baja**. Cada rango tiene su emblema (de una medalla de bronce a una corona radiante con alas) y cada división le añade adornos; la app muestra el % que falta para el siguiente, el "Camino a Radiante" y una celebración al subir. El médico y el nutricionista ven los rangos y récords del atleta.
 
+### Clasificación
+Tablas entre los atletas de su **equipo** (o, sin equipo, de todo su **deporte**; fuera del equipo solo se ve el nombre y la inicial del apellido):
+- **Constancia** (semana o 30 días): premia cumplir el plan, no el talento. Registrar la salud 10 puntos al día; sesión del plan completa 30 (a medias o apuntada a mano 15; una por día); cada comida apuntada 5 (hasta 4 al día).
+- **Marcas**: tests de su deporte y levantamientos, ordenados con la escala de los rangos, que ya tiene en cuenta el sexo y el peso corporal. Por eso solo compite quien indicó su sexo (y su peso, en fuerza); si le falta, la app se lo dice.
+
+Nunca se muestran datos de salud ni lesiones, y cada atleta puede elegir no aparecer.
+
+### Mi cuenta
+Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un archivo JSON (sin contraseñas ni notas clínicas privadas) y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
+
 ### Vita, el asistente
 - **Sin coste**: un **modelo de machine learning propio** (TF-IDF por trozos de letras + regresión logística, entrenado con scikit-learn sobre 782 frases) clasifica cada mensaje en 17 intenciones con un **81 % de precisión**. Con confianza ≥ 0,35 responde con los datos reales del atleta; si duda, pregunta. El servidor no necesita Python: el modelo se exporta a JSON y Node.js repite las cuentas (un test comprueba que da lo mismo). Detalles en [ml/README.md](ml/README.md).
 - **Con `ANTHROPIC_API_KEY`**: conversa con Claude, que recibe el contexto del atleta (rutina, comidas, salud, lesiones). Si Claude falla, responde el modo básico.
@@ -187,7 +198,8 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 | Módulo | Rutas principales |
 |---|---|
 | Auth | `POST /api/auth/login` · `/google` · `/registro` · `/olvide` · `/restablecer` · `GET /config` |
-| Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `GET /api/fotos/:userId` |
+| Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `PUT /api/cuenta/password` · `GET /api/cuenta/datos` · `DELETE /api/cuenta` · `GET /api/fotos/:userId` |
+| Clasificación (atletas) | `GET /api/clasificacion/opciones` · `GET /constancia?ambito=&periodo=` · `GET /marcas?ambito=&clave=` · `PUT /visible` |
 | Usuarios (admin) | `GET/POST /api/usuarios` · `PUT/DELETE /api/usuarios/:id` · `DELETE /:id/foto` |
 | Panel | `GET/PUT /api/panel/:userId/perfil` · `GET /dashboard` · historial de comidas, rutinas y alertas · `POST/DELETE` comidas y rutinas · `GET/POST /cumplimiento` |
 | Salud | `GET/POST /api/salud/:userId` |
@@ -277,4 +289,3 @@ Es una app de un proceso: el mismo servidor publica la interfaz y la API, sin co
 - **Render gratis se duerme** a los 15 minutos sin visitas; la primera visita tarda cerca de un minuto.
 - **Neon gratis** solo permite volver atrás unas horas: no hay copias de seguridad propias.
 - Las **referencias de los rangos** son orientativas y no se ajustan por edad.
-- El usuario no puede **cambiar su contraseña desde su perfil** (solo con "Olvidé mi contraseña") ni **borrar su cuenta o descargar sus datos** por sí mismo.

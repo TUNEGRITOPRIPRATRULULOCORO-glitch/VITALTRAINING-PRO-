@@ -27,6 +27,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `equipos` | `equipos`, `equipo_miembros` | `accesoAtleta` (middleware), `filtrarAtletas`, `puedenHablar`... — ver abajo |
 | `series` | `series` | `records` (registro serie a serie, récords y sugerencia de carga) |
 | `rangos` | `rangos` | — (Bronce … Radiante en fuerza y tests; guarda el más alto: nunca se baja) |
+| `clasificacion` | `clasificacion_preferencias` | — (constancia y marcas entre atletas del equipo o del deporte) |
 | `lesiones` | `lesiones`, `notas_clinicas` | `estadosDe`, `estadoDe` (apto / en recuperación / baja médica) |
 | `avisos` | — (decide qué correo mandar y a quién) | `bienvenida`, `restablecerPassword`, `alertaSalud`, `alertaCarga` |
 

@@ -5,6 +5,11 @@
  * DELETE /api/cuenta/foto   → Quitar mi foto
  * GET    /api/fotos/:userId → La imagen, o 404 si no tiene foto (solo con sesión iniciada;
  *                              la interfaz la pide con el token y la muestra como blob)
+ *
+ * Mi cuenta (cualquier rol):
+ * PUT    /api/cuenta/password → Cambiar la contraseña { actual, nueva }
+ * GET    /api/cuenta/datos    → Descargar todos mis datos (JSON)
+ * DELETE /api/cuenta          → Borrar mi cuenta y todos mis datos { password }
  */
 const express = require('express');
 const svc     = require('./fotos.service');
@@ -54,6 +59,46 @@ ver.get('/:userId', async (req, res) => {
     res.send(foto.bytes);
   } catch (err) {
     res.status(500).end();
+  }
+});
+
+// Piden la contraseña: pocos intentos por persona para que no sirvan para adivinarla
+const intentosCuenta = require('express-rate-limit')({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: req => `cuenta-${req.user.id}`,
+  message: { error: 'Demasiados intentos. Espera 15 minutos.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const cuentaSvc = require('./cuenta.service');
+const fallo = (res, err, porDefecto) => res.status(err.status || 500).json({ error: err.status ? err.message : porDefecto });
+
+cuenta.put('/password', intentosCuenta, async (req, res) => {
+  try {
+    await cuentaSvc.cambiarPassword(req.user.id, req.body || {});
+    res.json({ ok: true });
+  } catch (err) {
+    fallo(res, err, 'Error cambiando la contraseña.');
+  }
+});
+
+cuenta.get('/datos', async (req, res) => {
+  try {
+    const datos = await cuentaSvc.exportar(req.user.id);
+    res.set('Content-Disposition', `attachment; filename="vitaltraining-mis-datos-${new Date().toISOString().slice(0, 10)}.json"`);
+    res.json(datos);
+  } catch (err) {
+    fallo(res, err, 'Error preparando tus datos.');
+  }
+});
+
+cuenta.delete('/', intentosCuenta, async (req, res) => {
+  try {
+    await cuentaSvc.borrar(req.user.id, req.body || {});
+    res.json({ ok: true });
+  } catch (err) {
+    fallo(res, err, 'Error borrando la cuenta.');
   }
 });
 

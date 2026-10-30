@@ -29,7 +29,7 @@ const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', ia:'Asistente IA', soporte:'Mensajes y soporte' };
+    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
@@ -43,6 +43,7 @@ function pfRenderView(view) {
     else if(view==='plan')      enSegundoPlano(pfRenderPlan());
     else if(view==='tests')     enSegundoPlano(pfRenderTests());
     else if(view==='rangos')    enSegundoPlano(pfRenderRangos());
+    else if(view==='clasificacion') { _cl.opciones = null; enSegundoPlano(pfRenderClasificacion()); }
     else if(view==='soporte')   enSegundoPlano(pfRenderSoporte());
 }
 
@@ -281,6 +282,13 @@ async function pfRenderPerfil() {
                     <div class="form-group" style="grid-column:1/-1"><span style="color:var(--text-muted);font-size:12px;display:block;width:100%">Tu peso, altura, edad y sexo se usan para calcular tu plan de comidas. Tu selección de deporte se sincroniza con el registro inicial.</span></div>
                 </div>
                 <div class="form-actions"><button class="btn btn-primary" onclick="pfGuardarPerfil()">Guardar cambios</button></div>
+            </div>
+        </div>
+        <div class="card" style="max-width:560px;margin-top:20px">
+            <div class="card-header"><h2>🔐 Mi cuenta</h2></div>
+            <div class="card-body">
+                <p class="campo-ayuda" style="margin-top:0">Cambia tu contraseña, descarga todos tus datos o borra tu cuenta.</p>
+                <button class="btn btn-ghost btn-sm" onclick="cuentaModal()">Abrir Mi cuenta →</button>
             </div>
         </div>
         <div class="card" style="max-width:560px;margin-top:20px">

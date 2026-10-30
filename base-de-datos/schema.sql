@@ -235,6 +235,11 @@ CREATE TABLE IF NOT EXISTS rangos (  -- el rango más alto alcanzado en cada mar
   UNIQUE(user_id, clave)
 );
 
+CREATE TABLE IF NOT EXISTS clasificacion_preferencias (  -- quién prefiere no aparecer en las clasificaciones
+  user_id BIGINT PRIMARY KEY,
+  visible BOOLEAN NOT NULL DEFAULT TRUE
+);
+
 ALTER TABLE perfiles ADD CONSTRAINT perfiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE perfiles_medicos ADD CONSTRAINT perfiles_medicos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE salud ADD CONSTRAINT salud_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
@@ -256,6 +261,7 @@ ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_equipo_id_fkey FOREIG
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE series ADD CONSTRAINT series_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE rangos ADD CONSTRAINT rangos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE clasificacion_preferencias ADD CONSTRAINT clasificacion_preferencias_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_comidas_usuario_fecha  -- índices: casi todo se consulta por atleta y fecha (salud, cumplimiento y rangos ya tienen el de su UNIQUE)
   ON comidas (user_id, fecha);

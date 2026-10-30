@@ -32,16 +32,16 @@ const PASOS_REFERENCIA = [3, 6, 9, 15, 21];
 
 /** Fuerza: patrón del nombre del ejercicio → referencias de 1RM ÷ peso corporal [hombres, mujeres]. */
 const FUERZA = [
-  { id: 'sentadilla',    patron: /^sentadilla con barra/i,                       h: [0.75, 1.25, 1.5, 2.0, 2.5],  m: [0.5, 0.85, 1.1, 1.5, 1.9] },
-  { id: 'banca',         patron: /^press de banca con barra/i,                   h: [0.5, 0.8, 1.1, 1.5, 1.85],   m: [0.3, 0.5, 0.7, 0.95, 1.2] },
-  { id: 'bancaMancuernas', patron: /^press (de banca|inclinado) con mancuernas/i, h: [0.15, 0.25, 0.37, 0.5, 0.62], m: [0.08, 0.14, 0.2, 0.28, 0.36], mancuerna: true },
-  { id: 'pesoMuerto',    patron: /^peso muerto( \d|$)/i,                          h: [1.0, 1.5, 1.9, 2.4, 2.9],    m: [0.7, 1.05, 1.4, 1.8, 2.2] },
-  { id: 'rumano',        patron: /^peso muerto rumano/i,                          h: [0.6, 1.0, 1.35, 1.75, 2.1],  m: [0.45, 0.7, 0.95, 1.25, 1.55] },
-  { id: 'militar',       patron: /^press militar/i,                               h: [0.35, 0.55, 0.75, 1.0, 1.25], m: [0.2, 0.35, 0.5, 0.65, 0.8] },
-  { id: 'hipThrust',     patron: /^hip thrust/i,                                  h: [0.75, 1.25, 1.75, 2.3, 2.8], m: [0.6, 1.0, 1.5, 2.0, 2.5] },
-  { id: 'prensa',        patron: /^prensa de piernas/i,                           h: [1.5, 2.25, 3.0, 3.75, 4.5],  m: [1.0, 1.6, 2.2, 2.8, 3.4] },
-  { id: 'remoMancuerna', patron: /^remo con mancuerna/i,                          h: [0.2, 0.32, 0.45, 0.6, 0.75], m: [0.12, 0.2, 0.28, 0.38, 0.48], mancuerna: true },
-  { id: 'curl',          patron: /^curl de b[ií]ceps con mancuernas/i,            h: [0.1, 0.17, 0.25, 0.33, 0.42], m: [0.06, 0.1, 0.15, 0.2, 0.26], mancuerna: true },
+  { id: 'sentadilla', nombre: 'Sentadilla con barra',    patron: /^sentadilla con barra/i,                       h: [0.75, 1.25, 1.5, 2.0, 2.5],  m: [0.5, 0.85, 1.1, 1.5, 1.9] },
+  { id: 'banca', nombre: 'Press de banca con barra',         patron: /^press de banca con barra/i,                   h: [0.5, 0.8, 1.1, 1.5, 1.85],   m: [0.3, 0.5, 0.7, 0.95, 1.2] },
+  { id: 'bancaMancuernas', nombre: 'Press con mancuernas', patron: /^press (de banca|inclinado) con mancuernas/i, h: [0.15, 0.25, 0.37, 0.5, 0.62], m: [0.08, 0.14, 0.2, 0.28, 0.36], mancuerna: true },
+  { id: 'pesoMuerto', nombre: 'Peso muerto',    patron: /^peso muerto( \d|$)/i,                          h: [1.0, 1.5, 1.9, 2.4, 2.9],    m: [0.7, 1.05, 1.4, 1.8, 2.2] },
+  { id: 'rumano', nombre: 'Peso muerto rumano',        patron: /^peso muerto rumano/i,                          h: [0.6, 1.0, 1.35, 1.75, 2.1],  m: [0.45, 0.7, 0.95, 1.25, 1.55] },
+  { id: 'militar', nombre: 'Press militar',       patron: /^press militar/i,                               h: [0.35, 0.55, 0.75, 1.0, 1.25], m: [0.2, 0.35, 0.5, 0.65, 0.8] },
+  { id: 'hipThrust', nombre: 'Hip thrust',     patron: /^hip thrust/i,                                  h: [0.75, 1.25, 1.75, 2.3, 2.8], m: [0.6, 1.0, 1.5, 2.0, 2.5] },
+  { id: 'prensa', nombre: 'Prensa de piernas',        patron: /^prensa de piernas/i,                           h: [1.5, 2.25, 3.0, 3.75, 4.5],  m: [1.0, 1.6, 2.2, 2.8, 3.4] },
+  { id: 'remoMancuerna', nombre: 'Remo con mancuerna', patron: /^remo con mancuerna/i,                          h: [0.2, 0.32, 0.45, 0.6, 0.75], m: [0.12, 0.2, 0.28, 0.38, 0.48], mancuerna: true },
+  { id: 'curl', nombre: 'Curl de bíceps',          patron: /^curl de b[ií]ceps con mancuernas/i,            h: [0.1, 0.17, 0.25, 0.33, 0.42], m: [0.06, 0.1, 0.15, 0.2, 0.26], mancuerna: true },
 ];
 
 /** Tests físicos (ids del módulo evaluaciones) → referencias en su unidad [hombres, mujeres]. */
