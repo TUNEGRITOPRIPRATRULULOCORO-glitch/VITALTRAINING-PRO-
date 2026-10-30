@@ -256,3 +256,19 @@ ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_equipo_id_fkey FOREIG
 ALTER TABLE equipo_miembros ADD CONSTRAINT equipo_miembros_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE series ADD CONSTRAINT series_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE rangos ADD CONSTRAINT rangos_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_comidas_usuario_fecha  -- índices: casi todo se consulta por atleta y fecha (salud, cumplimiento y rangos ya tienen el de su UNIQUE)
+  ON comidas (user_id, fecha);
+CREATE INDEX IF NOT EXISTS idx_rutinas_usuario_fecha      ON rutinas (user_id, fecha);
+CREATE INDEX IF NOT EXISTS idx_alertas_usuario            ON alertas (user_id, leida);
+CREATE INDEX IF NOT EXISTS idx_evaluaciones_usuario_fecha ON evaluaciones (user_id, fecha);
+CREATE INDEX IF NOT EXISTS idx_series_usuario_ejercicio   ON series (user_id, ejercicio, fecha);
+CREATE INDEX IF NOT EXISTS idx_series_usuario_fecha       ON series (user_id, fecha);
+CREATE INDEX IF NOT EXISTS idx_lesiones_usuario           ON lesiones (user_id);
+CREATE INDEX IF NOT EXISTS idx_notas_clinicas_usuario     ON notas_clinicas (user_id);
+CREATE INDEX IF NOT EXISTS idx_notas_nutri_usuario        ON notas_nutricionista (user_id);
+CREATE INDEX IF NOT EXISTS idx_equipo_miembros_usuario    ON equipo_miembros (user_id);
+CREATE INDEX IF NOT EXISTS idx_ia_mensajes_usuario        ON ia_mensajes (user_id, id);
+CREATE INDEX IF NOT EXISTS idx_incidencias_usuario        ON incidencias (user_id);
+CREATE INDEX IF NOT EXISTS idx_mensajes_remitente         ON mensajes (remitente_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_mensajes_destinatario      ON mensajes (destinatario_id, leido);

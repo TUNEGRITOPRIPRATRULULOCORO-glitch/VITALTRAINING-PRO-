@@ -1,612 +1,282 @@
-# VITAL TRAINING — Documentación Técnica del Proyecto
+# VitalTraining — Documentación técnica
+
+Cómo está construida la app, por qué se tomó cada decisión y cómo funciona cada parte por dentro. Para ejecutarla, ver el [README](README.md); para dónde vive en internet, [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
 
 ---
 
-## 1. ¿Qué es el proyecto?
+## 1. Qué es y qué problema resuelve
 
-**Vital Training** es una plataforma web de gestión deportiva orientada a equipos de fútbol. Permite que futbolistas registren su alimentación, entrenamientos y estado de salud diario; que nutricionistas hagan seguimiento personalizado de cada atleta; y que el administrador gestione los usuarios y soporte del sistema.
+**VitalTraining** es una plataforma web para gestionar el entrenamiento, la alimentación y la salud de deportistas, con cuatro roles: **Atleta**, **Nutricionista**, **Médico** y **Administrador**. Sirve para clubes (fútbol, baloncesto, tenis, béisbol, atletismo, natación, boxeo…) y también para quien entrena por su cuenta (gimnasio, running, "estar en forma").
 
-**Problema que resuelve:** Los equipos de fútbol amateur y semiprofesional no tienen herramientas centralizadas para que el nutricionista, el jugador y la administración compartan información de salud, nutrición y rendimiento en un solo lugar.
-
----
-
-## 2. Arquitectura del Sistema
-
-El sistema sigue una arquitectura de **3 capas separadas**:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     CLIENTE (Navegador)                   │
-│           Frontend: HTML + CSS + JavaScript              │
-│           Archivo único: interfaz/index.html             │
-└──────────────────────────┬──────────────────────────────┘
-                           │ HTTP REST (JSON)
-                           │ Authorization: Bearer <token>
-┌──────────────────────────▼──────────────────────────────┐
-│                   BACKEND (Node.js + Express)            │
-│           Puerto 4000 — server.js                        │
-│           Sirve el frontend estático Y la API            │
-│           Estructura: api/ → routes → controller → service│
-└──────────────────────────┬──────────────────────────────┘
-                           │ pg (driver oficial)
-                           │ SSL obligatorio
-┌──────────────────────────▼──────────────────────────────┐
-│              BASE DE DATOS (PostgreSQL — Neon)           │
-│           Cloud SQL · Serverless · SSL requerido         │
-│           10 tablas relacionadas                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Comunicación:** El frontend llama al backend con `fetch()` y un token JWT en el header `Authorization: Bearer <token>`. El backend valida el token, consulta PostgreSQL con queries parametrizadas y devuelve JSON.
+**Problema:** en los clubes amateur y semiprofesionales el atleta, el nutricionista, el médico y la administración no comparten la información. Cada uno usa su hoja de cálculo, su chat o su app, y nadie ve el cuadro completo. Las apps del mercado que estudiamos (TrainingPeaks, Fitbod, Volt, MacroFactor, Peak, TrainHeroic, Strong, TrainUp) cubren entrenamiento **o** nutrición, pero ninguna junta a los tres profesionales ni tiene expediente médico.
 
 ---
 
-## 3. Base de Datos
+## 2. Arquitectura
 
-### Motor elegido: PostgreSQL
-
-**¿Por qué PostgreSQL y no MySQL o MongoDB?**
-- Soporte nativo de **JSONB** (columnas JSON con índices): permite guardar arrays complejos como `condiciones médicas`, `plan alimenticio semanal` y `comentarios de tickets` sin tablas extra.
-- **Constraint `UNIQUE(user_id, fecha)`** en la tabla `salud` para evitar doble registro en el mismo día a nivel de base de datos.
-- **`ON DELETE CASCADE`** en todas las foreign keys: al eliminar un usuario se borran automáticamente todos sus datos relacionados.
-- **`BIGSERIAL`** para IDs autoincrement seguros.
-- Operadores especiales como `ANY($1)` y `ALL($1)` para filtrar arrays de categorías de incidencias.
-
-### Proveedor: Neon (PostgreSQL serverless en la nube)
-
-Neon es una plataforma de PostgreSQL serverless. La conexión se configura mediante la variable de entorno `DATABASE_URL` (connection string completo). Se usa SSL obligatorio (`rejectUnauthorized: false`) porque Neon exige conexión encriptada.
-
-```js
-// base-de-datos/db.js
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
-});
+```
+┌───────────────────────────────────────────────────────────┐
+│ NAVEGADOR o app instalada (PWA)                            │
+│ interfaz/: index.html + styles.css + js/ (un archivo/rol) │
+└─────────────────────────────┬─────────────────────────────┘
+                              │ HTTPS · JSON · Authorization: Bearer <token>
+┌─────────────────────────────▼─────────────────────────────┐
+│ SERVIDOR Node.js + Express (servidor/server.js)            │
+│ Helmet → JSON con límite → CORS → archivos estáticos       │
+│ /api → auth (JWT) → rol → acceso por equipo → módulo       │
+└───────────┬───────────────────────┬───────────────────────┘
+            │ pg (SSL verificado)    │ HTTPS
+┌───────────▼───────────┐   ┌───────▼───────────────────────┐
+│ PostgreSQL · Neon      │   │ Brevo (correos) · Google      │
+│ 21 tablas · 14 índices │   │ (entrar con Google) · Claude  │
+└───────────────────────┘   │ (opcional)                     │
+                            └───────────────────────────────┘
 ```
 
-### Inicialización automática
+### Monolito modular
 
-Al arrancar el servidor, `base-de-datos/setup.js` ejecuta `base-de-datos/schema.sql` con `CREATE TABLE IF NOT EXISTS` — esto significa que las tablas se crean solas si no existen. Si la base de datos está vacía también inserta 5 usuarios de prueba con contraseñas hasheadas.
+Una sola aplicación (un proceso, un despliegue), dividida en **17 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
 
-### Tablas y relaciones
+1. **Cada tabla tiene un dueño.** Solo su módulo hace `INSERT`, `UPDATE` o `DELETE`; los demás leen o llaman a una función del dueño.
+2. **Cada módulo expone un `index.js` público.** Nadie importa archivos internos de otro módulo.
+3. **Lo común va en `servidor/compartido/`** (middleware, fechas, deportes).
 
-| Tabla | Descripción | FK |
-|-------|-------------|-----|
-| `usuarios` | Todos los usuarios del sistema (Futbolista, Nutricionista, Admin) | — |
-| `perfiles` | Datos deportivos del futbolista (posición, peso, altura, edad) | `user_id → usuarios` |
-| `perfiles_medicos` | Condiciones médicas, alergias, plan alimenticio y rutina generados por IA local | `user_id → usuarios` |
-| `salud` | Registro diario de fatiga, sueño y recuperación (1 por día por usuario) | `user_id → usuarios` |
-| `alertas` | Alertas automáticas generadas cuando fatiga ≥ 8 o recuperación ≤ 3 | `user_id → usuarios` |
-| `comidas` | Historial de comidas registradas (por el futbolista o el nutricionista) | `user_id → usuarios` |
-| `rutinas` | Historial de sesiones de entrenamiento | `user_id → usuarios` |
-| `incidencias` | Tickets de soporte (comentarios guardados como JSONB) | `user_id → usuarios` |
-| `notas_nutricionista` | Observaciones del nutricionista sobre un atleta | `user_id → usuarios` |
-| `cumplimiento` | Registro de cumplimiento del plan semanal | `user_id → usuarios` |
+Cada módulo sigue el patrón **routes → controller → service**: las rutas declaran permisos, el controlador traduce HTTP y el servicio tiene la lógica y las consultas. Los cálculos puros (sin base de datos) van en archivos `*.calculos.js` o `*.catalogo.js`, fáciles de probar.
 
-**Relación principal:** todos los datos giran alrededor de `usuarios`. Cada tabla tiene una foreign key `user_id` con `ON DELETE CASCADE`.
-
-**Columnas JSONB usadas:**
-- `perfiles_medicos.condiciones` → array de strings con enfermedades
-- `perfiles_medicos.alergias` → array de strings con alergias
-- `perfiles_medicos.plan_alimenticio` → objeto con 7 días de comidas generadas
-- `perfiles_medicos.rutina_semanal` → objeto con 7 días de ejercicios
-- `incidencias.comentarios` → array de objetos `{autor, fecha, texto}`
+| Módulo | Tablas propias | Qué hace |
+|---|---|---|
+| `auth` | `restablecimientos` | Entrar, registrarse, entrar con Google, recuperar contraseña |
+| `usuarios` | `usuarios`, `fotos_perfil` | Gestión de cuentas (admin) y fotos de perfil |
+| `panel` | `perfiles`, `comidas`, `rutinas`, `alertas`, `cumplimiento` | Dashboard, perfil, historial, sesiones cumplidas |
+| `salud` | `salud` | Registro diario de fatiga, sueño y recuperación, con alertas |
+| `perfilMedico` | `perfiles_medicos` | Condiciones, alergias, dieta; genera rutina y plan de comidas |
+| `rendimiento` | — (lectura) | Listo para entrenar, carga, cumplimiento y "Hoy te toca…" |
+| `lesiones` | `lesiones`, `notas_clinicas` | Lesiones, estado apto / en recuperación / baja y notas clínicas |
+| `equipos` | `equipos`, `equipo_miembros` | Equipos y qué atletas ve cada profesional |
+| `series` | `series` | Registro serie a serie, récords y sugerencia de carga |
+| `rangos` | `rangos` | Rangos de Bronce a Radiante en fuerza y tests |
+| `evaluaciones` | `evaluaciones` | Tests físicos periódicos por deporte |
+| `nutricionista` | `notas_nutricionista` | Panel del nutricionista |
+| `mensajes` | `mensajes` | Chat entre roles |
+| `incidencias` | `incidencias` | Tickets de soporte |
+| `ia` | `ia_mensajes` | Vita: el asistente (modelo propio + Claude opcional) |
+| `reportes` | — (lectura) | Estadísticas del admin |
+| `avisos` | — | Decide qué correo mandar y a quién |
 
 ---
 
-## 4. Backend
+## 3. Base de datos
 
-### Tecnología: Node.js + Express
+### PostgreSQL, en tres versiones según dónde corre
 
-**¿Por qué Node.js?**
-- JavaScript tanto en frontend como backend → mismo lenguaje para el equipo.
-- Modelo asíncrono (async/await) ideal para operaciones I/O intensivas como consultas a base de datos.
-- Ecosistema npm: acceso a todas las librerías necesarias.
+| Dónde | Motor | Por qué |
+|---|---|---|
+| La web (Render) | **Neon**, PostgreSQL en la nube | Datos que sobreviven a reinicios y despliegues; plan gratis |
+| Tu computador | **PGlite**, PostgreSQL en un archivo | Sin instalar nada; los datos se conservan en `base-de-datos/datos-locales/` |
+| Los tests | **pg-mem**, PostgreSQL en memoria | Cada prueba empieza con una base limpia y real, sin tocar datos |
 
-**¿Por qué Express?**
-- Framework minimalista y flexible para crear APIs REST.
-- Middleware encadenado: cada request pasa por CORS → Helmet → Auth → Roles → Controller.
-- Router modular: cada dominio tiene su propio archivo de rutas.
+El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js` crea lo que falte (`CREATE TABLE IF NOT EXISTS`, `CREATE INDEX IF NOT EXISTS`) y aplica migraciones de columnas nuevas, así que **desplegar nunca borra datos**.
 
-### Estructura de carpetas del backend
+**¿Por qué PostgreSQL y no MySQL o MongoDB?** Por las restricciones y la integridad (claves foráneas con `ON DELETE CASCADE`, `UNIQUE` compuestos), y por **JSONB** para guardar estructuras anidadas como el plan de comidas de 7 días o la rutina semanal, que siempre se leen completas.
 
-```
-servidor/
-  server.js                    ← Punto de entrada, configura middleware global
-  api/
-    index.js                   ← Router principal, aplica auth en todas las rutas
-    auth/
-      auth.routes.js            ← POST /login, POST /registro
-      auth.controller.js        ← Recibe request, llama al service
-      auth.service.js           ← Lógica: bcrypt, JWT, validaciones
-    usuarios/                  ← CRUD de usuarios (solo Admin)
-    panel/                     ← Dashboard, perfil, historial, alertas, cumplimiento
-    salud/                     ← Registros diarios de salud
-    nutricionista/             ← Endpoints exclusivos del nutricionista
-    incidencias/               ← Sistema de tickets de soporte
-    reportes/                  ← Estadísticas globales (solo Admin)
-    ia/                        ← Asistente IA local basado en reglas
-    perfilMedico/              ← Perfil médico y generación de plan/rutina
-  compartido/middleware/
-    auth.js                    ← Verifica JWT en cada request protegida
-    roles.js                   ← requireRol() y requireOwnerOrRol()
-    cors.js                    ← Configuración de CORS
-base-de-datos/
-  db.js                      ← Pool de conexiones PostgreSQL
-  schema.sql                 ← DDL de todas las tablas
-  setup.js                   ← Inicializa BD y seed de usuarios
-```
+### Tablas (21)
 
-### Patrón de capas (Routes → Controller → Service)
+| Grupo | Tablas |
+|---|---|
+| Cuentas | `usuarios`, `fotos_perfil`, `restablecimientos` |
+| Atleta | `perfiles`, `perfiles_medicos` (JSONB: condiciones, alergias, plan de comidas, rutina), `salud`, `comidas`, `rutinas`, `cumplimiento`, `alertas` |
+| Rendimiento | `evaluaciones`, `series`, `rangos` |
+| Médico y nutrición | `lesiones`, `notas_clinicas`, `notas_nutricionista` |
+| Club | `equipos`, `equipo_miembros` |
+| Comunicación | `mensajes`, `incidencias` (JSONB: comentarios), `ia_mensajes` |
 
-```
-Request HTTP
-    ↓
-Router (incidencias.routes.js)     → solo define URL y método
-    ↓
-Controller (incidencias.controller.js) → recibe req/res, valida básico, llama service
-    ↓
-Service (incidencias.service.js)   → toda la lógica de negocio y queries SQL
-    ↓
-db.js (Pool PostgreSQL)            → ejecuta query parametrizada
-```
+Todas las tablas de un usuario tienen `user_id → usuarios(id) ON DELETE CASCADE`: al borrar una cuenta se borran sus datos.
 
-**Regla:** ningún controlador hace queries directamente. Toda la lógica de negocio está en el service.
+### Índices
 
-### Dependencias principales
-
-| Librería | Versión | Uso |
-|----------|---------|-----|
-| `express` | 4.22 | Framework HTTP |
-| `pg` | 8.21 | Driver PostgreSQL |
-| `bcrypt` | 6.0 | Hasheo de contraseñas |
-| `jsonwebtoken` | 9.0 | Creación y verificación de JWT |
-| `helmet` | 8.2 | Headers HTTP de seguridad |
-| `express-rate-limit` | 8.5 | Límite de intentos de login |
-| `dotenv` | 17.4 | Variables de entorno desde .env |
+Casi todas las pantallas consultan "los datos de este atleta en estas fechas". Hay **14 índices** sobre `(user_id, fecha)` y similares (comidas, rutinas, series, evaluaciones, mensajes, lesiones…); `salud`, `cumplimiento`, `equipo_miembros` y `rangos` ya tienen el suyo por su `UNIQUE`. Sin ellos, con cientos de usuarios, cada consulta recorrería la tabla entera.
 
 ---
 
-## 5. Seguridad
+## 4. Seguridad
 
-### 5.1 Autenticación con JWT
+### Sesión: JWT, revisada contra la base
 
-**¿Qué es JWT?** JSON Web Token. Es un token firmado digitalmente que el servidor genera al hacer login. El cliente lo guarda y lo envía en cada petición en el header `Authorization: Bearer <token>`.
+1. Al entrar, `bcrypt.compare()` verifica la contraseña y el servidor firma un **JWT** con `JWT_SECRET` (dura 8 h).
+2. La interfaz lo guarda en `sessionStorage` (se borra al cerrar el navegador) y lo envía en `Authorization: Bearer`.
+3. En cada petición, el middleware `auth.js` verifica la firma **y comprueba en la base que la cuenta sigue activa y su rol actual** (con 30 s de memoria para no consultar en cada petición). Así, si el admin desactiva una cuenta o cambia su rol, el token viejo deja de servir enseguida.
 
-**Flujo:**
-1. El usuario envía email + password a `POST /api/auth/login`
-2. El backend verifica el password con `bcrypt.compare()`
-3. Si es correcto, genera un JWT firmado con `JWT_SECRET` y expiración de 8 horas
-4. El frontend guarda el token en `sessionStorage`
-5. Cada request siguiente incluye el token → el middleware `auth.js` lo verifica con `jwt.verify()`
-6. Si el token expiró o es inválido → 401 Unauthorized → el frontend redirige al login
+### Contraseñas
+**bcrypt** con 10 rondas. Mínimo 8 caracteres, validado en el servidor. La contraseña nunca vuelve al cliente. La recuperación usa un enlace de un solo uso: en la base solo se guarda el hash del token.
 
-**Payload del token:**
-```json
-{ "id": 1, "nombre": "Carlos Ruiz", "email": "carlos@vital.com", "rol": "Futbolista" }
-```
+### Permisos en tres capas
+| Capa | Qué comprueba |
+|---|---|
+| `requireRol(...)` | El rol puede usar esa sección (por ejemplo, solo el admin gestiona usuarios) |
+| `accesoAtleta(...)` (módulo equipos) | En rutas `/:userId`: es el propio atleta, el admin, o un profesional **que comparte equipo con ese atleta** |
+| Reglas del servicio | Por ejemplo: solo el médico registra lesiones; las notas clínicas privadas solo las ven médicos; cada médico borra solo sus notas; solo el atleta apunta sus series |
 
-### 5.2 Encriptación de contraseñas con bcrypt
-
-Bcrypt nunca guarda la contraseña en texto plano. Aplica una función de hash con **10 rondas de salt** (trabajo computacional deliberadamente lento para dificultar ataques de fuerza bruta).
-
-```js
-// Al crear usuario:
-const hashed = await bcrypt.hash(password, 10);  // "abc123" → "$2b$10$..."
-
-// Al verificar login:
-const match = await bcrypt.compare(password, usuario.password); // true/false
-```
-
-La contraseña nunca viaja de vuelta al cliente. En todas las queries de SELECT se excluye el campo `password`.
-
-### 5.3 Control de roles
-
-Existen 3 roles con permisos distintos:
-
-| Rol | Acceso |
-|-----|--------|
-| **Futbolista** | Solo sus propios datos (panel, salud, historial, plan, IA, soporte) |
-| **Nutricionista** | Sus datos + ver/gestionar datos de todos los futbolistas + tickets de nutrición/salud |
-| **Administrador** | Todo: usuarios, reportes, todos los tickets, todos los datos |
-
-**Middleware `requireRol`:** verifica que `req.user.rol` sea uno de los roles permitidos.
-
-```js
-// Ejemplo: solo Admin puede gestionar usuarios
-router.use('/usuarios', requireRol('Administrador'), usuariosRoutes);
-```
-
-**Middleware `requireOwnerOrRol`:** permite al dueño del recurso O a un rol privilegiado.
-
-```js
-// Ejemplo: el futbolista puede ver sus datos, y también el nutricionista o admin
-router.param('userId', requireOwnerOrRol('Administrador', 'Nutricionista'));
-```
-
-### 5.4 Routing de tickets por categoría
-
-Los tickets se enrutan automáticamente por categoría sin columna extra en la BD:
-
-```js
-const CATS_NUTRI = ['Nutrición', 'Plan alimenticio', 'Salud', 'Alimentación'];
-
-function destinatario(categoria) {
-  return CATS_NUTRI.includes(categoria) ? 'Nutricionista' : 'Administrador';
-}
-```
-
-El nutricionista solo ve tickets de las 4 categorías que le corresponden. El admin ve el resto. Ninguno puede responder tickets del otro.
-
-### 5.5 Otras medidas de seguridad
-
-| Medida | Implementación | Qué protege |
-|--------|---------------|-------------|
-| **Helmet** | `helmet({ contentSecurityPolicy: false })` | 15+ headers HTTP de seguridad automáticos |
-| **Rate limiting** | 10 intentos / 15 minutos en `/api/auth/login` | Ataques de fuerza bruta al login |
-| **Payload limit** | `express.json({ limit: '50kb' })` | Ataques con bodies enormes |
-| **CORS** | Configurable por `CORS_ORIGIN` en .env | Solo permite el origen configurado en producción |
-| **Queries parametrizadas** | `query('SELECT ... WHERE id = $1', [id])` | SQL Injection imposible |
-| **XSS** | `escapeHtml()` en todo innerHTML del frontend | Inyección de scripts en la interfaz |
-| **IDOR bloqueado** | `requireOwnerOrRol` en rutas con `:userId` | Impide acceder a datos de otros usuarios |
+### Otras medidas
+| Medida | Qué protege |
+|---|---|
+| **Helmet con política de contenido (CSP)** | Solo se cargan scripts, estilos e imágenes de orígenes permitidos |
+| **SRI** en Chart.js | Si el CDN sirviera un archivo alterado, el navegador no lo ejecuta |
+| **Límites de intentos** | Login 10, registro 10, recuperar contraseña 5 por 15 min; chat con Vita 30 mensajes por 10 min |
+| **Tamaño máximo de petición** | 50 KB (450 KB solo para subir la foto) |
+| **Consultas parametrizadas** | Inyección SQL |
+| **`escapeHtml()`** en toda la interfaz | Inyección de scripts (XSS) |
+| **SSL con certificado verificado** hacia Neon | Que alguien se haga pasar por la base de datos |
+| **Docker sin root** y solo las carpetas necesarias | Nada de `.env`, tests ni `.git` en la imagen |
+| **Secretos solo en Render** | El código lleva los nombres de las variables, nunca sus valores |
+| **Fotos de perfil solo con sesión** | Nadie las ve sin iniciar sesión |
 
 ---
 
-## 6. Frontend
+## 5. Interfaz
 
-### Tecnología: HTML + CSS + JavaScript vanilla (SPA)
-
-**¿Qué es una SPA?** Single Page Application. Todo el sistema está en un solo archivo `index.html`. La navegación entre vistas se hace con JavaScript modificando el DOM, sin recargar la página.
-
-**¿Por qué vanilla y no React/Vue?**
-- Sin build tools, sin npm en frontend → se despliega como archivos estáticos simples.
-- El backend sirve el frontend directamente con `express.static('interfaz')`.
-- Todo en un repositorio unificado.
-
-### Estructura del frontend
-
-```
-interfaz/
-  index.html    ← Contiene todos los paneles (admin, nutricionista, futbolista) ocultos con CSS
-  js/           ← La lógica, un archivo por rol: comun.js (sesión, enrutador, utilidades), auth.js,
-                  admin.js, nutricionista.js, medico.js, atleta.js, atleta-plan.js y los compartidos
-                  mensajes.js, rendimiento.js y evaluaciones.js. inicio.js arranca la app.
-  styles.css    ← Estilos: variables CSS, dark mode, componentes reutilizables
-```
-
-### Cómo funciona la navegación
-
-Cada panel tiene su función de renderizado:
-- `renderView(view)` → Admin
-- `ntRenderView(view)` → Nutricionista  
-- `pfRenderView(view)` → Futbolista
-
-Al iniciar, `window.addEventListener('load')` revisa si hay sesión guardada en `sessionStorage`. Si la hay, llama a `routeUser()` que muestra el panel correspondiente al rol.
-
-### Gestión de estado de sesión
-
-```js
-// Guardar al hacer login:
-sessionStorage.setItem('vt_user', JSON.stringify(usuario));
-sessionStorage.setItem('vt_token', token);
-
-// Leer en cada petición:
-const token = sessionStorage.getItem('vt_token');
-// Header automático en todos los fetch:
-'Authorization': `Bearer ${token}`
-```
-
-Si el backend devuelve 401, el frontend borra la sesión y muestra el login automáticamente.
-
-### Gráficas: Chart.js v3
-
-Se usa Chart.js cargado desde CDN para:
-- Barras: actividad por día (comidas/rutinas/salud)
-- Dona: distribución de usuarios por rol
-- Línea: tendencia de salud (fatiga/sueño/recuperación)
-- Barras: fatiga actual por atleta
-
-Cada gráfica se registra en `chartInstances{}` y se destruye antes de renderizar una nueva vista, evitando memory leaks.
+- **SPA sin frameworks**: un `index.html` y un archivo JS por rol o función (`interfaz/js/`). Sin compilación: el servidor publica la carpeta tal cual. Ver [interfaz/README.md](interfaz/README.md).
+- **App instalable (PWA)**: `manifest.webmanifest` (nombre, iconos, colores), `sw.js` (service worker) y `offline.html`. Se instala desde Chrome (Android y ordenador) o con "Añadir a pantalla de inicio" en Safari (iPhone). Las pantallas siempre se piden al servidor primero, así nadie se queda con una versión vieja; los datos de `/api` nunca se guardan en el celular; sin internet se ve un aviso amable.
+- Modo oscuro, diseño adaptado a móvil, gráficas con Chart.js y música de fondo opcional.
 
 ---
 
-## 7. API REST — Todos los Endpoints
+## 6. Cómo funciona cada parte
 
-### Autenticación
+### Plan de comidas
+1. **Calorías**: gasto en reposo con la fórmula **Mifflin-St Jeor** (peso, altura, edad, sexo) por un factor según el tipo de día (descanso ×1,40, entreno ×1,70, víspera de partido ×1,60, partido ×1,85…).
+2. **Macros**: carbohidratos por kg según el día (3,5 a 7 g/kg, guías ACSM 2016 y consenso UEFA), proteína 1,6-2,0 g/kg, grasa entre el 20 % y el 35 %.
+3. **Platos**: catálogo de 83 platos, cada uno con sus ingredientes clave. Las **alergias y la dieta (vegana, vegetariana, pescetariana) son filtros estrictos**; las condiciones médicas solo quitan platos si quedan al menos 3 opciones.
+4. **Porciones**: se reparte la energía del día (desayuno 25 %, almuerzo 30 %, cena 25 %, meriendas 10 % + 10 %) y se escala la porción del plato.
 
-| Método | Endpoint | Auth | Body | Respuesta |
-|--------|----------|------|------|-----------|
-| POST | `/api/auth/login` | No | `{ email, password }` | `{ usuario, token }` |
-| POST | `/api/auth/registro` | No | `{ nombre, email, password, peso, altura, ... }` | `{ usuario }` |
+### Rutina
+Plantillas por **deporte y posición**, basadas en evidencia (citada en `servidor/api/perfilMedico/rutinas.js`). Se quitan los ejercicios contraindicados por las condiciones médicas del atleta, y la semana se organiza alrededor de su **día de partido** (víspera suave, día siguiente de recuperación).
 
-### Usuarios (solo Administrador)
+### Listo para entrenar, carga y cumplimiento
+- **Listo para entrenar (0-100)**: `((11 − fatiga) + sueño + recuperación) / 30 × 100`, menos 10 si la carga está en riesgo. ≥75 listo, ≥50 bajar intensidad, <50 descanso.
+- **Carga**: cada sesión suma *minutos × esfuerzo percibido (1-10)*. Se comparan los últimos 7 días con la media de las últimas 4 semanas: más de 1,5 veces es **riesgo alto de lesión** y avisa al médico por correo.
+- **Cumplimiento**: calendario de 4 semanas con lo completado, parcial o no hecho. Los días de lesión no cuentan como fallados.
 
-| Método | Endpoint | Body | Respuesta |
-|--------|----------|------|-----------|
-| GET | `/api/usuarios` | — (query: `q`, `rol`, `estado`) | `[{ id, nombre, email, rol, estado }]` |
-| POST | `/api/usuarios` | `{ nombre, email, password, rol }` | `{ id, nombre, email, rol, estado }` |
-| PUT | `/api/usuarios/:id` | `{ nombre, email, rol, estado }` | usuario actualizado |
-| DELETE | `/api/usuarios/:id` | — | `{ mensaje }` |
+### Lesiones y estado médico
+El médico registra zona, tipo, gravedad e indicaciones, y decide si el atleta está de **baja** o puede entrenar **adaptado**. El estado manda en todo lo demás: de baja, "listo para entrenar" muestra *Baja médica*, la rutina queda en pausa, los rangos se congelan y Vita no le dice que está listo. El atleta recibe un aviso al registrar, cambiar o dar el alta.
 
-### Panel del Futbolista (dueño del recurso, Admin o Nutricionista)
+### Equipos
+Mientras no hay equipos, la app es un club único: cada profesional ve a todos los atletas. Con equipos, **un nutricionista o médico solo ve, abre y escribe a los atletas de sus equipos**, y los correos de alerta van solo a sus médicos. El admin crea los equipos y añade a los profesionales; los atletas se unen con un **código de 6 caracteres**.
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/panel/:userId/perfil` | Perfil deportivo |
-| PUT | `/api/panel/:userId/perfil` | Actualizar perfil |
-| GET | `/api/panel/:userId/dashboard` | Resumen: perfil + últimas comidas + rutinas + alertas |
-| GET | `/api/panel/:userId/historial/comidas` | Historial paginado de comidas |
-| POST | `/api/panel/:userId/comidas` | Registrar comida |
-| DELETE | `/api/panel/:userId/comidas/:comidaId` | Eliminar comida |
-| GET | `/api/panel/:userId/historial/rutinas` | Historial paginado de rutinas |
-| POST | `/api/panel/:userId/rutinas` | Registrar rutina |
-| DELETE | `/api/panel/:userId/rutinas/:rutinaId` | Eliminar rutina |
-| GET | `/api/panel/:userId/historial/alertas` | Alertas del usuario |
-| PUT | `/api/panel/:userId/alertas/:alertaId/leer` | Marcar alerta como leída |
-| PUT | `/api/panel/:userId/alertas/leer-todas` | Marcar todas las alertas como leídas |
+### "Hoy te toca…"
+Junta en una lista lo del día: registrar la salud, la sesión de la rutina y las 3 comidas del plan, con progreso ("2/5 hecho"), según el tipo de día (entreno, víspera, partido, descanso, baja). "La comí" apunta la comida del plan con un toque. Nunca regaña.
 
-### Salud
+### Series, récords y sugerencia de carga
+El atleta apunta peso y repeticiones de cada serie viendo la sesión anterior. **Récord** = mejor máximo estimado con la fórmula de **Epley** (`peso × (1 + reps/30)`, fiable hasta ~12 repeticiones). **Sugerencia por doble progresión**: si completó las repeticiones objetivo en todas las series, sube 2,5 kg (1 kg con pesos pequeños); si no, mismo peso y una repetición más. Lesionado o con el cuerpo pidiendo descanso, no sube.
 
-| Método | Endpoint | Body | Descripción |
-|--------|----------|------|-------------|
-| GET | `/api/salud/:userId` | — | Historial de salud ordenado por fecha DESC |
-| POST | `/api/salud/:userId` | `{ fatiga, sueno, recuperacion, notas, fecha }` | Registrar salud del día (solo 1 por día) |
+### Rangos
+8 rangos (Bronce, Plata, Oro, Platino, Esmeralda, Rubí, Diamante y Radiante); los 7 primeros con 3 divisiones. En **fuerza** se compara el máximo estimado con el **peso corporal**; en **tests físicos**, la mejor marca. Las referencias son distintas para hombres y mujeres y orientativas. Se guarda el rango más alto alcanzado: **nunca se baja**.
 
-Al registrar: si `fatiga ≥ 8` o `recuperacion ≤ 3` o `sueno ≤ 4` → se genera una alerta automática.
+### Vita, el asistente
+- **Sin coste**: un **modelo de machine learning propio** (TF-IDF por trozos de letras + regresión logística, entrenado con scikit-learn sobre 782 frases) clasifica cada mensaje en 17 intenciones con un **81 % de precisión**. Con confianza ≥ 0,35 responde con los datos reales del atleta; si duda, pregunta. El servidor no necesita Python: el modelo se exporta a JSON y Node.js repite las cuentas (un test comprueba que da lo mismo). Detalles en [ml/README.md](ml/README.md).
+- **Con `ANTHROPIC_API_KEY`**: conversa con Claude, que recibe el contexto del atleta (rutina, comidas, salud, lesiones). Si Claude falla, responde el modo básico.
 
-### Nutricionista (Nutricionista y Administrador)
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/nutricionista/futbolistas` | Lista todos los futbolistas activos con resumen de salud |
-| GET | `/api/nutricionista/futbolistas/:userId` | Detalle completo: salud, comidas, rutinas, alertas, notas |
-| POST | `/api/nutricionista/futbolistas/:userId/notas` | Agregar nota clínica |
-| POST | `/api/nutricionista/futbolistas/:userId/comidas` | Registrar comida al atleta |
-| POST | `/api/nutricionista/futbolistas/:userId/rutinas` | Registrar rutina al atleta |
-
-### Incidencias (Tickets de Soporte)
-
-| Método | Endpoint | Permisos | Descripción |
-|--------|----------|----------|-------------|
-| GET | `/api/incidencias` | Todos | Futbolista: solo los suyos. Nutricionista: solo categorías de nutrición. Admin: todos |
-| POST | `/api/incidencias` | Todos | Crear ticket (se enruta por categoría) |
-| PUT | `/api/incidencias/:id/estado` | Admin o destinatario | Cambiar estado (abierta/en progreso/resuelta) |
-| POST | `/api/incidencias/:id/comentarios` | Admin o destinatario | Agregar comentario/respuesta |
-
-### Perfil Médico y Plan Personalizado
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/api/perfil-medico/catalogos` | Listas de condiciones, alergias y preferencias disponibles |
-| GET | `/api/perfil-medico/:userId` | Obtener perfil médico + plan alimenticio + rutina |
-| POST | `/api/perfil-medico/:userId` | Guardar condiciones/alergias/preferencia → genera plan y rutina |
-
-### Asistente IA
-
-| Método | Endpoint | Query param |
-|--------|----------|-------------|
-| GET | `/api/ia/:userId/consulta` | `?tipo=estado_semana` / `tendencia` / `resumen` / `entrenar_hoy` / `fatiga` / `sobrecarga` / `sueno` / `recuperacion` / `nutricion` / `calorias` / `riesgo` / `alertas` / `partido` / `plan` / `mejorar` |
-
-### Reportes (solo Administrador)
-
-| Método | Endpoint | Respuesta |
-|--------|----------|-----------|
-| GET | `/api/reportes` | Totales de usuarios, incidencias, comidas, rutinas, fatiga por atleta, actividad últimos 7 días |
+### Correos (Brevo)
+Bienvenida, recuperar contraseña, alertas de salud y de carga al médico. Nunca rompen la acción que los provoca: si el correo falla, la app sigue.
 
 ---
 
-## 8. Roles y Flujo Principal
+## 7. API REST
 
-### Flujo de un Futbolista
+Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bearer <token>`. En las rutas `/:userId` entra el propio atleta y, según la ruta, el admin y los profesionales de su equipo.
 
-1. Se registra → rol `Futbolista` asignado automáticamente
-2. Completa onboarding médico: selecciona condiciones, alergias, preferencia alimenticia
-3. El sistema genera automáticamente: plan alimenticio personalizado de 7 días + rutina de entrenamiento adaptada a su posición
-4. Registra su salud diaria (fatiga, sueño, recuperación)
-5. Registra comidas y entrenamientos
-6. Consulta al Asistente IA para análisis de su estado
-7. Abre tickets de soporte dirigidos al nutricionista o al equipo técnico
-
-### Flujo de un Nutricionista
-
-1. Inicia sesión → ve dashboard con todos los atletas activos
-2. Revisa estado de fatiga en tiempo real
-3. Abre el perfil de un atleta → ve salud, comidas, rutinas, alertas
-4. Agrega notas clínicas y puede registrar comidas/rutinas al atleta
-5. Atiende tickets de soporte de nutrición/salud → responde y cambia estado
-
-### Flujo del Administrador
-
-1. Gestiona usuarios: crear, editar rol/estado, desactivar
-2. Ve reportes globales: usuarios por rol, incidencias por estado, actividad de la plataforma
-3. Atiende tickets técnicos (Bug, Soporte técnico, Mejora, Consulta)
-4. Ve todos los tickets con indicador de a quién van dirigidos (🥗 Nutricionista / 🛠 Soporte)
+| Módulo | Rutas principales |
+|---|---|
+| Auth | `POST /api/auth/login` · `/google` · `/registro` · `/olvide` · `/restablecer` · `GET /config` |
+| Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `GET /api/fotos/:userId` |
+| Usuarios (admin) | `GET/POST /api/usuarios` · `PUT/DELETE /api/usuarios/:id` · `DELETE /:id/foto` |
+| Panel | `GET/PUT /api/panel/:userId/perfil` · `GET /dashboard` · historial de comidas, rutinas y alertas · `POST/DELETE` comidas y rutinas · `GET/POST /cumplimiento` |
+| Salud | `GET/POST /api/salud/:userId` |
+| Perfil médico | `GET /api/perfil-medico/catalogos` · `GET /atletas` (médico) · `GET/POST /:userId` |
+| Rendimiento | `GET /api/rendimiento/:userId` · `GET /:userId/hoy` · `GET /equipo` (profesionales) |
+| Lesiones | `GET /api/lesiones/:userId` · `POST` lesión (médico) · `PUT /:id` · `POST /:id/alta` · `DELETE /:id` · `POST/DELETE /notas` |
+| Equipos | `GET /api/equipos/mios` · `POST /unirse` · admin: `GET/POST /` · `PUT/DELETE /:id` · `POST /:id/codigo` · `POST/DELETE /:id/miembros` |
+| Series | `GET /api/series/:userId/ejercicio?nombre=` · `GET /hoy` · `GET /records` · `POST` (atleta) · `DELETE /:id` |
+| Rangos | `GET /api/rangos/:userId` |
+| Tests físicos | `GET/POST /api/evaluaciones/:userId` · `DELETE /:id` |
+| Nutricionista | `GET /api/nutricionista/futbolistas` · `GET /:userId` · `POST` notas, comidas y rutinas |
+| Mensajes | `GET /api/mensajes/contactos` · `GET /no-leidos` · `GET/POST /:otroId` |
+| Soporte | `GET/POST /api/incidencias` · `PUT /:id/estado` · `POST /:id/comentarios` |
+| Vita | `GET/POST/DELETE /api/ia/:userId/chat` · `GET /consulta` |
+| Reportes (admin) | `GET /api/reportes` |
+| Estado | `GET /api/estado` (lo usa el hosting para saber si la app está viva) |
 
 ---
 
-## 9. Asistente IA — Cómo funciona
+## 8. Pruebas y calidad
 
-**Importante:** el asistente NO usa una API de inteligencia artificial externa (como OpenAI). Es una **IA local basada en reglas** (rule-based AI). Funciona así:
-
-1. Cuando el futbolista hace una consulta, el backend recupera todos sus datos de la BD: salud, comidas, rutinas, alertas, perfil médico
-2. El service `ia.service.js` analiza los datos con lógica condicional (promedios, tendencias, umbrales)
-3. Devuelve una respuesta en texto con tipo de alerta (`success`, `warning`, `danger`)
-4. Si el atleta tiene condiciones médicas registradas, la IA adapta sus recomendaciones
-
-**Tipos de consulta disponibles (15 en total):** estado de la semana, tendencia, resumen, ¿puedo entrenar hoy?, fatiga, sobrecarga, sueño, recuperación, nutrición, calorías, riesgo de lesión, alertas, pre-partido, plan de la semana, cómo mejorar.
+- **416 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
+- **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
+- **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.
+- **SonarQube Cloud** analiza fallos, seguridad y mantenibilidad.
 
 ---
 
-## 10. Plan Alimenticio y Rutina — Cómo se Genera
+## 9. Despliegue
 
-Cuando el futbolista guarda su perfil médico, el backend ejecuta dos generadores en `perfilMedico.service.js`:
-
-**Plan alimenticio:**
-- Tiene un pool de 12 desayunos, 12 almuerzos, 11 cenas y 8 meriendas
-- Cada comida tiene etiquetas: alérgenos que NO contiene, preferencias incompatibles, condiciones donde es recomendable o a evitar
-- El sistema filtra: excluye comidas con alérgenos del usuario, excluye las incompatibles con su preferencia, excluye las contraindicadas para sus condiciones
-- Asigna una comida diferente por día en un ciclo de 7 días
-
-**Rutina de entrenamiento:**
-- Hay 6 plantillas base por posición (Portero, Defensa Central, Lateral, Mediocampista, Extremo, Delantero)
-- Cada día tiene grupos de ejercicios asignados (fuerza, cardio, técnica, velocidad, recuperación)
-- Cada ejercicio tiene una lista de condiciones médicas con las que es incompatible
-- El sistema filtra los ejercicios contraindicados para las condiciones del atleta
-- El resultado se guarda como JSONB en la tabla `perfiles_medicos`
+Render construye la imagen con el `Dockerfile` desde la rama `main` (**Manual Deploy**) y la conecta a Neon con `DATABASE_URL`. Paso a paso en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md); mapa y guion para presentar en [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md). Las variables de entorno están en el [README](README.md#variables-de-entorno).
 
 ---
 
-## 11. Variables de Entorno
+## 10. Reglas del negocio
 
-El archivo `.env` (nunca subido a Git) debe contener:
-
-```env
-PORT=4000
-JWT_SECRET=tu-clave-secreta-muy-larga-y-segura
-JWT_EXPIRES_IN=8h
-DATABASE_URL=postgresql://usuario:password@host/basedatos?sslmode=require
-CORS_ORIGIN=https://tu-dominio.com
-```
-
-El `.env.example` está incluido en el repositorio como plantilla. El `.env` real está en `.gitignore`.
-
----
-
-## 12. Pruebas Unitarias
-
-Se usa **Jest** como framework de pruebas. Los tests están en la carpeta `__tests__/`.
-
-**Archivos de prueba:**
-- `auth.test.js` — Login, registro, hasheo de contraseñas, cuentas inactivas, email duplicado, case-insensitive
-- `usuarios.test.js` — CRUD de usuarios, validaciones
-- `salud.test.js` — Registro de salud, validación de rangos, duplicado del día
-- `historial.test.js` — Historial de comidas y rutinas
-- `incidencias.test.js` — Creación y gestión de tickets
-- `middleware.test.js` — Verificación de JWT, control de roles
-- `perfilMedico.test.js` — Guardado de perfil médico
-- `reportes.test.js` — Estadísticas del sistema
-- `dashboard.test.js` — Resumen del dashboard
-
-**Configuración de cobertura:** el umbral mínimo está fijado en **60% de líneas** en `package.json`:
-```json
-"coverageThreshold": { "global": { "lines": 60 } }
-```
-
-**Ejecutar pruebas:**
-```bash
-npm test                    # Corre todos los tests
-npm run test:coverage       # Genera reporte de cobertura en /coverage/
-```
-
-Los tests mockean la base de datos con `jest.mock('../data/db')` para no necesitar conexión real.
+1. Un atleta registra **una entrada de salud por día** (`UNIQUE(user_id, fecha)`); fatiga ≥ 8, recuperación ≤ 3 o sueño ≤ 4 generan una alerta y avisan al médico por correo.
+2. La rutina y el plan de comidas **se recalculan solos** cuando cambian el perfil, el peso, la posición, el deporte o el día de partido.
+3. **Las alergias y la dieta nunca se saltan**: si no queda un plato seguro, la comida queda "sin opción segura" en vez de recomendar algo peligroso.
+4. **Un atleta no ve datos de otro**, y un profesional solo ve a los atletas de sus equipos.
+5. **Solo el médico** registra lesiones y da el alta. Las notas clínicas no las ve el nutricionista; las privadas, tampoco el atleta.
+6. **De baja médica** no se entrena: rutina en pausa, rangos congelados y sugerencias sin subir carga.
+7. **Nunca se baja de rango** y los días lesionado no cuentan como sesiones falladas: la app no castiga.
+8. Un atleta está en **un solo equipo**; a los profesionales los añade solo el admin.
+9. Los tickets de nutrición y salud van al nutricionista; el resto, a la bandeja común de administración.
+10. **Al borrar un usuario se borran todos sus datos** (`ON DELETE CASCADE`), y las cuentas inactivas no pueden entrar.
 
 ---
 
-## 13. Docker
+## 11. Preguntas frecuentes
 
-El proyecto incluye `Dockerfile` y `docker-compose.yml` para contenerización.
+**¿Por qué un monolito modular y no microservicios?**
+Para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, varios despliegues y bases separadas. El monolito modular da un solo despliegue y mantiene fronteras claras: cada módulo es dueño de sus tablas y solo se habla con él por su `index.js`. Si un módulo creciera mucho, se podría sacar como servicio sin reescribir el resto.
 
-**Dockerfile explicado:**
-```dockerfile
-FROM node:20-alpine          # Imagen base: Node 20 en Alpine Linux (liviana, ~50MB)
-WORKDIR /app                 # Directorio de trabajo dentro del contenedor
-COPY package*.json ./        # Copia solo manifests primero (cache de capas)
-RUN npm ci --only=production # Instala solo dependencias de producción
-COPY . .                     # Copia el código
-EXPOSE 4000                  # Documenta el puerto expuesto
-HEALTHCHECK ...              # Verifica que el servidor responda
-CMD ["node", "server.js"]    # Comando de inicio
-```
+**¿Por qué el plan de comidas y la rutina se guardan como JSONB?**
+Son estructuras anidadas (día → comidas → macros; día → ejercicios) que siempre se leen completas. En tablas serían 4 o 5 tablas más y lecturas con muchos JOIN. La desventaja es que no se puede buscar dentro de ellas eficientemente, cosa que la app no necesita.
 
-**Ejecutar con Docker:**
-```bash
-docker build -t vital-training .
-docker run -p 4000:4000 \
-  -e DATABASE_URL=... \
-  -e JWT_SECRET=... \
-  vital-training
-```
+**¿Cómo funciona el JWT y qué pasa si lo roban?**
+Tiene tres partes: cabecera, datos (id, rol) y firma con la clave secreta. Si alguien cambia los datos, la firma no coincide. Si lo roban, sirve como máximo 8 horas. Como el servidor revisa en la base que la cuenta siga activa, el admin puede cortarlo desactivando la cuenta. Además se guarda en `sessionStorage` y todo va por HTTPS.
 
----
+**¿Cómo se controla quién ve qué?**
+En tres capas: el rol (`requireRol`), el acceso al atleta según el equipo (`accesoAtleta`) y las reglas de cada servicio. El rol se vuelve a comprobar contra la base, no solo se lee del token.
 
-## 14. Cómo Levantar el Proyecto Localmente
+**¿Cómo evitan la inyección SQL y el XSS?**
+SQL: consultas parametrizadas en todo el código; nunca se concatena texto del usuario en una consulta. XSS: todo lo que viene del usuario pasa por `escapeHtml()` antes de pintarse, y la política de contenido (CSP) bloquea scripts de otros orígenes.
 
-**Requisitos previos:** Node.js 18+, una base de datos PostgreSQL (local o Neon)
+**¿Vita es inteligencia artificial de verdad?**
+Sí, en dos niveles. El modo gratuito usa un **modelo de machine learning entrenado por nosotros** (clasificación de texto supervisada: TF-IDF + regresión logística, 81 % de precisión en frases que no vio al entrenar), y responde con los cálculos de la app sobre los datos reales del atleta. Con una clave de pago conversa con Claude. Cómo se entrenó y evaluó está en [ml/README.md](ml/README.md).
 
-```bash
-# 1. Clonar y entrar al directorio
-git clone <url-del-repositorio>
-cd vital-training-p4000
+**¿Las pruebas usan la base de datos real?**
+Usan **PostgreSQL en memoria (pg-mem)** con el mismo `schema.sql`: prueban consultas reales sin tocar los datos de nadie y sin internet. Solo algunas pruebas antiguas simulan la base para casos concretos.
 
-# 2. Instalar dependencias
-npm install
+**¿Las fórmulas tienen respaldo?**
+Sí: Mifflin-St Jeor para el gasto en reposo, ACSM 2016 y UEFA para los macros, relación de carga aguda/crónica para el riesgo de lesión, Epley para el máximo estimado y doble progresión para subir peso. Las referencias de los rangos son orientativas y la app lo dice.
 
-# 3. Crear archivo de variables de entorno
-cp .env.example .env
-# Editar .env con DATABASE_URL y JWT_SECRET reales
+**¿Qué hace Helmet?**
+Configura cabeceras de seguridad: la política de contenido (qué scripts e imágenes puede cargar la página), que no se pueda meter la app en un iframe ajeno, que el navegador no adivine tipos de archivo y que se use HTTPS.
 
-# 4. Iniciar servidor
-npm start
-# El servidor crea las tablas automáticamente si no existen
-# Abre http://localhost:4000
-
-# Usuarios de prueba creados automáticamente:
-# admin@vital.com / admin123  → Administrador
-# maria@vital.com / nutri123  → Nutricionista
-# carlos@vital.com / futbol123 → Futbolista
-```
+**¿Por qué una SPA sin React?**
+Es una app de un proceso: el mismo servidor publica la interfaz y la API, sin compilación ni servidor de frontend aparte. Los archivos están separados por rol para que el código siga ordenado.
 
 ---
 
-## 15. Preguntas Frecuentes del Profesor
+## 12. Límites conocidos
 
-**P: ¿Por qué PostgreSQL y no MySQL?**
-R: Porque necesitábamos guardar estructuras de datos complejas como arrays de condiciones médicas y planes alimenticios de 7 días. PostgreSQL tiene el tipo JSONB que permite guardarlos con índices, lo cual sería una tabla adicional en MySQL. Además, PostgreSQL tiene mejor soporte para operadores de arrays como `ANY()` y `ALL()` que usamos para filtrar tickets por categoría.
-
-**P: ¿Por qué el plan alimenticio y la rutina se guardan como JSONB en lugar de tablas?**
-R: El plan completo de 7 días tiene una estructura anidada compleja (día → comidas → macronutrientes). Guardarlo como JSONB evita crear 4-5 tablas adicionales (plan, días del plan, comidas del plan, ejercicios del día) y simplifica las lecturas. La desventaja es que no se puede filtrar eficientemente por campos internos del plan, pero como siempre se lee el plan completo de un usuario, esto no es un problema.
-
-**P: ¿Cómo funciona el JWT?**
-R: El JWT tiene 3 partes separadas por puntos: Header (algoritmo), Payload (datos del usuario: id, nombre, email, rol) y Signature (firma con la clave secreta). El servidor verifica la firma en cada request. Si alguien modifica el payload, la firma no coincide y el token es rechazado. El token expira en 8 horas.
-
-**P: ¿Qué pasa si alguien roba el JWT?**
-R: En el sistema actual puede usarlo hasta que expire (8 horas). La mitigación es: tokens de corta duración, guardado en sessionStorage (no localStorage ni cookie, desaparece al cerrar el navegador) y HTTPS en producción.
-
-**P: ¿Cómo evitan SQL Injection?**
-R: Usando queries parametrizadas en todo el código. Nunca concatenamos strings del usuario directamente en el SQL. El driver `pg` separa el SQL de los parámetros y el motor de PostgreSQL los trata como datos, nunca como código.
-
-**P: ¿Qué es bcrypt y cuántas rondas usan?**
-R: bcrypt es un algoritmo de hashing diseñado específicamente para contraseñas. Tiene un factor de costo intencional: 10 rondas significa que el hash requiere 2^10 = 1024 iteraciones internas. Esto hace que probar millones de contraseñas sea muy lento para un atacante, aunque no para el usuario legítimo.
-
-**P: ¿Cómo funciona el control de roles?**
-R: El rol viene dentro del JWT. Al hacer login, el payload del token incluye `{ rol: "Nutricionista" }`. En cada endpoint protegido, el middleware extrae el rol del token (ya verificado) y lo compara con los roles permitidos. No se consulta la base de datos en cada request para verificar el rol.
-
-**P: ¿Por qué el nutricionista y el admin no ven los mismos tickets?**
-R: El destinatario del ticket no se guarda en la base de datos. Se calcula dinámicamente con la función `destinatario(categoria)` que devuelve 'Nutricionista' para las categorías Nutrición/Plan alimenticio/Salud/Alimentación y 'Administrador' para el resto. En el controlador, según el rol del usuario que hace la petición, se aplica el filtro correspondiente.
-
-**P: ¿Qué es la IA del sistema?**
-R: No es una IA de machine learning ni conecta a servicios externos como ChatGPT. Es un sistema de reglas basado en umbrales y promedios. Analiza los datos reales del atleta (fatiga promedio, tendencia de sueño, historial de rutinas) y genera recomendaciones en texto. La ventaja es que funciona offline, es gratuita y sus respuestas son predecibles y explicables.
-
-**P: ¿Están las pruebas conectadas a la base de datos real?**
-R: No. Las pruebas usan `jest.mock('../data/db')` para simular la base de datos. Esto significa que las pruebas son rápidas, no dependen de conexión a internet y no contaminan los datos reales. El trade-off es que no prueban la integración real con PostgreSQL.
-
-**P: ¿Qué hace Helmet?**
-R: Helmet configura automáticamente más de 15 headers HTTP de seguridad. Por ejemplo: `X-Content-Type-Options: nosniff` (evita que el browser interprete archivos como un tipo distinto), `X-Frame-Options: DENY` (evita que el sitio se cargue en un iframe, previene clickjacking), `Strict-Transport-Security` (fuerza HTTPS), entre otros.
-
-**P: ¿Por qué el frontend es un solo archivo HTML?**
-R: Es una decisión de simplicidad para el proyecto académico. Al ser un SPA con JavaScript vanilla, el servidor Express sirve el HTML estático y luego toda la navegación la maneja JS en el cliente sin recargar la página. No necesita un servidor de frontend separado (como el que necesitaría React). Todo el deployment es un solo proceso de Node.js.
-
----
-
-## 16. Entidades y Reglas de Negocio Implementadas
-
-1. **Un futbolista solo puede registrar una entrada de salud por día** — constraint `UNIQUE(user_id, fecha)` en la tabla `salud`.
-2. **Las alertas se generan automáticamente** — cuando fatiga ≥ 8, recuperación ≤ 3 o sueño ≤ 4 al guardar salud.
-3. **El plan alimenticio y la rutina se regeneran** cada vez que el futbolista actualiza su perfil médico.
-4. **Los tickets se enrutan automáticamente** por categoría al rol correspondiente.
-5. **Un futbolista no puede ver datos de otro futbolista** — middleware `requireOwnerOrRol` en todas las rutas con `:userId`.
-6. **Las contraseñas deben tener mínimo 8 caracteres** — validado en frontend y backend.
-7. **No se puede crear un usuario con email duplicado** — constraint `UNIQUE` en `email` y verificación en el service.
-8. **Al eliminar un usuario, se eliminan todos sus datos** — `ON DELETE CASCADE` en todas las foreign keys.
-9. **Las cuentas inactivas no pueden iniciar sesión** — verificación de `estado === 'Activo'` antes de generar el token.
-10. **El login está limitado a 10 intentos en 15 minutos** — `express-rate-limit` en la ruta de login.
+- **Render gratis se duerme** a los 15 minutos sin visitas; la primera visita tarda cerca de un minuto.
+- **Neon gratis** solo permite volver atrás unas horas: no hay copias de seguridad propias.
+- Las **referencias de los rangos** son orientativas y no se ajustan por edad.
+- Mientras el atleta está de baja, el **plan de comidas** no se recalcula como días de descanso (el nutricionista ve el aviso).
+- El médico y el nutricionista aún **no tienen pantalla** para ver las series y los rangos del atleta (el servidor ya lo permite).
+- El usuario no puede **cambiar su contraseña desde su perfil** (solo con "Olvidé mi contraseña") ni **borrar su cuenta o descargar sus datos** por sí mismo.

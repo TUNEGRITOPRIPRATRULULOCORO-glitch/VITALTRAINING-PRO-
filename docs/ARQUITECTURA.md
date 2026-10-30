@@ -2,7 +2,7 @@
 
 Dónde vive la app, dónde se guardan los datos y qué servicio hace cada cosa.
 
-**App publicada:** https://vitaltraining-pro.onrender.com
+**App publicada:** https://vitaltraining-pro.onrender.com · se instala en el celular como una app (desde Chrome, o en iPhone con Safari → Compartir → "Añadir a pantalla de inicio").
 
 > Versión con diseño para proyectar: descarga [`arquitectura.html`](arquitectura.html) (botón **Download raw file**) y ábrela en el navegador.
 
@@ -34,27 +34,27 @@ flowchart LR
 ## Qué hace cada servicio
 
 ### Render: donde vive la app
-- Ejecuta el servidor y entrega las pantallas (HTML, CSS y JS).
+- Ejecuta el servidor y entrega las pantallas (HTML, CSS y JS), también a la app instalada en el celular.
 - Construye la app con el `Dockerfile` a partir de GitHub, rama `main`.
 - Después de subir cambios: **Manual Deploy → Deploy latest commit**.
 - No guarda archivos de forma permanente; por eso los datos van en Neon.
 
 ### Neon: la base de datos (PostgreSQL)
-- **La única base de la app publicada**: usuarios, perfiles, salud, comidas, rutinas, tests físicos, mensajes, tickets, fotos de perfil y conversaciones con el asistente.
+- **La única base de la app publicada**: 21 tablas con usuarios, perfiles, salud, comidas, rutinas, series y récords, rangos, tests físicos, lesiones y notas clínicas, equipos, mensajes, tickets, fotos de perfil y conversaciones con el asistente.
 - Está aparte de Render: los datos sobreviven a reinicios y deploys.
 - Las contraseñas se guardan cifradas (bcrypt), nunca en texto.
 - En **Tables** se ve cada tabla con sus filas.
 
 ### GitHub: el código
 - Cada cambio queda guardado con su explicación.
-- El CI pasa los 329 tests y construye la imagen de Docker en cada subida.
+- El CI pasa los 416 tests y construye la imagen de Docker en cada subida.
 
 ### SonarQube Cloud: calidad del código
 - Analiza solo cada cambio: fallos probables, seguridad y mantenibilidad.
 - **Quality Gate: Passed.** Fiabilidad, seguridad y mantenibilidad en **A**; 0 bugs, 0 vulnerabilidades, 0 code smells.
 
 ### Brevo: correos
-- Bienvenida, recuperar contraseña y alertas de salud y de carga. Plan gratis: 300 correos al día.
+- Bienvenida, recuperar contraseña y alertas de salud y de carga (solo a los médicos del equipo del atleta). Plan gratis: 300 correos al día.
 
 ### Google Cloud: "Entrar con Google"
 - Solo pide nombre y correo. Requiere la página de privacidad publicada en la app.
@@ -126,7 +126,7 @@ npm start
 
 ## Guion para la demo
 
-1. **La app.** Portada, registro y un atleta: plan, salud y asistente.
+1. **La app.** Portada y registro. Con un atleta: "Hoy te toca…", la rutina con el registro de series y su récord, Mis rangos y el chat con Vita. Con el médico: registrar una lesión y ver cómo cambia la pantalla del atleta. Con el admin: Equipos. Y cómo se instala en el celular.
 2. **Render.** El servicio en línea, el historial de deploys y los Logs ("Base de datos lista · postgresql").
 3. **Neon.** Tables → `usuarios` o `salud`: los datos que se acaban de ver en la app. Las contraseñas aparecen cifradas.
 4. **GitHub.** El historial de cambios y Actions con el CI en verde.

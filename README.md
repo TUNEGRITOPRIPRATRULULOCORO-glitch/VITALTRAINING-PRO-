@@ -1,6 +1,23 @@
-# Vital Training — Sistema de Gestión Deportiva
+# VitalTraining
 
-Plataforma web para la gestión integral de futbolistas, nutricionistas y administradores. Permite hacer seguimiento de salud, planes de alimentación personalizados, rutinas de entrenamiento adaptadas al perfil médico y asistencia con IA.
+Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su médico y el club**: entrenamiento, alimentación, salud, lesiones y seguimiento del equipo.
+
+**App publicada:** https://vitaltraining-pro.onrender.com · se puede **instalar en el celular** como una app.
+
+---
+
+## Qué hace
+
+| Rol | Qué puede hacer |
+|---|---|
+| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, tests físicos, chat con su nutricionista y su médico, y **Vita**, el asistente con IA |
+| **Nutricionista** | Sus atletas, con estado de salud, carga de entrenamiento, cumplimiento y lesiones activas. Notas, comidas y rutinas asignadas, y mensajes |
+| **Médico** | Expedientes: lesiones con estado **apto / en recuperación / baja médica**, notas clínicas (visibles para el atleta o solo para médicos), salud diaria, riesgo de lesión por carga y tests físicos |
+| **Administrador** | Usuarios, **equipos** (cada profesional solo ve a los atletas de sus equipos), reportes y soporte |
+
+**10 deportes:** fútbol, baloncesto, tenis, béisbol, atletismo, running, natación, boxeo, gimnasio y "estar en forma".
+
+**Lo que la diferencia:** las apps que estudiamos (TrainingPeaks, Fitbod, Volt, MacroFactor, Peak, TrainHeroic, Strong, TrainUp) son de entrenamiento **o** de nutrición. Ninguna junta al atleta, al nutricionista y al médico, ni tiene un expediente médico.
 
 ---
 
@@ -8,271 +25,98 @@ Plataforma web para la gestión integral de futbolistas, nutricionistas y admini
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | HTML5 · CSS3 · JavaScript (SPA vanilla) |
-| Backend | Node.js 20 · Express 4 |
-| Base de datos | JSON flat-file (`database.json`) |
-| Autenticación | JWT (Bearer Token · 8h) |
-| Seguridad | bcrypt (salt rounds: 10) |
-| Contenedor | Docker · Docker Compose |
-| CI/CD | GitHub Actions |
-| Tests | Jest 29 |
+| Interfaz | HTML, CSS y JavaScript sin frameworks (SPA) · app instalable (PWA) · Chart.js |
+| Servidor | Node.js 20 · Express 4 · monolito modular (17 módulos) |
+| Base de datos | PostgreSQL: **Neon** en la web, **PGlite** en tu computador, **pg-mem** en los tests |
+| Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
+| IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |
+| Servicios | Brevo (correos) · Google (entrar con Google) |
+| Calidad | Jest (416 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
+| Publicación | Docker · Render |
 
 ---
 
-## Arquitectura
-
-El proyecto está dividido en 4 bloques:
-
-| Bloque | Carpeta | ¿Para qué? |
-|---|---|---|
-| 🖥️ **Interfaz** | [`interfaz/`](interfaz/) | Lo que ve el usuario: pantallas HTML, estilos y JS del navegador |
-| 🗄️ **Servidor** | [`servidor/`](servidor/) | API REST con Express, organizada como monolito modular ([reglas](servidor/README.md)) |
-| ✉️ **Servicios** | [`servicios/`](servicios/) | Integraciones externas: correo (y en el futuro, pagos) |
-| 💾 **Base de datos** | [`base-de-datos/`](base-de-datos/) | Conexión a PostgreSQL, tablas (`schema.sql`) y datos iniciales |
+## Estructura
 
 ```
-vital-training/
-├── interfaz/               # 🖥️ INTERFAZ — SPA en HTML, CSS y JS
-│   ├── index.html
-│   ├── ayuda.html
-│   ├── privacidad.html
-│   ├── styles.css
-│   ├── js/                 # lógica del navegador, un archivo por rol (ver interfaz/README.md)
-│   └── img/
-│
-├── servidor/               # 🗄️ SERVIDOR — Node.js + Express
-│   ├── server.js           # Punto de entrada
-│   ├── compartido/         # middleware común: auth (JWT) · roles · cors
-│   └── api/                # Monolito modular: un módulo por funcionalidad, cada uno con index.js público
-│       ├── auth/           # Login · Registro
-│       ├── usuarios/       # CRUD usuarios (Admin)
-│       ├── panel/          # Dashboard · Historial · Perfil
-│       ├── salud/          # Registros diarios de salud
-│       ├── perfilMedico/   # Onboarding · Plan alimenticio · Rutina
-│       ├── ia/             # Asistente IA (chat con Vita)
-│       ├── rendimiento/    # Listo para entrenar · carga y riesgo de lesión · cumplimiento
-│       ├── mensajes/       # Chat atleta ↔ nutricionista/médico, equipo ↔ administración
-│       ├── evaluaciones/   # Tests físicos periódicos (salto, sprint, agilidad, Yo-Yo)
-│       ├── nutricionista/  # Panel nutricionista
-│       ├── incidencias/    # Soporte / tickets
-│       └── reportes/       # Estadísticas admin
-│
-├── servicios/              # ✉️ SERVICIOS — integraciones con terceros
-│   └── correo/             # Envío de correos (Brevo) y plantillas
-│
-├── base-de-datos/          # 💾 BASE DE DATOS — PostgreSQL
-│   ├── db.js               # Conexión (PostgreSQL real o pg-mem en memoria)
-│   ├── schema.sql          # Definición de tablas
-│   └── setup.js            # Crea tablas y usuarios de prueba al arrancar
-│
-├── ml/                     # 🧠 Modelo de machine learning de Vita (Python + scikit-learn) — ver ml/README.md
-├── __tests__/              # Pruebas unitarias Jest
-├── scripts/                # Utilidades sueltas (no forman parte de la app)
-├── Dockerfile
-└── docker-compose.yml
+interfaz/        Lo que ve el usuario: index.html, styles.css, js/ (un archivo por rol), app instalable
+servidor/        API con Express, un módulo por funcionalidad en servidor/api/
+servicios/       Integraciones externas (correo con Brevo)
+base-de-datos/   Conexión, tablas (schema.sql) y datos iniciales
+ml/              Modelo de machine learning de Vita (Python + scikit-learn)
+__tests__/       Pruebas con Jest
+docs/            Arquitectura y guía de despliegue
 ```
 
-### Roles del sistema
-
-| Rol | Acceso |
-|---|---|
-| **Administrador** | Dashboard global · Gestión de usuarios · Reportes · Soporte |
-| **Nutricionista** | Panel de pacientes · Estado de salud · Alertas |
-| **Médico** | Consulta de expedientes médicos de atletas |
-| **Futbolista** | Mi Salud · Mi Plan · Historial · Asistente IA · Soporte |
+Cada carpeta tiene su README con el detalle: [servidor](servidor/README.md) (módulos, tablas y reglas), [interfaz](interfaz/README.md) (archivos JS) y [ml](ml/README.md) (el modelo).
 
 ---
 
-## Requisitos previos
+## Ejecutarla en tu computador
 
-- Node.js 20+
-- npm 9+
-- (Opcional) Docker Desktop
-
----
-
-## Ejecución local
-
-### Sin Docker
+Necesitas **Node.js 20** o más nuevo.
 
 ```bash
-# 1. Clonar el repositorio
-git clone <url-del-repo>
-cd vital-training
-
-# 2. Instalar dependencias
+git clone https://github.com/TUNEGRITOPRIPRATRULULOCORO-glitch/VITALTRAINING-PRO-.git
+cd VITALTRAINING-PRO-
 npm install
-
-# 3. Configurar variables de entorno
-cp .env.example .env
-# Editar .env si es necesario
-
-# 4. (Opcional) Cargar datos de ejemplo
-npm run demo
-
-# 5. Iniciar servidor
 npm start
 ```
 
-Abrir en el navegador: **http://localhost:4000**
+Abre **http://localhost:4000**. No hace falta configurar nada: la base de datos se crea sola en `base-de-datos/datos-locales/` y se conserva al reiniciar. Para empezar de cero, borra esa carpeta.
 
-**Dónde se guardan los datos:**
+**Cuentas de prueba (solo en tu computador; en la web publicada están desactivadas):**
 
-| Situación | Base de datos | ¿Se conserva al reiniciar? |
+| Rol | Correo | Contraseña |
 |---|---|---|
-| `DATABASE_URL` en `.env` | PostgreSQL real | Sí |
-| Desarrollo sin `DATABASE_URL` | PGlite (PostgreSQL en un archivo) en `base-de-datos/datos-locales/` | Sí |
-| Tests (`npm test`) | pg-mem en memoria | No (cada test empieza vacío) |
+| Administrador | `admin@vital.com` | `admin123` |
+| Nutricionista | `maria@vital.com` | `nutri123` |
+| Médico | `medico@vital.com` | `medico123` |
+| Atleta | `carlos@vital.com` · `diego@vital.com` | `futbol123` |
 
-Para empezar de cero en local, borra la carpeta `base-de-datos/datos-locales/`. Esa carpeta no se sube a GitHub.
-
-### Publicarla en internet
-
-Guía paso a paso para tenerla en un enlace público gratis (Neon + Render): **[docs/DESPLIEGUE.md](docs/DESPLIEGUE.md)**.
-
-Cómo está montado todo (Render, Neon, GitHub, SonarQube...) y guion para presentarlo: **[docs/ARQUITECTURA.md](docs/ARQUITECTURA.md)**.
-
-### Con Docker
-
-Antes, copia `.env.example` como `.env` y rellena `POSTGRES_PASSWORD` y `JWT_SECRET` (las contraseñas no van en `docker-compose.yml`).
-
-```bash
-# Construir y levantar
-docker-compose up --build
-
-# Detener
-docker-compose down
-```
-
-Abrir en el navegador: **http://localhost:4000**
+Con Docker (base PostgreSQL en un contenedor): copia `.env.example` como `.env`, rellena `POSTGRES_PASSWORD` y `JWT_SECRET`, y ejecuta `docker-compose up --build`.
 
 ---
 
 ## Variables de entorno
 
-| Variable | Descripción | Valor por defecto |
-|---|---|---|
-| `PORT` | Puerto del servidor | `4000` |
-| `JWT_SECRET` | Clave secreta para firmar tokens | `vt-super-secret-key-2026` |
-| `JWT_EXPIRES_IN` | Tiempo de expiración del token | `8h` |
+En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el código nunca lleva sus valores. Ver [`.env.example`](.env.example).
 
----
-
-## Credenciales de prueba
-
-| Rol | Email | Contraseña |
-|---|---|---|
-| Administrador | `admin@vital.com` | `admin123` |
-| Nutricionista | `maria@vital.com` | `nutri123` |
-| Nutricionista | `pedro@vital.com` | `nutri123` |
-| Médico | `medico@vital.com` | `medico123` |
-| Futbolista | `carlos@vital.com` | `futbol123` |
-| Futbolista | `diego@vital.com` | `futbol123` |
-
----
-
-## API REST — Endpoints principales
-
-Todas las rutas (excepto `/api/auth/*`) requieren header:
-```
-Authorization: Bearer <token>
-```
-
-### Autenticación
-| Método | Ruta | Descripción |
-|---|---|---|
-| `POST` | `/api/auth/login` | Iniciar sesión |
-| `POST` | `/api/auth/registro` | Registrar nuevo futbolista |
-
-### Panel Futbolista
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/panel/:id/dashboard` | Resumen del panel |
-| `GET` | `/api/panel/:id/historial/comidas` | Historial de comidas (paginado) |
-| `POST` | `/api/panel/:id/comidas` | Registrar comida |
-| `DELETE` | `/api/panel/:id/comidas/:comidaId` | Eliminar comida |
-| `GET` | `/api/panel/:id/cumplimiento` | Registros de cumplimiento de rutina |
-| `POST` | `/api/panel/:id/cumplimiento` | Marcar día de rutina como completado |
-
-### Salud
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/salud/:id` | Obtener registros de salud |
-| `POST` | `/api/salud/:id` | Registrar estado de salud del día |
-
-### Perfil Médico
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/perfil-medico/catalogos` | Catálogos (condiciones, alergias, preferencias) |
-| `GET` | `/api/perfil-medico/:id` | Obtener perfil médico del usuario |
-| `POST` | `/api/perfil-medico/:id` | Guardar/actualizar perfil médico |
-
-### Asistente IA
-| Método | Ruta | Descripción |
-|---|---|---|
-| `POST` | `/api/ia/:id/consulta` | Consulta al asistente IA |
-
-### Admin — Usuarios
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/usuarios` | Listar todos los usuarios |
-| `POST` | `/api/usuarios` | Crear usuario |
-| `PUT` | `/api/usuarios/:id` | Actualizar usuario |
-| `DELETE` | `/api/usuarios/:id` | Eliminar usuario |
+| Variable | Para qué |
+|---|---|
+| `DATABASE_URL` | Base PostgreSQL (Neon). Sin ella, base local |
+| `JWT_SECRET` · `JWT_EXPIRES_IN` | Firmar las sesiones (obligatoria en producción) · duración (8 h) |
+| `ADMIN_PASSWORD` | Contraseña del admin al crear la base en producción |
+| `DATOS_DEMO` | `true` crea las cuentas de prueba (en la web está en `false`) |
+| `BREVO_API_KEY` · `CORREO_REMITENTE` · `CORREO_NOMBRE` · `APP_URL` | Correos (bienvenida, contraseña, alertas) |
+| `GOOGLE_CLIENT_ID` | Botón "Entrar con Google" |
+| `ANTHROPIC_API_KEY` | Opcional: Vita conversa con Claude. Sin ella usa el modelo propio, gratis |
+| `CORS_ORIGIN` · `PORT` | Dominio permitido si la interfaz va aparte · puerto (4000) |
 
 ---
 
 ## Pruebas
 
 ```bash
-# Ejecutar pruebas
-npm test
-
-# Ejecutar con cobertura
-npm test -- --coverage
+npm test                 # 416 pruebas
+npm run test:coverage    # con informe de cobertura en coverage/lcov-report/index.html
 ```
 
-Los reportes de cobertura se generan en `coverage/lcov-report/index.html`.
+Las pruebas de servicios usan una base PostgreSQL en memoria (pg-mem) con las tablas reales: no tocan tus datos. GitHub Actions las pasa en cada subida y construye la imagen de Docker; SonarQube Cloud analiza la calidad.
 
 ---
 
-## Docker
+## Documentación
 
-```dockerfile
-# Imagen base: Node 20 Alpine
-# Puerto expuesto: 4000
-# Comando: node servidor/server.js
-```
-
-```bash
-# Solo el contenedor
-docker build -t vital-training .
-docker run -p 4000:4000 vital-training
-
-# Con compose (recomendado)
-docker-compose up --build
-```
-
----
-
-## Flujo principal
-
-```
-1. Registro / Login
-       ↓
-2. Futbolista → Onboarding médico (condiciones · alergias · preferencia)
-       ↓
-3. Generación automática de Plan Alimenticio + Rutina Semanal
-       ↓
-4. Registro diario de salud (fatiga · sueño · recuperación)
-       ↓
-5. Asistente IA analiza perfil médico + datos de salud
-       ↓
-6. Nutricionista monitorea pacientes · Admin supervisa plataforma
-```
+| Documento | Para qué |
+|---|---|
+| [DOCUMENTACION.md](DOCUMENTACION.md) | **Documentación técnica completa**: arquitectura, base de datos, seguridad, cómo funciona cada parte, API y preguntas frecuentes |
+| [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) | Dónde vive la app (Render, Neon, GitHub…) y guion para presentarla |
+| [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) | Publicarla gratis paso a paso (Neon + Render) |
+| [ml/README.md](ml/README.md) | El modelo de machine learning de Vita |
 
 ---
 
 ## Licencia
 
-ISC — Proyecto académico · Vital Training 2026
+ISC · Proyecto académico · VitalTraining 2026

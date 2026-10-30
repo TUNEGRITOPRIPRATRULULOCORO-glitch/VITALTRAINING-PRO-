@@ -198,7 +198,7 @@ pre.comandos { margin: 0; overflow-x: auto; background: var(--surface); border: 
         <h3>Neon</h3>
         <span class="rol">La base de datos (PostgreSQL)</span>
         <ul>
-          <li>La única base de la app publicada: usuarios, perfiles, salud, comidas, rutinas, mensajes, tickets, fotos.</li>
+          <li>La única base de la app publicada: 21 tablas con usuarios, salud, comidas, rutinas, series y récords, rangos, lesiones, equipos, mensajes, tickets y fotos.</li>
           <li>Está aparte de Render: los datos sobreviven a reinicios y deploys.</li>
           <li>Las contraseñas se guardan cifradas (bcrypt), nunca en texto.</li>
           <li>En <strong>Tables</strong> se ve cada tabla con sus filas.</li>
@@ -209,7 +209,7 @@ pre.comandos { margin: 0; overflow-x: auto; background: var(--surface); border: 
         <span class="rol">El código y su historial</span>
         <ul>
           <li>Cada cambio queda guardado con su explicación.</li>
-          <li>El CI pasa los 329 tests y construye la imagen de Docker en cada subida.</li>
+          <li>El CI pasa los 416 tests y construye la imagen de Docker en cada subida.</li>
         </ul>
       </article>
       <article class="servicio">
@@ -333,7 +333,7 @@ npm start
   <section aria-labelledby="t-demo">
     <h2 id="t-demo">Guion para la demo</h2>
     <ol class="pasos">
-      <li><div><strong>La app.</strong> Portada, registro y un atleta: plan, salud y asistente.</div></li>
+      <li><div><strong>La app.</strong> Portada y registro. Con un atleta: "Hoy te toca…", series y récord, Mis rangos y Vita. Con el médico: registrar una lesión. Con el admin: Equipos. Y cómo se instala en el celular.</div></li>
       <li><div><strong>Render.</strong> El servicio en línea, el historial de deploys y los Logs (“Base de datos lista · postgresql”).</div></li>
       <li><div><strong>Neon.</strong> Tables → <span class="mono">usuarios</span> o <span class="mono">salud</span>: los datos que se acaban de ver en la app. Las contraseñas aparecen cifradas.</div></li>
       <li><div><strong>GitHub.</strong> El historial de cambios y Actions con el CI en verde.</div></li>
