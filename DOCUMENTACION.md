@@ -215,7 +215,7 @@ Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **
 
 ### Vita, el asistente
 - **Sin coste**: un **modelo de machine learning propio** (TF-IDF por trozos de letras + regresión logística, entrenado con scikit-learn sobre 782 frases) clasifica cada mensaje en 17 intenciones con un **81 % de precisión**. Con confianza ≥ 0,35 responde con los datos reales del atleta; si duda, pregunta. El servidor no necesita Python: el modelo se exporta a JSON y Node.js repite las cuentas (un test comprueba que da lo mismo). Detalles en [ml/README.md](ml/README.md).
-- **Antes del modelo** (`servidor/api/ia/conocimiento.js`) mira dos bases propias: **técnica de cada deporte** (lanzar más duro siendo receptor, batear, pegar más fuerte, saltar más, patear, sprint, saque, crol, salida, sentadilla…; usa el deporte que nombra la pregunta o el del atleta, y entiende errores como "lanar") y **cómo usar la app** (escanear, Mi reloj, código de equipo, día de competencia, alergias, contraseña, notificaciones, rangos, logros…). Las claves son concretas para no robarle preguntas de salud o comidas al modelo; si el atleta está de baja, antepone el aviso del médico.
+- **Antes del modelo** (`servidor/api/ia/conocimiento.js`) mira dos bases propias: **técnica de cada deporte** (lanzar más duro siendo receptor, batear, pegar más fuerte, saltar más, patear, sprint, saque, crol, salida, sentadilla…; usa el deporte que nombra la pregunta o el del atleta, y entiende errores como "lanar") **cómo usar la app** (tickets de soporte, foto de perfil, modo oscuro, escanear, Mi reloj, código de equipo, día de competencia, alergias, contraseña, privacidad, y qué significan la carga, el "listo para entrenar", la racha, el esfuerzo y las zonas) y **lo básico del atleta** (calentar, estirar, calambres, hidratación, qué comer antes y después de entrenar, golpe de calor, golpe en la cabeza, torceduras, suplementos, cafeína, descanso…). Las claves son concretas para no robarle preguntas de salud o comidas al modelo; si el atleta está de baja, antepone el aviso del médico.
 - **Con `ANTHROPIC_API_KEY`**: conversa con Claude, que recibe el contexto del atleta (rutina, comidas, salud, lesiones) y una guía de uso de la app, y también responde técnica deportiva. Si Claude falla, responde el modo básico.
 
 ### Correos (Brevo)
@@ -257,7 +257,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **491 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **494 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

@@ -12,7 +12,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { query } = require('../../../base-de-datos/db');
 const { consulta } = require('./ia.service');
 const { clasificar } = require('./clasificador');
-const { respuestaTecnica, respuestaAyudaApp } = require('./conocimiento');
+const { respuestaTecnica, respuestaAyudaApp, respuestaBasica } = require('./conocimiento');
 
 const MODELO = 'claude-opus-5-5';
 const MAX_HISTORIAL = 20;          // mensajes anteriores que se envían a Claude
@@ -239,6 +239,8 @@ async function responderLocal(userId, texto) {
     const aviso = await avisoEstadoMedico(userId, 'mejorar');
     return aviso ? `${aviso.texto}\nPractica esto cuando tu médico te dé el visto bueno.\n\n${tecnica}` : tecnica;
   }
+  const basica = respuestaBasica(texto);
+  if (basica) return basica;
 
   const prediccion = clasificar(texto);
   const intencion = prediccion.segura ? prediccion.intencion : detectarTema(texto);

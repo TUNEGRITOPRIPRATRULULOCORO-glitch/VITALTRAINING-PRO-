@@ -229,9 +229,92 @@ const AYUDA_APP = [
     respuesta: '⏱ Los tests físicos están en Tests físicos: salto, velocidad, resistencia… según tu deporte. Si estás en un equipo, los registra tu entrenador (así las marcas son reales). Lo ideal es repetirlos cada semana.' },
   { claves: /(hablar con|escribir(le)? a|mensaje|chat con) .*(entrenador|medico|nutricionista|doctor)|(mensajes)/,
     respuesta: '💬 En Mensajes puedes escribirle a tu entrenador, a tu nutricionista y a tu médico (los de tu equipo). Te llega un aviso cuando te responden.' },
+  // Cuenta, perfil y soporte
+  { claves: /(ticket|soporte|reportar (un )?(error|problema|fallo)|la app (no funciona|falla|tiene un error)|encontre un error|problema con la app)/, siempre: true,
+    respuesta: '🛠️ Para abrir un ticket: menú de la izquierda → Mensajes → "Soporte técnico" → "+ Nuevo ticket". Escribe qué pasó (y en qué pantalla) y llega al equipo de administración. Ahí mismo ves cómo va tu ticket y sus respuestas.' },
+  { claves: /(foto de perfil|mi foto|cambiar (la |mi )?foto|poner (una )?foto|subir (una )?foto|avatar)/, siempre: true,
+    respuesta: '📷 Para cambiar tu foto: Mi Perfil → "📷 Cambiar foto" (o toca tu foto abajo a la izquierda → Mi cuenta). Sirve JPG, PNG o WebP de hasta 5 MB; puedes recortarla antes de guardar. Solo la ven las personas con sesión iniciada en la app.' },
+  { claves: /(modo oscuro|modo claro|tema oscuro|fondo (negro|oscuro)|cambiar (los )?colores)/, siempre: true,
+    respuesta: '🌙 Para el modo oscuro: toca el botón de la luna, abajo a la izquierda junto a tu nombre. Vuelve a tocarlo para el modo claro; la app lo recuerda.' },
+  { claves: /(cerrar (la )?sesion|salir de (la app|mi cuenta)|desconectarme)/, siempre: true,
+    respuesta: '🚪 Para cerrar sesión: el botón de salida, abajo a la izquierda junto a tu nombre. Hazlo siempre en computadores que no son tuyos.' },
+  { claves: /(cambiar (mi )?nombre|corregir (mi )?nombre)/, siempre: true,
+    respuesta: '✏️ Tu nombre se cambia en Mi Perfil → "Nombre completo" → Guardar cambios.' },
+  { claves: /(cambiar (mi )?correo|cambiar (mi )?email|otro correo)/, siempre: true,
+    respuesta: '✉️ El correo no se cambia desde tu perfil (es con el que entras). Abre un ticket en Mensajes → Soporte técnico y el administrador te ayuda.' },
+  { claves: /(borr(ar|o|e)|elimin(ar|o|e)|quit(ar|o|e)) (una |la |esa |un |el )?(comida|sesion|entrenamiento|registro|serie)/, siempre: true,
+    respuesta: '🗑️ Para borrar un registro: en Historial (Comidas o Entrenamientos) pulsa la ✕ a la derecha de ese registro. Las marcas que verificó tu entrenador solo las puede borrar él.' },
+  { claves: /(video|como se hace (el|este|ese) ejercicio|no se hacer (el|un) ejercicio)/, siempre: true,
+    respuesta: '▶️ Cada ejercicio de tu rutina tiene "▶ Ver video": Mi Plan → Rutina → el botón al lado del ejercicio. Te lleva a videos de cómo hacerlo bien.' },
+  { claves: /(plan de comidas|que me toca comer|mi plan alimenticio|ver mi dieta)/,
+    respuesta: '🥗 Tu plan de comidas está en Mi Plan → Plan alimenticio, día por día con calorías y macros. En "Hoy te toca" ves las comidas de hoy y marcas "✓ La comí".' },
+  { claves: /(cambiar(me)? de equipo|salir(me)? del equipo|otro equipo|dejar (el|mi) equipo)/, siempre: true,
+    respuesta: '👥 Para cambiarte de equipo, escribe el código del nuevo en Mi Perfil → "Mi equipo": quedas en el nuevo. Para salir de un equipo sin entrar a otro, pídeselo a tu entrenador o al administrador.' },
+  { claves: /(quien (ve|puede ver) mis datos|privacidad|mis datos son privados|quien ve mi informacion)/, siempre: true,
+    respuesta: '🔒 Tus datos los ven solo tú y los profesionales de tu equipo (entrenador, nutricionista y médico); el administrador gestiona las cuentas. Tu foto solo se ve con sesión iniciada y algunas notas del médico son privadas. En Mi cuenta puedes descargar o borrar todos tus datos.' },
+  // Qué significa cada cosa de la app
+  { claves: /(que (es|significa) (el )?listo para entrenar|que es el puntaje|por que (estoy|me sale) en descanso)/, siempre: true,
+    respuesta: '✅ "Listo para entrenar" es un puntaje de 0 a 100 que sale de cómo amaneciste (fatiga, sueño, recuperación) y de tu carga reciente. Alto: entrena según tu plan. Medio: baja la intensidad. Bajo: hoy toca descansar o algo muy suave.' },
+  { claves: /(que (es|significa) (la )?carga|riesgo (alto|de lesion) por carga|que es el acwr|por que (tengo|me sale) riesgo)/, siempre: true,
+    respuesta: '📈 La carga de cada sesión es minutos × esfuerzo (1-10). La app compara tu última semana con tu promedio del mes: si de golpe entrenas mucho más de lo normal, sube el riesgo de lesión y te avisa. Subir poco a poco es la clave.' },
+  { claves: /(que es (la )?racha|como (mantengo|no pierdo) (la|mi) racha|perdi (la|mi) racha)/, siempre: true,
+    respuesta: '🔥 La racha son los días seguidos registrando cómo amaneciste. Si un día no registras, vuelve a empezar. Activa el recordatorio de cada mañana en Mi cuenta → Notificaciones para no perderla.' },
+  { claves: /(que es (el )?cumplimiento|que significa el porcentaje del plan)/, siempre: true,
+    respuesta: '📅 El cumplimiento es el porcentaje de sesiones de tu plan que marcaste como hechas en las últimas semanas (las parciales cuentan la mitad).' },
+  { claves: /(que es (el )?(rpe|esfuerzo)|esfuerzo (del )?1 (a|al) 10|escala de esfuerzo)/, siempre: true,
+    respuesta: '💪 El esfuerzo (RPE) es qué tan dura sentiste la sesión, de 1 (muy suave, podrías cantar) a 10 (máximo, no podías más). 5-6 es moderado: puedes hablar con frases cortas. Con él la app calcula tu carga.' },
+  { claves: /(que son las zonas|zona [1-5]|zonas de (pulso|frecuencia))/, siempre: true,
+    respuesta: '❤️ Las zonas de pulso salen de tu frecuencia máxima (208 − 0,7 × edad): Z1 50-60 % muy suave, Z2 60-70 % suave (base aeróbica), Z3 70-80 % moderada, Z4 80-90 % intensa y Z5 más del 90 %, máxima. Míralas en cada sesión de Mi reloj.' },
   { claves: /(que puedes hacer|para que sirves|quien eres|que sabes)/, siempre: true,
     respuesta: '👋 Soy Vita. Puedo decirte si hoy te conviene entrenar fuerte, cómo vas en la semana, qué comer, cómo dormir mejor, cómo prepararte para tu competencia, darte consejos de técnica de tu deporte (por ejemplo, "¿cómo lanzo más duro?") y explicarte cómo usar la app.' },
 ];
+
+// ── Lo básico que todo atleta debería saber ──────────────────────────────────
+
+const BASICO = [
+  { claves: /(calentar|calentamiento|como caliento)/,
+    respuesta: '🔥 Un buen calentamiento (10-15 min): 5 min de trote o bici suave, movilidad dinámica (círculos de cadera y hombros, zancadas, balanceos de pierna), activación (sentadillas, saltos suaves) y 2-3 aceleraciones progresivas o gestos de tu deporte. Antes de entrenar, mejor movimiento que estiramientos largos.' },
+  { claves: /(estirar|estiramiento|elongar|flexibilidad)/,
+    respuesta: '🧘 Antes de entrenar: estiramientos dinámicos (en movimiento). Después: estáticos suaves, 20-30 s por músculo, sin dolor. Para ganar flexibilidad, estira 3-4 veces por semana; no estires fuerte un músculo lesionado.' },
+  { claves: /(calambre)/,
+    respuesta: '⚡ Ante un calambre: para, estira suave el músculo (en la pantorrilla, lleva la punta del pie hacia ti) y masajea. Suelen venir de fatiga y de entrenar deshidratado: bebe agua con sales en sesiones largas o con calor. Si son muy frecuentes, coméntalo con tu médico.' },
+  { claves: /(cuanta agua|hidrat|tomar agua|beber agua|bebida isotonica|electrolito)/,
+    respuesta: '💧 Como guía: unos 35 ml por kg de peso al día, más 0,4-0,8 L por cada hora de entrenamiento. Bebe antes de tener sed; la orina clara indica que vas bien. En sesiones de más de 60-90 min o con mucho calor, añade sales (bebida isotónica). Tu plan de comidas muestra tu meta de agua de cada día.' },
+  { claves: /(antes de entrenar|antes del entreno|antes de (un )?partido|antes de competir|pre ?entreno)/,
+    respuesta: '🍌 Antes de entrenar: una comida con carbohidratos y algo de proteína 2-3 h antes (arroz o pasta con pollo, arepa con huevo), con poca grasa y fibra. Si falta poco (30-60 min), algo ligero: un banano, pan con miel o un yogur. Y llega hidratado.' },
+  { claves: /(despues de entrenar|despues del entreno|post ?entreno|al terminar de entrenar)/,
+    respuesta: '🥛 Después de entrenar: en las 1-2 horas siguientes, proteína (20-40 g: huevos, pollo, atún, yogur o leche) con carbohidratos (arroz, papa, fruta, pan) para recuperar, y repón el agua que perdiste.' },
+  { claves: /(golpe de calor|insolacion|mucho calor|me mareo con el calor)/,
+    respuesta: '🌡️ Con calor: entrena temprano o al final de la tarde, bebe más y con sales, y usa ropa clara. Si hay mareo, dolor de cabeza fuerte, náuseas o piel muy caliente: para, ve a la sombra, refréscate y bebe. Si hay confusión o desmayo, es una emergencia: llama al 123.' },
+  { claves: /(golpe en la cabeza|me golpee la cabeza|conmocion|me dieron en la cabeza|quede mareado)/,
+    respuesta: '🚨 Tras un golpe en la cabeza con dolor, mareo, náuseas, visión borrosa o confusión: no sigas entrenando ese día, avisa a tu entrenador y que te vea un médico. Si hay vómitos, sueño excesivo o pérdida de conocimiento, ve a urgencias. Vuelve al deporte solo con el visto bueno médico.' },
+  { claves: /(me torci|torcedura|esguince|me doble el (tobillo|pie)|me lesione)/,
+    respuesta: '🩹 Ante una torcedura: para, protege la zona, ponla en alto y usa una venda que comprima suave; el frío puede aliviar el dolor. No masajees fuerte ni fuerces. Si no puedes apoyar, se hincha mucho o el dolor es fuerte, que te vea un médico; escríbele a tu médico desde Mensajes.' },
+  { claves: /(diferencia entre (las )?agujetas|agujetas o lesion|es normal que me duela|dolor normal|dolor bueno)/,
+    respuesta: '🤔 Las agujetas son un dolor muscular difuso que aparece 24-72 h después de entrenar y mejora moviéndote. Una lesión suele doler en un punto concreto, aparece de golpe, empeora con el movimiento o viene con hinchazón. Ante la duda, no entrenes esa zona y consúltalo con tu médico.' },
+  { claves: /(ampolla)/,
+    respuesta: '🦶 Para evitar ampollas: medias técnicas secas, calzado de tu talla ya usado antes de competir y vaselina en las zonas de roce. Si sale una, no la revientes: cúbrela con un apósito. Si se abre, lávala y tápala.' },
+  { claves: /(zapatillas|tenis para correr|cambiar (los|las) (zapatos|zapatillas)|guayos)/,
+    respuesta: '👟 Usa calzado de tu deporte y de tu talla. Las zapatillas de correr se cambian más o menos cada 600-800 km o cuando la suela está muy gastada o sientes molestias nuevas. Estrena el calzado en entrenamientos, nunca el día de la competencia.' },
+  { claves: /(descanso entre series|cuanto descanso entre|cuanto tiempo descansar entre)/,
+    respuesta: '⏱️ Entre series: fuerza máxima (pocas repeticiones, mucho peso) 2-3 min; ganar músculo 60-90 s; resistencia 30-60 s. Si la técnica empeora, descansa más.' },
+  { claves: /(cuantos dias (debo )?descansar|dias de descanso|entrenar todos los dias|cuanto descanso a la semana)/,
+    respuesta: '😌 Deja al menos 1-2 días de descanso (o muy suaves) por semana y no entrenes fuerte el mismo músculo dos días seguidos. El cuerpo mejora mientras descansa. Tu plan ya trae sus días de recuperación y descanso.' },
+  { claves: /(cafeina|cafe antes)/,
+    respuesta: '☕ La cafeína puede mejorar el rendimiento en adultos (unos 3 mg por kg, 60 min antes), pero quita sueño si la tomas tarde y no se recomienda en menores. Pruébala en entrenamientos, nunca por primera vez en una competencia.' },
+  { claves: /(creatina|proteina en polvo|suplemento|whey|bcaa|quemador)/,
+    respuesta: '💊 Primero la comida: con tu plan cubres casi todo. La proteína en polvo es comida práctica, y la creatina es de los pocos suplementos con buena evidencia en adultos, pero coméntalo antes con tu nutricionista (desde Mensajes). Evita "quemadores" y productos sin registro; si eres menor de edad, no tomes suplementos sin indicación médica.' },
+  { claves: /(alcohol|cerveza|trago)/,
+    respuesta: '🍺 El alcohol empeora la recuperación, el sueño y la hidratación, sobre todo en las 24-48 h después de entrenar o antes de competir. Si eres menor de edad, nada de alcohol.' },
+  { claves: /(como (me )?(tomo|mido) el pulso|pulso en reposo|frecuencia cardiaca en reposo)/,
+    respuesta: '❤️ Para medir tu pulso en reposo: al despertar, todavía acostado, pon dos dedos en la muñeca o el cuello y cuenta 30 segundos × 2. Si un día está 5-10 latidos más alto de lo normal, puede ser cansancio o que te estás enfermando: ese día, suave.' },
+];
+
+/** Consejo básico de deporte y salud, o null. */
+function respuestaBasica(texto) {
+  const t = limpiar(texto);
+  return BASICO.find(b => b.claves.test(t))?.respuesta || null;
+}
 
 /** Respuesta de ayuda de la app, o null si no habla de la app. */
 function respuestaAyudaApp(texto) {
@@ -240,4 +323,4 @@ function respuestaAyudaApp(texto) {
   return AYUDA_APP.find(a => a.claves.test(t) && (a.siempre || esPregunta))?.respuesta || null;
 }
 
-module.exports = { respuestaTecnica, respuestaAyudaApp, deporteMencionado, TECNICA, AYUDA_APP, normalizar };
+module.exports = { respuestaTecnica, respuestaAyudaApp, respuestaBasica, deporteMencionado, TECNICA, AYUDA_APP, BASICO, normalizar };

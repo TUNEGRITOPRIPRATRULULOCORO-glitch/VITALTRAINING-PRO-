@@ -1,5 +1,5 @@
 // Lo que Vita sabe sin Claude: técnica de cada deporte y cómo usar la app (y lo que NO debe robarse).
-const { respuestaTecnica, respuestaAyudaApp, deporteMencionado } = require('../servidor/api/ia/conocimiento');
+const { respuestaTecnica, respuestaAyudaApp, respuestaBasica, deporteMencionado } = require('../servidor/api/ia/conocimiento');
 
 describe('técnica por deporte', () => {
   test('la pregunta del receptor de béisbol', () => {
@@ -41,6 +41,23 @@ describe('técnica por deporte', () => {
   });
 });
 
+describe('lo básico para el atleta', () => {
+  test('responde lo importante y lo urgente', () => {
+    expect(respuestaBasica('¿cómo caliento antes de jugar?')).toMatch(/movilidad dinámica/);
+    expect(respuestaBasica('me dio un calambre')).toMatch(/estira suave/);
+    expect(respuestaBasica('¿cuánta agua debo tomar?')).toMatch(/35 ml por kg/);
+    expect(respuestaBasica('¿qué como antes de entrenar?')).toMatch(/2-3 h antes/);
+    expect(respuestaBasica('qué como después de entrenar')).toMatch(/proteína/);
+    expect(respuestaBasica('me golpeé la cabeza en el partido')).toMatch(/urgencias/);
+    expect(respuestaBasica('me torcí el tobillo')).toMatch(/médico/);
+    expect(respuestaBasica('¿puedo tomar creatina?')).toMatch(/nutricionista/);
+  });
+  test('no responde lo que no conoce', () => {
+    expect(respuestaBasica('¿puedo entrenar hoy?')).toBeNull();
+    expect(respuestaBasica('¿cómo voy esta semana?')).toBeNull();
+  });
+});
+
 describe('ayuda de la app', () => {
   test('responde cómo usar cada parte', () => {
     expect(respuestaAyudaApp('¿cómo escaneo un producto?')).toMatch(/Escanear código de barras/);
@@ -51,6 +68,18 @@ describe('ayuda de la app', () => {
     expect(respuestaAyudaApp('no me aparece mi alergia, ¿dónde la pongo?')).toMatch(/Actualizar perfil/);
     expect(respuestaAyudaApp('¿cómo activo las notificaciones?')).toMatch(/Notificaciones/);
     expect(respuestaAyudaApp('¿qué puedes hacer?')).toMatch(/técnica/);
+  });
+
+  test('lo que no sabía: tickets, foto, modo oscuro, borrar, privacidad, qué significa cada cosa', () => {
+    expect(respuestaAyudaApp('como abro un ticket')).toMatch(/Nuevo ticket/);
+    expect(respuestaAyudaApp('la app no funciona')).toMatch(/Soporte técnico/);
+    expect(respuestaAyudaApp('como cambio mi foto de perfil')).toMatch(/Cambiar foto/);
+    expect(respuestaAyudaApp('quiero el modo oscuro')).toMatch(/luna/);
+    expect(respuestaAyudaApp('¿cómo borro una comida?')).toMatch(/✕/);
+    expect(respuestaAyudaApp('¿quién ve mis datos?')).toMatch(/profesionales de tu equipo/);
+    expect(respuestaAyudaApp('¿qué es la carga?')).toMatch(/minutos × esfuerzo/);
+    expect(respuestaAyudaApp('¿qué es el RPE?')).toMatch(/1 \(muy suave/);
+    expect(respuestaAyudaApp('perdí mi racha')).toMatch(/días seguidos/);
   });
 
   test('no se roba lo que responde el análisis del atleta', () => {
