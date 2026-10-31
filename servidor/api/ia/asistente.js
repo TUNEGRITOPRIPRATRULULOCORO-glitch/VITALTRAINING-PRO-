@@ -12,6 +12,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { query } = require('../../../base-de-datos/db');
 const { consulta } = require('./ia.service');
 const { clasificar } = require('./clasificador');
+const { respuestaTecnica, respuestaAyudaApp } = require('./conocimiento');
 
 const MODELO = 'claude-opus-5-5';
 const MAX_HISTORIAL = 20;          // mensajes anteriores que se envían a Claude
@@ -39,7 +40,18 @@ Cómo responder:
 Límites:
 - No eres médica. Ante dolor fuerte, lesión, mareos, dolor en el pecho, falta de aire, desmayos o síntomas que preocupen, dile con claridad que pare y consulte a su médico (puede escribirle desde Mensajes en la app).
 - Nada de dietas extremas, ayunos largos, fármacos, anabólicos ni suplementos de riesgo. Si es menor de edad, sé especialmente prudente.
-- Si te preguntan algo que no tiene que ver con entrenamiento, salud deportiva, nutrición o la app, responde breve y vuelve al tema.`;
+- Si te preguntan algo que no tiene que ver con deporte, entrenamiento, salud deportiva, nutrición o la app, responde breve y vuelve al tema.
+
+Técnica deportiva: también ayudas con la técnica y la preparación de cualquier deporte (por ejemplo, cómo lanza más duro un receptor de béisbol, cómo pegar más fuerte en boxeo, cómo saltar más o nadar mejor). Da 3-4 claves concretas y 1-2 ejercicios, y recuerda calentar y parar si hay dolor.
+
+Cómo se usa la app (para responder dudas de uso):
+- Mi Salud / "+ Registrar salud": fatiga, sueño y recuperación de cada mañana. "Hoy te toca" (Dashboard) dice qué hacer hoy.
+- Mi Plan: rutina y plan de comidas; "⚙️ Actualizar perfil" cambia condiciones y alergias (se pueden escribir las que no aparecen). El día de competencia se elige arriba en Mi Plan o en Mi Perfil.
+- Mi Perfil: deporte, posición, peso, altura, sexo, día de competencia, estilo de pelea (boxeo) y "Mi equipo" (unirse con el código de 6 letras).
+- Historial → Comidas: registrar comidas y "📷 Escanear código de barras". Historial → Entrenamientos: sesiones libres.
+- Mi reloj: importar .tcx/.gpx, pulso en vivo por Bluetooth (Chrome en Android o computador) y "📘 Guía para conectar tu reloj" por marca.
+- Tests físicos (los registra el entrenador si hay equipo), Rangos (Bronce a Radiante), Logros y Clasificación (constancia o marcas verificadas).
+- Mensajes: hablar con su entrenador, nutricionista y médico. Mi cuenta (tocando su foto): contraseña, notificaciones, descargar sus datos o borrar la cuenta.`;
 
 // ── Datos del atleta para el contexto ─────────────────────────────────────────
 
@@ -213,19 +225,33 @@ async function avisoEstadoMedico(userId, intencion) {
  * se habla. Si duda, se prueba con palabras clave; si tampoco, Vita pregunta entre las dos
  * intenciones más probables en vez de adivinar.
  */
+async function deporteDe(userId) {
+  const { rows } = await query('SELECT deporte_principal FROM usuarios WHERE id = $1', [userId]);
+  return rows[0]?.deporte_principal || 'Fútbol';
+}
+
 async function responderLocal(userId, texto) {
+  // Preguntas concretas que se responden mejor con lo que Vita sabe (conocimiento.js)
+  const ayuda = respuestaAyudaApp(texto);
+  if (ayuda) return ayuda;
+  const tecnica = respuestaTecnica(texto, await deporteDe(userId));
+  if (tecnica) {
+    const aviso = await avisoEstadoMedico(userId, 'mejorar');
+    return aviso ? `${aviso.texto}\nPractica esto cuando tu médico te dé el visto bueno.\n\n${tecnica}` : tecnica;
+  }
+
   const prediccion = clasificar(texto);
   const intencion = prediccion.segura ? prediccion.intencion : detectarTema(texto);
 
   if (intencion === 'saludo' || (!intencion && SALUDOS.test(texto.trim())))
-    return '¡Hola! 👋 Soy Vita. Pregúntame si puedes entrenar hoy, cómo vas esta semana, qué comer, cómo dormiste o cómo prepararte para tu partido.';
+    return '¡Hola! 👋 Soy Vita. Pregúntame si puedes entrenar hoy, cómo vas esta semana, qué comer, cómo dormiste, cómo prepararte para tu competencia, consejos de técnica de tu deporte o cómo usar la app.';
   if (intencion === 'gracias')
     return '¡Con gusto! 💪 Aquí estoy cuando quieras seguir hablando de tu entrenamiento o tus comidas.';
   if (intencion === 'fuera_tema')
-    return 'De eso no sé mucho 😅. Lo mío es tu entrenamiento, tu alimentación, tu descanso y tus partidos. ¿Te ayudo con algo de eso?';
+    return 'De eso no sé mucho 😅. Lo mío es tu entrenamiento, la técnica de tu deporte, tu alimentación, tu descanso y cómo usar la app. ¿Te ayudo con algo de eso?';
   if (!intencion) {
     const opciones = prediccion.ranking.map(r => TEMA_EN_PALABRAS[r.intencion]).filter(Boolean).slice(0, 2);
-    return `No estoy segura de haberte entendido. ¿Me preguntas por ${opciones.join(' o por ')}? Puedes decírmelo con otras palabras.`;
+    return `No estoy segura de haberte entendido. ¿Me preguntas por ${opciones.join(' o por ')}? También puedo darte consejos de técnica de tu deporte o explicarte cómo usar la app: dímelo con otras palabras.`;
   }
 
   const aviso = await avisoEstadoMedico(userId, intencion);

@@ -645,7 +645,7 @@ async function pfRenderIA() {
 
 function iaSaludo() {
     const nombre = currentUser.nombre.split(' ')[0]; // iaPintarMensaje ya lo escapa
-    return `¡Hola, ${nombre}! 👋 Soy Vita. Puedes preguntarme lo que quieras: si hoy te conviene entrenar fuerte, qué comer antes del partido, cómo mejorar tu descanso o cómo ajustar tu rutina. ¿En qué te ayudo?`;
+    return `¡Hola, ${nombre}! 👋 Soy Vita. Puedes preguntarme lo que quieras: si hoy te conviene entrenar fuerte, qué comer antes de competir, cómo mejorar tu descanso, consejos de técnica de tu deporte (por ejemplo, cómo lanzar más duro) o cómo usar la app. ¿En qué te ayudo?`;
 }
 
 // Texto seguro con **negritas** y saltos de línea
