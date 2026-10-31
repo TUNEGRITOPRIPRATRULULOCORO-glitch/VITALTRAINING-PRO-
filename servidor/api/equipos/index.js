@@ -22,4 +22,5 @@ module.exports = {
   nombreRepetido:   svc.nombreRepetido,    // (nombre) → ¿ya hay un equipo con ese nombre?
   crear:            svc.crear,             // ({ nombre, deporte }) → equipo con su código
   agregarMiembro:   svc.agregarMiembro,    // (equipoId, userId)
+  profesionalesDe:  svc.profesionalesDe,   // (atletaId) → médicos y nutricionistas con los que puede pedir cita
 };

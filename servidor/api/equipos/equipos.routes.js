@@ -10,6 +10,8 @@
  * POST   /api/equipos/:id/codigo            → Código de invitación nuevo
  * POST   /api/equipos/:id/miembros          → Añadir atleta o profesional { userId }
  * DELETE /api/equipos/:id/miembros/:userId  → Quitar del equipo
+ * POST   /api/equipos/asignaciones          → Asignar un profesional a un atleta sin equipo { atletaId, profesionalId }
+ * DELETE /api/equipos/asignaciones/:atletaId/:profesionalId → Quitar la asignación
  */
 const router = require('express').Router();
 const ctrl   = require('./equipos.controller');
@@ -19,6 +21,9 @@ const admin = requireRol('Administrador');
 
 router.get('/mios',    ctrl.getMios);
 router.post('/unirse', ctrl.postUnirse);
+
+router.post('/asignaciones',                              admin, ctrl.postAsignacion);
+router.delete('/asignaciones/:atletaId/:profesionalId',   admin, ctrl.deleteAsignacion);
 
 router.get('/',                         admin, ctrl.getEquipos);
 router.post('/',                        admin, ctrl.postEquipo);

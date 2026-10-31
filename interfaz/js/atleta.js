@@ -29,7 +29,7 @@ const showPanelFutbolista = showPanelAtleta;
 
 function pfRenderView(view) {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', reloj:'Mi reloj', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', logros:'Logros', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
+    const titles = { dashboard:'Dashboard', perfil:'Mi Perfil', salud:'Mi Salud', historial:'Historial', reloj:'Mi reloj', citas:'Mis citas', plan:'Mi Plan', tests:'Tests físicos', rangos:'Rangos', logros:'Logros', clasificacion:'Clasificación', ia:'Asistente IA', soporte:'Mensajes y soporte' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-futbolista .nav-btn').forEach(b=>{ b.disabled=false; b.classList.toggle('active',b.dataset.pfView===view); });
@@ -40,6 +40,7 @@ function pfRenderView(view) {
     else if(view==='salud')     enSegundoPlano(pfRenderSalud());
     else if(view==='historial') enSegundoPlano(pfRenderHistorial());
     else if(view==='reloj')     enSegundoPlano(pfRenderReloj());
+    else if(view==='citas')     enSegundoPlano(pfRenderCitas());
     else if(view==='ia')        enSegundoPlano(pfRenderIA());
     else if(view==='plan')      enSegundoPlano(pfRenderPlan());
     else if(view==='tests')     enSegundoPlano(pfRenderTests());

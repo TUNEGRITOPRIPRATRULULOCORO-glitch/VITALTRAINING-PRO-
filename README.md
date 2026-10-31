@@ -10,7 +10,7 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, **logros**, **clasificación** con su equipo o su deporte, tests físicos, **sesiones del reloj o pulsómetro** con zonas de pulso, **escáner de código de barras** para sus comidas, **notificaciones en el celular**, chat con su entrenador, su nutricionista y su médico, y **Vita**, el asistente con IA |
+| **Atleta** | **"Hoy te toca…"**: lo que tiene que hacer hoy (salud, sesión y comidas). Rutina por deporte y posición, y plan de comidas para cualquier dieta (también vegana o con alergias). Registro de su salud diaria y de sus series (peso y repeticiones) con récords, **rangos de Bronce a Radiante**, **logros**, **clasificación** con su equipo o su deporte, tests físicos, **citas con su médico o nutricionista**, **sesiones del reloj o pulsómetro** con zonas de pulso, **escáner de código de barras** para sus comidas, **notificaciones en el celular**, chat con su entrenador, su nutricionista y su médico, y **Vita**, el asistente con IA |
 | **Nutricionista** | Sus atletas, con estado de salud, carga de entrenamiento, cumplimiento y lesiones activas. Notas, comidas y rutinas asignadas, y mensajes |
 | **Entrenador** | Sus atletas, con estado médico, "listo para entrenar" y carga. **Registra los tests físicos** (quedan ✓ verificados) y **verifica los récords de fuerza** que vio: así la clasificación del equipo no tiene marcas falsas |
 | **Médico** | Expedientes: lesiones con estado **apto / en recuperación / baja médica**, notas clínicas (visibles para el atleta o solo para médicos), salud diaria, riesgo de lesión por carga y tests físicos |
@@ -27,12 +27,12 @@ Plataforma web que junta en un solo lugar al **atleta, su nutricionista, su méd
 | Capa | Tecnología |
 |---|---|
 | Interfaz | HTML, CSS y JavaScript sin frameworks (SPA) · app instalable (PWA) · Chart.js |
-| Servidor | Node.js 20 · Express 4 · monolito modular (22 módulos) |
+| Servidor | Node.js 20 · Express 4 · monolito modular (23 módulos) |
 | Base de datos | PostgreSQL: **Neon** en la web, **PGlite** en tu computador, **pg-mem** en los tests |
 | Seguridad | JWT · bcrypt · Helmet con CSP · límites de intentos · acceso por equipo |
 | IA | Modelo propio de **machine learning** (Python + scikit-learn) para entender al atleta; Claude opcional |
 | Servicios | Brevo (correos) · Google (entrar con Google) |
-| Calidad | Jest (494 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
+| Calidad | Jest (498 tests, ~94 % de cobertura) · GitHub Actions · SonarQube Cloud |
 | Publicación | Docker · Render |
 
 ---
@@ -103,7 +103,7 @@ En local no hace falta ninguna. En la web viven en Render (grupo **Pro**); el c�
 ## Pruebas
 
 ```bash
-npm test                 # 494 pruebas
+npm test                 # 498 pruebas
 npm run test:coverage    # con informe de cobertura en coverage/lcov-report/index.html
 ```
 

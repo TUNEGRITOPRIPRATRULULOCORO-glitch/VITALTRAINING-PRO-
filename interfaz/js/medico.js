@@ -23,9 +23,10 @@ function showPanelMedico(user) {
 function medicoRenderView(view) {
     closeSidebar();
     stopPolling();
-    setTitle(view === 'mensajes' ? 'Mensajes' : 'Expedientes médicos');
+    setTitle(view === 'mensajes' ? 'Mensajes' : view === 'citas' ? 'Citas' : 'Expedientes médicos');
     document.querySelectorAll('#panel-medico .nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mdView === view));
     if (view === 'mensajes') enSegundoPlano(medicoRenderMensajes());
+    else if (view === 'citas') enSegundoPlano(citasRenderProfesional('md-content'));
     else enSegundoPlano(medicoRenderAtletas());
 }
 

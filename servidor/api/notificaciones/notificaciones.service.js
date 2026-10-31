@@ -106,7 +106,7 @@ async function enviar(userId, aviso) {
 // Título según el tipo de alerta del panel (salud, lesión, carga…)
 const TITULOS = {
   lesion: '🩹 Tu médico', 'nota medica': '📋 Nota de tu médico', fatiga: '💪 Tu salud', recuperacion: '💪 Tu salud',
-  sueno: '😴 Tu descanso', carga: '📈 Tu carga de entrenamiento', cuenta: 'VitalTraining',
+  sueno: '😴 Tu descanso', carga: '📈 Tu carga de entrenamiento', cuenta: 'VitalTraining', cita: '📅 Tu cita',
 };
 function avisoDeAlerta(tipo, mensaje) {
   return { titulo: TITULOS[tipo] || 'VitalTraining', cuerpo: mensaje, url: '/', etiqueta: `alerta-${tipo}` };

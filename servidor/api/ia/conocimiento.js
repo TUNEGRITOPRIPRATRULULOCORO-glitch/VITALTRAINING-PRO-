@@ -229,6 +229,8 @@ const AYUDA_APP = [
     respuesta: '⏱ Los tests físicos están en Tests físicos: salto, velocidad, resistencia… según tu deporte. Si estás en un equipo, los registra tu entrenador (así las marcas son reales). Lo ideal es repetirlos cada semana.' },
   { claves: /(hablar con|escribir(le)? a|mensaje|chat con) .*(entrenador|medico|nutricionista|doctor)|(mensajes)/,
     respuesta: '💬 En Mensajes puedes escribirle a tu entrenador, a tu nutricionista y a tu médico (los de tu equipo). Te llega un aviso cuando te responden.' },
+  { claves: /(cita|consulta con (el|mi) (medico|nutricionista)|agendar|turno con)/, siempre: true,
+    respuesta: '📅 Para pedir cita: menú de la izquierda → "Mis citas" → "+ Pedir cita". Elige con quién (tu médico o tu nutricionista), el día, la hora libre, si es presencial o virtual, y el motivo. Te llega un aviso cuando la confirmen; desde ahí también puedes cancelarla.' },
   // Cuenta, perfil y soporte
   { claves: /(ticket|soporte|reportar (un )?(error|problema|fallo)|la app (no funciona|falla|tiene un error)|encontre un error|problema con la app)/, siempre: true,
     respuesta: '🛠️ Para abrir un ticket: menú de la izquierda → Mensajes → "Soporte técnico" → "+ Nuevo ticket". Escribe qué pasó (y en qué pantalla) y llega al equipo de administración. Ahí mismo ves cómo va tu ticket y sus respuestas.' },

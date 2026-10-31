@@ -17,6 +17,8 @@ const postCodigo   = (req, res) => responder(svc.renovarCodigo(req.params.id).th
 const postMiembro  = (req, res) => responder(svc.agregarMiembro(req.params.id, req.body?.userId).then(() => ({})), res, 'Error añadiendo al equipo.');
 const getMios      = (req, res) => responder(svc.misEquipos(req.user).then(equipos => ({ equipos })), res, 'Error cargando tus equipos.');
 const postUnirse   = (req, res) => responder(svc.unirseConCodigo(req.user, req.body?.codigo).then(equipo => ({ equipo })), res, 'Error uniéndote al equipo.');
+const postAsignacion   = (req, res) => responder(svc.asignar(req.body?.atletaId, req.body?.profesionalId).then(() => ({})), res, 'Error asignando el profesional.');
+const deleteAsignacion = (req, res) => responder(svc.quitarAsignacion(req.params.atletaId, req.params.profesionalId).then(() => ({})), res, 'Error quitando la asignación.');
 
 async function deleteEquipo(req, res) {
   try {
@@ -38,4 +40,4 @@ async function deleteMiembro(req, res) {
   }
 }
 
-module.exports = { getEquipos, postEquipo, putEquipo, deleteEquipo, postCodigo, postMiembro, deleteMiembro, getMios, postUnirse };
+module.exports = { getEquipos, postEquipo, putEquipo, deleteEquipo, postCodigo, postMiembro, deleteMiembro, getMios, postUnirse, postAsignacion, deleteAsignacion };

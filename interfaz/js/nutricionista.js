@@ -22,13 +22,14 @@ function showPanelNutricionista(user) {
 // filtro: '' | 'con' | 'alta' | 'media' | 'sin' para abrir "Mis Atletas" ya filtrado
 function ntRenderView(view, filtro = '') {
     closeSidebar();
-    const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', soporte:'Mensajes' };
+    const titles = { dashboard:'Dashboard', pacientes:'Mis Atletas', citas:'Citas', soporte:'Mensajes' };
     setTitle(titles[view] || view);
     stopPolling();
     document.querySelectorAll('#panel-nutricionista .nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.ntView===view));
     document.getElementById('nt-content').innerHTML=showLoading();
     if(view==='dashboard') { enSegundoPlano(ntRenderDashboard()); startPolling(ntRenderDashboard, 30); }
     else if(view==='pacientes') enSegundoPlano(ntRenderPacientes(filtro));
+    else if(view==='citas')     enSegundoPlano(citasRenderProfesional('nt-content'));
     else if(view==='soporte')   enSegundoPlano(ntRenderSoporte());
 }
 

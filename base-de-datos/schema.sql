@@ -282,6 +282,28 @@ CREATE TABLE IF NOT EXISTS alimentos_codigos (  -- productos leídos por código
   actualizado       TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS asignaciones (  -- médico o nutricionista que el administrador le asigna a un atleta sin equipo
+  id             BIGSERIAL PRIMARY KEY,
+  atleta_id      BIGINT NOT NULL,
+  profesional_id BIGINT NOT NULL,
+  created_at     TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(atleta_id, profesional_id)
+);
+
+CREATE TABLE IF NOT EXISTS citas (  -- citas del atleta con su médico o su nutricionista
+  id             BIGSERIAL PRIMARY KEY,
+  atleta_id      BIGINT NOT NULL,
+  profesional_id BIGINT NOT NULL,
+  fecha          DATE NOT NULL,
+  hora           VARCHAR(5) NOT NULL,                       -- 'HH:MM', cada 30 min
+  modalidad      VARCHAR(20) NOT NULL DEFAULT 'presencial', -- 'presencial' o 'virtual'
+  motivo         TEXT DEFAULT '',
+  estado         VARCHAR(20) NOT NULL DEFAULT 'pendiente',  -- pendiente, confirmada, rechazada, cancelada, realizada
+  respuesta      TEXT DEFAULT '',                           -- lo que escribe quien confirma, rechaza o cancela
+  created_at     TIMESTAMPTZ DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS sesiones_reloj (  -- datos de pulso de una sesión (archivo del reloj o pulsómetro Bluetooth)
   id           BIGSERIAL PRIMARY KEY,
   user_id      BIGINT NOT NULL,
@@ -327,6 +349,10 @@ ALTER TABLE logros ADD CONSTRAINT logros_user_id_fkey FOREIGN KEY (user_id) REFE
 ALTER TABLE push_suscripciones ADD CONSTRAINT push_suscripciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE sesiones_reloj ADD CONSTRAINT sesiones_reloj_user_id_fkey FOREIGN KEY (user_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 ALTER TABLE sesiones_reloj ADD CONSTRAINT sesiones_reloj_rutina_id_fkey FOREIGN KEY (rutina_id) REFERENCES rutinas(id) ON DELETE CASCADE;
+ALTER TABLE asignaciones ADD CONSTRAINT asignaciones_atleta_id_fkey FOREIGN KEY (atleta_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE asignaciones ADD CONSTRAINT asignaciones_profesional_id_fkey FOREIGN KEY (profesional_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE citas ADD CONSTRAINT citas_atleta_id_fkey FOREIGN KEY (atleta_id) REFERENCES usuarios(id) ON DELETE CASCADE;
+ALTER TABLE citas ADD CONSTRAINT citas_profesional_id_fkey FOREIGN KEY (profesional_id) REFERENCES usuarios(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_comidas_usuario_fecha  -- índices: casi todo se consulta por atleta y fecha (salud, cumplimiento y rangos ya tienen el de su UNIQUE)
   ON comidas (user_id, fecha);
@@ -343,3 +369,5 @@ CREATE INDEX IF NOT EXISTS idx_ia_mensajes_usuario        ON ia_mensajes (user_i
 CREATE INDEX IF NOT EXISTS idx_incidencias_usuario        ON incidencias (user_id);
 CREATE INDEX IF NOT EXISTS idx_mensajes_remitente         ON mensajes (remitente_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_mensajes_destinatario      ON mensajes (destinatario_id, leido);
+CREATE INDEX IF NOT EXISTS idx_citas_profesional_fecha    ON citas (profesional_id, fecha);
+CREATE INDEX IF NOT EXISTS idx_citas_atleta               ON citas (atleta_id, fecha);

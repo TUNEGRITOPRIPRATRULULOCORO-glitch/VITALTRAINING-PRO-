@@ -39,15 +39,48 @@ async function renderEquipos() {
             <div class="eq-info-sub">Los atletas se unen solos con el <strong>código del equipo</strong> (en Mi Perfil). A los profesionales los añades tú.</div>
         </div>
         ${equipos.length && sinEquipo.length ? `
-        <div class="ls-aviso rd-warn">
-            <strong>⚠️ ${sinEquipo.length} ${sinEquipo.length === 1 ? 'atleta sin equipo: ningún profesional lo ve' : 'atletas sin equipo: ningún profesional los ve'}.</strong>
-            <div>${sinEquipo.map(a => escapeHtml(a.nombre)).join(', ')}</div>
-        </div>` : ''}
+        ${eqSinEquipoHTML(sinEquipo, activos)}` : ''}
         <div class="eq-grid">
             ${equipos.length ? equipos.map(e => eqTarjeta(e, activos)).join('') : `
             <div class="card empty-state" style="grid-column:1/-1"><p>Crea tu primer equipo: por ejemplo "Primer equipo", "Sub-17" o "Grupo de running".</p></div>`}
         </div>
     </div>`;
+}
+
+/** Atletas sin equipo: el admin les asigna un médico o nutricionista (los ve, les escribe y les da citas). */
+function eqSinEquipoHTML(sinEquipo, activos) {
+    const profesionales = activos.filter(u => ['Nutricionista', 'Medico', 'Médico', 'Entrenador'].includes(u.rol));
+    const filas = sinEquipo.map(a => {
+        const asignados = a.asignados || [];
+        const libres = profesionales.filter(p => !asignados.some(x => x.id === Number(p.id)));
+        return `
+        <div class="eq-sin-fila">
+            <div class="eq-sin-nombre"><strong>${escapeHtml(a.nombre)}</strong>
+                ${asignados.length ? asignados.map(p => `<span class="eq-persona">${escapeHtml(p.nombre)} <small>${escapeHtml(normalizeDisplayRole(p.rol))}</small>
+                    <button type="button" title="Quitar" aria-label="Quitar a ${escapeHtml(p.nombre)}" onclick="eqQuitarAsignacion(${a.id},${p.id})">✕</button></span>`).join('') : '<small class="eq-sin-nadie">Sin profesional</small>'}
+            </div>
+            ${libres.length ? `<select onchange="if(this.value) eqAsignar(${a.id}, this.value)" aria-label="Asignar profesional a ${escapeHtml(a.nombre)}">
+                <option value="">+ Asignar profesional…</option>${libres.map(p => `<option value="${p.id}">${escapeHtml(p.nombre)} (${escapeHtml(normalizeDisplayRole(p.rol))})</option>`).join('')}</select>` : ''}
+        </div>`;
+    }).join('');
+    const sinNadie = sinEquipo.filter(a => !(a.asignados || []).length).length;
+    return `
+        <div class="card eq-sin-equipo">
+            <div class="card-header"><h2>🧍 Atletas sin equipo (${sinEquipo.length})</h2></div>
+            <div class="card-body">
+                <p class="msg-ayuda">${sinNadie ? `⚠️ ${sinNadie} sin profesional: nadie los ve ni pueden pedir citas. ` : ''}Asígnales un médico o nutricionista: los verá, podrán escribirse y pedirle citas, sin tener que crear un equipo.</p>
+                ${filas}
+            </div>
+        </div>`;
+}
+
+async function eqAsignar(atletaId, profesionalId) {
+    if (await eqPedir(`${API}/equipos/asignaciones`, 'POST', { atletaId, profesionalId: Number(profesionalId) })) { showToast('Profesional asignado ✓'); enSegundoPlano(renderEquipos()); }
+}
+
+async function eqQuitarAsignacion(atletaId, profesionalId) {
+    if (!confirm('¿Quitar este profesional al atleta? Dejará de verlo y de recibir sus citas.')) return;
+    if (await eqPedir(`${API}/equipos/asignaciones/${atletaId}/${profesionalId}`, 'DELETE')) { showToast('Asignación quitada'); enSegundoPlano(renderEquipos()); }
 }
 
 function eqPersona(e, m) {

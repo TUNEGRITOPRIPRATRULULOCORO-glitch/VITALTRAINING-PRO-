@@ -305,6 +305,18 @@ async function crearClubDemo({ password = process.env.CLUB_DEMO_PASSWORD } = {})
   await query('INSERT INTO notas_nutricionista (user_id, nutricionista_id, nutricionista_nombre, texto, fecha) VALUES ($1, $2, $3, $4, $5)',
     [id.juanpablo, id.nutricion, 'Laura Méndez', 'Con la carga de esta semana necesitas más carbohidratos: añade arroz o pasta en el almuerzo y una fruta antes de entrenar.', new Date().toLocaleDateString('es-CO')]);
 
+  // Citas: una pendiente para el médico (para confirmarla en la demo), una confirmada y una ya realizada
+  const CITAS = [
+    ['juanpablo', 'medico', -2, '09:00', 'presencial', 'Me molesta el gemelo después de los entrenos dobles.', 'pendiente', ''],
+    ['mateo', 'medico', -6, '10:30', 'presencial', 'Revisión de la lesión de isquiotibiales.', 'confirmada', 'Trae la ecografía si te la hiciste.'],
+    ['valeria', 'nutricion', -3, '16:00', 'virtual', 'Ajustar mis comidas para el torneo.', 'confirmada', ''],
+    ['santiago', 'nutricion', 9, '17:30', 'virtual', 'Revisar mi plan de comidas.', 'realizada', ''],
+  ];
+  for (const [atleta, prof, dias, hora, modalidad, motivo, estado, respuesta] of CITAS) {
+    await query('INSERT INTO citas (atleta_id, profesional_id, fecha, hora, modalidad, motivo, estado, respuesta) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+      [id[atleta], id[prof], dia(dias), hora, modalidad, motivo, estado, respuesta]);
+  }
+
   // Alerta de carga alta de Juan Pablo, y rangos y logros ya guardados (sin celebraciones pendientes)
   await require('../servidor/api/panel').revisarCargaAlta(id.juanpablo);
   for (const a of ATLETAS) {

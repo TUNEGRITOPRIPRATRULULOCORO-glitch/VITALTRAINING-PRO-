@@ -28,14 +28,14 @@ Cómo está construida la app, por qué se tomó cada decisión y cómo funciona
             │ pg (SSL verificado)    │ HTTPS
 ┌───────────▼───────────┐   ┌───────▼───────────────────────┐
 │ PostgreSQL · Neon      │   │ Brevo (correos) · Google      │
-│ 27 tablas · 14 índices │   │ (entrar con Google) · Claude  │
+│ 29 tablas · 16 índices │   │ (entrar con Google) · Claude  │
 └───────────────────────┘   │ (opcional)                     │
                             └───────────────────────────────┘
 ```
 
 ### Monolito modular
 
-Una sola aplicación (un proceso, un despliegue), dividida en **22 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
+Una sola aplicación (un proceso, un despliegue), dividida en **23 módulos** independientes dentro de `servidor/api/`. Se eligió frente a microservicios porque, para un equipo pequeño y un hosting gratuito, los microservicios añadirían red, despliegues y bases separadas sin beneficio real. A cambio, se mantienen las fronteras como si fueran servicios:
 
 1. **Cada tabla tiene un dueño.** Solo su módulo hace `INSERT`, `UPDATE` o `DELETE`; los demás leen o llaman a una función del dueño.
 2. **Cada módulo expone un `index.js` público.** Nadie importa archivos internos de otro módulo.
@@ -82,7 +82,7 @@ El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js`
 
 **¿Por qué PostgreSQL y no MySQL o MongoDB?** Por las restricciones y la integridad (claves foráneas con `ON DELETE CASCADE`, `UNIQUE` compuestos), y por **JSONB** para guardar estructuras anidadas como el plan de comidas de 7 días o la rutina semanal, que siempre se leen completas.
 
-### Tablas (27)
+### Tablas (29)
 
 | Grupo | Tablas |
 |---|---|
@@ -92,7 +92,7 @@ El mismo `schema.sql` sirve para los tres. Al arrancar, `base-de-datos/setup.js`
 | Rendimiento | `evaluaciones`, `series` (ambas con marca de *verificado*), `rangos`, `logros`, `clasificacion_preferencias` |
 | Notificaciones | `push_suscripciones`, `push_claves` |
 | Médico y nutrición | `lesiones`, `notas_clinicas`, `notas_nutricionista` |
-| Club | `equipos`, `equipo_miembros` |
+| Club | `equipos`, `equipo_miembros`, `asignaciones` (profesional asignado a un atleta sin equipo), `citas` |
 | Comunicación | `mensajes`, `incidencias` (JSONB: comentarios), `ia_mensajes` |
 
 Todas las tablas de un usuario tienen `user_id → usuarios(id) ON DELETE CASCADE`: al borrar una cuenta se borran sus datos.
@@ -210,6 +210,9 @@ El servidor calcula la **FC máxima** (Tanaka: 208 − 0,7 × edad, o la más al
 ### Escáner de código de barras
 En **Historial → Comidas**, "📷 Escanear código de barras" abre la cámara: usa el lector del navegador (BarcodeDetector, Chrome en Android) o, si no existe (iPhone), **ZXing**, que se descarga solo la primera vez desde jsDelivr con su huella SRI. También se puede escribir el número. El servidor valida el dígito de control y busca el producto primero en `alimentos_codigos` y luego en **Open Food Facts** (base abierta y gratuita; se guarda y se refresca al mes). El atleta indica cuántos gramos comió y se rellenan las calorías y la proteína de la comida. Si el producto no existe en ninguna base, se escriben una vez los datos de la etiqueta y **quedan para todo el club** (solo los corrige quien los escribió, un nutricionista o el admin).
 
+### Citas
+El atleta pide cita en **Mis citas** con su médico o su nutricionista: los de su equipo o, si no tiene equipo, el que le **asignó el administrador** (en Equipos → Atletas sin equipo; esa asignación también les permite verse y escribirse). Elige día (hasta 60 días), hora libre (cada 30 min de 7:00 a 19:30, hora de Colombia), presencial o virtual y el motivo. El profesional la ve en su panel **Citas** y la **confirma o rechaza** con un mensaje opcional; los dos pueden cancelarla y el profesional la marca como realizada. Una hora pendiente o confirmada no se puede volver a pedir, y cada atleta tiene como mucho 5 citas por delante. Cada cambio avisa a la otra persona (notificación y alerta en el panel del atleta).
+
 ### Mi cuenta
 Desde el avatar, cualquier rol puede cambiar su contraseña (pide la actual), **descargar todos sus datos** en un **PDF** para leerlos o imprimirlos (portada, ficha y una tabla por sección), o en JSON para llevarlos a otra app; nunca incluye contraseñas ni notas clínicas privadas y **borrar su cuenta** con todos sus datos (pide la contraseña y escribir BORRAR; un administrador no puede borrarse a sí mismo). Son los derechos de acceso y supresión de la ley de datos personales.
 
@@ -232,6 +235,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 | Auth | `POST /api/auth/login` · `/google` · `/registro` (modo `solo`, `unirse` con `codigoEquipo` o `crear` con `equipoNombre`) · `/olvide` · `/restablecer` · `GET /config` · `GET /equipo/:codigo` |
 | Cuenta y fotos | `GET /api/cuenta/yo` · `PUT/DELETE /api/cuenta/foto` · `PUT /api/cuenta/password` · `GET /api/cuenta/datos` · `DELETE /api/cuenta` · `GET /api/fotos/:userId` |
 | Logros | `GET /api/logros/:userId` |
+| Citas | `GET /api/citas` · `GET /profesionales` · `GET /ocupadas?profesionalId=&fecha=` · `POST` (atleta) · `PUT /:id/estado` · admin: `POST/DELETE /api/equipos/asignaciones` |
 | Reloj | `POST/GET /api/reloj/:userId/sesiones` · `GET /sesiones/:id` (con la curva de pulso) |
 | Alimentos | `GET /api/alimentos/codigo/:codigo` · `POST` (producto escrito desde la etiqueta) |
 | Notificaciones | `GET /api/notificaciones/clave` · `GET /estado` · `POST/DELETE /suscribir` · `POST /prueba` · `POST /recordatorios` (sin sesión, con `X-Cron-Secreto`) |
@@ -257,7 +261,7 @@ Todas las rutas, salvo `/api/auth/*` y `/api/estado`, piden `Authorization: Bear
 
 ## 8. Pruebas y calidad
 
-- **494 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
+- **498 pruebas con Jest**, cobertura de ~94 % de líneas en servicios y cálculos.
 - **Unitarias** para los cálculos puros (calorías, carga, rangos, series, "Hoy te toca"…).
 - **De integración** con **pg-mem**: los servicios corren contra una base PostgreSQL en memoria con el `schema.sql` real, sin simular consultas. Las rutas críticas (permisos por rol y por equipo) se prueban también por HTTP.
 - **GitHub Actions** pasa los tests, construye la imagen de Docker y la arranca en cada subida.

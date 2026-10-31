@@ -8,6 +8,8 @@ const { DEPORTES } = require('../../compartido/deportes');
  * - En cuanto hay equipos, un nutricionista o médico solo ve a los atletas de sus equipos
  *   (y un atleta solo puede escribirles a los profesionales de su equipo).
  * - El administrador ve siempre a todos.
+ * - A un atleta sin equipo, el administrador le puede asignar un médico o nutricionista
+ *   (tabla asignaciones): esa pareja se ve y se escribe como si compartieran equipo.
  */
 
 const ROLES_ATLETA = ['Atleta', 'Futbolista'];
@@ -40,6 +42,13 @@ async function equiposIdsDe(userId) {
   return rows.map(r => Number(r.equipo_id));
 }
 
+/** Atletas asignados a un profesional, o profesionales asignados a un atleta (ids). */
+async function asignadosDe(userId) {
+  const { rows } = await query(
+    'SELECT atleta_id, profesional_id FROM asignaciones WHERE atleta_id = $1 OR profesional_id = $1', [Number(userId)]);
+  return rows.map(r => (Number(r.atleta_id) === Number(userId) ? Number(r.profesional_id) : Number(r.atleta_id)));
+}
+
 async function miembrosDe(equipoIds) {
   if (!equipoIds.length) return [];
   const { rows } = await query(
@@ -63,8 +72,8 @@ async function atletasVisibles(usuario) {
   if (esAtleta(usuario?.rol)) return [Number(usuario.id)];
   if (!esProfesional(usuario?.rol)) return [];
   if (!(await hayEquipos())) return null;
-  const miembros = await miembrosDe(await equiposIdsDe(usuario.id));
-  return [...new Set(miembros.filter(m => esAtleta(m.rol)).map(m => m.id))];
+  const [miembros, asignados] = await Promise.all([miembrosDe(await equiposIdsDe(usuario.id)), asignadosDe(usuario.id)]);
+  return [...new Set([...miembros.filter(m => esAtleta(m.rol)).map(m => m.id), ...asignados])];
 }
 
 async function puedeVerAtleta(usuario, atletaId) {
@@ -93,7 +102,7 @@ async function puedenHablar(yo, otro) {
 
 async function filtrarContactos(yo, usuarios) {
   if (!(await hayEquipos())) return usuarios;
-  const propios = new Set((await miembrosDe(await equiposIdsDe(yo.id))).map(m => m.id));
+  const propios = new Set([...(await miembrosDe(await equiposIdsDe(yo.id))).map(m => m.id), ...(await asignadosDe(yo.id))]);
   return usuarios.filter(u => {
     const pareja = (esAtleta(yo.rol) && esProfesional(u.rol)) || (esProfesional(yo.rol) && esAtleta(u.rol));
     return !pareja || propios.has(Number(u.id));
@@ -152,10 +161,54 @@ async function listar() {
     `SELECT id, nombre, email FROM usuarios WHERE rol IN (${enLista(ROLES_ATLETA)}) AND estado = 'Activo' ORDER BY nombre`,
     ROLES_ATLETA
   );
+  const { rows: asignaciones } = await query(
+    `SELECT a.atleta_id, u.id, u.nombre, u.rol FROM asignaciones a JOIN usuarios u ON u.id = a.profesional_id ORDER BY u.nombre`);
+  const asignadosA = id => asignaciones.filter(a => Number(a.atleta_id) === Number(id)).map(a => ({ id: Number(a.id), nombre: a.nombre, rol: a.rol }));
   return {
     equipos: rows.map(r => aEquipo(r, miembros)),
-    sinEquipo: atletas.filter(a => !conEquipo.has(Number(a.id))).map(a => ({ id: Number(a.id), nombre: a.nombre, email: a.email })),
+    sinEquipo: atletas.filter(a => !conEquipo.has(Number(a.id)))
+      .map(a => ({ id: Number(a.id), nombre: a.nombre, email: a.email, asignados: asignadosA(a.id) })),
   };
+}
+
+// ── Asignaciones (atletas sin equipo) ───────────────
+
+const ROLES_CITA = ['Nutricionista', 'Medico', 'Médico'];
+
+/** El administrador le asigna un médico o nutricionista a un atleta. */
+async function asignar(atletaId, profesionalId) {
+  const { rows } = await query('SELECT id, rol, estado FROM usuarios WHERE id IN ($1, $2)', [Number(atletaId), Number(profesionalId)]);
+  const atleta = rows.find(r => Number(r.id) === Number(atletaId));
+  const prof = rows.find(r => Number(r.id) === Number(profesionalId));
+  if (!atleta || !esAtleta(atleta.rol)) throw error('Atleta no encontrado.', 404);
+  if (!prof || !esProfesional(prof.rol) || prof.estado !== 'Activo') throw error('Elige un médico, nutricionista o entrenador activo.', 400);
+  const { rows: ya } = await query('SELECT id FROM asignaciones WHERE atleta_id = $1 AND profesional_id = $2', [Number(atletaId), Number(profesionalId)]);
+  if (!ya.length) await query('INSERT INTO asignaciones (atleta_id, profesional_id) VALUES ($1, $2)', [Number(atletaId), Number(profesionalId)]);
+  return true;
+}
+
+async function quitarAsignacion(atletaId, profesionalId) {
+  await query('DELETE FROM asignaciones WHERE atleta_id = $1 AND profesional_id = $2', [Number(atletaId), Number(profesionalId)]);
+  return true;
+}
+
+/**
+ * Médicos y nutricionistas con los que el atleta puede pedir cita: los de sus equipos y los que le
+ * asignó el administrador. Sin equipos en el club (club único), todos los activos.
+ */
+async function profesionalesDe(atletaId) {
+  const id = Number(atletaId);
+  let ids = null;
+  if (await hayEquipos()) {
+    const miembros = await miembrosDe(await equiposIdsDe(id));
+    ids = [...new Set([...miembros.map(m => m.id), ...(await asignadosDe(id))])];
+    if (!ids.length) return [];
+  }
+  const { rows } = await query(
+    `SELECT id, nombre, rol FROM usuarios WHERE estado = 'Activo' AND rol IN (${enLista(ROLES_CITA)})${ids ? ` AND id IN (${enLista(ids, ROLES_CITA.length + 1)})` : ''} ORDER BY rol, nombre`,
+    [...ROLES_CITA, ...(ids || [])]
+  );
+  return rows.map(r => ({ id: Number(r.id), nombre: r.nombre, rol: r.rol }));
 }
 
 function validarDatos(datos) {
@@ -281,4 +334,5 @@ module.exports = {
   atletasVisibles, puedeVerAtleta, filtrarAtletas, puedenHablar, filtrarContactos, accesoAtleta, nombresDeEquipos,
   listar, crear, actualizar, renovarCodigo, eliminar, agregarMiembro, quitarMiembro, misEquipos, unirseConCodigo,
   hayEquipos, nuevoCodigo, LARGO_CODIGO, porCodigo, nombreRepetido,
+  asignar, quitarAsignacion, profesionalesDe,
 };

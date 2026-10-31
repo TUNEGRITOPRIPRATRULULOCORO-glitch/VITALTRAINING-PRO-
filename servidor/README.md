@@ -29,6 +29,7 @@ Está organizado como un **monolito modular**: una sola aplicación, dividida en
 | `rangos` | `rangos` | — (Bronce … Radiante en fuerza y tests; guarda el más alto: nunca se baja) |
 | `notificaciones` | `push_suscripciones`, `push_claves` | `enviar`, `avisoDeAlerta` (avisos al celular; nunca fallan) |
 | `logros` | `logros` | — (insignias; un logro ganado no se pierde) |
+| `citas` | `citas` | — (citas del atleta con su médico o nutricionista: pedir, confirmar, rechazar, cancelar) |
 | `reloj` | `sesiones_reloj` | — (sesiones del reloj o pulsómetro: zonas, TRIMP y esfuerzo; la sesión va a `rutinas`) |
 | `alimentos` | `alimentos_codigos` | — (productos por código de barras: nuestra base y Open Food Facts) |
 | `clasificacion` | `clasificacion_preferencias` | — (constancia y marcas entre atletas del equipo o del deporte) |

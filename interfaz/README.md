@@ -33,6 +33,7 @@ Es **lo que ve y usa la persona**: pantallas de login, panel del atleta, nutrici
 | `logros.js` | Atleta: logros (insignias con progreso) y su celebración |
 | `reloj-archivos.js` | Lee los archivos .tcx/.gpx del reloj (también lo usan los tests) |
 | `reloj.js` | Atleta: importar la sesión del reloj, pulso en vivo por Bluetooth y gráfica de pulso con zonas |
+| `citas.js` | Citas: el atleta las pide; el médico y el nutricionista las confirman o rechazan |
 | `escaner.js` | Atleta: escáner de código de barras (cámara o número) para rellenar la comida |
 | `clasificacion.js` | Atleta: clasificación de constancia y de marcas con su equipo o su deporte |
 | `atleta.js` | Atleta: inicio, perfil, salud, historial, soporte |
