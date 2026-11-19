@@ -85,7 +85,7 @@ async function renderDashboardAdmin() {
         <div class="card"><div class="card-header"><h2>💪 Fatiga actual por atleta</h2></div><div style="padding:20px"><div class="chart-wrap"><canvas id="chart-fatiga"></canvas></div></div></div>` : ''}
         <div class="charts-grid" style="margin-top:24px">
             <div class="card"><div class="card-header"><h2>Incidencias recientes</h2><button class="btn btn-ghost btn-sm" onclick="renderView('soporte')">Ver todas →</button></div><div style="padding:12px 16px">
-                ${inc.slice(0,4).map(i=>`<div class="mini-item" onclick="renderView('soporte')"><div class="mini-item-body"><div class="mini-item-title">${i.titulo}</div><div class="mini-item-sub">${i.usuario} · ${i.fecha}</div></div><div class="mini-item-right">${prioridadBadge(i.prioridad)}</div></div>`).join('')||'<p style="color:var(--text-muted);font-size:13px;padding:4px 0">Sin incidencias</p>'}
+                ${inc.slice(0,4).map(i=>`<div class="mini-item" onclick="renderView('soporte')"><div class="mini-item-body"><div class="mini-item-title">${escapeHtml(i.titulo)}</div><div class="mini-item-sub">${escapeHtml(i.usuario)} · ${escapeHtml(i.fecha)}</div></div><div class="mini-item-right">${prioridadBadge(i.prioridad)}</div></div>`).join('')||'<p style="color:var(--text-muted);font-size:13px;padding:4px 0">Sin incidencias</p>'}
             </div></div>
             <div class="card"><div class="card-header"><h2>Estado del sistema</h2></div><div style="padding:20px;display:flex;flex-direction:column;gap:12px">
                 ${[['Atletas',stats.porRol.Futbolista,'#0ea5e9','Futbolista'],['Nutricionistas',stats.porRol.Nutricionista,'#8b5cf6','Nutricionista'],['Médicos',stats.porRol.Medico||0,'#075985','Medico'],['Admins',stats.porRol.Administrador,'#f59e0b','Administrador']].map(([l,v,c,rol])=>`
@@ -181,7 +181,7 @@ function renderFilasUsuarios(users) {
     if(!users.length) return `<tr><td colspan="4"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>Sin resultados</p></div></td></tr>`;
     return users.map(u=>{
         const[c1,c2]=avatarColor(u.nombre);
-        return `<tr><td><div class="td-user"><div class="user-avatar-sm" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(u.id,u.nombre)}</div><div><div class="user-name">${escapeHtml(u.nombre)}</div><div class="user-email">${escapeHtml(u.email)}</div></div></div></td><td>${rolBadge(u.rol)}</td><td>${estadoBadge(u.estado)}</td><td><div class="td-actions">${u.tieneFoto?`<button class="btn btn-ghost btn-sm" data-tooltip="Ver o retirar la foto" onclick="modalFotoUsuario(${u.id},this)">🖼 Foto</button>`:''}<button class="btn btn-ghost btn-sm" data-tooltip="Editar usuario" onclick="modalEditarUsuario(${u.id})">✏ Editar</button><button class="btn btn-danger btn-sm" data-tooltip="Eliminar permanentemente" onclick="eliminarUsuario(${u.id},'${u.nombre.replace(/'/g,"\\'")}')">✕ Eliminar</button></div></td></tr>`;
+        return `<tr><td><div class="td-user"><div class="user-avatar-sm" style="background:linear-gradient(135deg,${c1},${c2})">${avatarContenido(u.id,u.nombre)}</div><div><div class="user-name">${escapeHtml(u.nombre)}</div><div class="user-email">${escapeHtml(u.email)}</div></div></div></td><td>${rolBadge(u.rol)}</td><td>${estadoBadge(u.estado)}</td><td><div class="td-actions">${u.tieneFoto?`<button class="btn btn-ghost btn-sm" data-tooltip="Ver o retirar la foto" onclick="modalFotoUsuario(${u.id},this)">🖼 Foto</button>`:''}<button class="btn btn-ghost btn-sm" data-tooltip="Editar usuario" onclick="modalEditarUsuario(${u.id})">✏ Editar</button><button class="btn btn-danger btn-sm" data-tooltip="Eliminar permanentemente" onclick="eliminarUsuario(${u.id},${jsArg(u.nombre)})">✕ Eliminar</button></div></td></tr>`;
     }).join('');
 }
 
@@ -211,7 +211,7 @@ async function guardarNuevoUsuario() {
     if(!nombre||!email) return showToast('Completa todos los campos','error');
     if(!password||password.length<8) return showToast('La contraseña debe tener al menos 8 caracteres','error');
     const res=await apiFetch(`${API}/usuarios`,{method:'POST',body:JSON.stringify({nombre,email,rol,estado,password})});
-    if(res.ok){ closeModal(); showToast(`Usuario ${escapeHtml(nombre)} creado correctamente`, 'success'); await renderUsuarios(); }
+    if(res.ok){ closeModal(); showToast(`Usuario ${nombre} creado correctamente`, 'success'); await renderUsuarios(); }
     else { const d=await res.json().catch(()=>({})); showToast(d.error||'Error al crear usuario','error'); }
 }
 
@@ -401,7 +401,7 @@ async function verIncidencia(id) {
     const inc=await apiFetch(`${API}/incidencias`).then(r=>r.json());
     const i=inc.find(x=>Number(x.id)===Number(id)); if(!i) return;
     const comentariosHTML=i.comentarios.length?i.comentarios.map(c=>`<div class="comment-item"><div class="comment-meta"><span class="comment-author">${escapeHtml(c.autor)}</span><span>${c.fecha}</span></div><div class="comment-text">${escapeHtml(c.texto)}</div></div>`).join(''):`<p style="font-size:13px;color:var(--text-muted)">Sin comentarios aún.</p>`;
-    openModal(escapeHtml(i.titulo),`
+    openModal(i.titulo,`
         <div class="inc-detalle-cabecera">
             <div class="inc-detalle-dato"><span>Estado</span>${selectEstadoInc(i, 'id="inc-modal-estado"')}</div>
             <div class="inc-detalle-dato"><span>Prioridad</span>${prioridadBadge(i.prioridad)}</div>

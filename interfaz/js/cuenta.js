@@ -54,6 +54,8 @@ async function cuentaCambiarPassword() {
     if (nueva.length < 8) return showToast('La nueva contraseña debe tener al menos 8 caracteres.', 'error');
     const res = await apiFetch(`${API}/cuenta/password`, { method: 'PUT', body: JSON.stringify({ actual, nueva }) }).then(r => r.json()).catch(() => null);
     if (!res?.ok) return showToast(res?.error || 'No se pudo cambiar la contraseña.', 'error');
+    // Cambiar la contraseña cierra las demás sesiones; esta sigue con el token nuevo
+    if (res.token) setSession(currentUser, res.token);
     ['cu-actual', 'cu-nueva', 'cu-repetir'].forEach(id => { document.getElementById(id).value = ''; });
     showToast('Contraseña cambiada 🔑');
 }

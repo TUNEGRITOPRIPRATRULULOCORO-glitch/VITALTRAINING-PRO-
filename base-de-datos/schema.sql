@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   pie           VARCHAR(50),
   objetivo      TEXT,
   fecha_registro VARCHAR(50),
+  password_cambiado TIMESTAMPTZ, -- las sesiones firmadas antes de esta fecha ya no valen
   created_at    TIMESTAMPTZ  DEFAULT NOW()
 );
 

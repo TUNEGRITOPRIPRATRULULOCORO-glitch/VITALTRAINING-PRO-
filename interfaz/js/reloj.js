@@ -204,7 +204,7 @@ function relojDatosHTML(s) {
 }
 
 function relojMostrarResumen(s) {
-    openModal(`✅ ${escapeHtml(s.nombre)}`, `
+    openModal(`✅ ${s.nombre}`, `
         ${relojDatosHTML(s)}
         ${relojPedirEsfuerzoHTML(s)}
         <h3 class="reloj-subtitulo">Tiempo en cada zona</h3>
@@ -241,7 +241,7 @@ async function verSesionReloj(userId, sesionId) {
     const res = await apiFetch(`${API}/reloj/${userId}/sesiones/${sesionId}`).then(r => r.json()).catch(() => null);
     if (!res?.ok) return showToast(res?.error || 'No se pudo abrir la sesión.', 'error');
     const s = res.sesion;
-    openModal(`⌚ ${escapeHtml(s.nombre)}`, `
+    openModal(`⌚ ${s.nombre}`, `
         <p class="reloj-nota">${formatFecha(s.fecha)} · ${s.origen === 'bluetooth' ? 'Pulsómetro Bluetooth' : 'Archivo del reloj'}</p>
         ${relojDatosHTML(s)}
         ${relojPedirEsfuerzoHTML(s)}

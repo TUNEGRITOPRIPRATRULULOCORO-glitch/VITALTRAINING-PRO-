@@ -133,7 +133,7 @@ async function actualizarDeporte(id, deportePrincipal) {
 
 /** Cambia la contraseña (ya hasheada) de un usuario. */
 async function cambiarPassword(id, hashedPassword) {
-  const { rows } = await query('UPDATE usuarios SET password = $1 WHERE id = $2 RETURNING id', [hashedPassword, id]);
+  const { rows } = await query('UPDATE usuarios SET password = $1, password_cambiado = NOW() WHERE id = $2 RETURNING id', [hashedPassword, id]);
   return rows.length > 0;
 }
 

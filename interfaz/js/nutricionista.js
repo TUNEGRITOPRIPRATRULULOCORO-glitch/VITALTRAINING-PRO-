@@ -464,7 +464,7 @@ async function ntVerIncidencia(id) {
     const comentariosHTML = i.comentarios?.length
         ? i.comentarios.map(c=>`<div class="comment-item"><div class="comment-meta"><span class="comment-author">${escapeHtml(c.autor)}</span><span>${c.fecha}</span></div><div class="comment-text">${escapeHtml(c.texto)}</div></div>`).join('')
         : `<p style="font-size:13px;color:var(--text-muted)">Sin respuestas aún. Sé el primero en responder.</p>`;
-    openModal(escapeHtml(i.titulo), `
+    openModal(i.titulo, `
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${incEstadoBadge(i.estado)}${prioridadBadge(i.prioridad)}<span class="badge" style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0">${escapeHtml(i.categoria)}</span><span class="inc-usuario">👤 ${escapeHtml(i.usuario)}</span></div>
         <div class="detail-desc" style="margin-bottom:16px">${escapeHtml(i.descripcion||'Sin descripción.')}</div>
         <div style="margin-bottom:12px">

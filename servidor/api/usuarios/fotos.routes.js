@@ -77,7 +77,8 @@ const fallo = (res, err, porDefecto) => res.status(err.status || 500).json({ err
 cuenta.put('/password', intentosCuenta, async (req, res) => {
   try {
     await cuentaSvc.cambiarPassword(req.user.id, req.body || {});
-    res.json({ ok: true });
+    // Las demás sesiones quedan cerradas; esta sigue con un token nuevo
+    res.json({ ok: true, token: require('../../compartido/sesion').firmar(req.user) });
   } catch (err) {
     fallo(res, err, 'Error cambiando la contraseña.');
   }

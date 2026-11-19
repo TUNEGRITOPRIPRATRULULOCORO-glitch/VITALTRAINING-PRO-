@@ -38,6 +38,7 @@ const MIGRACIONES = [
   'ALTER TABLE series       ADD COLUMN verificado BOOLEAN DEFAULT FALSE',
   'ALTER TABLE series       ADD COLUMN verificado_por VARCHAR(255)',
   'ALTER TABLE usuarios     ADD COLUMN estilo VARCHAR(40)',
+  'ALTER TABLE usuarios     ADD COLUMN password_cambiado TIMESTAMPTZ',
 ];
 
 // PostgreSQL y PGlite permiten comprobar antes; pg-mem (tests) no, y ahí se usa el error "ya existe".

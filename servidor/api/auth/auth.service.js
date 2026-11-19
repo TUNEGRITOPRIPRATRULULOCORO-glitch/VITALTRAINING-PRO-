@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const jwt    = require('jsonwebtoken');
 const { query } = require('../../../base-de-datos/db');
+const { firmar } = require('../../compartido/sesion');
+const { olvidarCuenta } = require('../../compartido/middleware/auth');
 const usuarios = require('../usuarios');
 const avisos   = require('../avisos');
 const { DEPORTES, DIAS_SEMANA, SIN_COMPETICION, ESTILOS_BOXEO } = require('../../compartido/deportes');
@@ -12,12 +13,10 @@ const SEXOS = ['Hombre', 'Mujer', 'Prefiero no decirlo'];
 const MODOS = ['solo', 'unirse', 'crear']; // atleta por su cuenta, se une a su equipo, crea su equipo (entrenador)
 const google   = require('./google');
 
-const JWT_SECRET  = process.env.JWT_SECRET || 'vt-super-secret-key-2026';
-const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '8h';
-
-if (!process.env.JWT_SECRET) {
-  console.warn('⚠️  ADVERTENCIA: JWT_SECRET no está definido en .env — usando clave de desarrollo. NO usar en producción.');
-}
+// Hash de relleno: si el correo no existe se compara igual contra algo, así la respuesta
+// tarda lo mismo y no delata qué correos tienen cuenta.
+let hashRelleno;
+const relleno = () => (hashRelleno ??= bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10));
 
 async function login(email, password) {
   const { rows } = await query(
@@ -25,22 +24,17 @@ async function login(email, password) {
     [email]
   );
   const usuario = rows[0];
-  if (!usuario) return { error: 'Correo o contraseña incorrectos.', status: 401 };
+  // Primero la contraseña: "cuenta inactiva" solo se le dice a quien ya demostró ser el dueño
+  const match = await bcrypt.compare(String(password ?? ''), usuario ? usuario.password : await relleno());
+  if (!usuario || !match) return { error: 'Correo o contraseña incorrectos.', status: 401 };
   if (usuario.estado === 'Inactivo') return { error: 'Cuenta inactiva. Contacta al administrador.', status: 403 };
-
-  const match = await bcrypt.compare(password, usuario.password);
-  if (!match) return { error: 'Correo o contraseña incorrectos.', status: 401 };
 
   return sesion(usuario);
 }
 
 function sesion(usuario) {
-  const token = jwt.sign(
-    { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES }
-  );
-  const { password: _, ...usuarioSeguro } = usuario;
+  const token = firmar(usuario);
+  const { password: _, password_cambiado: __, ...usuarioSeguro } = usuario;
   return { usuario: usuarioSeguro, token };
 }
 
@@ -218,6 +212,7 @@ async function restablecerPassword(token, password) {
 
   await usuarios.cambiarPassword(enlace.user_id, await bcrypt.hash(password, 10));
   await query('UPDATE restablecimientos SET usado = true WHERE user_id = $1', [enlace.user_id]);
+  olvidarCuenta(enlace.user_id); // las sesiones abiertas antes del cambio dejan de valer ya
   return { ok: true };
 }
 

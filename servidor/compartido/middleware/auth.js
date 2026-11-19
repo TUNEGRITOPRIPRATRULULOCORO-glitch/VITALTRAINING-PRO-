@@ -1,7 +1,5 @@
-const jwt = require('jsonwebtoken');
 const { query } = require('../../../base-de-datos/db');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'vt-super-secret-key-2026';
+const sesion = require('../sesion');
 
 /**
  * El token dice quién es la persona, pero su rol y si sigue activa se leen de la base:
@@ -15,9 +13,12 @@ const cuentas = new Map(); // id → { rol, estado, hasta }
 async function cuentaActual(id) {
   const guardada = cuentas.get(id);
   if (guardada && guardada.hasta > Date.now()) return guardada;
-  const { rows } = await query('SELECT rol, estado FROM usuarios WHERE id = $1', [id]);
+  const { rows } = await query('SELECT rol, estado, password_cambiado FROM usuarios WHERE id = $1', [id]);
   if (!rows[0]) { cuentas.delete(id); return null; }
-  const cuenta = { rol: rows[0].rol, estado: rows[0].estado, hasta: Date.now() + VIGENCIA_MS };
+  const cuenta = {
+    rol: rows[0].rol, estado: rows[0].estado, passwordCambiado: rows[0].password_cambiado,
+    hasta: Date.now() + VIGENCIA_MS,
+  };
   cuentas.set(id, cuenta);
   return cuenta;
 }
@@ -34,7 +35,7 @@ function authMiddleware(req, res, next) {
   }
   let datos;
   try {
-    datos = jwt.verify(header.slice(7), JWT_SECRET);
+    datos = sesion.verificar(header.slice(7));
   } catch {
     return res.status(401).json({ error: 'Sesión expirada. Vuelve a iniciar sesión.' });
   }
@@ -43,6 +44,8 @@ function authMiddleware(req, res, next) {
     .then(cuenta => {
       if (!cuenta || cuenta.estado === 'Inactivo')
         return res.status(401).json({ error: 'Tu cuenta no está activa. Contacta al administrador.' });
+      if (sesion.anteriorAlCambio(datos, cuenta.passwordCambiado))
+        return res.status(401).json({ error: 'Tu contraseña cambió. Vuelve a iniciar sesión.' });
       req.user = { ...datos, rol: cuenta.rol };
       next();
     })

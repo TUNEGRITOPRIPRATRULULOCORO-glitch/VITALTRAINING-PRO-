@@ -19,6 +19,15 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+/**
+ * Un valor como argumento dentro de onclick="...". escapeHtml solo no basta: el navegador
+ * convierte &#39; otra vez en ' antes de ejecutar el código. JSON.stringify lo vuelve un
+ * literal de JS seguro y escapeHtml protege el atributo. Uso: onclick="f(${jsArg(texto)})"
+ */
+function jsArg(valor) {
+    return escapeHtml(JSON.stringify(valor ?? ''));
+}
+
 
 // ── Counter animation ──────────────────────────────
 function animateCounters(root) {

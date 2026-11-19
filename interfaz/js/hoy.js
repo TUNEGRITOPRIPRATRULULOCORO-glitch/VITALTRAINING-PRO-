@@ -27,8 +27,7 @@ function hoyAccion(t) {
     if (t.accion === 'rutina') {
         const ver = `<button class="btn btn-ghost btn-sm" onclick="hoyVerRutina()">Ver rutina</button>`;
         if (t.estado !== 'pendiente') return ver;
-        const dia = escapeHtml(_hoy.dia).replace(/'/g, "\\'"), tipo = escapeHtml(t.titulo).replace(/'/g, "\\'");
-        return `${ver}<button class="btn btn-primary btn-sm" onclick="pfModalCumplimiento('${dia}','${tipo}')">Marcar hecha</button>`;
+        return `${ver}<button class="btn btn-primary btn-sm" onclick="pfModalCumplimiento(${jsArg(_hoy.dia)},${jsArg(t.titulo)})">Marcar hecha</button>`;
     }
     return '';
 }

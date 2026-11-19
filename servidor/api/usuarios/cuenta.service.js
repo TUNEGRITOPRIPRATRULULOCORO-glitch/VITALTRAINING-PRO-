@@ -28,7 +28,8 @@ async function cambiarPassword(userId, { actual, nueva } = {}) {
   await comprobarPassword(userId, actual);
   if (!nueva || String(nueva).length < MIN_PASSWORD) throw error(`La contraseña nueva debe tener al menos ${MIN_PASSWORD} caracteres.`, 400);
   if (String(nueva) === String(actual)) throw error('La contraseña nueva tiene que ser distinta de la actual.', 400);
-  await query('UPDATE usuarios SET password = $1 WHERE id = $2', [await bcrypt.hash(String(nueva), 10), Number(userId)]);
+  await query('UPDATE usuarios SET password = $1, password_cambiado = NOW() WHERE id = $2', [await bcrypt.hash(String(nueva), 10), Number(userId)]);
+  require('../../compartido/middleware/auth').olvidarCuenta(userId);
   return true;
 }
 

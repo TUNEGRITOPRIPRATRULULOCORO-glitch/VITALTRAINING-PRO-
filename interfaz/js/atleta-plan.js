@@ -511,14 +511,13 @@ async function pfRenderPlanRutina() {
                     : e.repeticiones ? `${e.series}×${e.repeticiones} reps`
                     : e.series===1 ? (e.tiempo||'')
                     : `${e.series}×${e.tiempo||''}`;
-                const nombreEsc=e.nombre.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-                return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${e.nombre}</span><span class="plan-ejercicio-series">${det}</span></div><div class="plan-ejercicio-botones">${!deBaja&&serApuntable(e)?serBoton(e):''}<button class="btn-video" onclick="verVideoEjercicio('${nombreEsc}')">▶ Ver video</button></div></div>`;
+                return `<div class="plan-ejercicio"><div class="plan-ejercicio-info"><span>${escapeHtml(e.nombre)}</span><span class="plan-ejercicio-series">${det}</span></div><div class="plan-ejercicio-botones">${!deBaja&&serApuntable(e)?serBoton(e):''}<button class="btn-video" onclick="verVideoEjercicio(${jsArg(e.nombre)})">▶ Ver video</button></div></div>`;
             }).join('');
         const cumplBtn=esDescanso||deBaja?''
             :yaCompleto
                 ?`<span class="cumpl-badge cumpl-ok">✅ Completado hoy</span>`
                 :esHoy
-                    ?`<button class="btn btn-primary btn-sm cumpl-btn" onclick="pfModalCumplimiento('${dia.dia}','${(dia.tipo||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✓ Marcar como completado</button>`
+                    ?`<button class="btn btn-primary btn-sm cumpl-btn" onclick="pfModalCumplimiento(${jsArg(dia.dia)},${jsArg(dia.tipo||'')})">✓ Marcar como completado</button>`
                     :``;
         return `
         <div class="plan-rutina-dia ${yaCompleto?'plan-dia-completo':''} ${deBaja&&!esDescanso?'plan-dia-pausa':''}">
@@ -556,7 +555,6 @@ async function pfRenderPlanRutina() {
 const RPE_ETIQUETAS = ['', 'Muy fácil', 'Muy fácil', 'Fácil', 'Fácil', 'Moderado', 'Moderado', 'Duro', 'Duro', 'Muy duro', 'Máximo'];
 
 function pfModalCumplimiento(diaSemana, tipo) {
-    const diaEsc=diaSemana.replace(/'/g,"\\'"), tipoEsc=tipo.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     openModal(`Sesión del ${diaSemana}`, `
         <div class="form-group"><label>¿Cómo te fue?</label>
             <div class="rd-opciones">
@@ -569,7 +567,7 @@ function pfModalCumplimiento(diaSemana, tipo) {
             <input type="range" id="cumpl-rpe" class="range-green" min="1" max="10" value="6" oninput="document.getElementById('cumpl-rpe-lab').textContent=this.value+' · '+RPE_ETIQUETAS[this.value]">
             <div class="rd-rango-lab"><span>1 · Muy fácil</span><span>10 · Máximo</span></div>
         </div>
-        <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="pfMarcarCumplimiento('${diaEsc}','${tipoEsc}')">Guardar</button></div>`);
+        <div class="form-actions"><button class="btn btn-ghost" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="pfMarcarCumplimiento(${jsArg(diaSemana)},${jsArg(tipo)})">Guardar</button></div>`);
 }
 
 async function pfMarcarCumplimiento(diaSemana, tipo) {

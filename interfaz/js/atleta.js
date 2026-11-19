@@ -721,7 +721,7 @@ async function pfRenderHistorialRutinas() {
 
 function verDetalleComida(c) {
     if(typeof c === 'string') c = JSON.parse(c);
-    openModal(`🍽 ${escapeHtml(c.nombre)}`, `
+    openModal(`🍽 ${c.nombre}`, `
         <div class="detalle-grid">
             <div class="detalle-item">
                 <span class="detalle-lbl">Tipo</span>
@@ -754,7 +754,7 @@ function verDetalleComida(c) {
 function verDetalleRutina(r) {
     if(typeof r === 'string') r = JSON.parse(r);
     const intensidadColor = {Baja:'badge-baja',Media:'badge-media',Alta:'badge-alta','Muy alta':'badge-critica'};
-    openModal(`🏃 ${escapeHtml(r.nombre)}`, `
+    openModal(`🏃 ${r.nombre}`, `
         <div class="detalle-grid">
             <div class="detalle-item">
                 <span class="detalle-lbl">Tipo</span>
@@ -897,7 +897,7 @@ async function pfVerIncidencia(id) {
     const inc=await apiFetch(`${API}/incidencias?userId=${currentUser.id}`).then(r=>r.json());
     const i=inc.find(x=>x.id===id); if(!i) return;
     const comentariosHTML=i.comentarios.length?i.comentarios.map(c=>`<div class="comment-item"><div class="comment-meta"><span class="comment-author">${escapeHtml(c.autor)}</span><span>${c.fecha}</span></div><div class="comment-text">${escapeHtml(c.texto)}</div></div>`).join(''):`<p style="font-size:13px;color:var(--text-muted)">Sin respuestas aún.</p>`;
-    openModal(escapeHtml(i.titulo),`
+    openModal(i.titulo,`
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${incEstadoBadge(i.estado)}${prioridadBadge(i.prioridad)}<span class="badge" style="background:#f1f5f9;color:#64748b">${escapeHtml(i.categoria)}</span></div>
         <div class="detail-desc">${escapeHtml(i.descripcion||'Sin descripción.')}</div>
         <div class="comments-section"><h4>Respuestas del equipo (${i.comentarios.length})</h4><div id="comments-list">${comentariosHTML}</div></div>
