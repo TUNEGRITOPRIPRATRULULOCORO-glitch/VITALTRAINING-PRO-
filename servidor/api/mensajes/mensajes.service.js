@@ -15,10 +15,12 @@ async function buscarUsuario(id) {
   return rows[0] || null;
 }
 
-async function validarContacto(yo, otroId) {
+/** { leer: true } basta con poder ver la conversación (p. ej. el atleta con los avisos de administración). */
+async function validarContacto(yo, otroId, { leer = false } = {}) {
   const otro = await buscarUsuario(otroId);
   if (!otro || otro.estado !== 'Activo') throw error('Usuario no encontrado.', 404);
-  if (!permisos.puedeEscribir(yo.rol, otro.rol)) throw error('No puedes enviar mensajes a este usuario.', 403);
+  const permitido = leer ? permisos.puedeLeer(yo.rol, otro.rol) : permisos.puedeEscribir(yo.rol, otro.rol);
+  if (!permitido) throw error('No puedes enviar mensajes a este usuario.', 403);
   // Con equipos creados, atleta y profesional solo hablan si comparten equipo
   if (!(await equipos.puedenHablar(yo, otro))) throw error('Esta persona no está en tu equipo.', 403);
   return otro;
@@ -29,7 +31,9 @@ async function validarContacto(yo, otroId) {
  * Orden: primero quien tiene mensajes sin leer, luego la conversación más reciente, luego por nombre.
  */
 async function listarContactos(yo) {
-  const roles = permisos.rolesContactables(yo.rol);
+  // También quien le escribe sin que pueda contestarle (administración → atleta), si ya le escribió
+  const soloLectura = permisos.rolesSoloLectura(yo.rol);
+  const roles = [...permisos.rolesContactables(yo.rol), ...soloLectura];
   if (!roles.length) return [];
 
   const marcadores = roles.map((_, i) => `$${i + 2}`).join(', ');
@@ -57,12 +61,14 @@ async function listarContactos(yo) {
   }
 
   return usuarios
+    .filter(u => !soloLectura.includes(u.rol) || resumen[String(u.id)])
     .map(u => {
       const r = resumen[String(u.id)];
       return {
         id: Number(u.id),
         nombre: u.nombre,
         rol: permisos.normalizarRol(u.rol),
+        soloLectura: !permisos.puedeEscribir(yo.rol, u.rol),
         noLeidos: r?.noLeidos || 0,
         ultimoMensaje: r ? {
           texto: r.ultimo.texto,
@@ -80,7 +86,7 @@ async function listarContactos(yo) {
 
 /** Mensajes con otra persona; marca como leídos los que me envió. */
 async function conversacion(yo, otroId) {
-  const otro = await validarContacto(yo, otroId);
+  const otro = await validarContacto(yo, otroId, { leer: true });
   const { rows } = await query(
     `SELECT id, remitente_id, texto, leido, created_at FROM mensajes
      WHERE (remitente_id = $1 AND destinatario_id = $2) OR (remitente_id = $2 AND destinatario_id = $1)
@@ -92,7 +98,10 @@ async function conversacion(yo, otroId) {
     [Number(otro.id), Number(yo.id)]
   );
   return {
-    contacto: { id: Number(otro.id), nombre: otro.nombre, rol: permisos.normalizarRol(otro.rol) },
+    contacto: {
+      id: Number(otro.id), nombre: otro.nombre, rol: permisos.normalizarRol(otro.rol),
+      soloLectura: !permisos.puedeEscribir(yo.rol, otro.rol),
+    },
     mensajes: rows.map(m => ({
       id: Number(m.id),
       texto: m.texto,
@@ -117,7 +126,7 @@ async function enviar(yo, otroId, texto) {
   );
   // Aviso al celular de quien lo recibe (sin esperar: enviar() nunca falla)
   void require('../notificaciones').enviar(otro.id, {
-    titulo: `💬 ${yo.nombre || 'Nuevo mensaje'}`, cuerpo: limpio.slice(0, 120), url: '/', etiqueta: `mensaje-${yo.id}`,
+    titulo: permisos.normalizarRol(yo.rol) === 'Administrador' ? `📢 Administración · ${yo.nombre || 'Aviso'}` : `💬 ${yo.nombre || 'Nuevo mensaje'}`, cuerpo: limpio.slice(0, 120), url: '/', etiqueta: `mensaje-${yo.id}`,
   });
   return { id: Number(rows[0].id), texto: rows[0].texto, fecha: rows[0].created_at, mio: true, leido: false };
 }

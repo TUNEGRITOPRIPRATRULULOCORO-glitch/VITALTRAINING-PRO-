@@ -20,7 +20,7 @@ describe('puedeEscribir', () => {
     ['Medico',          'Administrador', true],
     ['Administrador',   'Nutricionista', true],
     ['Administrador',   'Medico',        true],
-    ['Administrador',   'Atleta',        false],
+    ['Administrador',   'Atleta',        true],  // avisos: el atleta los lee pero no contesta
   ];
   test.each(casos)('%s → %s: %s', (de, para, esperado) => {
     expect(permisos.puedeEscribir(de, para)).toBe(esperado);
@@ -34,6 +34,13 @@ describe('puedeEscribir', () => {
   test('un rol desconocido no puede escribir a nadie', () => {
     expect(permisos.puedeEscribir('Hacker', 'Administrador')).toBe(false);
     expect(permisos.rolesContactables('Hacker')).toEqual([]);
+  });
+
+  test('el atleta solo lee los avisos de administración (no les escribe)', () => {
+    expect(permisos.puedeLeer('Futbolista', 'Administrador')).toBe(true);
+    expect(permisos.puedeLeer('Atleta', 'Atleta')).toBe(false);
+    expect(permisos.rolesSoloLectura('Atleta')).toEqual(['Administrador']);
+    expect(permisos.rolesSoloLectura('Administrador')).toEqual([]);
   });
 
   test('rolesContactables incluye las variantes guardadas en la base', () => {
@@ -90,7 +97,27 @@ describe('mensajes.service', () => {
   });
 
   test('tampoco puede leer conversaciones con quien no tiene permiso', async () => {
-    await expect(svc.conversacion(u.carlos, u.admin.id)).rejects.toMatchObject({ status: 403 });
+    await expect(svc.conversacion(u.carlos, u.diego.id)).rejects.toMatchObject({ status: 403 });
+  });
+
+  test('administración avisa a un atleta: él lo lee en el chat, sin poder contestar', async () => {
+    // Antes del primer aviso, administración no aparece entre sus contactos
+    expect((await svc.listarContactos(u.diego)).some(c => c.rol === 'Administrador')).toBe(false);
+
+    await svc.enviar(u.admin, u.diego.id, 'Mañana no hay entrenamiento');
+    const admin = (await svc.listarContactos(u.diego)).find(c => c.rol === 'Administrador');
+    expect(admin).toMatchObject({ id: u.admin.id, soloLectura: true, noLeidos: 1 });
+
+    const conv = await svc.conversacion(u.diego, u.admin.id);
+    expect(conv.contacto.soloLectura).toBe(true);
+    expect(conv.mensajes).toEqual([expect.objectContaining({ texto: 'Mañana no hay entrenamiento', mio: false })]);
+    await expect(svc.enviar(u.diego, u.admin.id, 'ok')).rejects.toMatchObject({ status: 403 });
+  });
+
+  test('administración puede escribir a cualquier atleta y sus chats sí admiten respuesta', async () => {
+    const contactos = await svc.listarContactos(u.admin);
+    expect(contactos.find(c => c.id === u.carlos.id)).toMatchObject({ rol: 'Atleta', soloLectura: false });
+    expect(contactos.every(c => c.soloLectura === false)).toBe(true);
   });
 
   test('valida texto vacío, demasiado largo y destinatario inexistente', async () => {

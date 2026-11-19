@@ -2646,6 +2646,15 @@ body.dark .ia-escribir textarea { background: #252d3d; color: #f1f5f9; }
     border-top: 1px solid var(--border);
     background: var(--bg-2);
 }
+.msg-solo-lectura {
+    margin: 0;
+    padding: 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+}
 .msg-enviar textarea {
     flex: 1;
     resize: none;

@@ -14,11 +14,11 @@ const MSG_ROL = {
 };
 // Orden de los grupos de contactos según quién mira
 const MSG_ORDEN_GRUPOS = {
-    Atleta:        ['Entrenador', 'Nutricionista', 'Medico'],
+    Atleta:        ['Entrenador', 'Nutricionista', 'Medico', 'Administrador'],
     Nutricionista: ['Atleta', 'Entrenador', 'Medico', 'Administrador'],
     Medico:        ['Atleta', 'Entrenador', 'Nutricionista', 'Administrador'],
     Entrenador:    ['Atleta', 'Nutricionista', 'Medico', 'Administrador'],
-    Administrador: ['Entrenador', 'Nutricionista', 'Medico']
+    Administrador: ['Entrenador', 'Nutricionista', 'Medico', 'Atleta']
 };
 const MSG_BADGE_POR_ROL = {
     Atleta: 'badge-pf-mensajes', Nutricionista: 'badge-nt-soporte', Medico: 'badge-md-mensajes', Entrenador: 'badge-en-mensajes', Administrador: 'badge-soporte'
@@ -133,11 +133,13 @@ async function msgAbrir(id) {
             <div class="msg-chat-quien"><strong>${escapeHtml(contacto.nombre)}</strong><span>${MSG_ROL[contacto.rol]?.etiqueta || contacto.rol}</span></div>
         </header>
         <div class="msg-mensajes" id="msg-mensajes">${showLoading()}</div>
-        <form class="msg-enviar" onsubmit="msgEnviar(event)">
+        ${contacto.soloLectura
+            ? `<p class="msg-solo-lectura">📢 Son avisos de administración. Para escribirles, usa <strong>Soporte</strong>.</p>`
+            : `<form class="msg-enviar" onsubmit="msgEnviar(event)">
             <textarea id="msg-texto" rows="1" maxlength="1000" placeholder="Escribe un mensaje..." aria-label="Mensaje"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();this.form.requestSubmit();}"></textarea>
             <button type="submit" class="btn btn-primary">Enviar</button>
-        </form>`;
+        </form>`}`;
     contacto.noLeidos = 0;
     msgPintarContactos();
     await msgCargarConversacion(true);
